@@ -1,0 +1,6 @@
+@FrameZone_WebApi_HostAddress = http://localhost:5150
+
+GET {{FrameZone_WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
