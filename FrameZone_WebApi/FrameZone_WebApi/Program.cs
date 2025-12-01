@@ -1,6 +1,12 @@
+using FrameZone_WebApi.Models;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Services.AddDbContext<AAContext>(options => options.UseSqlServer(
+      builder.Configuration.GetConnectionString("AA")));
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
