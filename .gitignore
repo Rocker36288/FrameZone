@@ -3,3 +3,8 @@
 ################################################################################
 
 /FrameZone_WebApi/FrameZone_WebApi/bin/Debug/net9.0
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+.vs/
