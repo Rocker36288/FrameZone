@@ -1,0 +1,44 @@
+/* ===== 主題切換按鈕樣式 ===== */
+.nav-item .nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  color: #64748b !important;
+}
+
+.nav-item .nav-link:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  transform: scale(1.1);
+}
+
+.nav-item .nav-link svg {
+  transition: all 0.3s ease;
+  stroke: #64748b !important;
+}
+
+.nav-item .nav-link:hover svg {
+  stroke: #667eea !important;
+  transform: rotate(20deg);
+}
+
+/* 深色模式樣式 */
+[data-bs-theme="dark"] .nav-item .nav-link {
+  color: #cbd5e1 !important;
+}
+
+[data-bs-theme="dark"] .nav-item .nav-link svg {
+  stroke: #cbd5e1 !important;
+}
+
+[data-bs-theme="dark"] .nav-item .nav-link:hover {
+  background: rgba(129, 140, 248, 0.15);
+}
+
+[data-bs-theme="dark"] .nav-item .nav-link:hover svg {
+  stroke: #818cf8 !important;
+}
