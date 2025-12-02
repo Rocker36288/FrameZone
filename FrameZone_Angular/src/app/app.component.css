@@ -1,0 +1,40 @@
+/* ===== 全局樣式 ===== */
+/* 淺色主題變數 */
+[data-bs-theme="light"] {
+  --bs-body-bg: #ffffff;
+  --bs-body-color: #000000;
+}
+
+/* 深色主題變數 */
+[data-bs-theme="dark"] {
+  --bs-body-bg: #1a1a1a;
+  --bs-body-color: #ffffff;
+}
+
+/* 頁面容器 */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 下拉選單深色模式 */
+[data-bs-theme="dark"] .dropdown-menu {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-bs-theme="dark"] .dropdown-item {
+  color: #cbd5e1;
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover {
+  background: rgba(129, 140, 248, 0.15);
+  color: #818cf8;
+}
+
+/* 卡片元件深色模式 */
+[data-bs-theme="dark"] .card {
+  background-color: #2d2d2d;
+  color: #ffffff;
+}
