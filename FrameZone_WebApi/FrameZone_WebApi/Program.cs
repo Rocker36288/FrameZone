@@ -8,6 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AAContext>(options => options.UseSqlServer(
       builder.Configuration.GetConnectionString("AA")));
 
+var policyName = "Angular";
+builder.Services.AddCors(
+    options => options.AddPolicy(policyName, policy => policy.WithOrigins("https://localhost:4200").AllowAnyHeader().AllowAnyMethod()));
+
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -19,6 +23,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseCors();
 
 app.UseHttpsRedirection();
 
