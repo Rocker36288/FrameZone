@@ -1,25 +1,22 @@
-import { Component } from '@angular/core';
 import { Routes } from '@angular/router';
-import { LoginComponent } from './pages/login/login.component';
-import { HomeComponent } from './pages/home/home.component';
-import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
-import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
 
 export const routes: Routes = [
   {
     path: 'login',
-    component: AuthLayoutComponent,
+    loadComponent: () => import('./layouts/auth-layout/auth-layout.component').then(m => m.AuthLayoutComponent),
     children: [
-      { path: '', component: LoginComponent }
+      {
+        path: '',
+        loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent)
+      }
     ]
   },
   {
     path: '',
-    component: MainLayoutComponent,
+    loadComponent: () => import('./layouts/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
-      { path: 'home', component: HomeComponent },
-      // { path: 'photo', component: PhotoComponent },
+      { path: 'home', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) }
     ]
   }
 ];
