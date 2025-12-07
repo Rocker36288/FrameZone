@@ -23,7 +23,71 @@
          "ObjectType": 0
       },
       {
+         "Name": "[dbo].[UserBankAccount]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserLog]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserNotificationPreference]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserPermission]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserPermissionCategory]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserPrivacySettings]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserPrivateInfo]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserProfile]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserRole]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserRolePermission]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserRoleType]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserSecurity]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserSecurityStatus]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[UserSession]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserSystemModule]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserVerification]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[UserVerificationType]",
          "ObjectType": 0
       }
    ],

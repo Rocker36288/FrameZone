@@ -31,5 +31,25 @@ public partial class User
 
     public DateTime UpdatedAt { get; set; }
 
+    public virtual ICollection<UserBankAccount> UserBankAccounts { get; set; } = new List<UserBankAccount>();
+
+    public virtual ICollection<UserLog> UserLogs { get; set; } = new List<UserLog>();
+
+    public virtual ICollection<UserNotificationPreference> UserNotificationPreferences { get; set; } = new List<UserNotificationPreference>();
+
+    public virtual ICollection<UserPrivacySetting> UserPrivacySettings { get; set; } = new List<UserPrivacySetting>();
+
+    public virtual UserPrivateInfo UserPrivateInfo { get; set; }
+
+    public virtual UserProfile UserProfile { get; set; }
+
+    public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+
+    public virtual UserSecurity UserSecurity { get; set; }
+
+    public virtual UserSecurityStatus UserSecurityStatus { get; set; }
+
     public virtual ICollection<UserSession> UserSessions { get; set; } = new List<UserSession>();
+
+    public virtual ICollection<UserVerification> UserVerifications { get; set; } = new List<UserVerification>();
 }
