@@ -99,7 +99,7 @@ namespace FrameZone_WebApi.Helpers
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(secretKey)
                     ),
-                    ClockSkew = TimeSpan.Zero           // 時間偏移量設置0 (預設為5分鐘，時間到Token就過期         )
+                    ClockSkew = TimeSpan.Zero           // 時間偏移量設置0 (預設為5分鐘，時間到Token就過期)
                 };
 
                 // 驗證 Token

@@ -1,16 +1,22 @@
-﻿namespace FrameZone_WebApi.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace FrameZone_WebApi.DTOs
 {
     // =========== 登入相關 ========== 
 
     /// <summary>
     /// 登入請求 DTO
     /// </summary>
-    public class AuthDtos
+    public class LoginRequestDto
     {
         // 帳號或Email
+        [Required(ErrorMessage = "請輸入帳號或Email")]
+        [MinLength(3, ErrorMessage = "請輸入至少3個字")]
         public string AccountOrEmail { get; set; } = string.Empty;
 
         // 密碼
+        [Required(ErrorMessage = "請輸入密碼")]
+        [MinLength(6, ErrorMessage = "密碼至少需要6個字")]
         public string Password { get; set; } = string.Empty;
 
         // 記住我

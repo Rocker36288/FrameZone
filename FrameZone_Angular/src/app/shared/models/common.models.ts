@@ -1,6 +1,6 @@
 // ==================== 通用 API 回應 ====================
 /**
- * 標準 API 回應格式
+ * API 回應格式
  */
 export interface ApiResponse<T = any> {
   success: boolean;

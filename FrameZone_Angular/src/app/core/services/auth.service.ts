@@ -16,12 +16,10 @@ import {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://localhost:7000/api';
+  private apiUrl = 'https://locathost:7213/api/auth';
 
   private currentUserSubject = new BehaviorSubject<LoginResponseDto | null>(null);
   private currentUser$ = this.currentUserSubject.asObservable();
-
-
 
   constructor(private http: HttpClient) {
     this.loadStoredUser();
@@ -142,8 +140,17 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/auth/reset-password`, data);
   }
 
+
   changePassword(data: ChangePasswordRequestDto): Observable<any> {
     return this.http.post(`${this.apiUrl}/auth/change-password`, data);
+  }
+
+
+  /**
+   * 測試連線
+   */
+  testApi(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/test`);
   }
 
 }
