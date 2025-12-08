@@ -9,17 +9,6 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ==================== 設定 Kestrel 監聽所有網路介面 ====================
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.ListenAnyIP(5150);  // HTTP
-    serverOptions.ListenAnyIP(7213, listenOptions =>
-    {
-        listenOptions.UseHttps();  // HTTPS
-    });
-});
-
-
 // Add services to the container.
 
 
@@ -33,6 +22,8 @@ builder.Services.AddDbContext<AAContext>(options =>
     // 開發時顯示詳細錯誤
     options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 });
+
+
 // ========== CORS 設定 ==========
 
 var policyName = "Angular";
@@ -40,9 +31,7 @@ builder.Services.AddCors(options =>
     {
         options.AddPolicy(policyName, policy =>
         {
-            policy.WithOrigins(
-                "http://localhost:4200"       // ← 加入虛擬機 IP
-            )
+            policy.WithOrigins("http://localhost:4200")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();

@@ -16,7 +16,7 @@ import {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://locathost:7213/api/auth';
+  private apiUrl = 'https://localhost:7213/api/auth';
 
   private currentUserSubject = new BehaviorSubject<LoginResponseDto | null>(null);
   private currentUser$ = this.currentUserSubject.asObservable();
