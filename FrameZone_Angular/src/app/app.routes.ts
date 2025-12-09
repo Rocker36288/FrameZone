@@ -18,5 +18,15 @@ export const routes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) }
     ]
-  }
+  },
+  {
+    path: 'social',
+    loadComponent: () => import('./layouts/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./social/social.component').then(m => m.SocialComponent)
+      }
+    ]
+  },
 ];
