@@ -15,9 +15,11 @@
     <div class="col-md-3 col-sm-12 p-3">
       <app-social-friends></app-social-friends>
       <!-- 回到最上面按鈕 -->
-      <button class="btn-up" id="backToTopBtn">
+      @if(showBackToTop){
+      <button ngClass="btn-up" id="backToTopBtn" (click)="backToTop()">
         ↑ 回到最上面
       </button>
+      }
     </div>
   </div>
 </div>
