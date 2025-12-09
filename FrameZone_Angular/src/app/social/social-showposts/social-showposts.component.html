@@ -1,0 +1,49 @@
+<div class="card mb-3" id="">
+  <div class="card-body">
+    <!-- 功能選單（右上角） -->
+    <div class="position-absolute top-0 end-0 m-2">
+      <div class="dropdown">
+        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
+          ...
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-xs">
+          <li>
+            <button class="dropdown-item" onclick="">
+              編輯
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item text-danger" onclick="">
+              刪除
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 頭貼 + UserId + 時間 -->
+    <div class="d-flex align-items-center mb-2">
+      <img src="~/img/social/Among Us.png" class="rounded-circle me-2" style="width:50px; height:50px" />
+
+      <div>
+        <strong>UserId:1</strong><br />
+        <span class="text-muted" style="font-size: 0.85rem;">
+          yyyy-MM-dd HH:mm
+        </span>
+      </div>
+    </div>
+    <!-- 顯示貼文文字內容 -->
+    <p id="content-@post.PostId">貼文文字內容</p>
+
+    <div id="edit-area-@post.PostId" style="display:none;">
+      <textarea id="edit-text-@post.PostId" class="form-control">貼文文字內容</textarea>
+      <button class="btn btn-success btn-sm mt-2" onclick="">保存</button>
+      <button class="btn btn-secondary btn-sm mt-2" onclick="">取消</button>
+    </div>
+
+    <div>
+      👍 按讚數
+      💬 留言數
+    </div>
+  </div>
+</div>
