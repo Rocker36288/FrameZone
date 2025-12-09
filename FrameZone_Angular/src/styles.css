@@ -1,1 +1,30 @@
-/* You can add global styles to this file, and also import other style files */
+/* ===== 全局樣式 ===== */
+
+/* 頁面容器 */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 卡片元件深色模式 */
+[data-bs-theme="dark"] .card {
+  background-color: #2d2d2d;
+  color: #ffffff;
+  border-color: #404040;
+}
+
+/* 下拉選單深色模式 */
+[data-bs-theme="dark"] .dropdown-menu {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-bs-theme="dark"] .dropdown-item {
+  color: #cbd5e1;
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover {
+  background: rgba(129, 140, 248, 0.15);
+  color: #818cf8;
+}
