@@ -1,0 +1,31 @@
+/* .card {
+  margin: 50px;
+  width: 800px;
+  background-color: rgba(243, 238, 232, 0.993)
+} */
+
+/* 設定自定義文字大小 */
+.cart-title {
+  /* font-size: 2rem; */
+  /* 這是標準文字的 1.5 倍大 */
+  /* font-weight: bold; */
+  /* 可選：讓文字更粗 */
+  /* text-align: center; */
+  /* 文字水平置中 */
+}
+
+/* .card-long {
+  width: 90%;
+  justify-content: center;
+  margin: auto;
+} */
+
+.subtotal {
+  /* 設定固定定位，使其脫離文檔流，不隨滾動條移動 */
+  /* position: fixed; */
+}
+
+.subtotal.sticky-top {
+  /* 讓它距離頂部 20 像素，避免緊貼頂部或被上方標題遮擋 */
+  top: 20px;
+}
