@@ -60,6 +60,9 @@ namespace FrameZone_WebApi.Services
                     bodyBuilder.TextBody = emailDto.Body;
                 }
 
+                // 將 BodyBuilder 轉換為 MessageBody 並設定給 message
+                message.Body = bodyBuilder.ToMessageBody();
+
                 // 使用 SMTPClient 發送 Email
                 using var client = new SmtpClient();
 

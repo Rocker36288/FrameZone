@@ -14,7 +14,7 @@ declare const bootstrap: any;
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
-export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   // ===== 主題相關 =====
   isDarkMode: boolean = false;
   private isBrowser: boolean;
@@ -25,6 +25,8 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
   isSuperAdmin: boolean = false;
   displayUserName: string = '';
   currentUser: LoginResponseDto | null = null;
+
+  isDropdownOpen: boolean = false;
 
   userSession = {
     email: ''
@@ -56,32 +58,27 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  ngAfterViewInit(): void {
-    if (this.isBrowser) {
-      this.initializeDropdowns();
-    }
-  }
-
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  private initializeDropdowns(): void {
-    try {
-      setTimeout(() => {
-        if (typeof bootstrap !== 'undefined'){
-          const dropdownElementList = document.querySelectorAll('[data-bs-toggle="dropdown"]');
-          dropdownElementList.forEach((dropdownToggle) => {
-            new bootstrap.Dropdown(dropdownToggle);
-          });
-          console.log('Boostrap Dropdown 初始化成功');
-        } else {
-          console.warn('Bootstrap JavaScript 尚未載入');
-        }
-      }, 100);
-    } catch (error) {
-      console.error('初始化 Dropdown 時發生錯誤:', error);
+  toggleDropdown(): void {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
+
+  closeDropdownMenu(): void {
+    this.isDropdownOpen = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const dropdown = document.querySelector('.nav-item.dropdown');
+
+    // 如果點擊在下拉選單外面,關閉選單
+    if (dropdown && !dropdown.contains(target)) {
+      this.isDropdownOpen = false;
     }
   }
 
@@ -144,27 +141,22 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
 
     console.log('執行登出操作');
 
-    this.closeDropdown();
+    this.closeDropdownMenu();
 
     this.authService.logout();
 
-    this.router.navigate(['/login']);
+    this.router.navigate(['/']);
   }
 
-  private closeDropdown(): void {
-    try {
-      if (typeof bootstrap !== 'undefined') {
-        const dropdownElement = document.querySelector('[data-bs-toggle="dropdown"]');
-        if (dropdownElement) {
-          const dropdownInstance = bootstrap.Dropdown.getInstance(dropdownElement);
-          if (dropdownInstance) {
-            dropdownInstance.hide();
-          }
-        }
+  navigateToLogin(): void{
+    console.log('導航到登入頁');
+    this.router.navigate(['/login']).then(success => {
+      if(success) {
+        console.log('導航成功');
+      } else {
+        console.error('導航失敗');
       }
-    } catch (error) {
-      console.error('關閉 dropdown 時發生錯誤:', error);
-    }
+    });
   }
 
   /**

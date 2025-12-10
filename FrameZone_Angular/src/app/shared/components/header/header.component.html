@@ -141,13 +141,14 @@
       @if (isLoggedIn) {
       <!-- 已登入：顯示頭像下拉選單 -->
       <div class="nav-item dropdown">
-        <a href="#" class="nav-link d-flex lh-1 p-0 px-2" data-bs-toggle="dropdown" aria-label="Open user menu">
+        <a href="#" (click)="toggleDropdown(); $event.preventDefault()" class="nav-link d-flex lh-1 p-0 px-2"
+          aria-label="Open user menu" [class.show]="isDropdownOpen">
           <span class="avatar avatar-sm" [style.background-image]="'url(' + getUserAvatar() + ')'">
           </span>
         </a>
-        <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+        <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow" [class.show]="isDropdownOpen">
           <!-- 使用者資訊 -->
-          <a href="#" class="dropdown-item d-flex align-items-center gap-2">
+          <a href="javascript:void(0)" class="dropdown-item d-flex align-items-center gap-2">
             <span class="avatar avatar-sm">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
@@ -204,7 +205,7 @@
           <div class="dropdown-divider"></div>
 
           <!-- 登出 -->
-          <a href="#" (click)="onLogout(); $event.preventDefault()" class="dropdown-item text-danger">
+          <a href="javascript:void(0)" (click)="onLogout(); $event.preventDefault()" class="dropdown-item text-danger">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-2">
               <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"></path>
@@ -218,7 +219,7 @@
       } @else {
       <!-- 未登入：顯示登入按鈕 -->
       <div class="nav-item">
-        <a routerLink="/login" class="btn btn-primary d-flex align-items-center gap-2">
+        <a href="javascript:void(0)" (click)="navigateToLogin(); $event.preventDefault()" class="btn btn-primary d-flex align-items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
             <path d="M9 8v-2a2 2 0 0 1 2 -2h7a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-2" />

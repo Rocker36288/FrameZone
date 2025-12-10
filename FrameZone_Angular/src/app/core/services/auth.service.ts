@@ -106,8 +106,19 @@ export class AuthService {
   /**
    * 檢查是否已登入
    */
-  isAuthenticated() {
-    return !!this.getToken();
+  isAuthenticated(): boolean{
+    const token = this.getToken();
+    const user = this.getCurrentUser();
+
+    const isAuth = !!(token && user);
+
+    console.log('isAuthenticated 檢查:', {
+      hasToken: !!token,
+      hasUser: !!user,
+      result: isAuth
+    });
+
+    return isAuth;
   }
 
   /**
@@ -120,7 +131,7 @@ export class AuthService {
   /**
    * 取得當前用戶資訊
    */
-  getCurrentUser() {
+  getCurrentUser(): LoginResponseDto | null {
     return this.currentUserSubject.value;
   }
 

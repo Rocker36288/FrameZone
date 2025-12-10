@@ -45,9 +45,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.checkQueryParams();
     this.redirectIfAuthenticated();
-
-
-    this.testApiConnection();
   }
 
   ngOnDestroy(): void {
@@ -95,8 +92,13 @@ export class LoginComponent implements OnInit, OnDestroy {
    * 如果已登入，導向首頁
    */
   private redirectIfAuthenticated(): void {
-    if (this.authService.isAuthenticated()) {
+    const token = this.authService.getToken();
+    const currentUser = this.authService.getCurrentUser();
+
+    if (token && currentUser) {
       this.router.navigate(['/']);
+    } else {
+      console.log('未登入，顯示登入頁面');
     }
   }
 
@@ -232,27 +234,6 @@ export class LoginComponent implements OnInit, OnDestroy {
    */
   dismissErrorMessage(): void {
     this.errorMessage = '';
-  }
-
-  private testApiConnection(): void {
-    console.log("正在測試 API 連線...");
-
-    this.authService.testApi()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response: any) => {
-          console.log('API 連線成功', response)
-        },
-        error: (error) => {
-          console.error('API 連線失敗', error)
-          console.error('錯誤詳情', {
-            status: error.status,
-            statusText: error.statusText,
-            message: error.message,
-            url: error.url
-          });
-        }
-      });
   }
 }
 
