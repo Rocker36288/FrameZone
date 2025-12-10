@@ -1,0 +1,125 @@
+/* 浮動按鈕 */
+.mini-btn {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform .3s ease, background .3s;
+  z-index: 9999;
+}
+
+.mini-btn:hover {
+  background: #0056b3;
+}
+
+.mini-btn.active {
+  transform: rotate(90deg);
+}
+
+/* 聊天視窗外框 */
+.chat-window {
+  position: fixed;
+  bottom: 20px;
+  right: 100px;
+  width: 320px;
+  height: 420px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.20);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  /* 初始隱藏 */
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+  transition: opacity .3s ease, transform .3s ease;
+  z-index: 9998;
+}
+
+/* 展開動畫 */
+.chat-window.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Header */
+.chat-header {
+  background: #007bff;
+  color: white;
+  padding: 12px;
+  font-size: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-btn {
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* 聊天內容 */
+.chat-body {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+/* 輸入區容器 */
+.chat-typing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  background: #f0f0f0;
+  border-top: 1px solid #ddd;
+}
+
+/* 輸入框樣式（美觀！） */
+.chat-typing input {
+  flex: 1;
+  padding: 10px 14px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  outline: none;
+  background: #fff;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+/* 點選輸入框變亮 */
+.chat-typing input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.4);
+}
+
+/* 送出按鈕（可選） */
+.send-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background .2s;
+}
+
+.send-btn:hover {
+  background: #0056b3;
+}
