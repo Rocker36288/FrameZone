@@ -5,10 +5,11 @@ import { SocialPostsComponent } from "./social-posts/social-posts.component";
 import { SocialShowpostsComponent } from "./social-showposts/social-showposts.component";
 import { NgClass } from '@angular/common';
 import { RouterModule } from "@angular/router";
+import { SocialIndexComponent } from "./social-index/social-index.component";
 
 @Component({
   selector: 'app-social',
-  imports: [SocialMenuComponent, SocialFriendsComponent, SocialPostsComponent, SocialShowpostsComponent, NgClass, RouterModule],
+  imports: [SocialMenuComponent, SocialFriendsComponent, SocialPostsComponent, SocialShowpostsComponent, NgClass, RouterModule, SocialIndexComponent],
   templateUrl: './social.component.html',
   styleUrl: './social.component.css'
 })

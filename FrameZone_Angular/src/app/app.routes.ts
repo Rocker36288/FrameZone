@@ -25,8 +25,20 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./social/social.component').then(m => m.SocialComponent)
+        loadComponent: () => import('./social/social.component').then(m => m.SocialComponent),
+        children: [
+          { path: '', redirectTo: 'index', pathMatch: 'full' },
+          {
+            path: 'index',
+            loadComponent: () => import('./social/social-index/social-index.component').then(m => m.SocialIndexComponent)
+          },
+          {
+            path: 'friends',
+            loadComponent: () => import('./social/social-friends/social-friends.component').then(m => m.SocialFriendsComponent)
+          },
+        ]
       }
     ]
   },
+
 ];
