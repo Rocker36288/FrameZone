@@ -185,19 +185,20 @@
 }
 
 .avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-  border: 2px solid #667eea;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-.avatar svg {
-  stroke: #667eea;
+.avatar-sm {
+  width: 40px;
+  height: 40px;
+}
+
+.avatar:not([style*="background-image"]) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* 下拉選單樣式優化 */

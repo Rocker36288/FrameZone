@@ -250,7 +250,6 @@ namespace FrameZone_WebApi.Repositories
                 // Log exception (not implemented here)
                 return false;
             }
-
         }
 
         /// <summary>
@@ -332,6 +331,118 @@ namespace FrameZone_WebApi.Repositories
             catch (Exception)
             {
                 // Log exception (not implemented here)
+                return false;
+            }
+        }
+
+        // ========= 驗證相關 ==========
+
+        /// <summary>
+        /// 根據 Email 查詢使用者
+        /// </summary>
+        /// <param name="email">Email</param>
+        /// <returns>使用者物件，找不到回傳 null</returns>
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users
+                .Include(u => u.UserProfile)
+                .FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        /// <summary>
+        /// 建立驗證紀錄
+        /// </summary>
+        /// <param name="verification">驗證紀錄物件</param>
+        /// <returns>建立成功回傳 true，失敗回傳 false</returns>
+        public async Task<bool> CreateVerificationAsync(UserVerification verification)
+        {
+            try
+            {
+                // 設定建立和更新時間
+                verification.CreatedAt = DateTime.UtcNow;
+                verification.UpdatedAt = DateTime.UtcNow;
+
+                // 加入到資料庫
+                await _context.UserVerifications.AddAsync(verification);
+
+                // 儲存變更
+                var result = await _context.SaveChangesAsync();
+
+                return result > 0;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 根據 Token 查詢驗證紀錄
+        /// </summary>
+        /// <param name="token">驗證 Token</param>
+        /// <returns>驗證紀錄物件，找不到則回傳 null</returns>
+        public async Task<UserVerification?> GetVerificationByTokenAsync(string token)
+        {
+            return await _context.UserVerifications
+                .Include(v => v.User)
+                .FirstOrDefaultAsync(v => v.VerificationToken == token);
+        }
+
+        /// <summary>
+        /// 更新驗證紀錄
+        /// </summary>
+        /// <param name="verification">驗證紀錄物件</param>
+        /// <returns>更新成功回傳 true，失敗回傳 false</returns>
+        public async Task<bool> UpdateVerificationAsync(UserVerification verification)
+        {
+            try
+            {
+                // 更新時間
+                verification.UpdatedAt = DateTime.UtcNow;
+
+                // 更新資料
+                _context.UserVerifications.Update(verification);
+
+                // 儲存變更
+                var result = await _context.SaveChangesAsync();
+
+                return result > 0;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 標記驗證紀錄為已使用
+        /// </summary>
+        /// <param name="verificationId">驗證ID</param>
+        /// <returns>更新成功回傳 true，失敗回傳 false</returns>
+        public async Task<bool> MarkVerificationAsUsedAsync(long verificationId)
+        {
+            try
+            {
+                var verification = await _context.UserVerifications
+                    .FirstOrDefaultAsync(v => v.VerificationId == verificationId);
+
+                if (verification == null)
+                {
+                    return false;
+                }
+
+                verification.IsUsed = true;
+                verification.IsVerified = true;
+                verification.VerifiedAt = DateTime.UtcNow;
+                verification.UpdatedAt = DateTime.UtcNow;
+
+                _context.UserVerifications.Update(verification);
+
+                var result = await _context.SaveChangesAsync();
+                return result > 0;
+            }
+            catch(Exception)
+            {
                 return false;
             }
         }
