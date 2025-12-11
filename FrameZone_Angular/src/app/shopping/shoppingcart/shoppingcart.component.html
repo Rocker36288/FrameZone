@@ -170,7 +170,7 @@
                 [checked]="coupon.isSelected" (change)="selectCoupon(coupon)">
             </div>
             <div>
-              <h5 class="m-0 text-success">{{ coupon.name }}</h5>
+              <h5 class="m-0 text-danger">{{ coupon.name }}</h5>
               <p class="text-secondary m-0">折扣金額: -${{ coupon.discount }}</p>
               <small>使用期限: {{ coupon.expiryDate | date }}</small>
             </div>

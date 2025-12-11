@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HeaderComponent } from "../../shared/components/header/header.component";
+import { CartItem, Coupon } from '../interfaces/cart';
 
 // interface CartItem {
 //   id: number;
