@@ -5,7 +5,7 @@ import { VideoTimeagoPipe } from "../../../pipes/video-timeago.pipe";
 import { VideoDurationPipe } from "../../../pipes/video-duration.pipe"; // 步驟 1 定義的 Interface
 @Component({
   selector: 'app-video-card',
-  imports: [RouterLink, VideoTimeagoPipe, VideoDurationPipe],
+  imports: [VideoTimeagoPipe, VideoDurationPipe],
   templateUrl: './video-card.component.html',
   styleUrl: './video-card.component.css'
 })

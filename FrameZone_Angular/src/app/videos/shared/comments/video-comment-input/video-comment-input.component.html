@@ -1,0 +1,27 @@
+<div class="card shadow-sm border-0 p-3 mb-3">
+  <div class="d-flex align-items-start gap-3">
+
+    <!-- User Avatar -->
+    <img src="https://i.pravatar.cc/48" class="rounded-circle" width="48" height="48" alt="User Avatar" />
+
+    <!-- Input Area -->
+    <div class="flex-grow-1">
+      <textarea class="form-control border-0 border-bottom rounded-0 shadow-none" rows="2" placeholder="留下留言..."
+        [(ngModel)]="commentText"></textarea>
+
+      <!-- Buttons -->
+      <div class="d-flex justify-content-end mt-2 gap-2">
+        <button class="btn btn-link text-muted px-3" (click)="onCancel()" *ngIf="commentText.trim().length > -1">
+          取消
+        </button>
+
+        <button class="btn btn-primary px-4 d-flex align-items-center gap-1"
+          [disabled]="commentText.trim().length === 0" (click)="onSubmit()">
+          <i class="ti ti-send"></i>
+          回覆
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

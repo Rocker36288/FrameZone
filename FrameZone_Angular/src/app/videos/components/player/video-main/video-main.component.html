@@ -78,7 +78,8 @@
       <div class="card shadow-sm mt-3">
         <div class="card-body">
           <h5 class="card-title mb-3">留言</h5>
-          <!-- 留言組件 -->
+          <app-video-comment-input (submitComment)="addComment($event)"></app-video-comment-input>
+          <app-video-comment-list [comments]="commentList"></app-video-comment-list>
         </div>
       </div>
 

@@ -1,0 +1,15 @@
+<div class="card shadow-sm border-0">
+  <div class="card-body">
+
+    <h6 class="card-title mb-3">留言</h6>
+
+    <div *ngFor="let comment of comments" class="mb-3">
+      <app-video-comment-item [comment]="comment"></app-video-comment-item>
+    </div>
+
+    <div *ngIf="comments.length === 0" class="text-secondary text-center py-3">
+      目前沒有留言。
+    </div>
+
+  </div>
+</div>
