@@ -1,4 +1,13 @@
 /* ===== 全局樣式 ===== */
+body {
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 
 /* 頁面容器 */
 .page {
