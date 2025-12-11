@@ -1,0 +1,85 @@
+<div class="video-page-wrapper container-xl py-4">
+  <div class="row g-4">
+
+    <!-- 主要內容區 -->
+    <div class="col-lg-8">
+
+      <!-- 影片播放器卡片 -->
+      <div class="card shadow-sm mb-3">
+        <div class="ratio ratio-16x9 bg-dark rounded-top">
+          <app-video-player [src]="'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8'"></app-video-player>
+        </div>
+      </div>
+
+      <!-- 影片資訊卡片 -->
+      <div class="card shadow-sm">
+        <div class="card-body">
+
+          <!-- 標題 -->
+          <h1 class="fs-1 fw-bold mb-2 lh-sm">
+            {{video.title}}
+          </h1>
+
+          <!-- 統計資訊和操作按鈕 -->
+          <div
+            class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-3">
+            <div class="text-muted">
+              <span class="me-2">{{video.views}} 次觀看</span>
+              <span>•</span>
+              <span class="ms-2">{{video.uploadDate! | videoTimeago}}</span>
+            </div>
+            <app-video-actions-bar></app-video-actions-bar>
+          </div>
+
+          <hr class="my-3">
+
+          <!-- 頻道資訊 -->
+          <div class="mb-3">
+            <app-channel-card [channel]="channel"></app-channel-card>
+          </div>
+
+          <!-- 影片描述 -->
+          <div class="video-description mt-3 p-3 bg-light rounded">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div class="fw-semibold text-dark">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-align-left me-1" width="20"
+                  height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M4 6l16 0"></path>
+                  <path d="M4 12l10 0"></path>
+                  <path d="M4 18l14 0"></path>
+                </svg>
+                影片描述
+              </div>
+            </div>
+
+            <p class="mb-2 small text-break" [class.description-collapsed]="!isDescriptionExpanded && showExpandButton"
+              style="white-space: pre-wrap; line-height: 1.6;">
+              {{getDisplayDescription()}}
+            </p>
+
+            <button *ngIf="showExpandButton" (click)="toggleDescription()"
+              class="btn btn-sm btn-link p-0 text-decoration-none fw-semibold">
+              {{ isDescriptionExpanded ? '顯示較少內容' : '顯示完整內容' }}
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler ms-1"
+                [class.icon-chevron-down]="!isDescriptionExpanded" [class.icon-chevron-up]="isDescriptionExpanded"
+                width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M6 9l6 6l6 -6"></path>
+              </svg>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 留言區可以放這裡 -->
+      <div class="card shadow-sm mt-3">
+        <div class="card-body">
+          <h5 class="card-title mb-3">留言</h5>
+          <!-- 留言組件 -->
+        </div>
+      </div>
+
+    </div>

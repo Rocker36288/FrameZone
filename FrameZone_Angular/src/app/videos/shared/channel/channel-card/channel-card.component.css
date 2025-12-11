@@ -1,0 +1,17 @@
+.pointer {
+  cursor: pointer;
+}
+
+/* 卡片基礎樣式 */
+.channel-card {
+  border: 1px solid var(--bs-border-color);
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  border-radius: 0.75rem;
+  /* transition: background-color .2s, border-color .2s; */
+}
+
+/* Hover 效果（明暗主題都一致） */
+.channel-card:hover {
+  background-color: var(--bs-tertiary-bg);
+}

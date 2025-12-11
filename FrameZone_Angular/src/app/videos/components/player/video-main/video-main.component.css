@@ -1,0 +1,27 @@
+.description-collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.video-description {
+  transition: all 0.3s ease;
+}
+
+.icon-chevron-down,
+.icon-chevron-up {
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+@media (max-width: 991.98px) {
+  .sticky-top {
+    position: relative !important;
+    top: 0 !important;
+  }
+}
+
+.icon-tabler {
+  vertical-align: middle;
+}

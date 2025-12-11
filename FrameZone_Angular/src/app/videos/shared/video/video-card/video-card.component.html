@@ -1,0 +1,51 @@
+<!-- 影片卡片-小(影片播放頁面右邊推薦列) -->
+<div class="card video-card text-decoration-none mb-3" (click)="onVideoClick()" style="max-width: 25rem;">
+  <div class="row g-0 align-items-center">
+
+    <div class="col-auto video-thumb-container video-thumb-small">
+      <div class="thumbnail-container">
+        <img [src]="video.thumbnailUrl" alt="Video Thumbnail">
+        <span class="duration-tag">{{ video.durationInSeconds!| videoDuration}}</span>
+      </div>
+    </div>
+
+    <div class="col ms-3">
+      <div class="card-body p-0">
+        <h6 class="card-title text-truncate fw-semibold">{{ video.title }}</h6>
+        <p class="card-text mb-1 text-muted small">{{ video.channelName }}</p>
+        <p class="card-text text-muted small">
+          <span>觀看次數：{{ video.views }}次</span> ·
+          <span>{{ video.uploadDate! | videoTimeago }}</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 影片卡片-大(首頁主要展示) -->
+<div class="card video-card text-decoration-none mb-3" style="width: 18rem;">
+  <!-- 縮圖 -->
+  <div class="position-relative video-thumb-container video-thumb-big">
+    <img [src]="video.thumbnailUrl" alt="Video Thumbnail">
+    <span class="duration-tag">{{ video.durationInSeconds!| videoDuration}}</span>
+    <!-- 320x180 -->
+  </div>
+
+  <!-- 影片資訊 -->
+  <div class="card-body p-2">
+    <h6 class="card-title text-truncate">{{ video.title }}</h6>
+    <p class="card-text text-muted small text-truncate mb-2">
+      {{ video.description }}
+    </p>
+
+    <div class="d-flex align-items-center">
+      <img src="https://placehold.co/40x40" class="rounded-circle me-2" alt="創作者頭像">
+      <div class="small text-truncate">
+        <div class="fw-semibold">創作者名稱</div>
+        <div class="text-muted"><span>觀看次數：{{ video.views }}次</span> ·
+          <span>{{ video.uploadDate! | videoTimeago }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
