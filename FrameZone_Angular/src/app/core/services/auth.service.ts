@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import {
@@ -7,9 +7,14 @@ import {
   LoginResponseDto,
   RegisterRequestDto,
   RegisterResponseDto,
-  ChangePasswordRequestDto,
   ForgotPasswordRequestDto,
-  ResetPasswordRequestDto
+  ForgotPasswordResponseDto,
+  ValidateResetTokenResponseDto,
+  ResetPasswordRequestDto,
+  ResetPasswordResponseDto,
+  ChangePasswordRequestDto,
+  ChangePasswordResponseDto,
+  UserInfo
 } from '../models/auth.models';
 
 @Injectable({
@@ -141,8 +146,22 @@ export class AuthService {
    * @returns
    */
   forgotPassword(data: ForgotPasswordRequestDto): Observable<any> {
-    return this.http.post(`${this.apiUrl}/forgot-password`, data);
+    return this.http.post<ForgotPasswordResponseDto>(`${this.apiUrl}/forgot-password`, data);
   }
+
+  /**
+   * 驗證重設密碼 Token
+   * @param token
+   * @returns
+   */
+  validateResetToken(token: string): Observable<ValidateResetTokenResponseDto> {
+  const params = new HttpParams().set('token', token);
+  return this.http.get<ValidateResetTokenResponseDto>(
+    `${this.apiUrl}/validate-reset-token`,
+    { params }
+  );
+
+}
 
   /**
    * 重設密碼
@@ -150,12 +169,16 @@ export class AuthService {
    * @returns
    */
   resetPassword(data: ResetPasswordRequestDto): Observable<any> {
-    return this.http.post(`${this.apiUrl}/reset-password`, data);
+    return this.http.post<ResetPasswordRequestDto>(`${this.apiUrl}/reset-password`, data);
   }
 
-
+  /**
+   * 修改密碼
+   * @param data
+   * @returns
+   */
   changePassword(data: ChangePasswordRequestDto): Observable<any> {
-    return this.http.post(`${this.apiUrl}/change-password`, data);
+    return this.http.post<ChangePasswordRequestDto>(`${this.apiUrl}/change-password`, data);
   }
 
 
