@@ -19,7 +19,7 @@ namespace FrameZone_WebApi.Services
         /// </summary>
         /// <param name="token">重設密碼 Token</param>
         /// <returns>是否有效</returns>
-        Task<bool> ValidateResetTokenAsync(string token);
+        Task<ApiResponseDto> ValidateResetTokenAsync(string token);
 
         /// <summary>
         /// 重設密碼

@@ -299,6 +299,42 @@ namespace FrameZone_WebApi.Controllers
 
         }
 
+        [HttpGet("validate-reset-token")]
+        public async Task<IActionResult> ValidateResetToken([FromQuery] string token)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    return BadRequest(new ApiResponseDto
+                    {
+                        Success = false,
+                        Message = "Token 不能為空"
+                    });
+                }
+
+                var response = await _passwordService.ValidateResetTokenAsync(token);
+
+                if (response.Success)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "驗證重設密碼 Token 時發生錯誤");
+                return StatusCode(500, new ApiResponseDto
+                {
+                    Success = false,
+                    Message = "系統錯誤，請稍後在試"
+                });
+            }
+        }
+
         /// <summary>
         /// 測試 API 是否正常運作
         /// </summary>

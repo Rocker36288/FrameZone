@@ -75,6 +75,7 @@ namespace FrameZone_WebApi.Services
                 {
                     UserId = user.UserId,
                     VerificationTypeId = 1,
+                    VerificationCode = string.Empty,
                     VerificationToken = token,
                     SentTo = request.Email,
                     Purpose = "重設密碼",
@@ -147,15 +148,18 @@ namespace FrameZone_WebApi.Services
         /// <summary>
         /// 驗證重設密碼 Token 是否有效
         /// </summary>
-        public async Task<bool> ValidateResetTokenAsync(string token)
+        public async Task<ApiResponseDto> ValidateResetTokenAsync(string token)
         {
             try
             {
                 // Token 是否為空
                 if (string.IsNullOrWhiteSpace(token))
                 {
-                    _logger.LogWarning("驗證失敗: Token 為空");
-                    return false;
+                    return new ApiResponseDto
+                    {
+                        Success = false,
+                        Message = "Token 不可為空"
+                    };
                 }
 
                 // 從資料庫查詢驗證紀錄
@@ -164,31 +168,51 @@ namespace FrameZone_WebApi.Services
                 // 是否已過期
                 if (verification == null)
                 {
-                    _logger.LogWarning($"驗證失敗: Token 已過期 - UserId={verification.UserId}");
-                    return false;
+                    _logger.LogWarning($"驗證失敗: Token 不存在 - {token}");
+                    return new ApiResponseDto
+                    {
+                        Success = false,
+                        Message = "此重設密碼連結已失效或以使用"
+                    };
                 }
 
                 // 是否已使用
                 if (verification.IsUsed)
                 {
-                    _logger.LogWarning($"驗證失敗: Token 已使用 - UserId={verification.UserId}");
-                    return false;
+                    _logger.LogWarning($"驗證失敗: Token 已使用 - VerificationId={verification.VerificationId}");
+                    return new ApiResponseDto
+                    {
+                        Success = false,
+                        Message = "此重設密碼連接已使用"
+                    };
                 }
 
-                // 失敗次數是否超過限制
-                if (verification.FailedAttempts >= _verificationSettings.MaxFailedAttempts)
+                // 是否過期
+                if (verification.ExpiredAt < DateTime.UtcNow)
                 {
-                    _logger.LogWarning($"驗證失敗: 失敗次數過多 - UserId={verification.UserId}");
-                    return false;
+                    _logger.LogWarning($"驗證失敗: Token 已過期 - VerificationId={verification.VerificationId}");
+                    return new ApiResponseDto
+                    {
+                        Success = false,
+                        Message = "此重設密碼連結已過期"
+                    };
                 }
 
-                // 驗證成功
-                return true;
+                _logger.LogInformation($"驗證成功: VerificationId={verification.VerificationId}");
+                return new ApiResponseDto
+                {
+                    Success = true,
+                    Message = "驗證成功"
+                };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"驗證 Token 時發生錯誤: {token}");
-                return false;
+                return new ApiResponseDto
+                {
+                    Success = false,
+                    Message = "系統錯誤，請稍後在試"
+                };
             }
         }
 
@@ -251,9 +275,9 @@ namespace FrameZone_WebApi.Services
                 }
 
                 // 驗證 Token
-                var isValid = await ValidateResetTokenAsync(request.Token);
+                var validationResult = await ValidateResetTokenAsync(request.Token);
 
-                if (!isValid)
+                if (!validationResult.Success)
                 {
                     verification.FailedAttempts += 1;
                     await _userRepository.UpdateVerificationAsync(verification);
