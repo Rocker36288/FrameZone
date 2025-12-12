@@ -20,7 +20,7 @@ export class VideoTimeagoPipe implements PipeTransform {
     if (diff < 2592000) return `${Math.floor(diff / 86400)} 天前`; // < 30 天
     if (diff < 31536000) return `${Math.floor(diff / 2592000)} 個月前`; // < 1 年
 
-    return `${Math.floor(diff / 31536000)} 年前`;
+    return `${date.getFullYear()}年${date.getUTCMonth() + 1}月${date.getUTCDate()}日`;
   }
 
 }

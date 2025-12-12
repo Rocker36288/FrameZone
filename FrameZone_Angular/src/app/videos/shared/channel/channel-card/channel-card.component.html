@@ -1,21 +1,105 @@
-<div class="card channel-card text-decoration-none p-1 d-flex flex-row align-items-center mb-3"
-  style="max-width: 22rem;">
+<ng-container [ngSwitch]="variant">
+  <ng-container *ngSwitchCase="'small'">
+    <div class="card channel-card text-decoration-none p-1 d-flex flex-row align-items-center mb-3"
+      style="max-width: 22rem;">
 
-  <!-- 頭像 -->
-  <div class="d-flex align-items-center pointer me-3" (click)="FollowerBtn()">
-    <img src="{{channel.UserAvatarUrl}}" alt="頻道頭像" class="rounded-circle"
-      style="width:64px; height:64px; object-fit:cover;" />
-  </div>
+      <!-- 頭像 -->
+      <div class="d-flex align-items-center pointer me-3" (click)="FollowerBtn()">
+        <img src="{{channel.Avatar}}" alt="頻道頭像" class="rounded-circle"
+          style="width:64px; height:64px; object-fit:cover;" />
+      </div>
 
-  <!-- 中間資訊 -->
-  <div class="flex-grow-1">
-    <div class="fw-semibold fs-5 text-truncate">{{ channel.Name }}</div>
+      <!-- 中間資訊 -->
+      <div class="flex-grow-1">
+        <div class="fw-semibold fs-5 text-truncate">{{ channel.Name }}</div>
 
-    <div class="text-secondary small d-flex align-items-center">
-      <i class="ti ti-users me-1"></i>
-      {{ channel.Follows }} 跟隨者
+        <div class="text-secondary small d-flex align-items-center">
+          <i class="ti ti-users me-1"></i>
+          {{ channel.Follows }} 跟隨者
+        </div>
+      </div>
+      <div class="me-3"><app-subscribe-button></app-subscribe-button></div>
+
     </div>
-  </div>
-  <div class="me-3"><app-subscribe-button></app-subscribe-button></div>
+  </ng-container>
 
-</div>
+  <ng-container *ngSwitchCase="'middle'">
+    <div class="channel-card channel-card-middle">
+      <div class="d-flex justify-content-center pointer my-3" (click)="FollowerBtn()">
+        <img src="{{channel.Avatar}}" alt="頻道頭像" class="rounded-circle" style="width:9rem; height:9rem;" />
+      </div>
+
+      <div class="d-flex justify-content-center flex-grow-1">
+        <div>
+          <div class="fw-semibold fs-1 text-truncate">{{ channel.Name }}</div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-center flex-grow-1">
+        <div class="text-secondary small d-flex align-items-center">
+          <i class="ti ti-users me-1"></i>
+          {{ channel.Follows }} 跟隨者
+        </div>
+      </div>
+
+      <div class="me-3 d-flex justify-content-center my-3"><app-subscribe-button></app-subscribe-button></div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="'large'">
+    <div class="card channel-card p-4">
+
+      <!-- 上方主要內容 -->
+      <div class="d-flex align-items-start gap-4 mb-4">
+
+        <!-- 左側：大頭貼 -->
+        <div class="flex-shrink-0">
+          <div class="creator-avatar-big pointer" (click)="FollowerBtn()">
+            <img [src]="channel.Avatar" class="rounded-circle shadow-sm"
+              style="width: 120px; height: 120px; object-fit: cover;" alt="Creator Avatar" />
+          </div>
+        </div>
+
+        <!-- 右側：資訊區 -->
+        <div class="creator-info flex-grow-1">
+
+          <!-- 名稱 -->
+          <h2 class="fw-bold mb-2 h3">{{ channel.Name }}</h2>
+
+          <!-- 追蹤數量 -->
+          <div class="text-secondary mb-3 d-flex align-items-center gap-2">
+            <i class="ti ti-users"></i>
+            <span>追蹤者：{{ channel.Follows }}</span>
+          </div>
+
+          <!-- 描述 -->
+          <p class="text-muted mb-0" style="white-space: pre-line; line-height: 1.6;">
+            {{ channel.Description }}
+          </p>
+
+        </div>
+
+      </div>
+
+      <!-- 底部動作按鈕 -->
+      <div class="d-flex gap-2 pt-3 border-top">
+
+        <button class="btn btn-primary d-flex align-items-center gap-2">
+          <i class="ti ti-plus"></i> 追蹤
+        </button>
+
+        <button class="btn btn-outline-secondary d-flex align-items-center gap-2">
+          <i class="ti ti-share"></i> 分享
+        </button>
+
+        <button class="btn btn-outline-secondary d-flex align-items-center gap-2">
+          <i class="ti ti-dots"></i> 更多
+        </button>
+
+      </div>
+
+    </div>
+  </ng-container>
+
+
+
+</ng-container>

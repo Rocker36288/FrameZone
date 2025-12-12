@@ -1,0 +1,232 @@
+/* 重置樣式，避免與外層 Layout 衝突 */
+.sidebar,
+.sidebar * {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Microsoft JhengHei', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: -2vh;
+  /* 假設 Navbar 高度為 60px */
+  height: 102vh;
+  /* 調整高度，填滿剩餘視窗空間 */
+  width: 250px;
+  background: linear-gradient(135deg, #667eea 0%, #ffffff 100%);
+  padding: 20px 0;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.sidebar.collapsed {
+  width: 80px;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  margin-bottom: 30px;
+  height: 60px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #667eea;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.logo-text {
+  margin-left: 15px;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar.collapsed .logo-text {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggle-btn {
+  position: absolute;
+  right: 5px;
+  top: 70px;
+  width: 30px;
+  height: -30px;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+  z-index: 1001;
+}
+
+.toggle-btn:hover {
+  transform: scale(1.1);
+}
+
+.toggle-btn:focus {
+  outline: none;
+}
+
+.toggle-btn i {
+  color: #667eea;
+  transition: transform 0.3s ease;
+}
+
+.sidebar.collapsed .toggle-btn i {
+  transform: rotate(180deg);
+}
+
+.menu {
+  list-style: none;
+  padding: 0 10px;
+  margin: 0;
+}
+
+.menu-item {
+  margin-bottom: 5px;
+}
+
+.menu-link {
+  display: flex;
+  align-items: center;
+  padding: 15px 15px;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.menu-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: translateX(5px);
+}
+
+.menu-link.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-weight: 600;
+}
+
+.menu-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 24px;
+  background: white;
+  border-radius: 0 4px 4px 0;
+}
+
+.menu-icon {
+  font-size: 20px;
+  width: 40px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.menu-text {
+  margin-left: 10px;
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar.collapsed .menu-text {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.main-content {
+  margin-left: 0px;
+  padding: 30px;
+  transition: margin-left 0.3s ease;
+  min-height: 100vh;
+  background: #f0f2f5;
+}
+
+.sidebar.collapsed~.main-content {
+  margin-left: 0px;
+}
+
+/* 滾動條樣式 */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 80px;
+  }
+
+  .sidebar.collapsed {
+    width: 0;
+    padding: 0;
+  }
+
+  .main-content {
+    margin-left: 80px;
+  }
+
+  .sidebar.collapsed~.main-content {
+    margin-left: 0;
+  }
+
+  .toggle-btn {
+    right: -12px;
+  }
+
+}
+
+.sidebar a,
+.sidebar a:visited,
+.sidebar a:hover,
+.sidebar a:active,
+.sidebar a:focus {
+  color: rgba(255, 255, 255, 0.8) !important;
+  text-decoration: none !important;
+}

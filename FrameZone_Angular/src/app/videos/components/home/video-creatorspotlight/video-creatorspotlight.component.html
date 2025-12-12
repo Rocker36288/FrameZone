@@ -1,0 +1,154 @@
+<div class="spotlight-section" [class.loaded]="isLoaded">
+
+  <!-- 背景聚光燈效果 -->
+  <div class="spotlight-background">
+    <div class="light-beam beam-1"></div>
+    <div class="light-beam beam-2"></div>
+    <div class="light-beam beam-3"></div>
+    <div class="radial-glow"></div>
+  </div>
+
+  <!-- 內容容器 -->
+  <div class="spotlight-content container">
+
+    <!-- 標題區 -->
+    <div class="spotlight-header">
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="spotlight-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" stroke-width="2"
+            stroke="currentColor" fill="none">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M12 9l0 12"></path>
+            <path d="M12 9m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+            <path d="M3 21l4 -4"></path>
+            <path d="M7 21l4 -4"></path>
+            <path d="M17 21l-4 -4"></path>
+            <path d="M21 21l-4 -4"></path>
+          </svg>
+        </div>
+        <h2 class="spotlight-title mb-0">聚光燈創作者</h2>
+        <div class="spotlight-badge">FEATURED</div>
+      </div>
+    </div>
+
+    <!-- 主要內容卡片 -->
+    <div class="spotlight-card">
+
+      <!-- 裝飾性光束 -->
+      <div class="card-light-effects">
+        <div class="corner-light tl"></div>
+        <div class="corner-light tr"></div>
+        <div class="corner-light bl"></div>
+        <div class="corner-light br"></div>
+      </div>
+
+      <div class="row g-4 align-items-center">
+
+        <!-- 左側：創作者資訊 -->
+        <div class="col-lg-4">
+          <div class="creator-spotlight-info">
+
+            <!-- 頭像區域 -->
+            <div class="avatar-container">
+              <div class="avatar-glow"></div>
+              <div class="avatar-ring"></div>
+              <img [src]="channel?.Avatar" [alt]="channel?.Name" class="creator-avatar-large">
+              <div class="spotlight-indicator">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+              </div>
+            </div>
+
+            <!-- 創作者資訊 -->
+            <div class="creator-details text-center mt-4">
+              <h3 class="creator-name mb-2">{{channel?.Name}}</h3>
+              <p class="creator-subscribers mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-inline" width="16" height="16" viewBox="0 0 24 24"
+                  stroke-width="2" stroke="currentColor" fill="none">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
+                  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+                </svg>
+                {{channel?.Follows}} 位追蹤者
+              </p>
+              <p class="creator-description">{{channel?.Description}}</p>
+
+              <!-- 訂閱按鈕 -->
+              <!-- <button class="btn subscribe-btn" [class.subscribed]="channel?.isSubscribed" (click)="toggleSubscribe()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-inline me-1" width="18" height="18"
+                  viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M5 12l5 5l10 -10" *ngIf="channel?.isSubscribed"></path>
+                  <path d="M12 5l0 14M5 12l14 0" *ngIf="!channel?.isSubscribed"></path>
+                </svg>
+                {{channel?.isSubscribed ? '已追蹤' : '追蹤'}}
+              </button> -->
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 右側：特色影片 -->
+        <div class="col-lg-8">
+          <div class="featured-videos-container">
+
+            <!-- 主要影片顯示 -->
+            <div class="main-video-spotlight" *ngIf="Videos![currentVideoIndex]">
+              <div class="video-wrapper">
+                <div class="video-glow"></div>
+                <div class="video-thumbnail-container">
+                  <img [src]="Videos![currentVideoIndex].thumbnail" [alt]="Videos![currentVideoIndex].title"
+                    class="video-thumbnail">
+                  <div class="video-overlay">
+                    <button class="play-button">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+                        fill="currentColor">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </button>
+                  </div>
+                  <!-- <div class="video-duration">{{Videos![currentVideoIndex].duration | videoDuration}}</div> -->
+                </div>
+
+                <!-- 影片資訊 -->
+                <div class="video-info-spotlight">
+                  <h4 class="video-title-spotlight">{{Videos![currentVideoIndex].title}}</h4>
+                  <div class="video-stats-spotlight">
+                    <span>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon-inline" width="14" height="14"
+                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                        <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6">
+                        </path>
+                      </svg>
+                      {{Videos![currentVideoIndex].views}} 次觀看
+                    </span>
+                    <span>•</span>
+                    <span>{{Videos![currentVideoIndex].uploadDate}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 其他影片縮圖列表 -->
+            <div class="video-thumbnails-list" *ngIf="Videos!.length > 1">
+              <div class="thumbnail-item" *ngFor="let video of Videos; let i = index"
+                [class.active]="i === currentVideoIndex" (click)="selectVideo(i)">
+                <img [src]="video.thumbnail" [alt]="video.title" class="thumbnail-small">
+                <div class="thumbnail-overlay">
+                  <div class="thumbnail-duration">{{video.duration | videoDuration}}</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

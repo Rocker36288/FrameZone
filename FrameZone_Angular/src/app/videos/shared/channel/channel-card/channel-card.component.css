@@ -11,7 +11,47 @@
   /* transition: background-color .2s, border-color .2s; */
 }
 
+/* 中縮圖卡 */
+.channel-card-middle {
+  width: 100%;
+  /* 滿寬卡片 */
+  max-width: 15rem;
+  /* 控制最大寬度 */
+  aspect-ratio: 16/9;
+}
+
+/* 大縮圖卡 */
+.channel-card-big {
+  width: 100%;
+  /* 滿寬卡片 */
+  max-width: 40rem;
+  /* 控制最大寬度 */
+  max-height: 20rem;
+  /* aspect-ratio: 16/9; */
+}
+
 /* Hover 效果（明暗主題都一致） */
 .channel-card:hover {
   background-color: var(--bs-tertiary-bg);
+}
+
+.creator-card {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.creator-avatar-big {
+  flex-shrink: 0;
+}
+
+.creator-info .line {
+  height: 12px;
+  background: #e9ecef;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.creator-thumb {
+  flex-shrink: 0;
 }

@@ -1,0 +1,53 @@
+.horizontal-scroll {
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 20px 0;
+  white-space: nowrap;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/*
+/* 假卡片，可換成你的影片卡片 */
+/* .video-card-placeholder {
+  width: 260px;
+  height: 160px;
+  background: #e9ecef;
+  border-radius: 12px;
+  flex-shrink: 0;
+}  */
+
+/* 按鈕 */
+.slide-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.horizontal-scroll {
+  display: flex;
+  /* 水平排列 */
+  flex-wrap: nowrap;
+  /* 不換行 */
+  overflow-x: auto;
+  gap: 1rem;
+  scroll-behavior: smooth;
+  white-space: nowrap;
+}
+
+.slide-btn-left {
+  left: -10px;
+}
+
+.slide-btn-right {
+  right: -10px;
+}

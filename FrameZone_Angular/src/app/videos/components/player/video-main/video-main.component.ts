@@ -10,10 +10,11 @@ import { CommentInputComponent } from "../../../shared/comments/video-comment-in
 import { VideoCommentItemComponent } from "../../../shared/comments/video-comment-item/video-comment-item.component";
 import { VideoCommentListComponent } from "../../../shared/comments/video-comment-list/video-comment-list.component";
 import { VideoCommentModel } from '../../../models/video-comment.interface';
+import { VideosRecommendedListComponent } from "../../../shared/video/videos-recommended-list/videos-recommended-list.component";
 
 @Component({
   selector: 'app-video-main',
-  imports: [VideoPlayerComponent, VideoTimeagoPipe, VideoActionsBarComponent, ChannelCardComponent, NgIf, CommentInputComponent, VideoCommentListComponent],
+  imports: [VideoPlayerComponent, VideoTimeagoPipe, VideoActionsBarComponent, ChannelCardComponent, NgIf, CommentInputComponent, VideoCommentListComponent, VideosRecommendedListComponent],
   templateUrl: './video-main.component.html',
   styleUrl: './video-main.component.css'
 })
@@ -22,17 +23,17 @@ export class VideoMainComponent {
   video: Partial<VideoCardData> = {
     title: '範例影片標題 Example Video Title',
     channelName: '範例頻道 Example Channel',
-    thumbnailUrl: 'https://picsum.photos/480/270', // 假圖片
-    durationInSeconds: 2158,
+    thumbnail: 'https://picsum.photos/480/270', // 假圖片
+    duration: 2158,
     views: 551,
-    uploadDate: new Date('2000-01-01'),
-    description: "我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明"
+    uploadDate: new Date('2002-02-07'),
+    description: "我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明"
   };
 
   channel: ChannelData = {
     id: 1,
     Name: '頻道名稱示例',
-    UserAvatarUrl: 'https://i.pravatar.cc/48',
+    Avatar: 'https://i.pravatar.cc/48',
     Description: "這個人很懶，甚麼都沒留",
     Follows: 12345,
   };
@@ -65,17 +66,46 @@ export class VideoMainComponent {
   }
   ]
 
+  videos: VideoCardData[] = [{
+    id: 1,
+    userAvatarUrl: 'https://i.pravatar.cc/49',
+    title: '範例影片標題 Example Video Title',
+    channelName: '範例頻道 Example Channel',
+    thumbnail: 'https://picsum.photos/480/270', // 假圖片
+    duration: 2158,
+    views: 551,
+    uploadDate: new Date('2002-02-07'),
+    description: "fff"
+  }, {
+    id: 1,
+    userAvatarUrl: 'https://i.pravatar.cc/49',
+    title: '範例影片標題 Example Video Title',
+    channelName: '範例頻道 Example Channel',
+    thumbnail: 'https://picsum.photos/480/270', // 假圖片
+    duration: 21558,
+    views: 551,
+    uploadDate: new Date('2002-02-07'),
+    description: "fff"
+  }];
+
 
 
   isDescriptionExpanded = false;
   showExpandButton = false;
+
+  isVideoLoaded = false;
+  isPlayerHovered = false;
   private readonly MAX_DESCRIPTION_LENGTH = 200;
 
   ngOnInit() {
-    // 檢查描述是否需要展開按鈕
     if (this.video?.description && this.video.description.length > this.MAX_DESCRIPTION_LENGTH) {
       this.showExpandButton = true;
     }
+
+    // 模擬影片載入動畫
+    setTimeout(() => {
+      this.isVideoLoaded = true;
+    }, 300);
   }
 
   toggleDescription() {
@@ -90,6 +120,10 @@ export class VideoMainComponent {
     }
 
     return this.video.description.substring(0, this.MAX_DESCRIPTION_LENGTH) + '...';
+  }
+
+  onPlayerHover(state: boolean) {
+    this.isPlayerHovered = state;
   }
 
   addComment($event: string) {

@@ -1,7 +1,7 @@
 export interface ChannelData {
   id: number;
   Name: string;
-  UserAvatarUrl: string;
+  Avatar: string;
   Description: string;
   Follows: number;
 }
