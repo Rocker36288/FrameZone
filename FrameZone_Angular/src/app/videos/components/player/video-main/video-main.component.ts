@@ -3,17 +3,16 @@ import { VideoPlayerComponent } from "../video-player/video-player.component";
 import { VideoCardData } from '../../../models/video-data.interface';
 import { ChannelData } from '../../../models/channel-data.interface';
 import { VideoTimeagoPipe } from "../../../pipes/video-timeago.pipe";
-import { VideoActionsBarComponent } from "../../../shared/actions/video-actions-bar/video-actions-bar.component";
-import { ChannelCardComponent } from "../../../shared/channel/channel-card/channel-card.component";
+import { VideoActionsBarComponent } from "../../../ui/actions/video-actions-bar/video-actions-bar.component";
+import { ChannelCardComponent } from "../../../ui/channel/channel-card/channel-card.component";
 import { NgIf } from '@angular/common';
-import { CommentInputComponent } from "../../../shared/comments/video-comment-input/video-comment-input.component";
-import { VideoCommentListComponent } from "../../../shared/comments/video-comment-list/video-comment-list.component";
+import { VideoCommentListComponent } from "../../../ui/comments/video-comment-list/video-comment-list.component";
 import { VideoCommentModel } from '../../../models/video-comment.interface';
-import { VideosRecommendedListComponent } from "../../../shared/video/videos-recommended-list/videos-recommended-list.component";
+import { VideosRecommendedListComponent } from "../../../ui/video/videos-recommended-list/videos-recommended-list.component";
 
 @Component({
   selector: 'app-video-main',
-  imports: [VideoPlayerComponent, VideoTimeagoPipe, VideoActionsBarComponent, ChannelCardComponent, NgIf, CommentInputComponent, VideoCommentListComponent, VideosRecommendedListComponent],
+  imports: [VideoPlayerComponent, VideoTimeagoPipe, VideoActionsBarComponent, ChannelCardComponent, NgIf, VideoCommentListComponent, VideosRecommendedListComponent],
   templateUrl: './video-main.component.html',
   styleUrl: './video-main.component.css'
 })

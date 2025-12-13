@@ -1,16 +1,13 @@
 import { Component } from '@angular/core';
 import { HeaderComponent } from "../../shared/components/header/header.component";
-import { VideoMainComponent } from "./player/video-main/video-main.component";
-import { VideosSidebarComponent } from "../shared/videos-sidebar/videos-sidebar.component";
-import { ChannelCardComponent } from "../shared/channel/channel-card/channel-card.component";
+import { VideosSidebarComponent } from "../ui/videos-sidebar/videos-sidebar.component";
 import { ChannelData } from '../models/channel-data.interface';
-import { VideoCreatorspotlightComponent } from "./home/video-creatorspotlight/video-creatorspotlight.component";
 import { VideoCardData } from '../models/video-data.interface';
 import { VideoHomeComponent } from "./home/video-home/video-home.component";
 
 @Component({
   selector: 'app-videos-shell',
-  imports: [HeaderComponent, VideoMainComponent, VideosSidebarComponent, ChannelCardComponent, VideoCreatorspotlightComponent, VideoHomeComponent],
+  imports: [HeaderComponent, VideosSidebarComponent, VideoHomeComponent],
   templateUrl: './videos-shell.component.html',
   styleUrl: './videos-shell.component.css'
 })
