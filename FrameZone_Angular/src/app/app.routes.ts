@@ -12,6 +12,11 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'photographer-bookinghome',
+    loadComponent: () => import('./PhotographerBooking/photographer-bookinghome/photographer-bookinghome.component').then(m => m.PhotographerBookinghomeComponent)
+
+  },
+  {
     path: '',
     loadComponent: () => import('./layouts/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
     children: [
