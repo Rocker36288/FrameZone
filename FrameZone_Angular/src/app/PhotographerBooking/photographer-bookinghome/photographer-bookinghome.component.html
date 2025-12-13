@@ -1,0 +1,53 @@
+<!-- 搜尋列 -->
+<div class="search-wrap">
+  <div class="container">
+    <div class="search">
+      <input placeholder="搜尋攝影師、工作室、風格關鍵字" [(ngModel)]="keyword" />
+      <select [(ngModel)]="filterLocation">
+        <option value="">地區</option>
+        <option>台北</option>
+        <option>新北</option>
+        <option>台中</option>
+        <option>高雄</option>
+      </select>
+      <select [(ngModel)]="filterService">
+        <option value="">服務</option>
+        <option>婚紗</option>
+        <option>人像</option>
+        <option>商業</option>
+        <option>活動</option>
+        <option>形象照</option>
+      </select>
+      <select [(ngModel)]="filterPrice">
+        <option value="">價格</option>
+        <option value="2k-5k">NT$2,000-5,000</option>
+        <option value="5k+">NT$5,000+</option>
+      </select>
+      <button (click)="keyword=''">清空</button>
+    </div>
+  </div>
+</div>
+
+<!-- 小卡列表 -->
+<main class="container">
+  <h2>熱門攝影師</h2>
+  <section class="grid">
+    <a class="card" href="#" *ngFor="let photographer of filteredPhotographers">
+      <img [src]="photographer.img" [alt]="photographer.name" />
+      <div class="card-body">
+        <div class="row">
+          <div class="title">{{ photographer.name }}</div>
+          <div class="rating">⭐ {{ photographer.rating }}</div>
+        </div>
+        <div class="meta">{{ photographer.location }}｜{{ photographer.services.join('・') }}</div>
+        <div class="row">
+          <div class="price">NT${{ photographer.price }} / 時</div>
+          <div class="meta">可預約：{{ photographer.availability }}</div>
+        </div>
+        <div class="tags">
+          <span class="tag" *ngFor="let tag of photographer.tags">{{ tag }}</span>
+        </div>
+      </div>
+    </a>
+  </section>
+</main>
