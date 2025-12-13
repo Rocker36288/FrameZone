@@ -4,6 +4,8 @@
   cursor: pointer;
 }
 
+
+
 .video-thumb {
   width: 100%;
   max-width: 320px;
@@ -47,9 +49,7 @@
 
 /* 大縮圖卡 */
 .video-thumb-big {
-  width: 100%;
-  /* 滿寬卡片 */
-  max-width: 320px;
+  /* width: 100%; */
   /* 控制最大寬度 */
   aspect-ratio: 16/9;
 }

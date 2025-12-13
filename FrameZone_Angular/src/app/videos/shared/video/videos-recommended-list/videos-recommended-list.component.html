@@ -1,12 +1,14 @@
 <ng-container [ngSwitch]="variant">
-  <ng-container *ngSwitchCase="'small'">
+  <ng-container *ngSwitchCase="'list'">
     @for(video of videos; track $index){
     <app-video-card [video]="video" [variant]="'small'"></app-video-card>
     }
   </ng-container>
   <ng-container *ngSwitchCase="'gridshow'">
-    @for(video of videos; track $index){
-    <app-video-card [video]="video" [variant]="'large'"></app-video-card>
-    }
+    <div class="video-grid">
+      @for(video of videos; track $index){
+      <app-video-card [video]="video" [variant]="'large'"></app-video-card>
+      }
+    </div>
   </ng-container>
 </ng-container>

@@ -7,7 +7,6 @@ import { VideoActionsBarComponent } from "../../../shared/actions/video-actions-
 import { ChannelCardComponent } from "../../../shared/channel/channel-card/channel-card.component";
 import { NgIf } from '@angular/common';
 import { CommentInputComponent } from "../../../shared/comments/video-comment-input/video-comment-input.component";
-import { VideoCommentItemComponent } from "../../../shared/comments/video-comment-item/video-comment-item.component";
 import { VideoCommentListComponent } from "../../../shared/comments/video-comment-list/video-comment-list.component";
 import { VideoCommentModel } from '../../../models/video-comment.interface';
 import { VideosRecommendedListComponent } from "../../../shared/video/videos-recommended-list/videos-recommended-list.component";

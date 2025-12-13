@@ -34,10 +34,8 @@
 
       <!-- 滑動區域 -->
       <div #scrollContainer class="horizontal-scroll">
-        <div #scrollContainer class="horizontal-scroll">
-          <app-video-card *ngFor="let video of videos" [video]="video" [variant]="'large'">
-          </app-video-card>
-        </div>
+        <app-video-card *ngFor="let video of videos" [video]="video" [variant]="'large'">
+        </app-video-card>
       </div>
 
       <!-- 右按鈕 -->
@@ -51,30 +49,11 @@
   <!-- Recommend -->
   <h2 class="my-4 fw-bold">Recommend</h2>
 
-  <div class="row g-3">
-    <div class="col-6 col-md-4 col-lg-3">
-      <div class="card bg-light shadow-sm rounded" style="height: 160px;"></div>
-    </div>
-
-    <div class="col-6 col-md-4 col-lg-3">
-      <div class="card bg-light shadow-sm rounded" style="height: 160px;"></div>
-    </div>
-
-    <div class="col-6 col-md-4 col-lg-3">
-      <div class="card bg-light shadow-sm rounded" style="height: 160px;"></div>
-    </div>
-
-    <div class="col-6 col-md-4 col-lg-3">
-      <div class="card bg-light shadow-sm rounded" style="height: 160px;"></div>
-    </div>
-
-    <div class="col-6 col-md-4 col-lg-3">
-      <div class="card bg-light shadow-sm rounded" style="height: 160px;"></div>
-    </div>
-
-    <div class="col-6 col-md-4 col-lg-3">
-      <div class="card bg-light shadow-sm rounded" style="height: 160px;"></div>
-    </div>
+  <div class="video-grid">
+    @for (video of videos; track $index) {
+    <app-video-card [video]="video" [variant]="'large'">
+    </app-video-card>
+    }
   </div>
 
 </div>
