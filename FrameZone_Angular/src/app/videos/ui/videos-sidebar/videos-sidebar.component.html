@@ -19,7 +19,7 @@
 
   <ul class="menu">
     <li class="menu-item">
-      <a class="menu-link" data-controller="Videos" data-action="Index">
+      <a class="menu-link" href="http://localhost:4200/videos/">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
           class="icon icon-tabler icons-tabler-filled icon-tabler-home">
           <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -50,6 +50,26 @@
       </a>
     </li>
     <li class="menu-item">
+      <a href="http://localhost:4200/videos/channel/1" class="menu-link" data-controller="Videos" data-action="Create">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          class="icon icon-tabler icons-tabler-outline icon-tabler-barrier-block">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path d="M4 7m0 1a1 1 0 0 1 1 -1h14a1 1 0 0 1 1 1v7a1 1 0 0 1 -1 1h-14a1 1 0 0 1 -1 -1z" />
+          <path d="M7 16v4" />
+          <path d="M7.5 16l9 -9" />
+          <path d="M13.5 16l6.5 -6.5" />
+          <path d="M4 13.5l6.5 -6.5" />
+          <path d="M17 16v4" />
+          <path d="M5 20h4" />
+          <path d="M15 20h4" />
+          <path d="M17 7v-2" />
+          <path d="M7 7v-2" />
+        </svg>
+        <span class="menu-text">假頻道</span>
+      </a>
+    </li>
+    <li class="menu-item">
       <a href="" class="menu-link" data-controller="Videos" data-action="Create">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -69,5 +89,6 @@
         <span class="menu-text">新增影片</span>
       </a>
     </li>
+
 
   </ul>

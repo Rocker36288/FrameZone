@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { VideoTimeagoPipe } from '../../../pipes/video-timeago.pipe';
-import { VideoCommentModel } from '../../../models/video-comment.interface';
+import { VideoCommentModel } from '../../../models/video-model';
 
 @Component({
   selector: 'app-video-comment-reply',
@@ -9,5 +9,5 @@ import { VideoCommentModel } from '../../../models/video-comment.interface';
   styleUrl: './video-comment-reply.component.css'
 })
 export class VideoCommentReplyComponent {
-  @Input() comment: VideoCommentModel | undefined;
+  @Input() comment!: VideoCommentModel;
 }

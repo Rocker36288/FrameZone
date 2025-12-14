@@ -1,0 +1,42 @@
+/* Placeholder */
+.placeholder-line {
+  height: 14px;
+  background: #e0e0e0;
+  border-radius: 4px;
+}
+
+
+.placeholder-box {
+  height: 18rem;
+  border-radius: 12px;
+}
+
+/* Section title */
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-icon {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.section-icon i {
+  display: block;
+  line-height: 1;
+  font-size: 1.4rem;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.1;
+}

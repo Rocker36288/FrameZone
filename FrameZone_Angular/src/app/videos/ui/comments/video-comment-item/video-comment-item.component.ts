@@ -3,7 +3,7 @@ import { Component, Input } from '@angular/core';
 import { VideoTimeagoPipe } from '../../../pipes/video-timeago.pipe';
 import { CommentInputComponent } from "../video-comment-input/video-comment-input.component";
 import { VideoCommentReplyComponent } from "../video-comment-reply/video-comment-reply.component";
-import { VideoCommentModel } from '../../../models/video-comment.interface';
+import { VideoCommentModel } from '../../../models/video-model';
 
 @Component({
   selector: 'app-video-comment-item',

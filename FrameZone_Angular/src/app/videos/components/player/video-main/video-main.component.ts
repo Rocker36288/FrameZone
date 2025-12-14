@@ -1,14 +1,12 @@
 import { Component } from '@angular/core';
 import { VideoPlayerComponent } from "../video-player/video-player.component";
-import { VideoCardData } from '../../../models/video-data.interface';
-import { ChannelData } from '../../../models/channel-data.interface';
 import { VideoTimeagoPipe } from "../../../pipes/video-timeago.pipe";
 import { VideoActionsBarComponent } from "../../../ui/actions/video-actions-bar/video-actions-bar.component";
 import { ChannelCardComponent } from "../../../ui/channel/channel-card/channel-card.component";
 import { NgIf } from '@angular/common';
 import { VideoCommentListComponent } from "../../../ui/comments/video-comment-list/video-comment-list.component";
-import { VideoCommentModel } from '../../../models/video-comment.interface';
 import { VideosRecommendedListComponent } from "../../../ui/video/videos-recommended-list/videos-recommended-list.component";
+import { ChannelCard, VideoCardData, VideoCommentModel } from '../../../models/video-model';
 
 @Component({
   selector: 'app-video-main',
@@ -28,7 +26,7 @@ export class VideoMainComponent {
     description: "我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明"
   };
 
-  channel: ChannelData = {
+  channel: ChannelCard = {
     id: 1,
     Name: '頻道名稱示例',
     Avatar: 'https://i.pravatar.cc/48',
@@ -66,7 +64,7 @@ export class VideoMainComponent {
 
   videos: VideoCardData[] = [{
     id: 1,
-    userAvatarUrl: 'https://i.pravatar.cc/49',
+    Avatar: 'https://i.pravatar.cc/49',
     title: '範例影片標題 Example Video Title',
     channelName: '範例頻道 Example Channel',
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
@@ -76,7 +74,7 @@ export class VideoMainComponent {
     description: "fff"
   }, {
     id: 1,
-    userAvatarUrl: 'https://i.pravatar.cc/49',
+    Avatar: 'https://i.pravatar.cc/49',
     title: '範例影片標題 Example Video Title',
     channelName: '範例頻道 Example Channel',
     thumbnail: 'https://picsum.photos/480/270', // 假圖片

@@ -1,0 +1,41 @@
+<div class="card videoList-card playlist-card text-decoration-none mb-3" style="width: 18rem;">
+
+  <!-- Playlist 標籤 -->
+  <span class="playlist-badge">
+    <i class="ti ti-list"></i>
+    播放清單
+  </span>
+
+  <!-- 縮圖 -->
+  <div class="position-relative videoList-thumb-container videoList-thumb-big">
+
+    <img [src]="videosPlaylist.thumbnail" alt="Playlist Thumbnail">
+
+    <!-- 播放清單遮罩 -->
+    <div class="playlist-overlay">
+      <i class="ti ti-player-play-filled"></i>
+    </div>
+
+    <span class="duration-tag">
+      <i class="ti ti-video me-1"></i>{{ videosPlaylist.VideoCount }} 部影片
+    </span>
+  </div>
+
+  <!-- 資訊 -->
+  <div class="card-body p-2">
+    <h6 class="card-title text-truncate mb-1">
+      {{ videosPlaylist.Title }}
+    </h6>
+
+    <p class="card-text text-muted small text-truncate mb-2">
+      {{ videosPlaylist.Description }}
+    </p>
+
+    <div class="d-flex align-items-center">
+      <img src="https://placehold.co/40x40" class="rounded-circle me-2" alt="創作者頭像">
+      <div class="small text-truncate fw-semibold">
+        創作者名稱
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,23 +1,23 @@
 <div class="d-flex gap-3 py-2">
 
   <!-- Avatar -->
-  <div><img [src]="comment?.avatar" class="rounded-circle" width="32" height="32" alt="avatar" /></div>
+  <div><img [src]="comment.avatar" class="rounded-circle" width="32" height="32" alt="avatar" /></div>
 
 
   <div>
 
     <!-- Username + Time -->
     <div class="d-flex align-items-center gap-2">
-      <strong>{{ comment?.userName }}</strong>
-      <span class="text-muted small">{{ comment?.createdAt!| videoTimeago }}</span>
+      <strong>{{ comment.userName }}</strong>
+      <span class="text-muted small">{{ comment.createdAt| videoTimeago }}</span>
     </div>
 
-    <p class="mb-1">{{ comment?.message }}</p>
+    <p class="mb-1">{{ comment.message }}</p>
 
     <!-- Action Buttons -->
     <button class="btn btn-sm btn-link px-1 text-muted">
       <i class="ti ti-thumb-up"></i>
-      {{comment?.likes}}
+      {{comment.likes}}
     </button>
 
   </div>

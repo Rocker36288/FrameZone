@@ -1,0 +1,52 @@
+<app-videos-sidebar></app-videos-sidebar>
+<div class="container my-4">
+
+  <!-- 頻道 Banner -->
+  <div class="channel-banner mb-4"></div>
+
+  <!-- 頻道主資訊 -->
+  <div class="d-flex align-items-center mb-4">
+
+    <!-- 頭像 -->
+    <div class="me-3">
+      <img src="{{channelHome.Avatar}}" alt="頻道頭像" class="rounded-circle"
+        style="width:10rem; height:10rem; object-fit:cover;" />
+    </div>
+
+    <!-- 頻道文字 -->
+    <div class="flex-grow-1">
+      <h4 class="mb-1 fs-1">{{channelHome.Name}}</h4>
+      <div class="text-muted small mb-1">
+        {{channelHome.Follows}} 位訂閱者 · {{channelHome.VideosCount}} 部影片
+      </div>
+      <div class="long">{{channelHome.Description}}</div>
+    </div>
+
+    <!-- 訂閱按鈕 -->
+    <div>
+      <app-subscribe-button></app-subscribe-button>
+    </div>
+
+  </div>
+
+  <!-- 分頁導覽 -->
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <a class="nav-link" routerLink="home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        首頁
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" routerLink="videos" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        影片列表
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" routerLink="playlists" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        撥放清單列表
+      </a>
+  </ul>
+  <router-outlet></router-outlet>
+
+
+</div>

@@ -26,23 +26,7 @@
 
     <!-- 卡片 -->
     <div class="position-relative my-4">
-
-      <!-- 左按鈕 -->
-      <button class="slide-btn slide-btn-left btn btn-light shadow-sm" (click)="scrollLeft()">
-        <i class="ti ti-chevron-left"></i>
-      </button>
-
-      <!-- 滑動區域 -->
-      <div #scrollContainer class="horizontal-scroll">
-        <app-video-card *ngFor="let video of videos" [video]="video" [variant]="'large'">
-        </app-video-card>
-      </div>
-
-      <!-- 右按鈕 -->
-      <button class="slide-btn slide-btn-right btn btn-light shadow-sm" (click)="scrollRight()">
-        <i class="ti ti-chevron-right"></i>
-      </button>
-
+      <app-videos-recommended-list [variant]="'gridshow-scroll'" [videos]="videos!"></app-videos-recommended-list>
     </div>
   </div>
 

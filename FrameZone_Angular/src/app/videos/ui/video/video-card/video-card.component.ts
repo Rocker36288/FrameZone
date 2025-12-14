@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { VideoCardData } from '../../../models/video-data.interface';
 import { RouterLink } from "@angular/router";
 import { VideoTimeagoPipe } from "../../../pipes/video-timeago.pipe";
 import { VideoDurationPipe } from "../../../pipes/video-duration.pipe";
 import { NgSwitch, NgSwitchCase } from '@angular/common';
+import { VideoCardData } from '../../../models/video-model';
 @Component({
   selector: 'app-video-card',
   imports: [VideoTimeagoPipe, VideoDurationPipe, NgSwitch, NgSwitchCase],

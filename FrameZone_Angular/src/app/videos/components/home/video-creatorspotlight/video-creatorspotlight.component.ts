@@ -1,8 +1,7 @@
 import { Component, Input } from '@angular/core';
-import { ChannelData } from '../../../models/channel-data.interface';
-import { VideoCardData } from '../../../models/video-data.interface';
 import { NgIf, NgForOf } from "@angular/common";
 import { VideoDurationPipe } from "../../../pipes/video-duration.pipe";
+import { ChannelCard, VideoCardData } from '../../../models/video-model';
 
 @Component({
   selector: 'app-video-creatorspotlight',
@@ -11,7 +10,7 @@ import { VideoDurationPipe } from "../../../pipes/video-duration.pipe";
   styleUrl: './video-creatorspotlight.component.css'
 })
 export class VideoCreatorspotlightComponent {
-  @Input() channel: ChannelData | undefined
+  @Input() channel: ChannelCard | undefined
   @Input() Videos: VideoCardData[] | undefined
   isLoaded = false;
   currentVideoIndex = 0;

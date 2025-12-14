@@ -1,0 +1,41 @@
+<!-- 最新上傳 -->
+<section class="mb-5">
+  <div class="section-header mb-3">
+    <span class="section-icon">
+      <i class="ti ti-upload"></i>
+    </span>
+    <h2 class="section-title mb-0">最新上傳</h2>
+  </div>
+  <div class="placeholder-box">
+    <app-videos-recommended-list [variant]="'gridshow-scroll'"
+      [videos]="LastUploadVideos"></app-videos-recommended-list>
+  </div>
+</section>
+
+<!-- 熱門影片 -->
+<section class="mb-5">
+  <div class="section-header mb-3">
+    <span class="section-icon">
+      <i class="ti ti-flame"></i>
+    </span>
+    <h2 class="section-title">熱門影片</h2>
+  </div>
+
+  <div class="placeholder-box">
+    <app-videos-recommended-list [variant]="'gridshow-scroll'" [videos]="PupularVideos"></app-videos-recommended-list>
+  </div>
+</section>
+
+<!-- 播放清單 -->
+<section class="mb-5">
+  <div class="section-header mb-3">
+    <span class="section-icon">
+      <i class="ti ti-list me-2"></i>
+    </span>
+    <h2 class="section-title mb-0">撥放清單</h2>
+  </div>
+  <div class="placeholder-box">
+    <app-videos-recommended-list [variant]="'Playlist-gridshow-scroll'"
+      [VideoPlaylists]="VideoPlaylists"></app-videos-recommended-list>
+  </div>
+</section>
