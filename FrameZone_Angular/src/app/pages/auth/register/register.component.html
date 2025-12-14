@@ -1,0 +1,180 @@
+<div class="text-center mb-4">
+  <!-- BEGIN NAVBAR LOGO -->
+  <a routerLink="/" class="navbar-brand navbar-brand-autodark d-inline-flex align-items-center gap-2">
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="icon icon-tabler icons-tabler-outline icon-tabler-brand-picsart">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 9m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+      <path d="M12 9m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+      <path d="M5 9v11a2 2 0 1 0 4 0v-4.5" />
+    </svg>
+    <h2 class="mb-0 fw-bold">{{ logoName }}</h2>
+  </a>
+  <!-- END NAVBAR LOGO -->
+</div>
+
+<div class="card card-md">
+  <div class="card-body">
+    <h2 class="h2 text-center mb-4">{{ titleName }}</h2>
+
+    <!-- 錯誤訊息 -->
+    @if(errorMessage) {
+    <div class="alert alert-danger alert-dismissible" role="alert">
+      <div class="d-flex">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="icon alert-icon">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
+            <path d="M12 8v4"></path>
+            <path d="M12 16h.01"></path>
+          </svg>
+        </div>
+        <div>{{ errorMessage }}</div>
+      </div>
+      <button type="button" class="btn-close" (click)="dismissErrorMessage()" aria-label="Close"></button>
+    </div>
+    }
+
+    <!-- 註冊表單 -->
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" autocomplete="off">
+      <!-- 帳號 -->
+      <div class="mb-3">
+        <label for="account" class="form-label">帳號</label>
+        <input type="text" id="account" formControlName="account" class="form-control"
+          [class.is-invalid]="hasError('account')" placeholder="請輸入帳號 (英文、數字、底線)" autocomplete="username">
+        @if(hasError('account')) {
+        <div class="invalid-feedback">
+          {{ getErrorMessage('account') }}
+        </div>
+        }
+      </div>
+
+      <!-- Email -->
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="text" id="email" formControlName="email" class="form-control"
+          [class.is-invalid]="hasError('email')" placeholder="請輸入 Email" autocomplete="email">
+        @if(hasError('email')) {
+        <div class="invalid-feedback">
+          {{ getErrorMessage('email') }}
+        </div>
+        }
+      </div>
+
+      <!-- 密碼 -->
+      <div class="mb-3">
+        <label for="passwordInput" class="form-label">密碼</label>
+        <div class="input-group input-group-flat">
+          <input [type]="showPassword ? 'text' : 'password'" id="passwordInput" class="form-control"
+            formControlName="password" [class.is-invalid]="hasError('password')" placeholder="請輸入密碼 (至少 6 個字)"
+            autocomplete="new-password">
+          <span class="input-group-text">
+            <a href="javascript:void(0)" class="link-secondary" (click)="togglePassword()"
+              [attr.title]="showPassword ? '隱藏密碼' : '顯示密碼'">
+              @if(!showPassword) {
+              <!-- 眼睛圖示 (顯示密碼) -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M10.585 10.587a2 2 0 0 0 2.829 2.828"></path>
+                <path
+                  d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87">
+                </path>
+                <path d="M3 3l18 18"></path>
+              </svg>
+              } @else {
+              <!-- 眼睛關閉圖示 (隱藏密碼) -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
+              </svg>
+              }
+            </a>
+          </span>
+        </div>
+        @if(hasError('password')) {
+        <div class="invalid-feedback d-block">
+          {{ getErrorMessage('password') }}
+        </div>
+        }
+      </div>
+
+      <div class="mb-3">
+        <label for="confirmPasswordInput" class="form-label">確認密碼</label>
+        <div class="input-group input-group-flat">
+          <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPasswordInput"
+            formControlName="confirmPassword" class="form-control"
+            [class.is-invalid]="hasError('confirmPassword') || hasPasswordMismatch()" placeholder="請再次輸入密碼"
+            autocomplete="new-password">
+          <span class="input-group-text">
+            <a href="javascript:void(0)" class="link-secondary" (click)="toggleConfirmPassword()"
+              [attr.title]="showConfirmPassword ? '隱藏密碼' : '顯示密碼'">
+              @if(!showConfirmPassword) {
+              <!-- 眼睛圖示 (顯示密碼) -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M10.585 10.587a2 2 0 0 0 2.829 2.828"></path>
+                <path
+                  d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87">
+                </path>
+                <path d="M3 3l18 18"></path>
+              </svg>
+              } @else {
+              <!-- 眼睛關閉圖示 (隱藏密碼) -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
+              </svg>
+              }
+            </a>
+          </span>
+        </div>
+        @if(hasError('confirmPassword')) {
+        <div class="invalid-feedback d-block">
+          {{ getErrorMessage('confirmPassword') }}
+        </div>
+        }
+        @if(hasPasswordMismatch()) {
+        <div class="invalid-feedback d-block">
+          密碼與確認密碼不相符
+        </div>
+        }
+      </div>
+
+      <!-- 手機號碼 -->
+      <div class="mb-3">
+        <label for="phone" class="form-label">手機號碼 <span class="text-muted">(選填)</span></label>
+        <input type="tel" id="phone" class="form-control" formControlName="phone" [class.is-invalid]="hasError('phone')"
+          placeholder="請輸入手機號碼 (09開頭共10碼)" autocomplete="tel">
+        @if(hasError('phone')) {
+        <div class="invalid-feedback">
+          {{ getErrorMessage('phone') }}
+        </div>
+        }
+      </div>
+
+      <div class="form-control">
+        <button class="btn btn-primary w-100" type="submit" [disabled]="isSubmitting">
+          @if(isSubmitting) {
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          註冊中...
+          } @else {
+          立即註冊
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="text-center text-secondary mt-3">
+  已經有帳號了？ <a routerLink="/login" class="link-primary">立即登入</a>
+</div>

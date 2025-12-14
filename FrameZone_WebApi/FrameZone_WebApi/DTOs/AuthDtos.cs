@@ -59,18 +59,31 @@ namespace FrameZone_WebApi.DTOs
     public class RegisterRequestDto
     {
         // 帳號
+        [Required(ErrorMessage = "請輸入帳號")]
+        [MinLength(3, ErrorMessage = "帳號至少需要 3 個字")]
+        [MaxLength(50, ErrorMessage = "帳號不能超過 50 個字")]
+        [RegularExpression(@"^[a-zA-Z0-9_]+$", ErrorMessage = "帳號只能包含英文字母、數字和底線")]
         public string Account { get; set; } = string.Empty;
 
         // Email
+        [Required(ErrorMessage = "請輸入Email")]
+        [EmailAddress(ErrorMessage = "Email格式不正確")]
         public string Email { get; set; } = string.Empty;
 
         // 密碼
+        [Required(ErrorMessage = "請輸入密碼")]
+        [MinLength(6, ErrorMessage = "密碼至少需要 6 個字")]
+        [MaxLength(50, ErrorMessage = "密碼至少超過 50 個字")]
         public string Password { get; set; } = string.Empty;
 
         // 確認密碼
+        [Required(ErrorMessage = "請輸入確認密碼")]
+        [Compare("Password", ErrorMessage = "密碼與確認密碼不相符")]
         public string ConfirmPassword { get; set; } = string.Empty;
 
         // 手機號碼
+        [Phone(ErrorMessage = "手機號碼格式不正確")]
+        [RegularExpression(@"^09\d{8}$", ErrorMessage = "請輸入正確的台灣手機號碼格式（09開頭共10碼）")]
         public string? Phone { get; set; }
     }
 

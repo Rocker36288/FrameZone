@@ -14,6 +14,17 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'register',
+    loadComponent: () => import('./layouts/auth-layout/auth-layout.component').then(m => m.AuthLayoutComponent),
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./pages/auth/register/register.component').then(m => m.RegisterComponent),
+        title: 'FrameZone - 註冊'
+      }
+    ]
+  },
+  {
     path: 'forgot-password',
     loadComponent: () => import('./layouts/auth-layout/auth-layout.component').then(m => m.AuthLayoutComponent),
     children: [
@@ -40,7 +51,8 @@ export const routes: Routes = [
     loadComponent: () => import('./layouts/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
-      { path: 'home', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) }
+      { path: 'home', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) },
+      { path: 'photo-home', loadComponent: () => import('./pages/photo-home/photo-home.component').then(m => m.PhotoHomeComponent) }
     ]
   }
 ];

@@ -88,7 +88,7 @@ export class AuthService {
    * @returns
    */
   register(registerData: RegisterRequestDto): Observable<RegisterResponseDto> {
-    return this.http.post<RegisterResponseDto>(`${this.apiUrl}/auth/register`, registerData);
+    return this.http.post<RegisterResponseDto>(`${this.apiUrl}/register`, registerData);
   }
 
   /**
@@ -111,7 +111,7 @@ export class AuthService {
   /**
    * 檢查是否已登入
    */
-  isAuthenticated(): boolean{
+  isAuthenticated(): boolean {
     const token = this.getToken();
     const user = this.getCurrentUser();
 
@@ -155,13 +155,13 @@ export class AuthService {
    * @returns
    */
   validateResetToken(token: string): Observable<ValidateResetTokenResponseDto> {
-  const params = new HttpParams().set('token', token);
-  return this.http.get<ValidateResetTokenResponseDto>(
-    `${this.apiUrl}/validate-reset-token`,
-    { params }
-  );
+    const params = new HttpParams().set('token', token);
+    return this.http.get<ValidateResetTokenResponseDto>(
+      `${this.apiUrl}/validate-reset-token`,
+      { params }
+    );
 
-}
+  }
 
   /**
    * 重設密碼

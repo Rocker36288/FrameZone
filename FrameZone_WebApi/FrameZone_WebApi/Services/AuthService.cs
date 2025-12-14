@@ -145,26 +145,6 @@ namespace FrameZone_WebApi.Services
         {
             try
             {
-                // 檢查密碼是否相符
-                if (request.Password != request.ConfirmPassword)
-                {
-                    return new RegisterResponseDto
-                    {
-                        Success = false,
-                        Message = "密碼與確認密碼不符"
-                    };
-                }
-
-                // 檢查密碼強度
-                if (!PasswordHelper.IsPasswordStrong(request.Password))
-                {
-                    return new RegisterResponseDto
-                    {
-                        Success = false,
-                        Message = "密碼強度不足,必須包含英文字母和數字,長度 6-50 個字元"
-                    };
-                }
-
                 // 檢查帳號
                 bool accountExists = await _userRepository.IsAccountExistsAsync(request.Account);
                 if (accountExists)
