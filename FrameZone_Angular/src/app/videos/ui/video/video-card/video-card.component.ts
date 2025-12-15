@@ -12,7 +12,12 @@ import { VideoCardData } from '../../../models/video-model';
 })
 export class VideoCardComponent {
   @Input() video!: VideoCardData;
-  @Input() variant: 'small' | 'spotlight' | 'large' = 'small';
+  @Input() variant:
+    'small'
+    | 'spotlight'
+    | 'large'
+    | 'creator-long'
+    = 'small';
   @Input() showChannel: boolean = true;
   @Input() showDescription: boolean = true;
 

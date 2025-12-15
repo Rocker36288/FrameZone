@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { of } from 'rxjs';
 import { ChannelCard, ChannelHome, VideoCardData, VideoListCard } from '../models/video-model';
+import { VideoDetailData } from '../models/videocreator-model';
+import { PrivacyStatus, ProcessStatus } from '../models/video.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -109,6 +111,62 @@ export class MockChannelService {
     LastUpdateAt: new Date('2002-02-07')
   }
 
+  VideoDetailData: VideoDetailData = {
+    id: 0,
+    title: '',
+    description: '',
+    thumbnail: '',
+    duration: 0,
+    uploadDate: new Date(),
+    viewsCount: 0,
+    likesCount: 0,
+    commentCount: 0,
+    videoUrl: '',
+    processStatus: ProcessStatus.UPLOADING,
+    privacyStatus: PrivacyStatus.PUBLIC
+  }
+
+  VideoDetailsData: VideoDetailData[] = [{
+    id: 0,
+    title: '',
+    description: '',
+    thumbnail: '',
+    duration: 0,
+    uploadDate: new Date(),
+    viewsCount: 15,
+    likesCount: 0,
+    commentCount: 0,
+    videoUrl: '',
+    processStatus: ProcessStatus.UPLOADING,
+    privacyStatus: PrivacyStatus.PUBLIC
+  }, {
+    id: 0,
+    title: '',
+    description: '',
+    thumbnail: '',
+    duration: 0,
+    uploadDate: new Date(),
+    viewsCount: 15,
+    likesCount: 0,
+    commentCount: 0,
+    videoUrl: '',
+    processStatus: ProcessStatus.UPLOADING,
+    privacyStatus: PrivacyStatus.PUBLIC
+  }, {
+    id: 0,
+    title: '',
+    description: '',
+    thumbnail: '',
+    duration: 0,
+    uploadDate: new Date(),
+    viewsCount: 15,
+    likesCount: 0,
+    commentCount: 0,
+    videoUrl: '',
+    processStatus: ProcessStatus.UPLOADING,
+    privacyStatus: PrivacyStatus.PUBLIC
+  }]
+
   getChannelCard() {
     return of(this.channel);
   }
@@ -123,5 +181,9 @@ export class MockChannelService {
 
   getChannelPlaylists() {
     return of(this.VideoPlaylists);
+  }
+
+  getVideoDetailsData() {
+    return of(this.VideoDetailsData);
   }
 }

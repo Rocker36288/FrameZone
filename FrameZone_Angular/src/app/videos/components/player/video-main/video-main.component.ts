@@ -5,12 +5,12 @@ import { VideoActionsBarComponent } from "../../../ui/actions/video-actions-bar/
 import { ChannelCardComponent } from "../../../ui/channel/channel-card/channel-card.component";
 import { NgIf } from '@angular/common';
 import { VideoCommentListComponent } from "../../../ui/comments/video-comment-list/video-comment-list.component";
-import { VideosRecommendedListComponent } from "../../../ui/video/videos-recommended-list/videos-recommended-list.component";
+import { VideosListComponent } from "../../../ui/video/videos-list/videos-list.component";
 import { ChannelCard, VideoCardData, VideoCommentModel } from '../../../models/video-model';
 
 @Component({
   selector: 'app-video-main',
-  imports: [VideoPlayerComponent, VideoTimeagoPipe, VideoActionsBarComponent, ChannelCardComponent, NgIf, VideoCommentListComponent, VideosRecommendedListComponent],
+  imports: [VideoPlayerComponent, VideoTimeagoPipe, VideoActionsBarComponent, ChannelCardComponent, NgIf, VideoCommentListComponent, VideosListComponent],
   templateUrl: './video-main.component.html',
   styleUrl: './video-main.component.css'
 })

@@ -1,3 +1,4 @@
+//影片卡片資訊
 export class VideoCardData {
   id: number = 0;
   title: string = '';

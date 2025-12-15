@@ -5,6 +5,10 @@ import { ChannelLayoutComponent } from './components/channel/channel-layout/chan
 import { ChannelVideosComponent } from './components/channel/channel-videos/channel-videos.component';
 import { ChannelComponent } from './components/channel/channel-home/channel-home.component';
 import { ChannelPlaylistsComponent } from './components/channel/channel-playlists/channel-playlists.component';
+import { VideocreatorHomeComponent } from './components/creatorworkshop/videocreator-home/videocreator-home.component';
+import { VideocreatorSidebarComponent } from './components/creatorworkshop/videocreator-sidebar/videocreator-sidebar.component';
+import { VideocreatorVideomanageComponent } from './components/creatorworkshop/videocreator-videomanage/videocreator-videomanage.component';
+import { VideocreatorUploadComponent } from './components/creatorworkshop/videocreator-upload/videocreator-upload.component';
 
 export const VIDEO_ROUTES: Routes = [
   {
@@ -23,6 +27,16 @@ export const VIDEO_ROUTES: Routes = [
       { path: 'home', component: ChannelComponent },
       { path: 'videos', component: ChannelVideosComponent },
       { path: 'playlists', component: ChannelPlaylistsComponent }
+    ]
+  },
+  {
+    path: 'videocreator/:id',
+    component: VideocreatorSidebarComponent,
+    children: [
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
+      { path: 'home', component: VideocreatorHomeComponent },
+      { path: 'videos', component: VideocreatorVideomanageComponent },
+      { path: 'upload', component: VideocreatorUploadComponent }
     ]
   }
 ]

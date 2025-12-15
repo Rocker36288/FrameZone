@@ -7,8 +7,7 @@
     <h2 class="section-title mb-0">最新上傳</h2>
   </div>
   <div class="placeholder-box">
-    <app-videos-recommended-list [variant]="'gridshow-scroll'"
-      [videos]="LastUploadVideos"></app-videos-recommended-list>
+    <app-videos-list [variant]="'gridshow-scroll'" [videos]="LastUploadVideos"></app-videos-list>
   </div>
 </section>
 
@@ -22,7 +21,7 @@
   </div>
 
   <div class="placeholder-box">
-    <app-videos-recommended-list [variant]="'gridshow-scroll'" [videos]="PupularVideos"></app-videos-recommended-list>
+    <app-videos-list [variant]="'gridshow-scroll'" [videos]="PupularVideos"></app-videos-list>
   </div>
 </section>
 
@@ -35,7 +34,6 @@
     <h2 class="section-title mb-0">撥放清單</h2>
   </div>
   <div class="placeholder-box">
-    <app-videos-recommended-list [variant]="'Playlist-gridshow-scroll'"
-      [VideoPlaylists]="VideoPlaylists"></app-videos-recommended-list>
+    <app-videos-list [variant]="'playlist-gridshow-scroll'" [VideoPlaylists]="VideoPlaylists"></app-videos-list>
   </div>
 </section>

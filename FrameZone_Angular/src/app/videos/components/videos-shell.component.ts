@@ -7,10 +7,12 @@ import { VideolistCardComponent } from "../ui/video/videolist-card/videolist-car
 import { ChannelComponent } from "./channel/channel-home/channel-home.component";
 import { ChannelLayoutComponent } from "./channel/channel-layout/channel-layout.component";
 import { ChannelCard, VideoCardData } from '../models/video-model';
+import { VideocreatorUploadComponent } from "./creatorworkshop/videocreator-upload/videocreator-upload.component";
+import { VideocreatorVideomanageComponent } from "./creatorworkshop/videocreator-videomanage/videocreator-videomanage.component";
 
 @Component({
   selector: 'app-videos-shell',
-  imports: [HeaderComponent, VideosSidebarComponent, VideoHomeComponent, VideolistCardComponent, ChannelComponent, ChannelLayoutComponent],
+  imports: [HeaderComponent, VideosSidebarComponent, VideoHomeComponent, VideolistCardComponent, ChannelComponent, ChannelLayoutComponent, VideocreatorUploadComponent, VideocreatorVideomanageComponent],
   templateUrl: './videos-shell.component.html',
   styleUrl: './videos-shell.component.css'
 })

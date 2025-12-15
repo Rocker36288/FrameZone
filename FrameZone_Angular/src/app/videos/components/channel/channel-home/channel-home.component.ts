@@ -1,11 +1,10 @@
 import { MockChannelService } from './../../../service/mock-channel.service';
 import { Component, Input } from '@angular/core';
-import { ChannelHome, VideoCardData, VideoListCard } from '../../../models/video-model';
-import { VideosRecommendedListComponent } from "../../../ui/video/videos-recommended-list/videos-recommended-list.component";
-
+import { VideoCardData, VideoListCard } from '../../../models/video-model';
+import { VideosListComponent } from "../../../ui/video/videos-list/videos-list.component";
 @Component({
   selector: 'app-channel-home',
-  imports: [VideosRecommendedListComponent],
+  imports: [VideosListComponent],
   templateUrl: './channel-home.component.html',
   styleUrl: './channel-home.component.css'
 })
