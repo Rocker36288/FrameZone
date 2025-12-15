@@ -89,6 +89,66 @@
       {
          "Name": "[dbo].[UserVerificationType]",
          "ObjectType": 0
+      },
+      {
+         "Name": "[SocialNetwork].[CommentImages]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[SocialNetwork].[CommentVideos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[SocialNetwork].[EventMembers]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[SocialNetwork].[Events]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[SocialNetwork].[Follows]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[SocialNetwork].[GroupMembers]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[SocialNetwork].[Groups]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[SocialNetwork].[PostImages]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[SocialNetwork].[PostLikes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[SocialNetwork].[Posts]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[SocialNetwork].[PostShares]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[SocialNetwork].[PostVideos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[SocialNetwork].[PostViews]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[SocialNetwork].[ReportTarget]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[SocialNetwork].[Stickers]",
+         "ObjectType": 0
       }
    ],
    "UiHint": null,

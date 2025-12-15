@@ -31,6 +31,20 @@ public partial class User
 
     public DateTime UpdatedAt { get; set; }
 
+    public virtual ICollection<Follow> FollowFollowers { get; set; } = new List<Follow>();
+
+    public virtual ICollection<Follow> FollowFollowings { get; set; } = new List<Follow>();
+
+    public virtual ICollection<Group> Groups { get; set; } = new List<Group>();
+
+    public virtual ICollection<PostLike> PostLikes { get; set; } = new List<PostLike>();
+
+    public virtual ICollection<PostShare> PostShares { get; set; } = new List<PostShare>();
+
+    public virtual ICollection<PostView> PostViews { get; set; } = new List<PostView>();
+
+    public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
+
     public virtual ICollection<UserBankAccount> UserBankAccounts { get; set; } = new List<UserBankAccount>();
 
     public virtual ICollection<UserLog> UserLogs { get; set; } = new List<UserLog>();
