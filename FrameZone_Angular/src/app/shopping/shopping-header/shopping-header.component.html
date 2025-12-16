@@ -1,28 +1,114 @@
+<!-- 固定在頂端的導覽列 -->
 <div class="page-header">
-  <div class="row align-items-center justify-content-center">
-    <div class="col">
-      <h2 class="page-title">賣家中心 / 買家中心</h2>
-    </div>
-    <div class="col-auto d-print-none">
-      <div class="d-flex">
-        <div class=" me-3 d-none d-md-block" style="width: 1000px">
-          <div class="input-icon">
-            <input type="text" class="form-control" placeholder="Search…" />
-            <span class="input-icon-addon">
-              <!-- Download SVG icon from http://tabler.io/icons/icon/search -->
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="icon icon-1">
-                <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
-                <path d="M21 21l-6 -6" />
-              </svg>
-            </span>
-          </div>
-        </div>
-        <a href="#" class="btn btn-primary">
-          搜尋
+  <!-- 上層導覽列 -->
+  <div class="top-navbar">
+    <div class="top-nav-container d-flex justify-content-between align-items-center">
+      <!-- 左側連結 -->
+      <div class="d-flex top-nav-left">
+        <a href="#" class="nav-link-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="icon icon-tabler icons-tabler-outline icon-tabler-user">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+            <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+          </svg>
+          買家中心
+        </a>
+        <a href="#" class="nav-link-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="icon icon-tabler icons-tabler-outline icon-tabler-user-dollar">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+            <path d="M6 21v-2a4 4 0 0 1 4 -4h3" />
+            <path d="M21 15h-2.5a1.5 1.5 0 0 0 0 3h1a1.5 1.5 0 0 1 0 3h-2.5" />
+            <path d="M19 21v1m0 -8v1" />
+          </svg>
+          賣家中心
+        </a>
+        <a href="#" class="nav-link-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="icon icon-tabler icons-tabler-outline icon-tabler-help">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+            <path d="M12 17l0 .01" />
+            <path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4" />
+          </svg>
+          幫助中心
+        </a>
+      </div>
+
+      <!-- 右側連結 -->
+      <div class="d-flex top-nav-right">
+        <a href="#" class="nav-link-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="icon icon-tabler icons-tabler-outline icon-tabler-bell">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
+            <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
+          </svg>
+          通知
+        </a>
+        <a href="#" class="member-profile-link">
+          <img [src]="memberAvatarUrl" alt="會員頭像" class="member-avatar">
+          <span class="member-name">{{ memberName }}</span>
         </a>
       </div>
     </div>
   </div>
+
+  <!-- 下層主導覽列 -->
+  <div class="main-header-content">
+    <div class="main-nav-container d-flex align-items-center">
+      <div class="search-cart-container">
+        <!-- Logo -->
+        <a routerLink="/shopping/home" class="logo-link me-4">
+          <img src="favicon5.png" alt="FrameZone Logo" class="brand-logo">
+        </a>
+
+        <!-- 搜尋群組 -->
+        <div class="search-group">
+          <div class="search-input-container">
+            <div class="input-icon">
+              <input type="text" class="form-control" placeholder="Search…" />
+              <span class="input-icon-addon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  class="icon icon-1">
+                  <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+                  <path d="M21 21l-6 -6" />
+                </svg>
+              </span>
+            </div>
+          </div>
+          <button type="button" class="btn btn-indigo">搜尋</button>
+        </div>
+
+        <!-- 購物車圖示 -->
+        <div class="cart-icon">
+          <a routerLink="/shoppingcart">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="icon icon-tabler icons-tabler-outline icon-tabler-shopping-cart">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+              <path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+              <path d="M17 17h-11v-14h-2" />
+              <path d="M6 5l14 1l-1 7h-13" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- 主要內容區域 -->
+<main class="shopping-main-content">
+  <router-outlet></router-outlet>
+</main>
+
+<!-- <app-footer></app-footer> -->
