@@ -1,0 +1,871 @@
+/* 1. 基礎佈局與容器 (CONTAINER & LAYOUT)           */
+
+.product-detail-container {
+  font-family: 'Inter', sans-serif;
+  background-color: #f5f5f5;
+  padding: 20px 0;
+}
+
+.content-wrapper {
+  /* 擴展寬度，使用 1200px */
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.product-main-info {
+  display: flex;
+  gap: 40px;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* 左側欄位容器 (包含圖片和賣家資訊) */
+.product-left-column {
+  /* 固定左側寬度，給予右側足夠空間 */
+  flex: 0 0 450px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.product-options {
+  flex: 1;
+}
+
+@media (max-width: 1100px) {
+  .product-left-column {
+    flex-basis: 400px;
+  }
+}
+
+@media (max-width: 992px) {
+  .product-main-info {
+    flex-direction: column;
+  }
+
+  .product-left-column {
+    flex-basis: auto;
+    max-width: 100%;
+  }
+}
+
+
+/* 2. 左側：圖片與收藏按鈕 (IMAGES & ACTIONS) */
+
+.product-images {
+  flex-shrink: 0;
+}
+
+/* 主圖容器 (main-image-box) 樣式 */
+.product-images .main-image-box {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  color: #999;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 主圖圖片樣式 */
+.product-images .main-image-box .main-product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* 確保主圖完整顯示，不裁剪 */
+  display: block;
+}
+
+/* 圖片縮圖 & 收藏按鈕 (橫向對齊) */
+.product-images .image-meta-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 圖片縮圖總容器 */
+.product-images .thumbnails {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 5px;
+  flex-grow: 1;
+}
+
+/* 導航箭頭樣式 */
+.product-images .thumbnails .nav-arrow {
+  color: #3f41d3;
+  cursor: pointer;
+  padding: 0 5px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  /* 匹配縮圖高度 */
+  transition: color 0.2s;
+  /* 確保箭頭在視覺上比滾動條高一點 (如果箭頭需要浮動) */
+  z-index: 2;
+
+}
+
+.product-images .thumbnails .nav-arrow:hover {
+  color: #7e6fff;
+}
+
+.product-images .thumbnails .nav-arrow svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 3;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 3;
+  /* 確保線條足夠粗，可以被看見 */
+}
+
+/* 縮圖的實際滾動容器 (只顯示約 7 張的寬度) */
+.thumbnails-scroll-container {
+  display: flex;
+  /* 這裡計算 7 張圖的總寬度：7 * 50px 圖片 + 6 * 10px 間距 = 410px */
+  width: 410px;
+  overflow-x: hidden;
+  /* 隱藏滾動條，只透過按鈕捲動 */
+  scroll-behavior: smooth;
+  /* 平滑滾動 */
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* 單個縮圖容器 */
+.product-images .thumbnails .thumb {
+  width: 50px;
+  height: 50px;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+  flex-shrink: 0;
+  /* 確保縮圖在滾動時不會被擠壓 */
+}
+
+.product-images .thumbnails .thumb.active {
+  border-color: #3d48ec;
+  box-shadow: 0 0 0 1px #4e2de2;
+}
+
+/* 縮圖圖片樣式 */
+.product-images .thumbnails .thumbnail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 確保圖片填滿縮圖框 */
+  display: block;
+}
+
+
+/* 收藏按鈕 */
+.product-images .side-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.product-images .side-actions .action-btn {
+  border: 1px solid #ccc;
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: #5654cf;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-images .side-actions .action-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+}
+
+.product-images .side-actions .action-btn.favorited {
+  color: #dc3545;
+  /* 實心紅 */
+}
+
+.product-images .side-actions .action-btn.favorited svg {
+  fill: currentColor;
+}
+
+
+/* 3. 左側：賣家資訊區塊 (SELLER INFO) */
+
+.seller-info-section {
+  border: 1px solid #eee;
+  padding: 15px;
+  border-radius: 4px;
+  background-color: #fafafa;
+}
+
+.seller-title {
+  font-size: 1rem;
+  color: #565fdb;
+  font-weight: 600;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+.seller-detail-box {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.seller-detail-box .avatar-and-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.seller-avatar-placeholder {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #6b21e2;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px #5965d4;
+  flex-shrink: 0;
+}
+
+.seller-name {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.seller-status {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.seller-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.seller-actions button {
+  flex: 1;
+  padding: 8px 15px;
+  border-radius: 4px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+/* 確保 SVG 圖示尺寸正確 */
+.seller-actions button svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* 聊聊按鈕 (紅框/紅字) */
+.seller-chat-btn {
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  background-color: #fff;
+}
+
+.seller-chat-btn:hover {
+  background-color: #fcebeb;
+}
+
+/* 查看賣場按鈕 (灰框/灰字) */
+.seller-store-btn {
+  border: 1px solid #ccc;
+  color: #555;
+  background-color: #fff;
+}
+
+.seller-store-btn:hover {
+  background-color: #f0f0f0;
+}
+
+
+/* 4. 右側：資訊與購買選項 (INFO & OPTIONS) */
+
+.product-options {
+  padding-top: 0;
+}
+
+.product-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* 價格區塊 - 加大文字 */
+.product-options .price-section {
+  background-color: #ddd4ee;
+  padding: 15px;
+  margin: 15px 0;
+  border-radius: 4px;
+}
+
+.product-options .price-section .price {
+  font-size: 36px;
+  color: #2818b9;
+  font-weight: bold;
+}
+
+/* 通用資訊行 (規格/數量/付款方式/運送方式) */
+.product-options .option-row,
+.product-options .info-row {
+  display: flex;
+  gap: 20px;
+  padding: 8px 0;
+  align-items: flex-start;
+}
+
+.product-options .label,
+.product-options .info-label {
+  font-weight: bold;
+  color: #6a5bf1;
+  flex-shrink: 0;
+  width: 80px;
+  /* 固定標籤寬度 */
+  margin-top: 5px;
+}
+
+/* 規格和數量輸入框 */
+.product-options .form-select,
+.product-options .quantity-input {
+  max-width: 150px;
+}
+
+
+/* 付款方式區塊 - 垂直列表顯示 */
+.payment-method-info {
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+  border-top: 1px solid #eee;
+  border-bottom: 1px dashed #eee;
+}
+
+.payment-method-info .payment-list {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  /* 垂直排列 */
+  gap: 5px;
+}
+
+.payment-method-info .payment-item {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #333;
+}
+
+
+/* 運送/優惠區塊 */
+.shipping-discount-info {
+  padding-top: 5px;
+}
+
+.shipping-discount-info .shipping-row,
+.shipping-discount-info .coupon-row {
+  padding: 8px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+.shipping-discount-info .coupon-row {
+  border-bottom: none;
+}
+
+.shipping-discount-info .shipping-list {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  /* 垂直排列 */
+  gap: 5px;
+  font-size: 0.95rem;
+}
+
+.shipping-discount-info .shipping-item .combined-fee-link {
+  color: #3725db;
+  text-decoration: none;
+  margin-left: 8px;
+  font-weight: 500;
+}
+
+/* 優惠券按鈕 */
+.shipping-discount-info .coupon-list {
+  flex-grow: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.coupon-btn {
+  font-size: 0.85rem !important;
+  padding: 4px 10px !important;
+}
+
+.coupon-btn.btn-outline-primary {
+  color: #6259da !important;
+  border-color: #4a40cc !important;
+}
+
+.coupon-btn.btn-success {
+  background-color: #675fda !important;
+  border-color: #6557dd !important;
+  color: #fff !important;
+}
+
+/* 加入購物車按鈕區塊 - 靠右對齊 */
+.product-options .action-buttons-row {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.product-options .add-to-cart-btn {
+  background: linear-gradient(to right, #5a62d4, #8f24e6);
+  color: #fff !important;
+  border: none !important;
+  padding: 12px 25px;
+  font-size: 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+
+/* 5. 底部區塊與類似商品 (FOOTER SECTIONS & SIMILAR) */
+
+.product-section h2 {
+  color: #6a5acd;
+  border-bottom: 2px solid #6a5acd;
+  padding-bottom: 10px;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+/* 內容框線 - 微灰背景色 */
+.product-section .content-bordered-box {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 4px;
+  background-color: #fafafa;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+/* 類似商品排版 (一排六個) */
+.similar-products-section .similar-list-override {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin: 0;
+}
+
+.similar-products-section .similar-col {
+  /* 寬度計算: (100% - 5個間距) / 6 */
+  flex: 0 0 calc((100% - 5 * 15px) / 6);
+  max-width: calc((100% - 5 * 15px) / 6);
+  padding: 0;
+  margin-bottom: 15px;
+}
+
+/* 響應式調整 */
+@media (max-width: 1000px) {
+  .similar-products-section .similar-col {
+    flex: 0 0 calc((100% - 3 * 15px) / 4);
+    max-width: calc((100% - 3 * 15px) / 4);
+  }
+}
+
+@media (max-width: 768px) {
+  .similar-products-section .similar-col {
+    flex: 0 0 calc((100% - 15px) / 2);
+    max-width: calc((100% - 15px) / 2);
+  }
+}
+
+/* 類似商品卡片樣式覆蓋 (圓角、懸停放大動畫) */
+.similar-products-section .product-card-override {
+  height: 100%;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  /* <-- 圓角設計 */
+  transition: box-shadow 0.2s, transform 0.3s;
+  /* <-- 懸停動畫 */
+  will-change: transform;
+  overflow: hidden;
+  /* <-- 確保內容在圓角內裁剪 */
+}
+
+.similar-products-section .product-card-override:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transform: scale(1.03);
+  /* <-- 懸停放大效果 */
+  z-index: 10;
+}
+
+/* 類似商品卡片圖片/佔位符 */
+.similar-products-section .card-img-placeholder {
+  height: 150px;
+  background-color: transparent;
+  /* 移除背景色，讓圖片顯示 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: transparent;
+  /* 移除中央文字 */
+  border-bottom: 1px solid #eee;
+  overflow: hidden;
+}
+
+/* 類似商品卡片圖片樣式 */
+.similar-products-section .card-img-placeholder .product-thumb-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 確保圖片能填滿整個空間 */
+  display: block;
+}
+
+
+.similar-products-section .card-title a {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  text-decoration: none;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.similar-products-section .card-description-override {
+  font-size: 0.85rem;
+  color: #777;
+  margin-bottom: 5px !important;
+  height: 2.5em;
+  overflow: hidden;
+}
+
+/* 價格與愛心容器對齊 */
+.similar-products-section .similar-price-fav-row {
+  align-items: center;
+}
+
+.similar-products-section .icon-container {
+  margin-left: auto;
+  line-height: 1;
+  padding-top: 3px;
+}
+
+.similar-products-section .price-color-override {
+  color: #dc3545;
+  font-size: 1.1rem;
+}
+
+.similar-products-section .similar-fav-btn {
+  color: #999;
+  transition: color 0.2s;
+}
+
+.similar-products-section .similar-fav-btn.favorited {
+  color: #dc3545;
+}
+
+.similar-products-section .similar-fav-btn svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+
+/* 6. 互動元素樣式 (MODAL & CHAT WINDOW & TOAST)    */
+
+/* --- Modal 運費規則 (居中) --- */
+.app-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+}
+
+.app-modal {
+  background: #fff;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  padding: 0;
+  display: block;
+}
+
+/* Modal 標頭 - 修正標題與圖示對齊 */
+.app-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+/* Modal 標題組件 (包含圖示和文字) */
+.modal-title-content {
+  display: flex;
+  align-items: center;
+  /* 讓圖示和文字垂直居中 */
+  gap: 10px;
+  /* 圖示和文字間距 */
+  font-weight: 600;
+}
+
+.modal-title-content .modal-icon {
+  line-height: 1;
+  color: #5c5acd;
+}
+
+.modal-title-content .modal-title {
+  margin: 0;
+  /* 移除 h3 預設的 margin */
+  font-size: 1.2rem;
+}
+
+/* Modal 關閉按鈕樣式 */
+.modal-close-btn-override {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.modal-close-btn-override svg {
+  stroke: #333;
+  width: 24px;
+  height: 24px;
+}
+
+.app-modal .modal-body {
+  padding: 15px 20px;
+}
+
+
+/* --- Chat Window --- */
+.chat-window {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  height: 400px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  background-color: #6a5acd;
+  color: #fff;
+  padding: 10px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+}
+
+.chat-header .close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.chat-header .close-btn svg {
+  stroke: #ffffff;
+  width: 20px;
+  height: 20px;
+}
+
+.chat-body {
+  flex-grow: 1;
+  padding: 10px;
+  overflow-y: auto;
+  background-color: #f7f7f7;
+}
+
+/* 聊天室輸入區塊結構 */
+.chat-input-area {
+  padding: 5px 10px;
+  border-top: 1px solid #eee;
+  flex-shrink: 0;
+  background-color: #fff;
+}
+
+.chat-function-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.chat-func-btn {
+  background: none;
+  border: none;
+  color: #999;
+  padding: 2px;
+  cursor: pointer;
+  transition: color 0.1s;
+}
+
+.chat-func-btn:hover {
+  color: #5f55e4;
+}
+
+.chat-input {
+  display: flex;
+  align-items: center;
+  padding-top: 5px;
+}
+
+.chat-input input {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-right: 5px;
+  font-size: 0.9rem;
+}
+
+.chat-input .send-btn {
+  background-color: #3a2eeb;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+
+/* --- Toast 提示框樣式 --- */
+.app-toast {
+  position: fixed;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 4px;
+  z-index: 1100;
+  font-size: 1rem;
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* 7. 圖片放大彈窗 (IMAGE MODAL / LIGHTBOX) */
+
+/* 彈窗背景疊層 */
+.app-image-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* 使用深色半透明背景 */
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  /* 確保它在所有元素之上 */
+}
+
+/* 圖片容器 (讓圖片可以放大) */
+.app-image-modal {
+  position: relative;
+  max-width: 90%;
+  /* 限制容器最大寬度 */
+  max-height: 90%;
+  /* 限制容器最大高度 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 放大圖片本身 */
+.image-modal-content {
+  /* 確保圖片適應容器，不超出 */
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  /* 輕微的陰影效果 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* 關閉按鈕 (位於右上角，浮動於圖片上) */
+.app-image-modal .modal-close-btn-override {
+  position: absolute;
+  top: -40px;
+  /* 移到圖片上方 */
+  right: -40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2010;
+}
+
+.app-image-modal .modal-close-btn-override svg {
+  stroke: #ffffff;
+  /* 關閉按鈕圖示為白色 */
+  width: 32px;
+  height: 32px;
+}
+
+/* 小螢幕調整關閉按鈕位置 */
+@media (max-width: 768px) {
+  .app-image-modal .modal-close-btn-override {
+    top: 10px;
+    right: 10px;
+    /* 在小螢幕上給它一個背景，更容易點擊 */
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 50%;
+    padding: 5px;
+  }
+}
