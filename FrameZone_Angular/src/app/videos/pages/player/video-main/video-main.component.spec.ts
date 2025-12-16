@@ -10,7 +10,7 @@ describe('VideoMainComponent', () => {
     await TestBed.configureTestingModule({
       imports: [VideoMainComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(VideoMainComponent);
     component = fixture.componentInstance;

@@ -19,7 +19,8 @@ export class ChannelComponent {
     uploadDate: new Date(),
     description: '',
     channelName: '',
-    Avatar: ''
+    avatar: '',
+    videoUri: ''
   }]
 
   @Input() PupularVideos: VideoCardData[] = [{
@@ -31,7 +32,8 @@ export class ChannelComponent {
     uploadDate: new Date(),
     description: '',
     channelName: '',
-    Avatar: ''
+    avatar: '',
+    videoUri: ''
   }]
 
   @Input() VideoPlaylists: VideoListCard[] = [{

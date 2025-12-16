@@ -18,76 +18,83 @@ export class MockChannelService {
 
   video: VideoCardData = {
     id: 5,
-    Avatar: '',
+    avatar: '',
     title: '範例影片標題 Example Video Title',
     channelName: '範例頻道 Example Channel',
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 2158,
     views: 551,
     uploadDate: new Date('2002-02-07'),
-    description: "我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明"
+    description: "我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明",
+    videoUri: ''
   };
 
   videos: VideoCardData[] = [{
     id: 1,
-    Avatar: 'https://i.pravatar.cc/49',
+    avatar: 'https://i.pravatar.cc/49',
     title: '範例影片標題 Example Video Title',
     channelName: '範例頻道 Example Channel',
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 2158,
     views: 551,
     uploadDate: new Date('2002-02-07'),
-    description: "fff"
+    description: "fff",
+    videoUri: ''
   }, {
     id: 1,
-    Avatar: 'https://i.pravatar.cc/49',
+    avatar: 'https://i.pravatar.cc/49',
     title: '範例影片標題 Example Video Title',
     channelName: '範例頻道 Example Channel',
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 21558,
     views: 551,
     uploadDate: new Date('2002-02-07'),
-    description: "fff"
+    description: "fff",
+    videoUri: ''
   }, {
     id: 1,
-    Avatar: 'https://i.pravatar.cc/49',
+    avatar: 'https://i.pravatar.cc/49',
     title: '範例影片標題 Example Video Title',
     channelName: '範例頻道 Example Channel',
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 21558,
     views: 551,
     uploadDate: new Date('2002-02-07'),
-    description: "fff"
+    description: "fff",
+    videoUri: ''
   }, {
     id: 1,
-    Avatar: 'https://i.pravatar.cc/49',
+    avatar: 'https://i.pravatar.cc/49',
     title: '範例影片標題 Example Video Title',
     channelName: '範例頻道 Example Channel',
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 21558,
     views: 551,
     uploadDate: new Date('2002-02-07'),
-    description: "fff"
+    description: "fff",
+    videoUri: ''
   }, {
     id: 1,
-    Avatar: 'https://i.pravatar.cc/49',
+    avatar: 'https://i.pravatar.cc/49',
     title: '範例影片標題 Example Video Title',
     channelName: '範例頻道 Example Channel',
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 21558,
     views: 551,
     uploadDate: new Date('2002-02-07'),
-    description: "fff"
+    description: "fff",
+    videoUri: ''
   }, {
     id: 1,
-    Avatar: 'https://i.pravatar.cc/49',
+    avatar: 'https://i.pravatar.cc/49',
     title: '範例影片標題 Example Video Title',
     channelName: '範例頻道 Example Channel',
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 21558,
     views: 551,
     uploadDate: new Date('2002-02-07'),
-    description: "fff"
+    description: "fff",
+    videoUri: ''
   }
   ];
 

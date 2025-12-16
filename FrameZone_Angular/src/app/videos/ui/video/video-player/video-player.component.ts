@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnDestroy, AfterViewInit, Input } from '@angular/core';
 import Hls from 'hls.js';
 import { NgIf, NgFor, NgClass } from '@angular/common';
 

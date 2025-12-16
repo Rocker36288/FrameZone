@@ -2,9 +2,13 @@ using FrameZone_WebApi.Helpers;
 using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Repositories;
 using FrameZone_WebApi.Services;
+using FrameZone_WebApi.Videos.Repositories;
+using FrameZone_WebApi.Videos.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.StaticFiles;
+
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -94,6 +98,12 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddHttpContextAccessor();
 
+// ========== 影片服務 (DI注入) ==========
+builder.Services.AddScoped<VideoCardResponsity>(); // 註冊 Repository
+builder.Services.AddScoped<VideoServices>();
+//=======================================
+
+
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -114,6 +124,17 @@ var app = builder.Build();
 //{
 //    app.MapOpenApi();
 //}
+
+// ==========  啟用 wwwroot 靜態檔案(影片要用的) ==========
+var provider = new FileExtensionContentTypeProvider();
+provider.Mappings[".m3u8"] = "application/vnd.apple.mpegurl";
+provider.Mappings[".ts"] = "video/mp2t";
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = provider
+});
+//=======================================
 
 app.UseCors(policyName);
 

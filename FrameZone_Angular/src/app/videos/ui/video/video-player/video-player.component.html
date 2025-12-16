@@ -9,8 +9,9 @@
 
     <!-- 進度條 -->
     <div class="progress-container">
-      <input type="range" class="progress-bar" min="0" max="100" [value]="getProgress()"
-        (input)="onProgressChange($event)">
+      <input type="range" class="progress-bar" min="0" max="100" [value]="getProgress()">
+      <!-- <input type="range" class="progress-bar" min="0" max="100" [value]="getProgress()"
+        (input)="onProgressChange($event)"> -->
     </div>
 
     <!-- 控制按鈕列 -->
@@ -57,8 +58,10 @@
         </button>
 
         <!-- 音量滑桿 -->
-        <input type="range" class="volume-slider" min="0" max="100" [value]="getVolume()"
-          (input)="onVolumeChange($event)">
+        <input type="range" class="volume-slider" min="0" max="100" [value]="getVolume()">
+
+        <!-- <input type="range" class="volume-slider" min="0" max="100" [value]="getVolume()"
+          (input)="onVolumeChange($event)"> -->
 
         <!-- 時間顯示 -->
         <span class="time-display">{{ getCurrentTime() }} / {{ getDuration() }}</span>

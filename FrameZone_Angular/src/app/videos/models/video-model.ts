@@ -1,19 +1,24 @@
-//影片卡片資訊
+// 影片卡片資訊
 export class VideoCardData {
-  id: number = 0;
+  // ⚠️ 僅供內部使用（例如 trackBy）
+  id?: number;
+
+  // ✅ 對外識別（從 VideoUrl 解析 GUID）
+  videoUri: string = '';
+
   title: string = '';
   thumbnail: string = '';
-  duration: number = 0; // 預設為0秒
+  duration: number = 0;
   views: number = 0;
   uploadDate: Date = new Date();
   description: string = '';
 
   channelName: string = '';
-  Avatar: string = '';
+  avatar: string = '';
 
   constructor(data?: Partial<VideoCardData>) {
     if (data) {
-      Object.assign(this, data); // 如果傳入了部分資料，就用來覆蓋預設值
+      Object.assign(this, data);
     }
   }
 }

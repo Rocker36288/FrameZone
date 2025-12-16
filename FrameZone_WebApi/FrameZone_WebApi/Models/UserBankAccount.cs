@@ -33,5 +33,9 @@ public partial class UserBankAccount
 
     public DateTime UpdatedAt { get; set; }
 
+    public virtual Bank Bank { get; set; }
+
+    public virtual BankBranch Branch { get; set; }
+
     public virtual User User { get; set; }
 }

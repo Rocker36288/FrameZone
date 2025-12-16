@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { VideoPlayerComponent } from '../../../ui/video/video-player/video-player.component';
 import { VideoTimeagoPipe } from "../../../pipes/video-timeago.pipe";
 import { VideoActionsBarComponent } from "../../../ui/actions/video-actions-bar/video-actions-bar.component";
@@ -25,6 +25,8 @@ export class VideoMainComponent {
     uploadDate: new Date('2002-02-07'),
     description: "我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明"
   };
+
+  @Input() PlayVideo: VideoCardData | undefined
 
   channel: ChannelCard = {
     id: 1,
@@ -62,27 +64,7 @@ export class VideoMainComponent {
   }
   ]
 
-  videos: VideoCardData[] = [{
-    id: 1,
-    Avatar: 'https://i.pravatar.cc/49',
-    title: '範例影片標題 Example Video Title',
-    channelName: '範例頻道 Example Channel',
-    thumbnail: 'https://picsum.photos/480/270', // 假圖片
-    duration: 2158,
-    views: 551,
-    uploadDate: new Date('2002-02-07'),
-    description: "fff"
-  }, {
-    id: 1,
-    Avatar: 'https://i.pravatar.cc/49',
-    title: '範例影片標題 Example Video Title',
-    channelName: '範例頻道 Example Channel',
-    thumbnail: 'https://picsum.photos/480/270', // 假圖片
-    duration: 21558,
-    views: 551,
-    uploadDate: new Date('2002-02-07'),
-    description: "fff"
-  }];
+  @Input() videosRecommand: VideoCardData[] | undefined
 
 
 
