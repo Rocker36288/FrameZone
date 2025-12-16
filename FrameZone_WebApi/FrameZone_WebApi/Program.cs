@@ -90,7 +90,9 @@ builder.Services.AddAuthentication(options =>
 // ========== 註冊依賴注入服務 (DI注入) ==========
 
 builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<PostRepository>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<PostService>();
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddHttpContextAccessor();
 
