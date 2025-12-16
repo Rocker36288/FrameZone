@@ -10,7 +10,7 @@ describe('ChannelLayoutComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ChannelLayoutComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(ChannelLayoutComponent);
     component = fixture.componentInstance;

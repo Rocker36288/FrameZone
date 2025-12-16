@@ -1,4 +1,4 @@
-import { ChannelService } from './../../../service/channel.service';
+import { ChannelService } from '../../../service/channel.service';
 import { Component, Input } from '@angular/core';
 import { ChannelHome, VideoCardData, VideoListCard } from '../../../models/video-model';
 import { SubscribeButtonComponent } from "../../../ui/actions/subscribe-button/subscribe-button.component";

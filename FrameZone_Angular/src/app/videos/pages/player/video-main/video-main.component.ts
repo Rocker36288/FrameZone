@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { VideoPlayerComponent } from "../video-player/video-player.component";
+import { VideoPlayerComponent } from '../../../ui/video/video-player/video-player.component';
 import { VideoTimeagoPipe } from "../../../pipes/video-timeago.pipe";
 import { VideoActionsBarComponent } from "../../../ui/actions/video-actions-bar/video-actions-bar.component";
 import { ChannelCardComponent } from "../../../ui/channel/channel-card/channel-card.component";
