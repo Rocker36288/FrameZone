@@ -18,5 +18,24 @@ export const routes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) }
     ]
+  },
+  {
+    path: 'shopping',
+    loadComponent: () => import('./shopping/shopping-header/shopping-header.component').then(m => m.ShoppingHeaderComponent),
+    children: [
+      {
+        path: '',
+        redirectTo: 'home',
+        pathMatch: 'full'
+      },
+      {
+        path: 'home',
+        loadComponent: () => import('./shopping/shoppinghome/shoppinghome.component').then(m => m.ShoppinghomeComponent)
+      }
+    ]
+  },
+  {
+    path: 'shoppingcart',
+    loadComponent: () => import('./shopping/shoppingcart/shoppingcart.component').then(m => m.ShoppingcartComponent)
   }
 ];

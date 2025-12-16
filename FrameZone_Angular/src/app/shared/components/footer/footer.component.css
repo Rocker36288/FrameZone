@@ -3,7 +3,7 @@
   ;
   color: #f0f2f5;
   font-size: 1rem;
-  padding-top: 0.5rem;
+  /* padding-top: 0.5rem; */
 }
 
 /* Footer 連結和文字樣式 */
@@ -38,4 +38,9 @@
 /* 分隔線樣式 */
 .footer-hr {
   border-top: 1px solid #2a2e64;
+}
+
+.logoimage {
+  width: 100px;
+  height: 100px;
 }
