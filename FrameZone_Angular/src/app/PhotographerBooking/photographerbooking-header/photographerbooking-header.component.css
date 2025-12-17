@@ -1,0 +1,163 @@
+/* ===== 導覽列基礎樣式 ===== */
+.navbar {
+  background: white;
+  border-bottom: 1px solid #e6e7e9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 0.75rem 0;
+}
+
+/* Logo 區域 */
+.navbar-brand {
+  transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover {
+  transform: scale(1.05);
+}
+
+.navbar-brand a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.navbar-brand svg {
+  stroke: #667eea;
+  flex-shrink: 0;
+}
+
+.navbar-brand h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1e293b;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  white-space: nowrap;
+}
+
+/* ===== 導覽項目樣式 ===== */
+#navbar-menu .navbar-nav {
+  gap: 0.25rem;
+}
+
+#navbar-menu .navbar-nav .nav-item {
+  position: relative;
+}
+
+#navbar-menu .navbar-nav .nav-link {
+  color: #64748b !important;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+/* 導覽項目懸停效果 */
+#navbar-menu .navbar-nav .nav-link:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.08) 0%,
+    rgba(118, 75, 162, 0.08) 100%
+  );
+  color: #667eea !important;
+  transform: translateY(-1px);
+}
+
+/* 活動狀態 */
+#navbar-menu .navbar-nav .nav-link.active {
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.1) 0%,
+    rgba(118, 75, 162, 0.1) 100%
+  );
+  color: #667eea !important;
+}
+
+/* 底部指示線動畫 */
+#navbar-menu .navbar-nav .nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+#navbar-menu .navbar-nav .nav-link:hover::after,
+#navbar-menu .navbar-nav .nav-link.active::after {
+  width: 70%;
+}
+
+/* Icon 樣式 */
+#navbar-menu .navbar-nav .nav-link-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  transition: all 0.3s ease;
+}
+
+#navbar-menu .navbar-nav .nav-link:hover .nav-link-icon svg {
+  transform: scale(1.1);
+}
+
+/* ===== Toggler 按鈕樣式 ===== */
+.navbar-toggler {
+  border: 2px solid #e6e7e9;
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2864, 74, 139, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* ===== 右側功能區樣式 ===== */
+.navbar-nav.order-md-last {
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* ===== 主題切換按鈕樣式 ===== */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  color: #64748b;
+  padding: 0;
+}
+
+.theme-toggle:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.1) 0%,
+    rgba(118, 75, 162, 0.1) 100%
+  );
+  transform: scale(1.1);
+}
+
+.theme-toggle svg {
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover svg {
+  transform: rotate(20deg);
+}
