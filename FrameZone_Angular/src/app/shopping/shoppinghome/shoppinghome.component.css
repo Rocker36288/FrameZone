@@ -1,7 +1,7 @@
 .carousel {
   width: 70%;
   margin: auto;
-  margin-top: 250px;
+  margin-top: 200px;
   /* border-radius: 20px; */
   /* overflow: hidden; */
   box-shadow: 0 15px 40px rgba(118, 75, 162, 0.2);
@@ -58,7 +58,7 @@
 .row {
   margin: 60px;
   margin-bottom: 100px;
-  margin-top: 100px;
+  margin-top: 50px;
   padding: 50px;
 }
 

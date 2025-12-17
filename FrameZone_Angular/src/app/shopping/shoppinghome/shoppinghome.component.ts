@@ -21,14 +21,14 @@ export class ShoppinghomeComponent {
 
   // 分類資料
   categories = [
-    { name: '相機', image: 'images/1.jpg' },
-    { name: '拍立得', image: 'images/1.jpg' },
-    { name: '攝影機', image: 'images/1.jpg' },
-    { name: '閃光燈', image: 'images/1.jpg' },
-    { name: '腳架', image: 'images/1.jpg' },
-    { name: '底片', image: 'images/1.jpg' },
-    { name: '相機包', image: 'images/1.jpg' },
-    { name: '創作', image: 'images/1.jpg' }
+    { name: '相機', image: 'images/products/1.jpg' },
+    { name: '拍立得', image: 'images/products/2.jpg' },
+    { name: '攝影機', image: 'images/products/4.jpg' },
+    { name: '閃光燈', image: 'images/products/5.jpg' },
+    { name: '腳架', image: 'images/products/6.jpg' },
+    { name: '底片', image: 'images/products/7.jpg' },
+    { name: '相機包', image: 'images/products/8.jpg' },
+    { name: '創作', image: 'images/products/1.jpg' }
   ];
 
   // 熱門推薦商品
@@ -39,7 +39,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/1.jpg'
     },
     {
       id: 2,
@@ -47,7 +47,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/6.jpg'
     },
     {
       id: 3,
@@ -55,7 +55,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/4.jpg'
     },
     {
       id: 4,
@@ -63,7 +63,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/7.jpg'
     },
     {
       id: 5,
@@ -71,7 +71,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/1.jpg'
     },
     {
       id: 6,
@@ -79,7 +79,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/4.jpg'
     },
     {
       id: 7,
@@ -87,7 +87,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/4.jpg'
     },
     {
       id: 8,
@@ -95,7 +95,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/5.jpg'
     },
     {
       id: 9,
@@ -103,7 +103,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/8.jpg'
     },
     {
       id: 10,
@@ -111,7 +111,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/6.jpg'
     },
     {
       id: 11,
@@ -119,7 +119,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/7.jpg'
     },
     {
       id: 12,
@@ -127,7 +127,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/8.jpg'
     }
   ];
 
@@ -139,7 +139,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/1.jpg'
     },
     {
       id: 14,
@@ -147,7 +147,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/4.jpg'
     },
     {
       id: 15,
@@ -155,7 +155,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/5.jpg'
     },
     {
       id: 16,
@@ -163,7 +163,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/6.jpg'
     },
     {
       id: 17,
@@ -171,7 +171,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/7.jpg'
     },
     {
       id: 18,
@@ -179,7 +179,7 @@ export class ShoppinghomeComponent {
       condition: '二手使用過',
       seller: 'Maryjo Lebarree',
       avatar: '/static/avatars/023m.jpg',
-      image: 'images/1.jpg'
+      image: 'images/products/8.jpg'
     }
   ];
 
