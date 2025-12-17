@@ -409,7 +409,11 @@
   border-color: #334155;
 }
 
-<<<<<<< HEAD
+.logo-image {
+  width: 50px;
+  height: 50px;
+}
+
 /* ===== 響應式設計 ===== */
 
 /* 通用調整 - 所有螢幕 */
@@ -602,9 +606,201 @@
     height: 16px;
   }
 }
-=======
+
+/* ===== 響應式設計 ===== */
+
+/* 通用調整 - 所有螢幕 */
+.navbar-brand h2 {
+  font-size: clamp(1.25rem, 2.5vw, 1.5rem) !important;
+}
+
+.navbar-nav .btn-primary {
+  padding: 0.5rem 1rem !important;
+  font-size: 0.875rem !important;
+  white-space: nowrap;
+}
+
+.avatar-sm {
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+}
+
+.theme-toggle {
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+}
+
+/* 下拉選單定位修正 */
+.dropdown-menu-end {
+  right: 0 !important;
+  left: auto !important;
+}
+
+.dropdown-menu {
+  min-width: 240px;
+  max-width: calc(100vw - 2rem);
+}
+
+/* 平板 (< 992px) */
+@media (max-width: 991.98px) {
+  .navbar-brand h2 {
+    font-size: 1.25rem !important;
+  }
+
+  .navbar-nav.order-md-last {
+    gap: 0.35rem;
+  }
+
+  .theme-toggle {
+    width: 2rem !important;
+    height: 2rem !important;
+  }
+
+  .avatar-sm {
+    width: 2rem !important;
+    height: 2rem !important;
+  }
+
+  .navbar-nav .btn-primary {
+    padding: 0.4rem 0.875rem !important;
+    font-size: 0.8125rem !important;
+  }
+
+  .dropdown-menu {
+    min-width: 220px;
+  }
+}
+
+/* 小平板 (< 768px) */
+@media (max-width: 767.98px) {
+  .navbar-brand h2 {
+    font-size: 1.125rem !important;
+  }
+
+  .navbar-nav.order-md-last {
+    gap: 0.25rem;
+  }
+
+  .nav-item.me-3 {
+    margin-right: 0.5rem !important;
+  }
+
+  .navbar-nav .btn-primary {
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .navbar-nav .btn-primary svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .dropdown-menu {
+    min-width: 200px;
+  }
+}
+
+/* 手機 (< 576px) */
+@media (max-width: 575.98px) {
+  .container-xl {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .navbar {
+    padding: 0.5rem 0;
+  }
+
+  .navbar-brand h2 {
+    font-size: 1rem !important;
+  }
+
+  .navbar-brand svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .navbar-nav.order-md-last {
+    gap: 0.25rem;
+  }
+
+  .nav-item.me-3 {
+    margin-right: 0.375rem !important;
+  }
+
+  .theme-toggle {
+    width: 1.875rem !important;
+    height: 1.875rem !important;
+  }
+
+  .theme-toggle svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .avatar-sm {
+    width: 1.875rem !important;
+    height: 1.875rem !important;
+  }
+
+  .navbar-nav .btn-primary {
+    padding: 0.35rem 0.625rem !important;
+    font-size: 0.6875rem !important;
+  }
+
+  .navbar-nav .btn-primary svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .dropdown-menu {
+    position: fixed !important;
+    right: 0.5rem !important;
+    left: auto !important;
+    min-width: calc(100vw - 1rem);
+    max-width: calc(100vw - 1rem);
+    margin-top: 0.25rem;
+  }
+
+  .dropdown-menu::before,
+  .dropdown-menu::after {
+    right: 1rem !important;
+  }
+}
+
+/* 極小螢幕 (< 400px) */
+@media (max-width: 399.98px) {
+  .navbar-brand h2 {
+    font-size: 0.875rem !important;
+  }
+
+  .navbar-brand svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .navbar-nav .btn-primary {
+    padding: 0.3rem 0.5rem !important;
+    font-size: 0.625rem !important;
+  }
+
+  .navbar-nav .btn-primary svg {
+    display: none;
+  }
+
+  .theme-toggle,
+  .avatar-sm {
+    width: 1.75rem !important;
+    height: 1.75rem !important;
+  }
+
+  .theme-toggle svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
 .logo-image {
   width: 50px;
   height: 50px;
 }
->>>>>>> shopping
