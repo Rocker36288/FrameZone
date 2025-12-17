@@ -1,24 +1,27 @@
-<div class="container-fluid bg-light" style="min-height:100vh;">
-  <div class="row">
-    <!-- 左側欄（功能選單） -->
-    <div class="col-md-3 col-sm-12 p-3">
-      <app-social-menu></app-social-menu>
-    </div>
-    <!-- 中間欄（貼文區域） -->
-    <div class="col-md-6 col-sm-12 p-3">
-      <router-outlet></router-outlet>
-    </div>
-    <!-- 右側欄（朋友列表 / 廣告） -->
-    <div class="col-md-3 col-sm-12 p-3">
-      <app-social-friends></app-social-friends>
-      <!-- 回到最上面按鈕 -->
-      @if(showBackToTop){
-      <button ngClass="btn-up" id="backToTopBtn" (click)="backToTop()">
-        ↑
-      </button>
-      }
+<section>
+  <div class="container-fluid bg-light" style="min-height:100vh;">
+    <div class="row">
+      <!-- 左側欄（功能選單） -->
+      <div class="col-md-3 col-sm-12 p-3">
+        <app-social-menu></app-social-menu>
+      </div>
+      <!-- 中間欄（貼文區域） -->
+      <div class="col-md-6 col-sm-12 p-3">
+        <router-outlet></router-outlet>
+      </div>
+      <!-- 右側欄（朋友列表 / 廣告） -->
+      <div class="col-md-3 col-sm-12 p-3">
+        <app-social-friends></app-social-friends>
+        <!-- 回到最上面按鈕 -->
+        @if(showBackToTop){
+        <button ngClass="btn-up" id="backToTopBtn" (click)="backToTop()">
+          ↑
+        </button>
+        }
+      </div>
     </div>
   </div>
-</div>
+
+</section>
 <!-- 聊天室 -->
 <app-social-chat></app-social-chat>
