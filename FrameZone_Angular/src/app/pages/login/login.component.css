@@ -1,0 +1,67 @@
+/* 隱藏驗證錯誤時的 X 圖示，只保留紅色邊框 */
+.form-control.is-invalid {
+  background-image: none !important;
+  padding-right: 0.75rem !important;
+}
+
+/* 如果 input 有 input-group，特別處理 */
+.input-group .form-control.is-invalid {
+  background-image: none !important;
+}
+
+/* 保持紅色邊框和錯誤訊息顏色 */
+.form-control.is-invalid {
+  border-color: #d63939;
+}
+
+.invalid-feedback {
+  color: #d63939;
+}
+
+/* Input 聚焦時的樣式 */
+.form-control.focus {
+  border-color: #206bc4;
+  box-shadow: 0 0 0 0.25rem rgba(32, 107, 196, 0.25);
+}
+
+/* 成功訊息的動畫 */
+.alert-success {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 錯誤訊息的動畫 */
+.alert-danger {
+  animation: shake 0.3s ease-out;
+}
+
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+.link-primary:hover {
+  text-decoration: underline;
+}

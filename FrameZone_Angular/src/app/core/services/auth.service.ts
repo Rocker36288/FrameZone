@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import {
@@ -7,9 +7,14 @@ import {
   LoginResponseDto,
   RegisterRequestDto,
   RegisterResponseDto,
-  ChangePasswordRequestDto,
   ForgotPasswordRequestDto,
-  ResetPasswordRequestDto
+  ForgotPasswordResponseDto,
+  ValidateResetTokenResponseDto,
+  ResetPasswordRequestDto,
+  ResetPasswordResponseDto,
+  ChangePasswordRequestDto,
+  ChangePasswordResponseDto,
+  UserInfo
 } from '../models/auth.models';
 
 @Injectable({
@@ -19,7 +24,8 @@ export class AuthService {
   private apiUrl = 'https://localhost:7213/api/auth';
 
   private currentUserSubject = new BehaviorSubject<LoginResponseDto | null>(null);
-  private currentUser$ = this.currentUserSubject.asObservable();
+
+  public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient) {
     this.loadStoredUser();
@@ -32,7 +38,8 @@ export class AuthService {
     const storedUser = localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser');
     if (storedUser) {
       try {
-        this.currentUserSubject.next(JSON.parse(storedUser));
+        const user = JSON.parse(storedUser);
+        this.currentUserSubject.next(user);
       } catch (error) {
         console.error('Failed to parse stored user:', error);
         this.clearStorage();
@@ -46,7 +53,7 @@ export class AuthService {
    * @returns
    */
   login(loginData: LoginRequestDto): Observable<LoginResponseDto> {
-    return this.http.post<LoginResponseDto>(`${this.apiUrl}/auth/login`, loginData)
+    return this.http.post<LoginResponseDto>(`${this.apiUrl}/login`, loginData)
       .pipe(
         tap(response => {
           if (response.success && response.token) {
@@ -81,7 +88,7 @@ export class AuthService {
    * @returns
    */
   register(registerData: RegisterRequestDto): Observable<RegisterResponseDto> {
-    return this.http.post<RegisterResponseDto>(`${this.apiUrl}/auth/register`, registerData);
+    return this.http.post<RegisterResponseDto>(`${this.apiUrl}/register`, registerData);
   }
 
   /**
@@ -104,8 +111,19 @@ export class AuthService {
   /**
    * 檢查是否已登入
    */
-  isAuthenticated() {
-    return !!this.getToken();
+  isAuthenticated(): boolean {
+    const token = this.getToken();
+    const user = this.getCurrentUser();
+
+    const isAuth = !!(token && user);
+
+    console.log('isAuthenticated 檢查:', {
+      hasToken: !!token,
+      hasUser: !!user,
+      result: isAuth
+    });
+
+    return isAuth;
   }
 
   /**
@@ -118,7 +136,7 @@ export class AuthService {
   /**
    * 取得當前用戶資訊
    */
-  getCurrentUser() {
+  getCurrentUser(): LoginResponseDto | null {
     return this.currentUserSubject.value;
   }
 
@@ -128,7 +146,21 @@ export class AuthService {
    * @returns
    */
   forgotPassword(data: ForgotPasswordRequestDto): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/forgot-password`, data);
+    return this.http.post<ForgotPasswordResponseDto>(`${this.apiUrl}/forgot-password`, data);
+  }
+
+  /**
+   * 驗證重設密碼 Token
+   * @param token
+   * @returns
+   */
+  validateResetToken(token: string): Observable<ValidateResetTokenResponseDto> {
+    const params = new HttpParams().set('token', token);
+    return this.http.get<ValidateResetTokenResponseDto>(
+      `${this.apiUrl}/validate-reset-token`,
+      { params }
+    );
+
   }
 
   /**
@@ -137,12 +169,16 @@ export class AuthService {
    * @returns
    */
   resetPassword(data: ResetPasswordRequestDto): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/reset-password`, data);
+    return this.http.post<ResetPasswordRequestDto>(`${this.apiUrl}/reset-password`, data);
   }
 
-
+  /**
+   * 修改密碼
+   * @param data
+   * @returns
+   */
   changePassword(data: ChangePasswordRequestDto): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/change-password`, data);
+    return this.http.post<ChangePasswordRequestDto>(`${this.apiUrl}/change-password`, data);
   }
 
 

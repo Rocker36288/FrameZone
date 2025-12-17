@@ -52,6 +52,22 @@ export interface ForgotPasswordRequestDto {
 }
 
 /**
+ * 忘記密碼回應
+ */
+export interface ForgotPasswordResponseDto {
+  success: boolean;
+  message: string;
+}
+
+/**
+ * 驗證重設 Token 回應
+ */
+export interface ValidateResetTokenResponseDto {
+  success: boolean;
+  message: string;
+}
+
+/**
  * 重設密碼請求
  */
 export interface ResetPasswordRequestDto {
@@ -61,10 +77,37 @@ export interface ResetPasswordRequestDto {
 }
 
 /**
+ * 重設密碼回應
+ */
+export interface ResetPasswordResponseDto {
+  success: boolean;
+  message: string;
+}
+
+/**
  * 變更密碼請求
  */
 export interface ChangePasswordRequestDto {
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
+}
+
+/**
+ * 變更密碼回應
+ */
+export interface ChangePasswordResponseDto {
+  success: boolean;
+  message: string;
+}
+
+/**
+ * 用戶資訊
+ */
+export interface UserInfo {
+  userId: number;
+  account: string;
+  email: string;
+  displayName?: string;
+  avatar?: string;
 }

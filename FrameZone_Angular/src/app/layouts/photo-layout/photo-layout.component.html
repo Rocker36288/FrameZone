@@ -1,0 +1,54 @@
+<div class="page">
+  <header class="navbar navbar-expand-lg navbar-transparent py-3">
+    <div class="container">
+      <!-- BEGIN NAVBAR LOGO -->
+      <div class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
+        <a routerLink="/home" aria-label="FrameZone" class="d-flex align-items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="icon icon-tabler icons-tabler-outline icon-tabler-brand-picsart">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M12 9m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+            <path d="M12 9m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+            <path d="M5 9v11a2 2 0 1 0 4 0v-4.5" />
+          </svg>
+          <h2 class="mb-0">FrameZone</h2>
+        </a>
+      </div>
+      <!-- END NAVBAR LOGO -->
+      <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+        <button type="button" class="btn-close d-lg-none ms-auto mb-3" data-bs-toggle="collapse"
+          data-bs-target="#navbarTogglerDemo01" aria-label="Close"></button>
+        <nav class="navbar-nav ms-auto">
+          <div class="nav-item">
+            <a class="nav-link active" routerLink="/photo-home"><span class="nav-link-title">照片首頁</span></a>
+          </div>
+          <div class="nav-item">
+            <a class="nav-link" routerLink="/photo-classify"><span class="nav-link-title">照片分類</span></a>
+          </div>
+          <div class="nav-item">
+            <a class="nav-link" routerLink="/photo-myphoto"><span class="nav-link-title">我的照片</span></a>
+          </div>
+          <div class="nav-item">
+            <a class="nav-link" routerLink="/photo-price"><span class="nav-link-title">方案</span></a>
+          </div>
+          <div class="nav-item">
+            <a class="nav-link" routerLink="/photo-about"><span class="nav-link-title">關於我們</span></a>
+          </div>
+          <div class="nav-item ms-4">
+            <app-user-menu></app-user-menu>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="page-wrapper">
+    <div class="page-body">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+
+  <app-photo-footer></app-photo-footer>
+</div>

@@ -1,3 +1,4 @@
+using FrameZone_WebApi.Configuration;
 using FrameZone_WebApi.Helpers;
 using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Repositories;
@@ -22,6 +23,17 @@ builder.Services.AddDbContext<AAContext>(options =>
     // 開發時顯示詳細錯誤
     options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 });
+
+
+//========== 註冊設定 ==========
+
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings")
+);
+
+builder.Services.Configure<VerificationSettings>(
+    builder.Configuration.GetSection("VerificationSettings")
+);
 
 
 // ========== CORS 設定 ==========
@@ -91,6 +103,8 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddHttpContextAccessor();
 
@@ -98,8 +112,9 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
      {
-         options.JsonSerializerOptions.PropertyNamingPolicy = null;     // 保持原始屬性名稱
-         options.JsonSerializerOptions.WriteIndented = true;            // 格式化 JSON
+        options.JsonSerializerOptions.PropertyNamingPolicy = 
+            System.Text.Json.JsonNamingPolicy.CamelCase;            // 使用駝峰命名法
+         options.JsonSerializerOptions.WriteIndented = true;        // 格式化 JSON
      });
 
 builder.Services.AddEndpointsApiExplorer();

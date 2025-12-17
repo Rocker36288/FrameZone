@@ -1,9 +1,11 @@
 ﻿using FrameZone_WebApi.DTOs;
+using FrameZone_WebApi.Helpers;
 using FrameZone_WebApi.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using System.Security.Claims;
 
 
 namespace FrameZone_WebApi.Controllers
@@ -13,11 +15,13 @@ namespace FrameZone_WebApi.Controllers
     public class AuthController : ControllerBase
     {
         private readonly AuthService _authService;
+        private readonly IPasswordService _passwordService;
         private readonly ILogger<AuthController> _logger;
 
-        public AuthController(AuthService authService, ILogger<AuthController> logger)
+        public AuthController(AuthService authService, IPasswordService passwordService, ILogger<AuthController> logger)
         {
             _authService = authService;
+            _passwordService = passwordService;
             _logger = logger;
         }
 
@@ -148,13 +152,37 @@ namespace FrameZone_WebApi.Controllers
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto request)
         {
-            // TODO: 實作忘記密碼邏輯
-
-            return Ok(new ApiResponseDto
+            try
             {
-                Success = false,
-                Message = "密碼重設功能尚未實作"
-            });
+                if (!ModelState.IsValid)
+                {
+                    // 取得第一個錯誤訊息
+                    var firstError = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .FirstOrDefault()?.ErrorMessage ?? "輸入資料不正確";
+
+                    return BadRequest(new ApiResponseDto
+                    {
+                        Success = false,
+                        Message = firstError
+                    });
+                }
+
+                // 呼叫 Service 處理忘記密碼邏輯
+                var response = await _passwordService.ForgotPasswordAsync(request);
+
+                return Ok(response);
+            }
+
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "忘記密碼時發生錯誤");
+                return StatusCode(500, new ApiResponseDto
+                {
+                    Success = false,
+                    Message = "系統錯誤,請稍後再試"
+                });
+            }
         }
 
         /// <summary>
@@ -167,13 +195,45 @@ namespace FrameZone_WebApi.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request)
         {
-            // TODO: 實作重設密碼邏輯
-
-            return Ok(new ApiResponseDto
+            try
             {
-                Success = false,
-                Message = "密碼重設功能尚未實作"
-            });
+                if (!ModelState.IsValid)
+                {
+                    var firstError = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .FirstOrDefault()?.ErrorMessage ?? "輸入資料不正確";
+
+                    return BadRequest(new ApiResponseDto
+                    {
+                        Success = false,
+                        Message = firstError
+                    });
+                }
+
+                // 呼叫 PasswordService 處理重設密碼邏輯
+                var response = await _passwordService.ResetPasswordAsync(request);
+
+                if (response.Success)
+                {
+                    _logger.LogInformation("密碼重設成功");
+                    return Ok(response);
+                }
+                else
+                {
+                    _logger.LogInformation($"密碼重設失敗: {response.Message}");
+                    return BadRequest(response);
+                }
+            }
+
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, "重設密碼時發生錯誤");
+                return StatusCode(500, new ApiResponseDto
+                {
+                    Success = false,
+                    Message = "系統錯誤，請稍後再試"
+                });
+            }
         }
 
         /// <summary>
@@ -186,13 +246,93 @@ namespace FrameZone_WebApi.Controllers
         [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto request)
         {
-            // TODO: 實作變更密碼邏輯
-
-            return Ok(new ApiResponseDto
+            try
             {
-                Success = false,
-                Message = "變更密碼功能尚未實作"
-            });
+                if (!ModelState.IsValid)
+                {
+                    var firstError = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .FirstOrDefault()?.ErrorMessage ?? "輸入資料不正確";
+
+                    return BadRequest(new ApiResponseDto
+                    {
+                        Success = false,
+                        Message = firstError
+                    });
+                }
+
+                // 從 JWT Token 取得使用者 ID
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(userIdClaim) || !long.TryParse(userIdClaim, out var userId))
+                {
+                    _logger.LogWarning("無法從 Token 取得使用者 ID");
+                    return Unauthorized(new ApiResponseDto
+                    {
+                        Success = false,
+                        Message = "未授權的請求"
+                    });
+                }
+
+                var response = await _passwordService.ChangePasswordAsync(userId, request);
+
+                if (response.Success)
+                {
+                    _logger.LogInformation($"密碼變更成功: UserId={userId}");
+                    return Ok(response);
+                }
+                else
+                {
+                    _logger.LogWarning($"密碼變更失敗: userId={userId}, Message={response.Message}");
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "變更密碼時發生錯誤");
+                return StatusCode(500, new ApiResponseDto
+                {
+                    Success = false,
+                    Message = "系統錯誤，請稍後再試"
+                });
+            }
+
+        }
+
+        [HttpGet("validate-reset-token")]
+        public async Task<IActionResult> ValidateResetToken([FromQuery] string token)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    return BadRequest(new ApiResponseDto
+                    {
+                        Success = false,
+                        Message = "Token 不能為空"
+                    });
+                }
+
+                var response = await _passwordService.ValidateResetTokenAsync(token);
+
+                if (response.Success)
+                {
+                    return Ok(response);
+                }
+                else
+                {
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "驗證重設密碼 Token 時發生錯誤");
+                return StatusCode(500, new ApiResponseDto
+                {
+                    Success = false,
+                    Message = "系統錯誤，請稍後在試"
+                });
+            }
         }
 
         /// <summary>
@@ -212,5 +352,22 @@ namespace FrameZone_WebApi.Controllers
             });
         }
 
+        [HttpGet("generate-password")]
+        public IActionResult GeneratePassword([FromQuery] string password)
+        {
+            if (string.IsNullOrEmpty(password))
+            {
+                return BadRequest("請提供密碼");
+            }
+
+            var hashedPassword = PasswordHelper.HashPassword(password);
+
+            return Ok(new
+            {
+                原始密碼 = password,
+                加密後密碼 = hashedPassword,
+                說明 = "請將加密後的密碼更新到資料庫的 Password 欄位"
+            });
+        }
     }
 }
