@@ -1,0 +1,24 @@
+<a class="card">
+  <img [src]="photographer.img" />
+  <div class="card-body">
+    <div class="row">
+      <div class="title">{{ photographer.name }}</div>
+      <div class="rating">⭐ {{ photographer.rating }}</div>
+    </div>
+
+    <div class="meta">
+      {{ photographer.location }}｜{{ photographer.services.join("・") }}
+    </div>
+
+    <div class="row">
+      <div class="price">NT${{ photographer.price }} / 時</div>
+      <div class="meta">可預約：{{ photographer.availability }}</div>
+    </div>
+
+    <div class="tags">
+      <span class="tag" *ngFor="let tag of photographer.tags">
+        {{ tag }}
+      </span>
+    </div>
+  </div>
+</a>
