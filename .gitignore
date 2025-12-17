@@ -2,8 +2,15 @@
 # 這個 .gitignore 檔案由 Microsoft(R) Visual Studio 自動建立。
 ################################################################################
 
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+.vs/
+.DS_Store
 /.vs
-/FrameZone_WebApi/.vs/FrameZone_WebApi/FileContentIndex
+
+*.vsidx
 /FrameZone_WebApi/FrameZone_WebApi/obj/Release/net9.0
 /FrameZone_WebApi/.vs/FrameZone_WebApi/CopilotIndices/17.14.1368.60722/CodeChunks.db
 /FrameZone_WebApi/.vs/FrameZone_WebApi/CopilotIndices/17.14.1368.60722/CodeChunks.db-shm

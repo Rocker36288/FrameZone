@@ -1,9 +1,218 @@
 .page-header {
-  background: linear-gradient(135deg, #7999f1 0%, #764ba2 100%);
-  border-radius: 11px;
-  padding: 40px 30px;
-  margin-bottom: 24px;
+  margin: auto;
+  background: linear-gradient(135deg, #79a3f1 0%, #764ba2 100%);
+  /* padding: 0 20px 30px; */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
 }
+
+.top-nav-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  /* padding-right: 100px; */
+  padding: 0 20px;
+}
+
+/* 上層連結的樣式：小字且顏色較淺 */
+.nav-link-sm {
+  color: white;
+  font-size: 1rem;
+  padding-left: 10px;
+  margin-right: 10px;
+  text-decoration: none;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.nav-link-sm:hover {
+  opacity: 1;
+  color: #131b33;
+}
+
+/* 下層主導覽列的垂直間距 */
+.main-header-content {
+  padding: 5px 0;
+}
+
+.main-nav-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 60px;
+}
+
+/* 搜尋+購物車容器 - 置中且控制整體寬度 */
+.search-cart-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  padding-left: 20px;
+  /* padding-left: 0; */
+}
+
+/* 搜尋群組 - 讓它自動延展 */
+.search-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  /* 佔滿除了購物車以外的空間 */
+  max-width: 1000px;
+}
+
+/* 搜尋輸入框容器 */
+.search-input-container {
+  /* margin-top: 20px; */
+  flex-grow: 1;
+  min-width: 0;
+}
+
+/* 搜尋按鈕 */
+.btn-indigo {
+  /* margin-top: 20px; */
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* 購物車圖示 */
+.cart-icon {
+  flex-shrink: 0;
+  margin-left: 50px;
+  margin-right: -150px;
+}
+
+.cart-icon a {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+/* 購物車 SVG */
+.cart-icon a svg {
+  stroke: azure;
+  width: 40px;
+  height: 40px;
+  transition: all 0.3s ease;
+}
+
+/* 購物車懸停效果 */
+.cart-icon a:hover svg {
+  transform: scale(1.15);
+  stroke: #131b33;
+  filter: drop-shadow(0 0 8px rgba(238, 239, 255, 0.5));
+}
+
+/* 媒體查詢：針對大螢幕 (> 1200px) */
+@media (min-width: 1200px) {
+  .top-nav-container {
+    max-width: 1100px;
+    padding-right: 80px;
+  }
+}
+
+/* 媒體查詢：針對超大螢幕 (> 1400px) */
+@media (min-width: 1400px) {
+
+  .search-cart-container,
+  .top-nav-container {
+    max-width: 1300px;
+    padding-right: 100px;
+  }
+}
+
+/* 媒體查詢：手機版 */
+@media (max-width: 768px) {
+  .search-cart-container {
+    padding-right: 50px;
+  }
+
+  .search-group {
+    gap: 0.5rem;
+  }
+
+  .cart-icon a svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .btn-indigo {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* 媒體查詢：平板 */
+@media (min-width: 769px) and (max-width: 1199px) {
+  .search-cart-container {
+    max-width: 800px;
+  }
+}
+
+/* 會員頭像及名稱的整體連結容器 */
+.member-profile-link {
+  /* 調整間距，確保與右側的通知連結不重疊 */
+  margin-left: 15px;
+  text-decoration: none;
+  margin-top: 7px;
+
+}
+
+/* 會員頭像樣式：實現圓形、大小和間距 */
+.member-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 8px;
+  /* 確保圖片內容填滿 */
+  object-fit: cover;
+}
+
+/* 帳號名稱樣式：使用與導覽列小字相似的樣式 */
+.member-name {
+  color: white;
+  font-size: 1rem;
+  margin-right: 50px;
+  text-decoration: none;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+
+}
+
+/* 確保頭像連結 hover 時保持樣式一致 */
+.member-profile-link:hover .member-name {
+  color: #131b33;
+}
+
+.brand-logo {
+  height: 120px;
+  width: 120px;
+}
+
+/* 確保 Logo 連結與其他元素垂直對齊 */
+.logo-link {
+  flex-shrink: 0;
+  /* 確保 Logo 不會被壓縮 */
+  margin-right: 32px;
+  margin-left: -100px;
+}
+
+.top-nav-left {
+  margin-left: -100px;
+}
+
+.top-nav-right {
+  margin-right: -200px;
+}
+
+/* 增加 .top-nav-container 的 padding 來控制內縮程度 */
+/* .top-nav-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 0px;
+} */

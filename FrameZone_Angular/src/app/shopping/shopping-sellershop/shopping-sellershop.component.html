@@ -1,0 +1,344 @@
+<div class="page-wrapper">
+  <div class="page-body">
+    <div class="container-xl">
+      <!-- 賣場標題區 -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card seller-header">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-auto">
+                  <span class="avatar avatar-xl avatar-rounded"
+                    [style.background-image]="'url(' + sellerInfo.avatar + ')'">
+                  </span>
+                </div>
+                <div class="col">
+                  <h2 class="mb-1">{{ sellerInfo.name }}</h2>
+                  <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <div>
+                      <span class="badge bg-white text-primary fw-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                          fill="currentColor" class="me-1">
+                          <circle cx="12" cy="12" r="10" />
+                        </svg>
+                        上線中
+                      </span>
+                    </div>
+                    <div class="text-white-80">
+                      評價：{{ sellerInfo.rating }} ({{ sellerInfo.reviewCount }}則)
+                    </div>
+                    <div class="text-white-80">
+                      商品數：{{ sellerInfo.productCount }}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <button class="btn btn-chat" (click)="toggleChatRoom()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="icon me-2">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path
+                        d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z" />
+                      <path d="M9.5 9h.01" />
+                      <path d="M14.5 9h.01" />
+                      <path d="M9.5 13a3.5 3.5 0 0 0 5 0" />
+                    </svg>
+                    聊聊
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 賣場介紹 -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card intro-card">
+            <div class="card-header">
+              <h3 class="card-title">賣場介紹</h3>
+            </div>
+            <div class="card-body">
+              <p class="text-secondary mb-0">{{ sellerInfo.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 賣場圖片 -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card shop-image-card">
+            <div class="card-header">
+              <h3 class="card-title">賣場圖片</h3>
+            </div>
+            <img [src]="sellerInfo.shopImage" class="shop-main-image" alt="賣場代表圖片">
+          </div>
+        </div>
+      </div>
+
+      <!-- 商品區 -->
+      <div class="row">
+        <!-- 左側分類欄 -->
+        <div class="col-lg-2 col-md-3 mb-4">
+          <div class="card category-card">
+            <div class="card-header">
+              <h4 class="card-title mb-0">分類</h4>
+            </div>
+            <div class="list-group list-group-flush">
+              <a *ngFor="let category of categories" href="javascript:void(0)"
+                class="list-group-item list-group-item-action" [class.active]="selectedCategoryId === category.id"
+                (click)="selectCategory(category.id)">
+                {{ category.name }}
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右側商品區 -->
+        <div class="col-lg-10 col-md-9">
+          <!-- 排序按鈕 -->
+          <div class="card mb-3">
+            <div class="card-body py-2">
+              <div class="d-flex align-items-center justify-content-end gap-2">
+                <span class="text-muted small">排序：</span>
+                <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-sm d-flex align-items-center gap-1"
+                    [ngClass]="sortBy === 'price' ? 'btn-primary' : 'btn-outline-primary'" (click)="onSort('price')">
+                    價格
+                    <span *ngIf="sortBy === 'price'">
+                      <svg *ngIf="sortOrder === 'desc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" class="icon">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M12 5v.5m0 3v1.5m0 3v6" />
+                        <path d="M16 15l-4 4" />
+                        <path d="M8 15l4 4" />
+                      </svg>
+                      <svg *ngIf="sortOrder === 'asc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" class="icon">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M12 5v6m0 3v1.5m0 3v.5" />
+                        <path d="M16 9l-4 -4" />
+                        <path d="M8 9l4 -4" />
+                      </svg>
+                    </span>
+                  </button>
+                  <button type="button" class="btn btn-sm d-flex align-items-center gap-1"
+                    [ngClass]="sortBy === 'latest' ? 'btn-primary' : 'btn-outline-primary'" (click)="onSort('latest')">
+                    最新
+                    <span *ngIf="sortBy === 'latest'">
+                      <svg *ngIf="sortOrder === 'desc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" class="icon">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M12 5v.5m0 3v1.5m0 3v6" />
+                        <path d="M16 15l-4 4" />
+                        <path d="M8 15l4 4" />
+                      </svg>
+                      <svg *ngIf="sortOrder === 'asc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" class="icon">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M12 5v6m0 3v1.5m0 3v.5" />
+                        <path d="M16 9l-4 -4" />
+                        <path d="M8 9l4 -4" />
+                      </svg>
+                    </span>
+                  </button>
+                  <button type="button" class="btn btn-sm d-flex align-items-center gap-1"
+                    [ngClass]="sortBy === 'sales' ? 'btn-primary' : 'btn-outline-primary'" (click)="onSort('sales')">
+                    熱銷
+                    <span *ngIf="sortBy === 'sales'">
+                      <svg *ngIf="sortOrder === 'desc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" class="icon">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M12 5v.5m0 3v1.5m0 3v6" />
+                        <path d="M16 15l-4 4" />
+                        <path d="M8 15l4 4" />
+                      </svg>
+                      <svg *ngIf="sortOrder === 'asc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" class="icon">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M12 5v6m0 3v1.5m0 3v.5" />
+                        <path d="M16 9l-4 -4" />
+                        <path d="M8 9l4 -4" />
+                      </svg>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 商品列表 -->
+          <div class="row row-cards" *ngIf="displayProducts.length > 0">
+            <div class="col-xl-2-4 col-lg-3 col-md-4 col-sm-6 mb-3" *ngFor="let product of displayProducts">
+              <div class="card d-flex flex-column h-100 product-card">
+                <a href="javascript:void(0)">
+                  <img class="card-img-top" [src]="product.image" [alt]="product.name" />
+                </a>
+                <div class="card-body d-flex flex-column">
+                  <h4 class="card-title">
+                    <a href="javascript:void(0)">{{ product.name }}</a>
+                  </h4>
+                  <div class="text-secondary small mb-3">
+                    {{ product.description }}
+                  </div>
+                  <div class="mt-auto">
+                    <div class="h3 text-primary mb-0">
+                      NT$ {{ product.price }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 無商品提示 -->
+          <div class="card" *ngIf="displayProducts.length === 0">
+            <div class="card-body">
+              <div class="empty">
+                <div class="empty-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M16 16s-1.5-2-4-2-4 2-4 2"></path>
+                    <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                    <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                  </svg>
+                </div>
+                <p class="empty-title">此分類目前沒有商品</p>
+                <p class="empty-subtitle text-secondary">
+                  請選擇其他分類查看
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 分頁 -->
+          <div class="card mt-3" *ngIf="totalPages > 1">
+            <div class="card-body py-3">
+              <ul class="pagination justify-content-center mb-0 flex-wrap">
+                <!-- 上一頁 -->
+                <li class="page-item" [class.disabled]="currentPage === 1">
+                  <a class="page-link" href="javascript:void(0)" (click)="currentPage > 1 && goToPage(currentPage - 1)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="icon">
+                      <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    上一頁
+                  </a>
+                </li>
+
+                <!-- 第一頁 -->
+                <li class="page-item" [class.active]="currentPage === 1">
+                  <a class="page-link" href="javascript:void(0)" (click)="goToPage(1)">1</a>
+                </li>
+
+                <!-- 省略號（前） -->
+                <li class="page-item disabled" *ngIf="showFirstPageDots()">
+                  <span class="page-link">...</span>
+                </li>
+
+                <!-- 中間頁碼 -->
+                <li class="page-item" *ngFor="let page of visiblePages" [class.active]="currentPage === page">
+                  <a class="page-link" href="javascript:void(0)" (click)="goToPage(page)"
+                    *ngIf="page !== 1 && page !== totalPages">
+                    {{ page }}
+                  </a>
+                </li>
+
+                <!-- 省略號（後） -->
+                <li class="page-item disabled" *ngIf="showLastPageDots()">
+                  <span class="page-link">...</span>
+                </li>
+
+                <!-- 最後一頁 -->
+                <li class="page-item" [class.active]="currentPage === totalPages" *ngIf="totalPages > 1">
+                  <a class="page-link" href="javascript:void(0)" (click)="goToPage(totalPages)">
+                    {{ totalPages }}
+                  </a>
+                </li>
+
+                <!-- 下一頁 -->
+                <li class="page-item" [class.disabled]="currentPage === totalPages">
+                  <a class="page-link" href="javascript:void(0)"
+                    (click)="currentPage < totalPages && goToPage(currentPage + 1)">
+                    下一頁
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="icon">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 聊天室 -->
+  <div class="chat-room" *ngIf="showChatRoom">
+    <div class="chat-header">
+      <div class="d-flex align-items-center">
+        <span class="avatar avatar-sm avatar-rounded me-2" [style.background-image]="'url(' + sellerInfo.avatar + ')'">
+        </span>
+        <span class="fw-bold">{{ sellerInfo.name }}</span>
+      </div>
+      <button class="btn-close-chat" (click)="closeChatRoom()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="chat-body">
+      <div class="chat-messages">
+        <div *ngFor="let msg of chatMessages" class="chat-message"
+          [ngClass]="msg.sender === 'user' ? 'chat-message-user' : 'chat-message-seller'">
+          <div class="message-content">
+            {{ msg.text }}
+          </div>
+          <div class="message-time">{{ msg.time }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-footer">
+      <div class="input-group">
+        <button class="btn btn-icon" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+        <button class="btn btn-icon" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="1"></circle>
+            <circle cx="19" cy="12" r="1"></circle>
+            <circle cx="5" cy="12" r="1"></circle>
+          </svg>
+        </button>
+      </div>
+      <input type="text" class="form-control chat-input" placeholder="請輸入訊息..." [(ngModel)]="newMessage"
+        (keyup.enter)="sendChatMessage()">
+      <button class="btn btn-send" (click)="sendChatMessage()">
+        發送
+      </button>
+    </div>
+  </div>
+</div>

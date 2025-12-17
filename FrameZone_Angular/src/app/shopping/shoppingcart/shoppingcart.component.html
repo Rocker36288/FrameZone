@@ -1,9 +1,10 @@
 <div class="container py-4">
 
   <div class="cart mb-4">
+    <h2> ←返回</h2>
     <div class="card card-long">
       <div class="card-body">
-        <p class="cart-title fw-bold text-center fs-3">購物車</p>
+        <p class="cart-title fw-bold text-center">購物車</p>
       </div>
     </div>
   </div>
@@ -12,179 +13,74 @@
 
     <div class="col-lg-8">
 
-      <div class="card mb-3">
-        <div class="row row-0 flex-fill">
-          <div class="col-md-3">
-            <a href="#">
-              <img src="images/1.jpg" class="w-100 h-100 object-cover" alt="Card side image" />
-            </a>
+      <div class="card mb-4 seller-group">
+        <div class="card-header">
+          <div class="col-auto ps-1 pt-1">
+            <label class="form-check m-0">
+              <input class="form-check-input" type="checkbox" #masterCheckbox
+                (change)="toggleAllItems(masterCheckbox.checked)" [checked]="areAllItemsChecked()">
+            </label>
           </div>
-          <div class="col">
-            <div class="card-body h-full d-flex flex-column">
-              <h3 class="card-title">
-                <a href="#">相機</a>
-              </h3>
-              <div class="text-secondary">
-                $2500
-              </div>
-              <div class="d-flex align-items-center pt-4 mt-auto">
-                <span class="avatar" style="background-image: url(/static/avatars/029m.jpg)"></span>
-                <div class="ms-3">
-                  <a href="#" class="text-body">Egan Poetz</a>
-                  <div class="text-secondary">3 days ago</div>
-                </div>
-                <div class="ms-auto">
-                  <a href="#" class="icon d-none d-md-inline-block ms-3 text-red">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                      class="icon icon-1">
-                      <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
-                    </svg>
-                  </a>
-                </div>
+          <h3 class="card-title">
+            <div class="d-flex align-items-center pt-1 mt-auto">
+              <span class="avatar" style="background-image: url(/static/avatars/029m.jpg)"></span>
+              <div class="ms-3">
+                <a href="#" class="text-body">賣家帳號</a>
               </div>
             </div>
-          </div>
+          </h3>
         </div>
-      </div>
+        <div class="card-body">
+          <div *ngFor="let item of cartItems" class="card mb-3">
+            <div class="row row-0 flex-fill align-items-center">
+              <div class="col-auto ps-3">
+                <label class="form-check m-0">
+                  <input class="form-check-input" type="checkbox" [(ngModel)]="item.selected"
+                    (change)="updateMasterCheckbox()">
+                </label>
+              </div>
 
-      <div class="card mb-3">
-        <div class="row row-0 flex-fill">
-          <div class="col-md-3">
-            <a href="#">
-              <img src="images/1.jpg" class="w-100 h-100 object-cover" alt="Card side image" />
-            </a>
-          </div>
-          <div class="col">
-            <div class="card-body h-full d-flex flex-column">
-              <h3 class="card-title">
-                <a href="#">相機</a>
-              </h3>
-              <div class="text-secondary">
-                $2500
+              <div class="col-md-3">
+                <a href="#">
+                  <img src="images/products/4.jpg" class="w-100 h-100 object-cover" alt="Card side image" />
+                </a>
               </div>
-              <div class="d-flex align-items-center pt-4 mt-auto">
-                <span class="avatar" style="background-image: url(/static/avatars/029m.jpg)"></span>
-                <div class="ms-3">
-                  <a href="#" class="text-body">Egan Poetz</a>
-                  <div class="text-secondary">3 days ago</div>
-                </div>
-                <div class="ms-auto">
-                  <a href="#" class="icon d-none d-md-inline-block ms-3 text-red">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                      class="icon icon-1">
-                      <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card mb-3">
-        <div class="row row-0 flex-fill">
-          <div class="col-md-3">
-            <a href="#">
-              <img src="images/1.jpg" class="w-100 h-100 object-cover" alt="Card side image" />
-            </a>
-          </div>
-          <div class="col">
-            <div class="card-body h-full d-flex flex-column">
-              <h3 class="card-title">
-                <a href="#">相機</a>
-              </h3>
-              <div class="text-secondary">
-                $2500
-              </div>
-              <div class="d-flex align-items-center pt-4 mt-auto">
-                <span class="avatar" style="background-image: url(/static/avatars/029m.jpg)"></span>
-                <div class="ms-3">
-                  <a href="#" class="text-body">Egan Poetz</a>
-                  <div class="text-secondary">3 days ago</div>
-                </div>
-                <div class="ms-auto">
-                  <a href="#" class="icon d-none d-md-inline-block ms-3 text-red">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                      class="icon icon-1">
-                      <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card mb-3">
-        <div class="row row-0 flex-fill">
-          <div class="col-md-3">
-            <a href="#">
-              <img src="images/1.jpg" class="w-100 h-100 object-cover" alt="Card side image" />
-            </a>
-          </div>
-          <div class="col">
-            <div class="card-body h-full d-flex flex-column">
-              <h3 class="card-title">
-                <a href="#">相機</a>
-              </h3>
-              <div class="text-secondary">
-                $2500
-              </div>
-              <div class="d-flex align-items-center pt-4 mt-auto">
-                <span class="avatar" style="background-image: url(/static/avatars/029m.jpg)"></span>
-                <div class="ms-3">
-                  <a href="#" class="text-body">Egan Poetz</a>
-                  <div class="text-secondary">3 days ago</div>
-                </div>
-                <div class="ms-auto">
-                  <a href="#" class="icon d-none d-md-inline-block ms-3 text-red">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                      class="icon icon-1">
-                      <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card mb-3">
-        <div class="row row-0 flex-fill">
-          <div class="col-md-3">
-            <a href="#">
-              <img src="images/1.jpg" class="w-100 h-100 object-cover" alt="Card side image" />
-            </a>
-          </div>
-          <div class="col">
-            <div class="card-body h-full d-flex flex-column">
-              <h3 class="card-title">
-                <a href="#">相機</a>
-              </h3>
-              <div class="text-secondary">
-                $2500
-              </div>
-              <div class="d-flex align-items-center pt-4 mt-auto">
-                <span class="avatar" style="background-image: url(/static/avatars/029m.jpg)"></span>
-                <div class="ms-3">
-                  <a href="#" class="text-body">Egan Poetz</a>
-                  <div class="text-secondary">3 days ago</div>
-                </div>
-                <div class="ms-auto">
-                  <a href="#" class="icon d-none d-md-inline-block ms-3 text-red">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                      class="icon icon-1">
-                      <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
-                    </svg>
-                  </a>
+              <div class="col">
+                <div class="card-body h-full d-flex flex-column">
+                  <h3 class="card-title">
+                    <h2><a href="#">{{item.name}}</a></h2>
+                  </h3>
+                  <div class="text-secondary">
+                    <h3>{{item.price}}</h3>
+                  </div>
+                  <div class="mt-2 d-flex align-items-center">
+                    <div class="input-group input-group-sm" style="width: 120px;">
+                      <button class="btn btn-outline-secondary" type="button"
+                        (click)="item.quantity = item.quantity > 1 ? item.quantity - 1 : 1">
+                        -
+                      </button>
+                      <input type="text" class="form-control text-center" [(ngModel)]="item.quantity" min="1">
+                      <button class="btn btn-outline-secondary" type="button"
+                        (click)="item.quantity = item.quantity + 1">
+                        +
+                      </button>
+                    </div>
+                    <small class="text-secondary ms-3">庫存 1 件</small>
+                    <div class="ms-auto">
+                      <a href="#" class="icon d-none d-md-inline-block ms-3 text-red">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                          stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                          class="icon icon-tabler icons-tabler-outline icon-tabler-trash">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                          <path d="M4 7l16 0" />
+                          <path d="M10 11l0 6" />
+                          <path d="M14 11l0 6" />
+                          <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                          <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -193,23 +89,103 @@
       </div>
     </div>
 
-
     <div class="col-lg-4 sticky-top pt-4">
 
       <div class="subtotal">
         <div class="card">
           <div class="card-body">
-            <p>數量:</p>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h2 class="m-0">數量:</h2>
+              <h2 class="m-0 text-end">x {{ getTotalQuantity() }}</h2>
+            </div>
             <br>
-            <p>總金額:</p>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h2 class="m-0">總金額:</h2>
+              <h2 class="m-0 text-end">${{ getTotalAmount() }}</h2>
+            </div>
             <br>
-            <p>優惠券:</p>
-            <br><br>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h2 class="m-0">優惠券:</h2>
+              <a href="#" class="text-danger text-decoration-none d-flex align-items-center" data-bs-toggle="modal"
+                (click)="saveCouponState()" data-bs-target="#couponModal" style="cursor: pointer;font-size: 1rem;">
+                {{ getDiscountDisplay() }}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                  class="bi bi-chevron-right ms-1" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd"
+                    d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708" />
+                </svg>
+              </a>
+            </div>
             <hr>
-            <p>小計:</p>
-            <button class="btn btn-primary w-100">下一步</button>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h2 class="m-0">小計:</h2>
+              <h2 class="m-0 text-end">${{ getFinalTotal() }}</h2>
+            </div>
+            <a class="btn btn-animate-icon w-100" style="background-color: rgb(139, 168, 231);"
+              [routerLink]="['/checkout']">
+              下一步
+              <!-- Download SVG icon from http://tabler.io/icons/icon/chevron-right -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="icon icon-end icon-2">
+                <path d="M9 6l6 6l-6 6" />
+              </svg>
+            </a>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="couponModal" tabindex="-1" aria-labelledby="couponModalLabel" aria-hidden="true"
+  #couponModalElement>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="couponModalLabel">選擇/輸入折扣碼</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="input-group mb-4">
+          <input type="text" class="form-control" placeholder="請輸入折扣碼" [(ngModel)]="couponCodeInput">
+          <button type="button" class="btn text-white" style="background-color: #5988ee;" (click)="applyCouponCode()">
+            使用
+          </button>
+        </div>
+
+        <h4>可選折扣券</h4>
+        <hr>
+
+        <!-- 如果沒有優惠券,顯示提示 -->
+        <div *ngIf="availableCoupons.length === 0" class="alert alert-info text-center">
+          目前沒有可用的優惠券。
+        </div>
+
+        <!-- 優惠券列表 -->
+        <div *ngFor="let coupon of availableCoupons" class="card mb-3 p-3">
+          <div class="d-flex align-items-center">
+            <div class="form-check me-3">
+              <input class="form-check-input" type="radio" name="selectedCouponRadio" [value]="coupon.id"
+                [checked]="coupon.isSelected" (change)="selectCoupon(coupon)">
+            </div>
+            <div>
+              <h5 class="m-0 text-danger">{{ coupon.name }}</h5>
+              <p class="text-secondary m-0">折扣金額: -${{ coupon.discount }}</p>
+              <small>使用期限: {{ coupon.expiryDate | date }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- modal-footer 必須在 modal-content 裡面,與 modal-body 同層 -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal" (click)="restoreCouponState()">取消</button>
+        <button type="button" class="btn text-white" style="background-color: #5988ee;" (click)="calculateFinalTotal()"
+          data-bs-dismiss="modal" [disabled]="getAppliedDiscount() === 0">
+          確認使用
+        </button>
       </div>
     </div>
   </div>

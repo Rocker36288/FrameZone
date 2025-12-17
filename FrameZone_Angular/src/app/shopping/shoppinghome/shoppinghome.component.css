@@ -1,0 +1,382 @@
+.carousel {
+  width: 70%;
+  margin: auto;
+  margin-top: 200px;
+  /* border-radius: 20px; */
+  /* overflow: hidden; */
+  box-shadow: 0 15px 40px rgba(118, 75, 162, 0.2);
+  position: relative;
+}
+
+.carousel-inner {
+  height: 600px;
+}
+
+.carousel-item img {
+  height: 600px;
+  object-fit: cover;
+}
+
+/* 針對左右按鈕容器 */
+.carousel-control-prev,
+.carousel-control-next {
+  /* 讓按鈕的覆蓋區域更明顯 */
+  width: 7%;
+  /* 增加按鈕的點擊區域 */
+  opacity: 1;
+  /* 確保按鈕不是半透明的，使圖標更清晰 */
+  transition: all 0.3s ease;
+}
+
+/* 針對左右按鈕的背景圖標 */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  /* 增加圖標尺寸，讓箭頭更大 */
+  width: 3rem;
+  height: 3rem;
+
+  /* 添加背景顏色讓圖標更突出 */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* 半透明黑色背景 */
+  border-radius: 50%;
+  /* 讓背景成為圓形 */
+  padding: 0.5rem;
+  transition: all 0.3s ease;
+
+  /* 預設圖標顏色是白色的 SVG，如果背景是白色，則需要改變顏色 */
+  /* 如果背景設定為白色，並且您需要黑色箭頭，可以嘗試使用濾鏡 */
+  /* filter: invert(1) grayscale(100%); */
+}
+
+.carousel-control-prev:hover .carousel-control-prev-icon,
+.carousel-control-next:hover .carousel-control-next-icon {
+  background-color: rgba(38, 36, 39, 0.7);
+  transform: scale(1.1);
+}
+
+
+.row {
+  margin: 60px;
+  margin-bottom: 100px;
+  margin-top: 50px;
+  padding: 50px;
+}
+
+.card {
+  width: 90%;
+  margin: auto;
+  background-color: rgb(244, 246, 255);
+  border: none;
+  /* 移除邊框 */
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  /* 設定過渡動畫 */
+  overflow: hidden;
+  /* 圖片放大時不會溢出圓角邊界 */
+
+}
+
+.card:hover {
+  /* transform: translateY(-5px); */
+  box-shadow: 0 10px 25px rgba(118, 75, 162, 0.2);
+  /* 項目之間水平間距 (例如 1.5rem) */
+  margin: 1.7rem;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.category-item {
+  /* 設定一致的最小寬度 */
+  min-width: 120px;
+  /* 項目之間水平間距 (例如 1.5rem) */
+  margin: 1.4rem;
+  cursor: pointer;
+}
+
+.category-item:hover {
+  transform: translateY(-10px);
+}
+
+.category-item .card {
+  width: 100%;
+  margin: 0;
+  height: 100%;
+  background: linear-gradient(145deg, #ffffff 0%, #f0f2ff 100%);
+  box-shadow: 0 8px 20px rgba(118, 75, 162, 0.15);
+  transition: box-shadow 0.3s ease, background 0.3s ease;
+  /* 只變化陰影和背景，不變化 transform */
+}
+
+.category-item:hover .card {
+  box-shadow: 0 15px 35px rgba(118, 75, 162, 0.25);
+  background: linear-gradient(145deg, #ffffff 0%, #e8ebff 100%);
+}
+
+.category-item .card .img-responsive {
+  height: 85px;
+  width: 80%;
+  margin: auto;
+  border-radius: 50%;
+  /* 圓形圖標 */
+  background-size: cover;
+  background-position: center;
+  border: 4px solid rgba(121, 153, 241, 0.2);
+  transition: all 0.3s ease;
+}
+
+.category-item:hover .card .img-responsive {
+  border-color: rgba(118, 75, 162, 0.5);
+  transform: scale(1.05);
+}
+
+.category-item .card-title {
+  color: #5a4a7c;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+@keyframes shimmer {
+
+  /* 動畫開始：將閃光條移到元素左側（-100% 的位置） */
+  0% {
+    transform: translateX(-100%);
+  }
+
+  /* 動畫結束：將閃光條移到元素右側（+100% 的位置） */
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.cagetoryname {
+  background: linear-gradient(135deg, #7999f1 0%, #764ba2 100%);
+  ;
+  padding: 10px;
+  border-radius: 50px;
+  box-shadow: 0 8px 25px rgba(118, 75, 162, 0.3);
+  margin-bottom: 40px;
+  /* 必須設置 position: relative，這樣 ::before 的 position: absolute 才能相對於它定位 */
+  position: relative;
+  /* 隱藏閃光條在容器範圍外的部分 */
+  overflow: hidden;
+}
+
+.cagetoryname h2 {
+  color: white;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.popularname {
+  background: linear-gradient(135deg, #7999f1 0%, #764ba2 100%);
+  ;
+  padding: 10px;
+  border-radius: 50px;
+  box-shadow: 0 8px 25px rgba(118, 75, 162, 0.3);
+  margin-bottom: 40px;
+  /* 必須設置 position: relative，這樣 ::before 的 position: absolute 才能相對於它定位 */
+  position: relative;
+  /* 隱藏閃光條在容器範圍外的部分 */
+  overflow: hidden;
+}
+
+.popularname h2 {
+  color: white;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.recently-viewed {
+  background: linear-gradient(135deg, #7999f1 0%, #764ba2 100%);
+  ;
+  padding: 10px;
+  border-radius: 50px;
+  box-shadow: 0 8px 25px rgba(118, 75, 162, 0.3);
+  margin-bottom: 40px;
+  /* 必須設置 position: relative，這樣 ::before 的 position: absolute 才能相對於它定位 */
+  position: relative;
+  /* 隱藏閃光條在容器範圍外的部分 */
+  overflow: hidden;
+}
+
+.recently-viewed h2 {
+  color: white;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* 為標題創建閃光偽元素 (::before) */
+.cagetoryname::before,
+.popularname::before,
+.recently-viewed::before {
+  content: "";
+  /* 偽元素必須要有 content 屬性 */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60%;
+  /* 閃光條的寬度 */
+  height: 100%;
+
+  /* 閃光條的顏色：一個從透明到半透明白色的漸層 */
+  background: linear-gradient(to right,
+      rgba(255, 255, 255, 0) 0%,
+      /* 左邊透明 */
+      rgba(255, 255, 255, 0.2) 50%,
+      /* 中間半透明白 */
+      rgba(255, 255, 255, 0) 100%
+      /* 右邊透明 */
+    );
+
+  /* 應用動畫：shimmer 動畫，持續 1.5 秒，重複無限次 */
+  animation: shimmer 2s infinite;
+}
+
+.col-lg-2 .card,
+.col-md-3 .card,
+.col-6 .card {
+  width: 90%;
+  margin: auto;
+  background-color: rgb(244, 246, 255);
+  border: none;
+  border-radius: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+.col-lg-2 .card:hover,
+.col-md-3 .card:hover,
+.col-6 .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(118, 75, 162, 0.2);
+}
+
+/* 商品卡片樣式 */
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+.card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.card-body {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title {
+  color: #5a4a7c;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-title a {
+  color: #5a4a7c;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.card-title a:hover {
+  color: #764ba2;
+}
+
+.text-secondary {
+  color: #9ca3af !important;
+  font-size: 0.9rem;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid rgba(121, 153, 241, 0.3);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.text-body {
+  color: #6b7280 !important;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.text-body:hover {
+  color: #764ba2 !important;
+}
+
+/* 收藏圖示 */
+.icon svg {
+  transition: all 0.3s ease;
+  stroke: #9ca3af;
+}
+
+.icon:hover svg {
+  stroke: #764ba2;
+  fill: rgba(118, 75, 162, 0.1);
+  transform: scale(1.2);
+}
+
+/* 為圖片的 <a> 標籤設定固定高度並隱藏溢出 */
+.col-lg-2 .card>a,
+.col-md-3 .card>a,
+.col-6 .card>a {
+  display: block;
+  height: 200px;
+  /* 固定高度 */
+  overflow: hidden;
+  /* 隱藏超出部分 */
+  flex-shrink: 0;
+  /* 防止被壓縮 */
+}
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* 響應式設計，讓一個網站的版面和內容能夠根據使用者正在使用的設備螢幕尺寸、方向和解析度來自動調整、優化顯示效果 */
+@media (max-width: 768px) {
+  .carousel {
+    width: 90%;
+  }
+
+  .carousel-inner {
+    height: 300px;
+  }
+
+  .carousel-item img {
+    height: 300px;
+  }
+
+  .row {
+    margin: 40px 20px;
+    padding: 30px;
+  }
+
+  .category-item {
+    margin: 1rem;
+    min-width: 100px;
+  }
+
+  .category-item .img-responsive {
+    height: 70px;
+    width: 70px;
+  }
+}

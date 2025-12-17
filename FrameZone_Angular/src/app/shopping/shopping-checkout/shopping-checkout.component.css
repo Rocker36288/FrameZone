@@ -1,0 +1,28 @@
+.subtotal {
+  /* 設定固定定位，使其脫離文檔流，不隨滾動條移動 */
+  position: fixed;
+  /* 必須手動設定寬度，這是一個估計值，請根據實際設計調整 */
+  width: 415px;
+}
+
+.checkout-title {
+  font-size: 26px;
+}
+
+.checkout-button {
+  font-family: "Microsoft JhengHei", Arial, sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 1.1rem;
+}
+
+.card {
+  background-color: rgb(244, 246, 255);
+}
+
+.avatar {
+  border-radius: 50%;
+}
+
+.card-body-checkout {
+  /* background: linear-gradient(135deg, #79a3f1 0%, #764ba2 100%); */
+}
