@@ -36,7 +36,7 @@
 
 /* 下層主導覽列的垂直間距 */
 .main-header-content {
-  padding: 10px 0;
+  padding: 5px 0;
 }
 
 .main-nav-container {
@@ -190,11 +190,8 @@
 }
 
 .brand-logo {
-  height: 140px;
-  width: 140px;
-  /* 可選：確保 Logo 圖片看起來清晰 */
-  /* display: block; */
-  /* margin: 0; */
+  height: 120px;
+  width: 120px;
 }
 
 /* 確保 Logo 連結與其他元素垂直對齊 */

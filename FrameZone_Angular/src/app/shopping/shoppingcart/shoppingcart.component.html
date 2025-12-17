@@ -42,7 +42,7 @@
 
               <div class="col-md-3">
                 <a href="#">
-                  <img src="images/1.jpg" class="w-100 h-100 object-cover" alt="Card side image" />
+                  <img src="images/products/4.jpg" class="w-100 h-100 object-cover" alt="Card side image" />
                 </a>
               </div>
               <div class="col">
@@ -121,7 +121,8 @@
               <h2 class="m-0">小計:</h2>
               <h2 class="m-0 text-end">${{ getFinalTotal() }}</h2>
             </div>
-            <a class="btn btn-animate-icon w-100" style="background-color: rgb(139, 168, 231);">
+            <a class="btn btn-animate-icon w-100" style="background-color: rgb(139, 168, 231);"
+              [routerLink]="['/checkout']">
               下一步
               <!-- Download SVG icon from http://tabler.io/icons/icon/chevron-right -->
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"

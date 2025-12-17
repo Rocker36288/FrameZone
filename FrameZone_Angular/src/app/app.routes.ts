@@ -31,11 +31,23 @@ export const routes: Routes = [
       {
         path: 'home',
         loadComponent: () => import('./shopping/shoppinghome/shoppinghome.component').then(m => m.ShoppinghomeComponent)
+      },
+      {
+        path: 'product/:productId',
+        loadComponent: () => import('./shopping/shopping-product-detail/shopping-product-detail.component').then(m => m.ShoppingProductDetailComponent)
+      },
+      {
+        path: 'sellershop/:sellerAccount',
+        loadComponent: () => import('./shopping/shopping-sellershop/shopping-sellershop.component').then(m => m.ShoppingSellershopComponent)
       }
     ]
   },
   {
     path: 'shoppingcart',
     loadComponent: () => import('./shopping/shoppingcart/shoppingcart.component').then(m => m.ShoppingcartComponent)
+  },
+  {
+    path: 'checkout',
+    loadComponent: () => import('./shopping/shopping-checkout/shopping-checkout.component').then(m => m.ShoppingCheckoutComponent)
   }
 ];

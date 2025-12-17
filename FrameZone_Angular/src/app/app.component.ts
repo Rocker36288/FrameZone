@@ -5,10 +5,11 @@ import { ShoppingHeaderComponent } from "./shopping/shopping-header/shopping-hea
 import { ShoppingCheckoutComponent } from "./shopping/shopping-checkout/shopping-checkout.component";
 import { ShoppinghomeComponent } from "./shopping/shoppinghome/shoppinghome.component";
 import { ShoppingProductDetailComponent } from "./shopping/shopping-product-detail/shopping-product-detail.component";
+import { ShoppingSellershopComponent } from "./shopping/shopping-sellershop/shopping-sellershop.component";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ShoppingcartComponent, ShoppingHeaderComponent, ShoppingCheckoutComponent, ShoppinghomeComponent, ShoppingProductDetailComponent],
+  imports: [RouterOutlet, ShoppingcartComponent, ShoppingHeaderComponent, ShoppingCheckoutComponent, ShoppinghomeComponent, ShoppingProductDetailComponent, ShoppingSellershopComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
