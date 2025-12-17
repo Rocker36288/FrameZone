@@ -83,7 +83,7 @@
                 </svg>
                 聊聊
               </button>
-              <button class="seller-store-btn" (click)="goToStore()">
+              <button class="seller-store-btn" [routerLink]="['/shopping/sellershop', sellerInfo.account]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                   class="icon icon-tabler icons-tabler-outline icon-tabler-building-store">
@@ -183,14 +183,14 @@
 
         <div class="similar-col" *ngFor="let item of similarProducts">
           <div class="card d-flex flex-column h-100 product-card-override">
-            <a href="#">
-              <div class="card-img-top card-img-placeholder"><img [src]="item.img" [alt]="item.title"
+            <a [routerLink]="['/shopping/product', item.id]">
+              <div class="card-img-top card-img-placeholder"><img [src]="item.img" [alt]="item.name"
                   class="product-thumb-image">
               </div>
             </a>
             <div class="card-body d-flex flex-column">
               <h3 class="card-title">
-                <a href="#">{{ item.title }}</a>
+                <a [routerLink]="['/shopping/product', item.id]">{{ item.name }}</a>
               </h3>
               <div class="text-secondary text-truncate mb-2 card-description-override">
                 {{ item.desc }}
