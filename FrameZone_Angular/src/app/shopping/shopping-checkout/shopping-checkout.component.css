@@ -22,3 +22,7 @@
 .avatar {
   border-radius: 50%;
 }
+
+.card-body-checkout {
+  /* background: linear-gradient(135deg, #79a3f1 0%, #764ba2 100%); */
+}
