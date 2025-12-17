@@ -11,11 +11,11 @@
 
       <p class="fs-5 mb-2">拖放影片檔案到這裡，或</p>
 
-      <button class="btn btn-primary mb-2">
+      <button class="btn btn-primary mb-2" (click)="fileInput.click()">
         <i class="ti ti-upload me-1"></i> 選擇檔案
       </button>
 
-      <input type="file" class="d-none" id="fileInput" accept="video/*">
+      <input #fileInput type="file" class="d-none" accept="video/*" (change)="onFileSelected($event)">
 
       <div class="text-muted mt-3 small">
         支援格式：MP4、AVI、MOV（最大 500MB）

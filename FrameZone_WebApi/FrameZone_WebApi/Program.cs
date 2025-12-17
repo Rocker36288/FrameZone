@@ -160,6 +160,7 @@ builder.Services.AddHttpContextAccessor();
 
 // ========== 影片服務 (DI注入) ==========
 builder.Services.AddScoped<VideoCardResponsity>(); // 註冊 Repository
+builder.Services.AddScoped<IVideoUploadService, VideoUploadService>();
 builder.Services.AddScoped<VideoServices>();
 //=======================================
 

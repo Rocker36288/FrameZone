@@ -24,8 +24,6 @@ namespace FrameZone_WebApi.Videos.Services
             return dto;
         }
 
-
-
         public async Task<VideoCommentDto?> GetVideoCommentByCommentidAsync(int videoid)
         {
             var dto = await _videoRepo.GetVideoCommentByCommentid(videoid);
@@ -49,5 +47,7 @@ namespace FrameZone_WebApi.Videos.Services
 
             return dto;
         }
+
+       
     }
 }
