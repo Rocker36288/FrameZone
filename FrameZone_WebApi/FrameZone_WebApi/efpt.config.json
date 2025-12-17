@@ -255,6 +255,62 @@
          "ObjectType": 0
       },
       {
+         "Name": "[Share].[ChatMembers]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[ChatRoom]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[CommentLikes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[Comments]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[CommentTarget]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[Favorites]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[MessageReads]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[Messages]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[ReportAction]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[ReportCategories]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[Reports]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[ReviewPhotos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[Reviews]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[TargetTypes]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[Video].[Channels]",
          "ObjectType": 0
       },

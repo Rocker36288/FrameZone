@@ -21,6 +21,18 @@ public partial class AAContext : DbContext
 
     public virtual DbSet<Channel> Channels { get; set; }
 
+    public virtual DbSet<ChatMember> ChatMembers { get; set; }
+
+    public virtual DbSet<ChatRoom> ChatRooms { get; set; }
+
+    public virtual DbSet<Comment> Comments { get; set; }
+
+    public virtual DbSet<CommentLike> CommentLikes { get; set; }
+
+    public virtual DbSet<CommentTarget> CommentTargets { get; set; }
+
+    public virtual DbSet<Favorite> Favorites { get; set; }
+
     public virtual DbSet<Following> Followings { get; set; }
 
     public virtual DbSet<Invoice> Invoices { get; set; }
@@ -28,6 +40,10 @@ public partial class AAContext : DbContext
     public virtual DbSet<InvoiceSetting> InvoiceSettings { get; set; }
 
     public virtual DbSet<Like> Likes { get; set; }
+
+    public virtual DbSet<Message> Messages { get; set; }
+
+    public virtual DbSet<MessageRead> MessageReads { get; set; }
 
     public virtual DbSet<PaymentMethod> PaymentMethods { get; set; }
 
@@ -99,7 +115,19 @@ public partial class AAContext : DbContext
 
     public virtual DbSet<RefundRequest> RefundRequests { get; set; }
 
+    public virtual DbSet<Report> Reports { get; set; }
+
+    public virtual DbSet<ReportAction> ReportActions { get; set; }
+
+    public virtual DbSet<ReportCategory> ReportCategories { get; set; }
+
     public virtual DbSet<ReportTarget> ReportTargets { get; set; }
+
+    public virtual DbSet<Review> Reviews { get; set; }
+
+    public virtual DbSet<ReviewPhoto> ReviewPhotos { get; set; }
+
+    public virtual DbSet<TargetType> TargetTypes { get; set; }
 
     public virtual DbSet<TransactionStatusLog> TransactionStatusLogs { get; set; }
 
@@ -264,6 +292,133 @@ public partial class AAContext : DbContext
                 .HasConstraintName("FK_Channels_User");
         });
 
+        modelBuilder.Entity<ChatMember>(entity =>
+        {
+            entity.HasKey(e => new { e.RoomId, e.UserId });
+
+            entity.ToTable("ChatMembers", "Share");
+
+            entity.Property(e => e.JoinAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.LeaveAt).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Room).WithMany(p => p.ChatMembers)
+                .HasForeignKey(d => d.RoomId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ChatMembers_ChatRoom");
+
+            entity.HasOne(d => d.User).WithMany(p => p.ChatMembers)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ChatMembers_User");
+        });
+
+        modelBuilder.Entity<ChatRoom>(entity =>
+        {
+            entity.HasKey(e => e.RoomId);
+
+            entity.ToTable("ChatRoom", "Share");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DeletedAt).HasColumnType("datetime");
+            entity.Property(e => e.RoomCategory)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.RoomName).HasMaxLength(100);
+            entity.Property(e => e.RoomType)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<Comment>(entity =>
+        {
+            entity.ToTable("Comments", "Share");
+
+            entity.Property(e => e.CommentContent)
+                .IsRequired()
+                .HasMaxLength(500);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__Comments__Create__6399A2AA")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DeletedAt).HasColumnType("datetime");
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+
+            entity.HasOne(d => d.ParentComment).WithMany(p => p.InverseParentComment)
+                .HasForeignKey(d => d.ParentCommentId)
+                .HasConstraintName("FK_Comments_Comments");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Comments)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Comments_User");
+        });
+
+        modelBuilder.Entity<CommentLike>(entity =>
+        {
+            entity.HasKey(e => e.LikeId);
+
+            entity.ToTable("CommentLikes", "Share");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__CommentLi__Creat__66760F55")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Comment).WithMany(p => p.CommentLikes)
+                .HasForeignKey(d => d.CommentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CommentLikes_Comments");
+
+            entity.HasOne(d => d.User).WithMany(p => p.CommentLikes)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CommentLikes_User");
+        });
+
+        modelBuilder.Entity<CommentTarget>(entity =>
+        {
+            entity.HasKey(e => e.CommentTargetId).HasName("PK_Share_CommentTarget");
+
+            entity.ToTable("CommentTarget", "Share");
+
+            entity.HasOne(d => d.Comment).WithMany(p => p.CommentTargets)
+                .HasForeignKey(d => d.CommentId)
+                .HasConstraintName("FK_CommentTarget_Comments");
+
+            entity.HasOne(d => d.TargetType).WithMany(p => p.CommentTargets)
+                .HasForeignKey(d => d.TargetTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CommentTarget_TargetTypes");
+
+            entity.HasOne(d => d.Video).WithMany(p => p.CommentTargets)
+                .HasForeignKey(d => d.VideoId)
+                .HasConstraintName("FK_CommentTarget_Videos");
+        });
+
+        modelBuilder.Entity<Favorite>(entity =>
+        {
+            entity.ToTable("Favorites", "Share");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__Favorites__Creat__46FD63FC")
+                .HasColumnType("datetime");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__Favorites__Updat__47F18835")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Favorites)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Favorites_User2");
+        });
+
         modelBuilder.Entity<Following>(entity =>
         {
             entity
@@ -388,6 +543,56 @@ public partial class AAContext : DbContext
                 .HasForeignKey(d => d.VideoId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Likes_Videos");
+        });
+
+        modelBuilder.Entity<Message>(entity =>
+        {
+            entity.ToTable("Messages", "Share");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DeletedAt).HasColumnType("datetime");
+            entity.Property(e => e.LinkDescription).HasMaxLength(500);
+            entity.Property(e => e.LinkTitle).HasMaxLength(200);
+            entity.Property(e => e.MediaUrl).HasMaxLength(500);
+            entity.Property(e => e.MessageContent).HasMaxLength(500);
+            entity.Property(e => e.MessageType)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.ThumbnailUrl).HasMaxLength(500);
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Room).WithMany(p => p.Messages)
+                .HasForeignKey(d => d.RoomId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Messages_ChatRoom");
+
+            entity.HasOne(d => d.SenderUser).WithMany(p => p.Messages)
+                .HasForeignKey(d => d.SenderUserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Messages_User");
+        });
+
+        modelBuilder.Entity<MessageRead>(entity =>
+        {
+            entity.HasKey(e => new { e.MessageId, e.UserId });
+
+            entity.ToTable("MessageReads", "Share");
+
+            entity.Property(e => e.ReadAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Message).WithMany(p => p.MessageReads)
+                .HasForeignKey(d => d.MessageId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_MessageReads_Messages");
+
+            entity.HasOne(d => d.User).WithMany(p => p.MessageReads)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_MessageReads_User");
         });
 
         modelBuilder.Entity<PaymentMethod>(entity =>
@@ -1482,16 +1687,177 @@ public partial class AAContext : DbContext
                 .HasConstraintName("FK_RefundRequest_User");
         });
 
+        modelBuilder.Entity<Report>(entity =>
+        {
+            entity.ToTable("Reports", "Share");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__Reports__Created__4BC21919")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Description)
+                .IsRequired()
+                .HasMaxLength(500);
+            entity.Property(e => e.Status).HasAnnotation("Relational:DefaultConstraintName", "DF__Reports__Status__4ACDF4E0");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__Reports__Updated__4CB63D52")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Category).WithMany(p => p.Reports)
+                .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Reports_ReportCategories");
+
+            entity.HasOne(d => d.ReportTarget).WithMany(p => p.Reports)
+                .HasForeignKey(d => d.ReportTargetId)
+                .HasConstraintName("FK_Reports_ReportTarget");
+
+            entity.HasOne(d => d.ReportedUser).WithMany(p => p.ReportReportedUsers)
+                .HasForeignKey(d => d.ReportedUserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Reports_User");
+
+            entity.HasOne(d => d.ReporterUser).WithMany(p => p.ReportReporterUsers)
+                .HasForeignKey(d => d.ReporterUserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Reports_User1");
+        });
+
+        modelBuilder.Entity<ReportAction>(entity =>
+        {
+            entity.HasKey(e => e.ActionId);
+
+            entity.ToTable("ReportAction", "Share");
+
+            entity.Property(e => e.ActionResult).HasMaxLength(1000);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__ReportAct__Creat__54575F1A")
+                .HasColumnType("datetime");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__ReportAct__Updat__554B8353")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.AdminUser).WithMany(p => p.ReportActions)
+                .HasForeignKey(d => d.AdminUserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ReportAction_User");
+
+            entity.HasOne(d => d.Report).WithMany(p => p.ReportActions)
+                .HasForeignKey(d => d.ReportId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ReportAction_Reports");
+        });
+
+        modelBuilder.Entity<ReportCategory>(entity =>
+        {
+            entity.HasKey(e => e.CategoryId);
+
+            entity.ToTable("ReportCategories", "Share");
+
+            entity.Property(e => e.CategoryName)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__ReportCat__Creat__5086CE36")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__ReportCat__IsAct__4F92A9FD");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__ReportCat__Updat__517AF26F")
+                .HasColumnType("datetime");
+        });
+
         modelBuilder.Entity<ReportTarget>(entity =>
         {
             entity.HasKey(e => e.ReportTargetId).HasName("PK_Video_ReportTarget");
 
             entity.ToTable("ReportTarget", "Video");
 
+            entity.HasOne(d => d.TargetType).WithMany(p => p.ReportTargets)
+                .HasForeignKey(d => d.TargetTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ReportTarget_Targets");
+
             entity.HasOne(d => d.Video).WithMany(p => p.ReportTargets)
                 .HasForeignKey(d => d.VideoId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ReportTarget_Videos");
+        });
+
+        modelBuilder.Entity<Review>(entity =>
+        {
+            entity.ToTable("Reviews", "Share");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.ReviewType)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.RevieweeUser).WithMany(p => p.ReviewRevieweeUsers)
+                .HasForeignKey(d => d.RevieweeUserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Reviews_User1");
+
+            entity.HasOne(d => d.ReviewerUser).WithMany(p => p.ReviewReviewerUsers)
+                .HasForeignKey(d => d.ReviewerUserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Reviews_User");
+        });
+
+        modelBuilder.Entity<ReviewPhoto>(entity =>
+        {
+            entity.ToTable("ReviewPhotos", "Share");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.ImageUrl)
+                .IsRequired()
+                .HasMaxLength(500);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Review).WithMany(p => p.ReviewPhotos)
+                .HasForeignKey(d => d.ReviewId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ReviewPhotos_Reviews");
+        });
+
+        modelBuilder.Entity<TargetType>(entity =>
+        {
+            entity.HasKey(e => e.TargetTypeId).HasName("PK_Targets");
+
+            entity.ToTable("TargetTypes", "Share");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__Targets__Created__30D918B3")
+                .HasColumnType("datetime");
+            entity.Property(e => e.TargetType1)
+                .IsRequired()
+                .HasMaxLength(20)
+                .HasColumnName("TargetType");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__Targets__Updated__31CD3CEC")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.System).WithMany(p => p.TargetTypes)
+                .HasForeignKey(d => d.SystemId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Targets_UserSystemModule");
         });
 
         modelBuilder.Entity<TransactionStatusLog>(entity =>

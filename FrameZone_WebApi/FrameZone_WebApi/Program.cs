@@ -1,4 +1,4 @@
-using FrameZone_WebApi.Helpers;
+ï»¿using FrameZone_WebApi.Helpers;
 using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Repositories;
 using FrameZone_WebApi.Services;
@@ -10,25 +10,60 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.StaticFiles;
 
 using System.Text;
+using Xabe.FFmpeg.Downloader;
+using Xabe.FFmpeg;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+//////////////--------------------------åœ¨æ‡‰ç”¨ç¨‹å¼å•Ÿå‹•å‰ä¸‹è¼‰ FFmpeg---------------
+//var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+//var ffmpegPath = Path.Combine(wwwrootPath, "FFmpeg");
+
+//// ç¢ºä¿ç›®éŒ„å­˜åœ¨
+//Directory.CreateDirectory(ffmpegPath);
+
+//// æª¢æŸ¥æ˜¯å¦å·²å­˜åœ¨ FFmpeg
+//var ffmpegExe = Path.Combine(ffmpegPath, "ffmpeg.exe");
+//if (!File.Exists(ffmpegExe))
+//{
+//    Console.WriteLine("FFmpeg ä¸å­˜åœ¨,æ­£åœ¨ä¸‹è¼‰...");
+//    try
+//    {
+//        await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Official, ffmpegPath);
+//        Console.WriteLine("! FFmpeg ä¸‹è¼‰å®Œæˆ!");
+//    }
+//    catch (Exception ex)
+//    {
+//        Console.WriteLine($"X FFmpeg ä¸‹è¼‰å¤±æ•—: {ex.Message}");
+//        Console.WriteLine("è«‹æ‰‹å‹•ä¸‹è¼‰ FFmpeg ä¸¦æ”¾ç½®åˆ° wwwroot/FFmpeg/ ç›®éŒ„");
+//    }
+//}
+//else
+//{
+//    Console.WriteLine("! FFmpeg å·²å­˜åœ¨");
+//}
+
+//// è¨­å®š FFmpeg è·¯å¾‘
+//FFmpeg.SetExecutablesPath(ffmpegPath);
+////////////--------------------------
 
 // Add services to the container.
 
 
-// ========== ¸ê®Æ®w³s½u³]©w ==========
+// ========== è³‡æ–™åº«é€£ç·šè¨­å®š ==========
 
 builder.Services.AddDbContext<AAContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("AA");
     options.UseSqlServer(connectionString);
 
-    // ¶}µo®ÉÅã¥Ü¸Ô²Ó¿ù»~
+    // é–‹ç™¼æ™‚é¡¯ç¤ºè©³ç´°éŒ¯èª¤
     options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 });
 
 
-// ========== CORS ³]©w ==========
+// ========== CORS è¨­å®š ==========
 
 var policyName = "Angular";
 builder.Services.AddCors(options =>
@@ -43,17 +78,17 @@ builder.Services.AddCors(options =>
         });
     });
 
-// ========== JWT ³]©w ==========
+// ========== JWT è¨­å®š ==========
 
 /// <summery>
-/// µù¥U JWT Bearer Token ÅçÃÒ
+/// è¨»å†Š JWT Bearer Token é©—è­‰
 /// </summery>
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey ¥¼³]©w");
+var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey æœªè¨­å®š");
 
 builder.Services.AddAuthentication(options =>
 {
-    // ¹w³]¨Ï¥Î JWT Bearer ÅçÃÒ
+    // é è¨­ä½¿ç”¨ JWT Bearer é©—è­‰
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
@@ -61,45 +96,45 @@ builder.Services.AddAuthentication(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,                          // ÅçÃÒµo¦æªÌ
-        ValidateAudience = true,                        // ÅçÃÒ±µ¦¬ªÌ
-        ValidateLifetime = true,                        // ÅçÃÒ¹L´Á®É¶¡
-        ValidateIssuerSigningKey = true,                // ÅçÃÒÃ±³¹ª÷Æ_
+        ValidateIssuer = true,                          // é©—è­‰ç™¼è¡Œè€…
+        ValidateAudience = true,                        // é©—è­‰æ¥æ”¶è€…
+        ValidateLifetime = true,                        // é©—è­‰éæœŸæ™‚é–“
+        ValidateIssuerSigningKey = true,                // é©—è­‰ç°½ç« é‡‘é‘°
         ValidIssuer = jwtSettings["Issuer"],
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(secretKey)
         ),
-        ClockSkew = TimeSpan.Zero                       // ¤£¤¹³\®É¶¡°¾²¾
+        ClockSkew = TimeSpan.Zero                       // ä¸å…è¨±æ™‚é–“åç§»
     };
 
-    // Token ÅçÃÒ¨Æ¥ó
+    // Token é©—è­‰äº‹ä»¶
     options.Events = new JwtBearerEvents
     {
         OnAuthenticationFailed = context =>
         {
-            // Token ÅçÃÒ¥¢±Ñ®É
-            Console.WriteLine($"JWT ÅçÃÒ¥¢±Ñ: {context.Exception.Message}");
+            // Token é©—è­‰å¤±æ•—æ™‚
+            Console.WriteLine($"JWT é©—è­‰å¤±æ•—: {context.Exception.Message}");
             return Task.CompletedTask;
         },
         OnTokenValidated = context =>
         {
-            // Token ÅçÃÒ¦¨¥\®É
-            Console.WriteLine("JWT ÅçÃÒ¦¨¥\");
+            // Token é©—è­‰æˆåŠŸæ™‚
+            Console.WriteLine("JWT é©—è­‰æˆåŠŸ");
             return Task.CompletedTask;
         }
     };  
 });
 
-// ========== µù¥U¨Ì¿àª`¤JªA°È (DIª`¤J) ==========
+// ========== è¨»å†Šä¾è³´æ³¨å…¥æœå‹™ (DIæ³¨å…¥) ==========
 
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddHttpContextAccessor();
 
-// ========== ¼v¤ùªA°È (DIª`¤J) ==========
-builder.Services.AddScoped<VideoCardResponsity>(); // µù¥U Repository
+// ========== å½±ç‰‡æœå‹™ (DIæ³¨å…¥) ==========
+builder.Services.AddScoped<VideoCardResponsity>(); // è¨»å†Š Repository
 builder.Services.AddScoped<VideoServices>();
 //=======================================
 
@@ -108,8 +143,8 @@ builder.Services.AddScoped<VideoServices>();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
      {
-         options.JsonSerializerOptions.PropertyNamingPolicy = null;     // «O«ù­ì©lÄİ©Ê¦WºÙ
-         options.JsonSerializerOptions.WriteIndented = true;            // ®æ¦¡¤Æ JSON
+         options.JsonSerializerOptions.PropertyNamingPolicy = null;     // ä¿æŒåŸå§‹å±¬æ€§åç¨±
+         options.JsonSerializerOptions.WriteIndented = true;            // æ ¼å¼åŒ– JSON
      });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -125,7 +160,9 @@ var app = builder.Build();
 //    app.MapOpenApi();
 //}
 
-// ==========  ±Ò¥Î wwwroot ÀRºAÀÉ®×(¼v¤ù­n¥Îªº) ==========
+app.UseCors(policyName);
+
+// ==========  å•Ÿç”¨ wwwroot éœæ…‹æª”æ¡ˆ(å½±ç‰‡è¦ç”¨çš„) ==========
 var provider = new FileExtensionContentTypeProvider();
 provider.Mappings[".m3u8"] = "application/vnd.apple.mpegurl";
 provider.Mappings[".ts"] = "video/mp2t";
@@ -136,8 +173,6 @@ app.UseStaticFiles(new StaticFileOptions
 });
 //=======================================
 
-app.UseCors(policyName);
-
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
@@ -146,9 +181,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 Console.WriteLine("====================================");
-Console.WriteLine("FrameZone WebAPI ¥¿¦b±Ò°Ê...");
-Console.WriteLine($"Àô¹Ò: {app.Environment.EnvironmentName}");
-Console.WriteLine($"API ºİÂI: https://localhost:7213/api/");
+Console.WriteLine("FrameZone WebAPI æ­£åœ¨å•Ÿå‹•...");
+Console.WriteLine($"ç’°å¢ƒ: {app.Environment.EnvironmentName}");
+Console.WriteLine($"API ç«¯é»: https://localhost:7213/api/");
 Console.WriteLine("====================================");
 
 app.Run();

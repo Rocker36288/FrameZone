@@ -25,6 +25,8 @@ public partial class UserSystemModule
 
     public virtual ICollection<PhotoSubscriptionPlan> PhotoSubscriptionPlans { get; set; } = new List<PhotoSubscriptionPlan>();
 
+    public virtual ICollection<TargetType> TargetTypes { get; set; } = new List<TargetType>();
+
     public virtual ICollection<UserPermission> UserPermissions { get; set; } = new List<UserPermission>();
 
     public virtual ICollection<UserRoleType> UserRoleTypes { get; set; } = new List<UserRoleType>();

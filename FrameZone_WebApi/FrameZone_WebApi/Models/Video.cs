@@ -45,5 +45,7 @@ public partial class Video
 
     public virtual Channel Channel { get; set; }
 
+    public virtual ICollection<CommentTarget> CommentTargets { get; set; } = new List<CommentTarget>();
+
     public virtual ICollection<ReportTarget> ReportTargets { get; set; } = new List<ReportTarget>();
 }

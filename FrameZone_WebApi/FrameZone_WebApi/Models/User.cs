@@ -33,9 +33,21 @@ public partial class User
 
     public virtual Channel Channel { get; set; }
 
+    public virtual ICollection<ChatMember> ChatMembers { get; set; } = new List<ChatMember>();
+
+    public virtual ICollection<CommentLike> CommentLikes { get; set; } = new List<CommentLike>();
+
+    public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
+
+    public virtual ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
+
     public virtual ICollection<InvoiceSetting> InvoiceSettings { get; set; } = new List<InvoiceSetting>();
 
     public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
+
+    public virtual ICollection<MessageRead> MessageReads { get; set; } = new List<MessageRead>();
+
+    public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
 
     public virtual ICollection<PaymentMethod> PaymentMethods { get; set; } = new List<PaymentMethod>();
 
@@ -58,6 +70,16 @@ public partial class User
     public virtual ICollection<Playlist> Playlists { get; set; } = new List<Playlist>();
 
     public virtual ICollection<RefundRequest> RefundRequests { get; set; } = new List<RefundRequest>();
+
+    public virtual ICollection<ReportAction> ReportActions { get; set; } = new List<ReportAction>();
+
+    public virtual ICollection<Report> ReportReportedUsers { get; set; } = new List<Report>();
+
+    public virtual ICollection<Report> ReportReporterUsers { get; set; } = new List<Report>();
+
+    public virtual ICollection<Review> ReviewRevieweeUsers { get; set; } = new List<Review>();
+
+    public virtual ICollection<Review> ReviewReviewerUsers { get; set; } = new List<Review>();
 
     public virtual ICollection<UserBankAccount> UserBankAccounts { get; set; } = new List<UserBankAccount>();
 
