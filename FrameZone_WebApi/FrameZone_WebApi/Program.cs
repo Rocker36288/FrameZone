@@ -92,8 +92,6 @@ builder.Services.AddAuthentication(options =>
         },
         OnTokenValidated = context =>
         {
-            // Token ���Ҧ��\��
-            Console.WriteLine("JWT ���Ҧ��\");
             return Task.CompletedTask;
         }
     };  
