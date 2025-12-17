@@ -3,7 +3,13 @@
   background: white;
   border-bottom: 1px solid #e6e7e9;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  padding: 0.75rem 0;
+  padding: 0.5rem 0;
+  /* 導覽列固定不動 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
 }
 
 /* Logo 區域 */
@@ -403,6 +409,7 @@
   border-color: #334155;
 }
 
+<<<<<<< HEAD
 /* ===== 響應式設計 ===== */
 
 /* 通用調整 - 所有螢幕 */
@@ -595,3 +602,9 @@
     height: 16px;
   }
 }
+=======
+.logo-image {
+  width: 50px;
+  height: 50px;
+}
+>>>>>>> shopping

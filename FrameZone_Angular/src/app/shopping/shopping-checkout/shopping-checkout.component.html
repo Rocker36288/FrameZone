@@ -1,0 +1,130 @@
+<div class="container py-4">
+
+  <div class="checkout mb-4">
+    <h2> ←返回購物車</h2>
+    <div class="card card-long">
+      <div class="card-body">
+        <p class="checkout-title fw-bold text-center">結帳</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+
+    <div class="col-lg-8">
+
+      <div class="card mb-4 seller-group">
+        <div class="card-header">
+          <h3 class="card-title">
+            <div class="d-flex align-items-center pt-1 mt-auto">
+              <span class="avatar" style="background-image: url(/static/avatars/029m.jpg)"></span>
+              <div class="ms-3">
+                <a href="#" class="text-body">賣家帳號</a>
+              </div>
+            </div>
+          </h3>
+        </div>
+        <div class="card-body">
+          <div *ngFor="let item of cartItems" class="card mb-3">
+            <div class="row row-0 flex-fill align-items-center">
+              <div class="col-md-3">
+                <a href="#">
+                  <img src="images/products/1.jpg" class="w-100 h-100 object-cover" alt="Card side image" />
+                </a>
+              </div>
+              <div class="col">
+                <div class="card-body h-full d-flex flex-column">
+                  <h3 class="card-title">
+                    <h2><a href="#">{{item.name}}</a></h2>
+                  </h3>
+                  <div class="text-secondary">
+                    <h3>{{item.price}}</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="card-title">付款方式</h3>
+        </div>
+        <div class="card-body">
+          <p class="text-secondary">信用卡</p>
+          <p class="text-secondary">郵局/銀行轉帳</p>
+          <p class="text-secondary">貨到付款</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">運送方式</h3>
+        </div>
+        <div class="card-body">
+          <p class="text-secondary">郵寄</p>
+          <p class="text-secondary">7-11取貨</p>
+          <p class="text-secondary">7-11取貨付款</p>
+          <p class="text-secondary">全家取貨</p>
+          <p class="text-secondary">全家取貨付款</p>
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="col-lg-4 sticky-top pt-4">
+
+      <div class="subtotal">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h2 class="m-0">優惠券:</h2>
+              <a href="#" class="text-danger text-decoration-none d-flex align-items-center" data-bs-toggle="modal"
+                (click)="saveCouponState()" data-bs-target="#couponModal" style="cursor: pointer;font-size: 1rem;">
+                {{ getDiscountDisplay() }}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                  class="bi bi-chevron-right ms-1" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd"
+                    d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708" />
+                </svg>
+              </a>
+            </div>
+            <br>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h2 class="m-0">小計:</h2>
+              <h2 class="m-0 text-end">${{ getTotalAmount() }}</h2>
+            </div>
+            <br>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h2 class="m-0">運費:</h2>
+              <h2 class="m-0 text-end">${{ getTotalAmount() }}</h2>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h2 class="m-0">應付總金額:</h2>
+              <h2 class="m-0 text-end">${{ getFinalTotal() }}</h2>
+            </div>
+            <a class="btn btn-animate-icon w-100 checkout-button" style="background-color: rgb(139, 168, 231);">
+
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-basket-check">
+
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M17 10l-2 -6" />
+                <path d="M7 10l2 -6" />
+                <path
+                  d="M11 20h-3.756a3 3 0 0 1 -2.965 -2.544l-1.255 -7.152a2 2 0 0 1 1.977 -2.304h13.999a2 2 0 0 1 1.977 2.304l-.479 2.729" />
+                <path d="M10 14a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                <path d="M15 19l2 2l4 -4" />
+              </svg>
+              結帳
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

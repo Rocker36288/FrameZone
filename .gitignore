@@ -12,4 +12,10 @@ obj/
 
 *.vsidx
 /FrameZone_WebApi/FrameZone_WebApi/obj/Release/net9.0
+/FrameZone_WebApi/.vs/FrameZone_WebApi/CopilotIndices/17.14.1368.60722/CodeChunks.db
+/FrameZone_WebApi/.vs/FrameZone_WebApi/CopilotIndices/17.14.1368.60722/CodeChunks.db-shm
+/FrameZone_WebApi/.vs/FrameZone_WebApi/CopilotIndices/17.14.1368.60722/CodeChunks.db-wal
+/FrameZone_WebApi/.vs/FrameZone_WebApi/CopilotIndices/17.14.1368.60722/SemanticSymbols.db
+/FrameZone_WebApi/.vs/FrameZone_WebApi/CopilotIndices/17.14.1368.60722/SemanticSymbols.db-shm
+/FrameZone_WebApi/.vs/FrameZone_WebApi/CopilotIndices/17.14.1368.60722/SemanticSymbols.db-wal
 /FrameZone_WebApi/FrameZone_WebApi/wwwroot/FFmpeg/

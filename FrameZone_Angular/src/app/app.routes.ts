@@ -55,6 +55,37 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'shopping',
+    loadComponent: () => import('./shopping/shopping-header/shopping-header.component').then(m => m.ShoppingHeaderComponent),
+    children: [
+      {
+        path: '',
+        redirectTo: 'home',
+        pathMatch: 'full'
+      },
+      {
+        path: 'home',
+        loadComponent: () => import('./shopping/shoppinghome/shoppinghome.component').then(m => m.ShoppinghomeComponent)
+      },
+      {
+        path: 'product/:productId',
+        loadComponent: () => import('./shopping/shopping-product-detail/shopping-product-detail.component').then(m => m.ShoppingProductDetailComponent)
+      },
+      {
+        path: 'sellershop/:sellerAccount',
+        loadComponent: () => import('./shopping/shopping-sellershop/shopping-sellershop.component').then(m => m.ShoppingSellershopComponent)
+      }
+    ]
+  },
+  {
+    path: 'shoppingcart',
+    loadComponent: () => import('./shopping/shoppingcart/shoppingcart.component').then(m => m.ShoppingcartComponent)
+  },
+  {
+    path: 'checkout',
+    loadComponent: () => import('./shopping/shopping-checkout/shopping-checkout.component').then(m => m.ShoppingCheckoutComponent)
+  },
+  {
     path: '',
     loadComponent: () => import('./layouts/photo-layout/photo-layout.component').then(m => m.PhotoLayoutComponent),
     children: [

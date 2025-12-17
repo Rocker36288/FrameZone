@@ -1,39 +1,16 @@
-import { CommonModule } from '@angular/common';
+import { HeaderComponent } from './../../shared/components/header/header.component';
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HeaderComponent } from "../../shared/components/header/header.component";
 import { CartItem, Coupon } from '../interfaces/cart';
-import { RouterLink } from '@angular/router';
-
-// interface CartItem {
-//   id: number;
-//   name: string;
-//   price: number;
-//   quantity: number;
-//   selected: boolean; // <-- 關鍵: 用來追蹤是否被勾選
-//   // 您可以加入其他屬性，例如: quantity: number;
-// }
-
-// interface Coupon {
-//   id: number;
-//   name: string;
-//   discount: number; // 折扣金額
-//   code: string;
-//   expiryDate: Date;
-//   isSelected: boolean; // 是否被使用者選中
-// }
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-shoppingcart',
-  standalone: true,
-  imports: [FormsModule, CommonModule, ReactiveFormsModule, HeaderComponent, RouterLink],
-  templateUrl: './shoppingcart.component.html',
-  styleUrl: './shoppingcart.component.css'
+  selector: 'app-shopping-checkout',
+  imports: [FormsModule, CommonModule, ReactiveFormsModule, HeaderComponent],
+  templateUrl: './shopping-checkout.component.html',
+  styleUrl: './shopping-checkout.component.css'
 })
-
-
-export class ShoppingcartComponent {
-
+export class ShoppingCheckoutComponent {
   @ViewChild('couponModalElement') couponModalElement!: ElementRef;
 
 
@@ -202,4 +179,5 @@ export class ShoppingcartComponent {
     // 如果 finalAppliedDiscount 是唯一參考，則不需要，但為了安全起見，建議呼叫。
     // 更好的做法是確保 getAppliedDiscount() 保持使用最新的 this.availableCoupons 狀態
   }
+
 }
