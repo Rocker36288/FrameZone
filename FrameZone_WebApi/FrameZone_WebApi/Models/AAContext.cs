@@ -161,8 +161,6 @@ public partial class AAContext : DbContext
 
     public virtual DbSet<PostView> PostViews { get; set; }
 
-    public virtual DbSet<ReportTarget> ReportTargets { get; set; }
-
     public virtual DbSet<Sticker> Stickers { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -1818,6 +1816,14 @@ public partial class AAContext : DbContext
                 .HasForeignKey(d => d.VideoId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ReportTarget_Videos");
+
+            entity.HasKey(e => e.ReportTargetId).HasName("PK_SocialNetwork_ReportTarget");
+
+            entity.ToTable("ReportTarget", "SocialNetwork");
+
+            entity.HasOne(d => d.Post).WithMany(p => p.ReportTargets)
+                .HasForeignKey(d => d.PostId)
+                .HasConstraintName("FK_ReportTarget_Posts");
         });
 
         modelBuilder.Entity<Review>(entity =>
@@ -2258,17 +2264,7 @@ public partial class AAContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PostViews_User");
         });
-
-        modelBuilder.Entity<ReportTarget>(entity =>
-        {
-            entity.HasKey(e => e.ReportTargetId).HasName("PK_SocialNetwork_ReportTarget");
-
-            entity.ToTable("ReportTarget", "SocialNetwork");
-
-            entity.HasOne(d => d.Post).WithMany(p => p.ReportTargets)
-                .HasForeignKey(d => d.PostId)
-                .HasConstraintName("FK_ReportTarget_Posts");
-        });
+                
 
         modelBuilder.Entity<Sticker>(entity =>
         {
