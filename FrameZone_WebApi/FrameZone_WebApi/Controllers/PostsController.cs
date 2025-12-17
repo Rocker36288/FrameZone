@@ -15,11 +15,24 @@ namespace FrameZone_WebApi.Controllers
             _postService = postService;
         }
 
+        // GET: api/posts
+        [HttpGet]
+        public async Task<IActionResult> GetPosts()
+        {
+            var post = await _postService.GetPostsAsync();
+
+            if (post == null)
+            {
+                return NotFound(new { message = "貼文不存在" });
+            }
+            return Ok(post);
+        }
+
         // GET: api/posts/1
         [HttpGet("{postId}")]
-        public async Task<IActionResult> GetPost(int postId)
+        public async Task<IActionResult> GetPostById(int postId)
         {
-            var post = await _postService.GetPostAsync(postId);
+            var post = await _postService.GetPostByIdAsync(postId);
 
             if (post == null)
             {
@@ -47,7 +60,7 @@ namespace FrameZone_WebApi.Controllers
             }
 
             return CreatedAtAction(
-                    nameof(GetPost),
+                    nameof(GetPostById),
                     new { postId = post.PostId },
                     post
                     );

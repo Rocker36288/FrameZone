@@ -11,6 +11,27 @@ namespace FrameZone_WebApi.Repositories
             _context = context;
         }
 
+        // ================= 取得多筆貼文 =================
+        public async Task<List<Post>> GetPostsAsync()
+        {
+            try
+            {
+                return await _context.Posts
+                    //依照貼文Id查詢 & 不顯示已刪除的貼文
+                    .Where(p =>
+                        p.Status != "Deleted" &&
+                        p.DeletedAt == null)
+                    //依照最新更新時間排序
+                    .OrderByDescending(p => p.UpdatedAt)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"取得貼文失敗: {ex.Message}");
+                return null;
+            }
+        }
+
         // ================= 取得貼文 =================
         public async Task<Post?> GetPostByIdAsync(int postId)
         {

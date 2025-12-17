@@ -12,8 +12,14 @@ namespace FrameZone_WebApi.Services
             _postRepository = postRepository;
         }
 
+        // ================= 取得多筆貼文 =================
+        public async Task<List<Post>> GetPostsAsync()
+        {
+            return await _postRepository.GetPostsAsync();
+        }
+
         // ================= 取得貼文 =================
-        public async Task<Post?> GetPostAsync(int postId)
+        public async Task<Post?> GetPostByIdAsync(int postId)
         {
             return await _postRepository.GetPostByIdAsync(postId);
         }
