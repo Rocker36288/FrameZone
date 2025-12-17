@@ -1,0 +1,17 @@
+.horizontal-scroll {
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 20px 0;
+  white-space: nowrap;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}

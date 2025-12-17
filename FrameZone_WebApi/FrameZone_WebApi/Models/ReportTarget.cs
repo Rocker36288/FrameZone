@@ -18,4 +18,11 @@ public partial class ReportTarget
     public int? MessageId { get; set; }
 
     public virtual Post Post { get; set; }
+    public int VideoId { get; set; }
+
+    public virtual ICollection<Report> Reports { get; set; } = new List<Report>();
+
+    public virtual TargetType TargetType { get; set; }
+
+    public virtual Video Video { get; set; }
 }

@@ -1,0 +1,141 @@
+<div class="container py-5">
+
+  <!-- 標題 -->
+  <h2 class="mb-4 fw-bold">上傳影片</h2>
+
+  <!-- 上傳區 -->
+  <div class="card mb-4 border-2 border-dashed text-center">
+    <div class="card-body py-5">
+
+      <i class="ti ti-video-plus fs-1 text-primary mb-3"></i>
+
+      <p class="fs-5 mb-2">拖放影片檔案到這裡，或</p>
+
+      <button class="btn btn-primary mb-2">
+        <i class="ti ti-upload me-1"></i> 選擇檔案
+      </button>
+
+      <input type="file" class="d-none" id="fileInput" accept="video/*">
+
+      <div class="text-muted mt-3 small">
+        支援格式：MP4、AVI、MOV（最大 500MB）
+      </div>
+    </div>
+  </div>
+
+  <!-- 上傳進度 -->
+  <div class="card mb-4 d-none" id="progressContainer">
+    <div class="card-body">
+      <div class="progress mb-2">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressFill" style="width: 0%">
+          0%
+        </div>
+      </div>
+      <div class="text-muted small" id="statusMessage">上傳中...</div>
+    </div>
+  </div>
+
+  <!-- 影片詳細資訊 -->
+  <div class="card d-none" id="videoPreviewSection">
+    <div class="card-header fw-bold">
+      影片詳細資訊
+    </div>
+
+    <div class="card-body">
+
+      <!-- 影片預覽 -->
+      <div class="mb-4 text-center">
+        <video id="previewVideo" class="w-100 rounded" controls></video>
+      </div>
+
+      <!-- 縮圖選擇 -->
+      <div class="mb-4">
+        <h5 class="mb-3">選擇縮圖</h5>
+
+        <div class="d-flex gap-2 flex-wrap" id="thumbnailOptions">
+          <!-- 縮圖卡片 -->
+          <!--
+          <img src="..." class="img-thumbnail" style="width: 160px;">
+          -->
+        </div>
+
+        <input type="file" id="customThumbnailInput" accept="image/*" class="d-none">
+      </div>
+
+      <!-- 表單 -->
+      <div class="row g-4">
+
+        <!-- 標題 -->
+        <div class="col-12">
+          <label class="form-label fw-semibold">影片標題 *</label>
+          <input type="text" class="form-control" maxlength="100" placeholder="輸入吸引人的標題">
+          <div class="form-text">0 / 100</div>
+        </div>
+
+        <!-- 描述 -->
+        <div class="col-12">
+          <label class="form-label fw-semibold">影片描述</label>
+          <textarea class="form-control" rows="4" maxlength="5000" placeholder="描述您的影片內容..."></textarea>
+          <div class="form-text">0 / 5000</div>
+        </div>
+
+        <!-- 隱私設定 -->
+        <div class="col-12">
+          <label class="form-label fw-semibold">隱私設定 *</label>
+
+          <div class="row g-3">
+
+            <!-- 公開 -->
+            <div class="col-md-4">
+              <label class="card h-100 border-primary">
+                <div class="card-body text-center">
+                  <input type="radio" name="privacy" class="form-check-input d-none" checked>
+                  <i class="ti ti-world fs-2 text-primary mb-2"></i>
+                  <div class="fw-bold">公開</div>
+                  <small class="text-muted">所有人都可以觀看</small>
+                </div>
+              </label>
+            </div>
+
+            <!-- 不公開 -->
+            <div class="col-md-4">
+              <label class="card h-100">
+                <div class="card-body text-center">
+                  <input type="radio" name="privacy" class="form-check-input d-none">
+                  <i class="ti ti-link fs-2 mb-2"></i>
+                  <div class="fw-bold">不公開列出</div>
+                  <small class="text-muted">有連結的人可觀看</small>
+                </div>
+              </label>
+            </div>
+
+            <!-- 私人 -->
+            <div class="col-md-4">
+              <label class="card h-100">
+                <div class="card-body text-center">
+                  <input type="radio" name="privacy" class="form-check-input d-none">
+                  <i class="ti ti-lock fs-2 mb-2"></i>
+                  <div class="fw-bold">私人</div>
+                  <small class="text-muted">只有您可以觀看</small>
+                </div>
+              </label>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 操作按鈕 -->
+    <div class="card-footer d-flex justify-content-end gap-2">
+      <button class="btn btn-outline-secondary" disabled>
+        <i class="ti ti-device-floppy me-1"></i> 儲存草稿
+      </button>
+      <button class="btn btn-primary" disabled>
+        <i class="ti ti-send me-1"></i> 發佈影片
+      </button>
+    </div>
+  </div>
+
+</div>

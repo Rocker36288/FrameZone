@@ -45,6 +45,56 @@ public partial class User
 
     public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
 
+    public virtual Channel Channel { get; set; }
+
+    public virtual ICollection<ChatMember> ChatMembers { get; set; } = new List<ChatMember>();
+
+    public virtual ICollection<CommentLike> CommentLikes { get; set; } = new List<CommentLike>();
+
+    public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
+
+    public virtual ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
+
+    public virtual ICollection<InvoiceSetting> InvoiceSettings { get; set; } = new List<InvoiceSetting>();
+
+    public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
+
+    public virtual ICollection<MessageRead> MessageReads { get; set; } = new List<MessageRead>();
+
+    public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
+
+    public virtual ICollection<PaymentMethod> PaymentMethods { get; set; } = new List<PaymentMethod>();
+
+    public virtual ICollection<PaymentTransaction> PaymentTransactions { get; set; } = new List<PaymentTransaction>();
+
+    public virtual ICollection<PhotoAlbum> PhotoAlbums { get; set; } = new List<PhotoAlbum>();
+
+    public virtual ICollection<PhotoCategory> PhotoCategories { get; set; } = new List<PhotoCategory>();
+
+    public virtual ICollection<PhotoShare> PhotoShares { get; set; } = new List<PhotoShare>();
+
+    public virtual ICollection<PhotoSubscriptionHistory> PhotoSubscriptionHistories { get; set; } = new List<PhotoSubscriptionHistory>();
+
+    public virtual ICollection<PhotoTag> PhotoTags { get; set; } = new List<PhotoTag>();
+
+    public virtual ICollection<PhotoUserQuotaUsage> PhotoUserQuotaUsages { get; set; } = new List<PhotoUserQuotaUsage>();
+
+    public virtual ICollection<PhotoUserSubscription> PhotoUserSubscriptions { get; set; } = new List<PhotoUserSubscription>();
+
+    public virtual ICollection<Playlist> Playlists { get; set; } = new List<Playlist>();
+
+    public virtual ICollection<RefundRequest> RefundRequests { get; set; } = new List<RefundRequest>();
+
+    public virtual ICollection<ReportAction> ReportActions { get; set; } = new List<ReportAction>();
+
+    public virtual ICollection<Report> ReportReportedUsers { get; set; } = new List<Report>();
+
+    public virtual ICollection<Report> ReportReporterUsers { get; set; } = new List<Report>();
+
+    public virtual ICollection<Review> ReviewRevieweeUsers { get; set; } = new List<Review>();
+
+    public virtual ICollection<Review> ReviewReviewerUsers { get; set; } = new List<Review>();
+
     public virtual ICollection<UserBankAccount> UserBankAccounts { get; set; } = new List<UserBankAccount>();
 
     public virtual ICollection<UserLog> UserLogs { get; set; } = new List<UserLog>();
@@ -58,6 +108,8 @@ public partial class User
     public virtual UserProfile UserProfile { get; set; }
 
     public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+
+    public virtual ICollection<UserSavedPlaylist> UserSavedPlaylists { get; set; } = new List<UserSavedPlaylist>();
 
     public virtual UserSecurity UserSecurity { get; set; }
 

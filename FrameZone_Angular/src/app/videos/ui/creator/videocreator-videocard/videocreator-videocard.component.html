@@ -1,0 +1,148 @@
+<div class="container">
+  <!-- 創作者後台影片列（流程狀態 + 隱私狀態分開） -->
+  <div class="card creator-video-row mb-3 shadow-sm border-0 hover-shadow-lg transition" (click)="onVideoClick()"
+    style="cursor: pointer; transition: all 0.2s ease;">
+    <div class="card-body p-3">
+      <div class="row g-3 align-items-center">
+
+        <!-- 縮圖區域 -->
+        <div class="col-auto">
+          <div class="position-relative video-thumb-backstage rounded-3 overflow-hidden shadow-sm"
+            style="width: 160px; height: 90px;">
+            <img [src]="Video.thumbnail" alt="Video Thumbnail" class="img-fluid w-100 h-100 object-fit-cover">
+
+            <!-- 影片時長標籤 -->
+            <span class="position-absolute bottom-0 end-0 m-1 badge bg-dark text-white fs-7 fw-normal">
+              {{ Video.duration! | videoDuration }}
+            </span>
+          </div>
+        </div>
+
+        <!-- 主要資訊區 -->
+        <div class="col">
+          <div class="d-flex flex-column gap-2">
+
+            <!-- 標題 -->
+            <h5 class="mb-0 text-truncate fw-bold" style="max-width: 500px;">
+              {{ Video.title }}
+            </h5>
+
+            <!-- 發佈時間 -->
+            <div class="text-muted d-flex align-items-center gap-1">
+              <i class="ti ti-clock fs-5"></i>
+              <span class="fs-7">發佈於 {{ Video.uploadDate! | videoTimeago }}</span>
+            </div>
+
+            <!-- 統計數據 -->
+            <div class="d-flex flex-wrap gap-3 mt-1">
+              <div class="d-flex align-items-center gap-1 text-muted">
+                <i class="ti ti-eye fs-5"></i>
+                <span class="fs-7 fw-medium">{{ Video.viewsCount }}</span>
+              </div>
+              <div class="d-flex align-items-center gap-1 text-muted">
+                <i class="ti ti-message-circle fs-5"></i>
+                <span class="fs-7 fw-medium">{{ Video.commentCount }}</span>
+              </div>
+              <div class="d-flex align-items-center gap-1 text-muted">
+                <i class="ti ti-thumb-up fs-5"></i>
+                <span class="fs-7 fw-medium">{{ Video.likesCount }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右側：狀態與操作區 -->
+        <div class="col-auto">
+          <div class="d-flex align-items-center gap-3">
+
+            <!-- 狀態標籤組 -->
+            <div class="d-flex flex-column gap-2 align-items-end">
+
+              <!-- 流程狀態 Badge -->
+              <span class="badge fs-7 fw-semibold px-3 py-2 d-flex align-items-center gap-1" [ngClass]="{
+                    'bg-azure-lt text-azure': Video.processStatus === 'UPLOADING',
+                    'bg-cyan-lt text-cyan': Video.processStatus === 'UPLOADED' || Video.processStatus === 'PRE_PROCESSING',
+                    'bg-yellow-lt text-yellow': Video.processStatus === 'TRANSCODING' || Video.processStatus === 'AI_AUDITING',
+                    'bg-green-lt text-green': Video.processStatus === 'READY',
+                    'bg-red-lt text-red': Video.processStatus === 'FAILED_TRANSCODE' || Video.processStatus === 'FAILED_AUDIT'
+                  }">
+                <i class="ti" [ngClass]="{
+                'ti-upload': Video.processStatus === 'UPLOADING',
+                'ti-cloud-check': Video.processStatus === 'UPLOADED',
+                'ti-loader': Video.processStatus === 'PRE_PROCESSING' || Video.processStatus === 'TRANSCODING' || Video.processStatus === 'AI_AUDITING',
+                'ti-circle-check': Video.processStatus === 'READY',
+                'ti-alert-circle': Video.processStatus === 'FAILED_TRANSCODE' || Video.processStatus === 'FAILED_AUDIT'
+              }"></i>
+                {{
+                Video.processStatus === 'UPLOADING' ? '上傳中' :
+                Video.processStatus === 'UPLOADED' ? '已上傳' :
+                Video.processStatus === 'PRE_PROCESSING' ? '前處理中' :
+                Video.processStatus === 'TRANSCODING' ? '轉碼中' :
+                Video.processStatus === 'AI_AUDITING' ? 'AI審核中' :
+                Video.processStatus === 'READY' ? '已就緒' :
+                Video.processStatus === 'FAILED_TRANSCODE' ? '轉碼失敗' :
+                Video.processStatus === 'FAILED_AUDIT' ? '審核未過' : ''
+                }}
+              </span>
+
+              <!-- 隱私狀態 Badge -->
+              <span class="badge fs-7 fw-semibold px-3 py-2 d-flex align-items-center gap-1" [ngClass]="{
+                    'bg-green-lt text-green': Video.privacyStatus === 'PUBLIC',
+                    'bg-dark-lt text-dark': Video.privacyStatus === 'UNLISTED',
+                    'bg-secondary-lt text-secondary': Video.privacyStatus === 'PRIVATE' || Video.privacyStatus === 'DRAFT'
+                  }">
+                <i class="ti" [ngClass]="{
+                'ti-world': Video.privacyStatus === 'PUBLIC',
+                'ti-link': Video.privacyStatus === 'UNLISTED',
+                'ti-lock': Video.privacyStatus === 'PRIVATE',
+                'ti-file-text': Video.privacyStatus === 'DRAFT'
+              }"></i>
+                {{
+                Video.privacyStatus === 'PUBLIC' ? '公開' :
+                Video.privacyStatus === 'UNLISTED' ? '非公開' :
+                Video.privacyStatus === 'PRIVATE' ? '私人' :
+                Video.privacyStatus === 'DRAFT' ? '草稿' : ''
+                }}
+              </span>
+            </div>
+
+            <!-- 更多操作按鈕 -->
+            <div class="dropdown" (click)="$event.stopPropagation()">
+              <button class="btn btn-icon btn-ghost-secondary" type="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                <i class="ti ti-dots-vertical fs-4"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow">
+                <li>
+                  <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                    <i class="ti ti-edit"></i> 編輯
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                    <i class="ti ti-chart-bar"></i> 分析
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                    <i class="ti ti-share"></i> 分享
+                  </a>
+                </li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li>
+                  <a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="#">
+                    <i class="ti ti-trash"></i> 刪除
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

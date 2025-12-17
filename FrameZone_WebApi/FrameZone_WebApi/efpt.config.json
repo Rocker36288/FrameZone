@@ -19,6 +19,170 @@
    "T4TemplatePath": null,
    "Tables": [
       {
+         "Name": "[dbo].[Bank]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[BankBranch]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[CardBrand]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Invoice]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[InvoiceSettings]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PaymentMethod]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PaymentMethodType]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PaymentTransaction]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Photo]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoAIClassificationLog]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoAIClassificationSuggestion]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoAlbum]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoCategory]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoCategoryType]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoClassificationSource]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoFeatureToggle]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoGeneralSetting]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoLocation]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoMaintenanceSetting]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoMetadata]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoPhotoAlbum]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoPhotoCategory]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoPhotoTag]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoQuotaType]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoSecuritySetting]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoShare]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoStorage]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoStorageProvider]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoSubscriptionHistory]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoSubscriptionPlan]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoSubscriptionQuota]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoTag]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoThirdPartyConfig]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoThirdPartyServiceType]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoUploadLimitSetting]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoUserQuotaUsage]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoUserSubscription]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[RefundRequest]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[TransactionStatusLog]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[TransactionStatusType]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[TransactionType]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[User]",
          "ObjectType": 0
       },
@@ -88,6 +252,98 @@
       },
       {
          "Name": "[dbo].[UserVerificationType]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[ChatMembers]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[ChatRoom]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[CommentLikes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[Comments]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[CommentTarget]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[Favorites]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[MessageReads]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[Messages]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[ReportAction]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[ReportCategories]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[Reports]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[ReviewPhotos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[Reviews]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Share].[TargetTypes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[Channels]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[Following]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[Likes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[Playlists]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[PlaylistVideos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[ReportTarget]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[UserSavedPlaylists]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[Videos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[View]",
          "ObjectType": 0
       },
       {

@@ -1,0 +1,42 @@
+<div class="d-flex gap-3 py-3 border-bottom">
+
+  <!-- Avatar -->
+  <div>
+    <img [src]='comment?.avatar' class="rounded-circle" width="40" height="40" alt="User Avatar" />
+  </div>
+
+
+  <div class="flex-grow-1">
+
+    <!-- Username + Time -->
+    <div class="d-flex align-items-center gap-2 mb-1">
+      <strong>{{ comment?.userName }}</strong>
+      <span class="text-muted small">{{ comment!.createdAt| videoTimeago }}</span>
+    </div>
+
+    <!-- Comment Text -->
+    <p class="d-flex mb-2">{{ comment?.message }}</p>
+
+    <!-- Actions -->
+    <div class="d-flex align-items-center gap-3 mb-2">
+
+      <button class="btn btn-sm btn-light d-flex align-items-center gap-1">
+        <i class="ti ti-thumb-up"></i>
+        {{ comment?.likes }}
+      </button>
+      <button class="btn btn-sm btn-link text-decoration-none" (click)="toggleReply()">
+        回覆
+      </button>
+
+    </div>
+
+    <!-- Child Replies -->
+    <div class="mt-2 ms-5">
+      <app-video-comment-reply *ngFor="let reply of comment?.replies" [comment]="reply"></app-video-comment-reply>
+    </div>
+
+    <!-- Reply Input -->
+    <app-video-comment-input *ngIf="showReplyInput" (submitComment)="onReply($event) "
+      (buttonClicked)="toggleReply()"></app-video-comment-input>
+  </div>
+</div>

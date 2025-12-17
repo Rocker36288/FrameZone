@@ -1,0 +1,127 @@
+<div #videoContainer class="video-container" [ngClass]="{'hide-cursor': hideCursor}" (mouseenter)="onMouseEnter()"
+  (mousemove)="onMouseMove()" (mouseleave)="onMouseLeave()">
+
+  <!-- 影片元素 -->
+  <video #videoRef class="video-player" playsinline></video>
+
+  <!-- 自訂控制列 -->
+  <div class="custom-controls" [ngClass]="{'show': showControls}">
+
+    <!-- 進度條 -->
+    <div class="progress-container">
+      <input type="range" class="progress-bar" min="0" max="100" [value]="getProgress()"
+        (input)="onProgressChange($event)">
+    </div>
+
+    <!-- 控制按鈕列 -->
+    <div class="controls-row">
+
+      <!-- 左側控制 -->
+      <div class="controls-left">
+        <!-- 播放/暫停按鈕 -->
+        <button class="btn btn-icon" (click)="togglePlay()" type="button">
+          <svg *ngIf="!isPlaying()" xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M7 4v16l13 -8z" />
+          </svg>
+          <svg *ngIf="isPlaying()" xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <rect x="6" y="5" width="4" height="14" rx="1" />
+            <rect x="14" y="5" width="4" height="14" rx="1" />
+          </svg>
+        </button>
+
+        <!-- 音量按鈕 -->
+        <button class="btn btn-icon" (click)="toggleMute()" type="button">
+          <svg *ngIf="!isMuted()" xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M15 8a5 5 0 0 1 0 8" />
+            <path d="M17.7 5a9 9 0 0 1 0 14" />
+            <path
+              d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5" />
+          </svg>
+          <svg *ngIf="isMuted()" xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path
+              d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5" />
+            <path d="M16 10l4 4m0 -4l-4 4" />
+          </svg>
+        </button>
+
+        <!-- 音量滑桿 -->
+
+        <input type="range" class="volume-slider" min="0" max="100" [value]="getVolume()"
+          (input)="onVolumeChange($event)">
+
+        <!-- 時間顯示 -->
+        <span class="time-display">{{ getCurrentTime() }} / {{ getDuration() }}</span>
+      </div>
+
+      <!-- 右側控制 -->
+      <div class="controls-right">
+
+        <!-- 畫質設定按鈕 -->
+        <div class="quality-control" *ngIf="qualityLevels.length > 0">
+          <button class="btn btn-icon" (click)="toggleQualityMenu()" type="button" [class.active]="showQualityMenu">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+              stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path
+                d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </button>
+
+          <!-- 畫質選單 -->
+          <div class="dropdown-menu dropdown-menu-end show" *ngIf="showQualityMenu">
+            <h6 class="dropdown-header">畫質設定</h6>
+
+            <a href="javascript:void(0)" class="dropdown-item" [class.active]="currentQuality === -1"
+              (click)="changeQuality(-1)">
+              <span>自動</span>
+              <svg *ngIf="currentQuality === -1" xmlns="http://www.w3.org/2000/svg"
+                class="icon icon-tabler icon-tabler-check ms-auto" width="24" height="24" viewBox="0 0 24 24"
+                stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <polyline points="5 12 9 16 19 6" />
+              </svg>
+            </a>
+
+            <div class="dropdown-divider"></div>
+
+            <a *ngFor="let quality of qualityLevels" href="javascript:void(0)" class="dropdown-item"
+              [class.active]="currentQuality === quality.index" (click)="changeQuality(quality.index)">
+              <span>{{ quality.name }}</span>
+              <svg *ngIf="currentQuality === quality.index" xmlns="http://www.w3.org/2000/svg"
+                class="icon icon-tabler icon-tabler-check ms-auto" width="24" height="24" viewBox="0 0 24 24"
+                stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <polyline points="5 12 9 16 19 6" />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- 全螢幕按鈕 -->
+        <button class="btn btn-icon" (click)="toggleFullscreen()" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+            stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M4 8v-2a2 2 0 0 1 2 -2h2" />
+            <path d="M4 16v2a2 2 0 0 0 2 2h2" />
+            <path d="M16 4h2a2 2 0 0 1 2 2v2" />
+            <path d="M16 20h2a2 2 0 0 0 2 -2v-2" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

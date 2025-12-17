@@ -1,0 +1,177 @@
+<div class="spotlight-wrapper container-xl py-4">
+  <div class="row g-4">
+
+    <!-- 主要內容區 - Spotlight -->
+    <div class="col-lg-8">
+
+      <!-- 影片播放器 - 帶有聚光燈效果 -->
+      <div class="spotlight-player-container mb-4" [class.loaded]="isVideoLoaded" (mouseenter)="onPlayerHover(true)"
+        (mouseleave)="onPlayerHover(false)">
+
+        <!-- 背景光暈效果 -->
+        <div class="spotlight-glow"></div>
+
+        <!-- 主播放器卡片 -->
+        <div class="card border-0 shadow-lg player-card" [class.hovered]="isPlayerHovered">
+          <div class="card-body p-0 position-relative">
+
+            <!-- 裝飾性邊框光效 -->
+            <div class="spotlight-border-glow"></div>
+
+            <!-- 播放器容器 -->
+            <div class="ratio ratio-16x9 bg-dark rounded overflow-hidden">
+              <app-video-player [src]="'https://localhost:7213/videos/video/test/master.m3u8'"></app-video-player>
+            </div>
+
+            <!-- 播放器角落裝飾 -->
+            <div class="corner-accent corner-tl"></div>
+            <div class="corner-accent corner-tr"></div>
+            <div class="corner-accent corner-bl"></div>
+            <div class="corner-accent corner-br"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 影片資訊卡片 - 玻璃態效果 -->
+      <div class="card shadow-lg border-0 info-card mb-3" [class.loaded]="isVideoLoaded">
+        <div class="card-body p-4">
+
+          <!-- 標題區 - 帶有動畫 -->
+          <div class="title-section mb-3" [class.loaded]="isVideoLoaded">
+            <div class="d-flex align-items-start gap-2">
+              <div class="spotlight-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-spotlight" width="24"
+                  height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path d="M12 9l0 12"></path>
+                  <path d="M12 9m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
+                  <path d="M3 21l4 -4"></path>
+                  <path d="M7 21l4 -4"></path>
+                  <path d="M17 21l-4 -4"></path>
+                  <path d="M21 21l-4 -4"></path>
+                </svg>
+              </div>
+              <h1 class="fs-4 fw-bold mb-0 lh-sm flex-grow-1 title-text">
+                {{video!.title}}
+              </h1>
+            </div>
+          </div>
+
+          <!-- 統計資訊 - 帶有漸變背景 -->
+          <div class="stats-bar d-flex flex-wrap align-items-center gap-3 mb-3 p-3 rounded">
+            <div class="stat-item">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler me-1" width="18" height="18"
+                viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+                <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
+              </svg>
+              <span class="fw-semibold">{{video.views}}</span> 次觀看
+            </div>
+            <span class="text-muted">•</span>
+            <div class="stat-item">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler me-1" width="18" height="18"
+                viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"></path>
+                <path d="M16 3v4"></path>
+                <path d="M8 3v4"></path>
+                <path d="M4 11h16"></path>
+              </svg>
+              {{video.uploadDate!| videoTimeago}}
+            </div>
+            <div class="ms-auto">
+              <app-video-actions-bar></app-video-actions-bar>
+            </div>
+          </div>
+
+          <div class="divider-glow my-3"></div>
+
+          <!-- 頻道資訊 -->
+          <div class="channel-section mb-3">
+            <app-channel-card [channel]="channel!"></app-channel-card>
+          </div>
+
+          <!-- 影片描述 - 霓虹邊框效果 -->
+          <div class="description-container position-relative">
+            <div class="description-glow"></div>
+            <div class="video-description p-4 rounded position-relative">
+              <div class="d-flex align-items-center gap-2 mb-3">
+                <div class="description-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="20" height="20"
+                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M4 6l16 0"></path>
+                    <path d="M4 12l10 0"></path>
+                    <path d="M4 18l14 0"></path>
+                  </svg>
+                </div>
+                <span class="fw-bold text-dark">影片描述</span>
+              </div>
+
+              <p class="mb-2 text-break description-text" [class.collapsed]="!isDescriptionExpanded && showExpandButton"
+                style="white-space: pre-wrap; line-height: 1.7;">
+                {{getDisplayDescription()}}
+              </p>
+
+              <button *ngIf="showExpandButton" (click)="toggleDescription()"
+                class="btn btn-sm btn-ghost-primary expand-btn mt-2">
+                <span>{{ isDescriptionExpanded ? '顯示較少' : '顯示更多' }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler ms-1" width="16" height="16"
+                  viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                  <path [attr.d]="isDescriptionExpanded ? 'M6 15l6 -6l6 6' : 'M6 9l6 6l6 -6'"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 評論區 -->
+      <div class="card shadow-lg border-0 comments-card" [class.loaded]="isVideoLoaded">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler text-primary" width="24" height="24"
+              viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <path
+                d="M3 20l1.3 -3.9c-2.324 -3.437 -1.426 -7.872 2.1 -10.374c3.526 -2.501 8.59 -2.296 11.845 .48c3.255 2.777 3.695 7.266 1.029 10.501c-2.666 3.235 -7.615 4.215 -11.574 2.293l-4.7 1">
+              </path>
+            </svg>
+            <h5 class="mb-0 fw-bold">留言討論</h5>
+          </div>
+          <div class="text-muted text-center py-5">
+            <!-- 留言組件 -->
+            <app-video-comment-list [comments]="commentList"></app-video-comment-list>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 側邊欄 - 推薦內容 -->
+    <div class="col-lg-4">
+      <div class="card shadow-lg border-0 sticky-top sidebar-card" style="top: 1rem;" [class.loaded]="isVideoLoaded">
+        <div class="card-header bg-gradient py-3">
+          <div class="d-flex align-items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler text-primary" width="20" height="20"
+              viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"></path>
+              <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"></path>
+            </svg>
+            <h6 class="mb-0 fw-bold">推薦影片</h6>
+          </div>
+        </div>
+        <div class="card-body p-3">
+          <div class="text-muted text-center py-5">
+            <app-videos-list [videos]="videosRecommand!" [variant]="'list'"></app-videos-list>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

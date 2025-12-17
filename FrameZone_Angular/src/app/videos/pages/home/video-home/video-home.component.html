@@ -1,0 +1,43 @@
+<div class="container my-5">
+
+  <!-- 搜尋框 -->
+  <form action="search-results.html" method="get"
+    class="d-flex w-100 border rounded-pill shadow-sm overflow-hidden bg-white">
+
+    <input type="search" name="q" placeholder="請輸入關鍵字..." aria-label="搜尋關鍵字"
+      class="form-control border-0 bg-transparent flex-grow-1 ps-4">
+
+    <button type="submit" class="btn btn-primary px-4 rounded-pill rounded-start-0">
+      <i class="ti ti-search"></i>
+    </button>
+
+  </form>
+</div>
+
+<div class="container my-5">
+
+  <!-- 熱門創作者 -->
+  <app-video-creatorspotlight [channel]="channel" [Videos]="videos"></app-video-creatorspotlight>
+
+  <!-- Popular -->
+  <h2 class="my-4 fw-bold">Popular</h2>
+
+  <div class="row g-4">
+
+    <!-- 卡片 -->
+    <div class="position-relative my-4">
+      <app-videos-list [variant]="'gridshow-scroll'" [videos]="videos!"></app-videos-list>
+    </div>
+  </div>
+
+  <!-- Recommend -->
+  <h2 class="my-4 fw-bold">Recommend</h2>
+
+  <div class="video-grid">
+    @for (video of videos; track $index) {
+    <app-video-card [video]="video" [variant]="'large'">
+    </app-video-card>
+    }
+  </div>
+
+</div>

@@ -1,0 +1,746 @@
+/* // ========== Component SCSS ========== */
+/* // spotlight-creator.component.scss */
+
+.spotlight-section {
+  position: relative;
+  padding: 60px 0;
+  margin: 40px 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.loaded {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* // 背景聚光燈效果 */
+.spotlight-background {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 50%, rgba(13, 110, 253, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 50%, rgba(102, 16, 242, 0.15) 0%, transparent 50%);
+  }
+}
+
+/* // 光束效果 */
+.light-beam {
+  position: absolute;
+  width: 200px;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.03) 50%,
+      transparent 100%);
+  animation: sweepLight 8s ease-in-out infinite;
+
+  &.beam-1 {
+    left: -100px;
+    animation-delay: 0s;
+  }
+
+  &.beam-2 {
+    left: 30%;
+    animation-delay: 2.5s;
+  }
+
+  &.beam-3 {
+    right: -100px;
+    animation-delay: 5s;
+  }
+}
+
+@keyframes sweepLight {
+
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateX(-50px) rotate(-10deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(50px) rotate(-10deg);
+  }
+}
+
+/* // 徑向光暈 */
+.radial-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  height: 80%;
+  background: radial-gradient(ellipse at center,
+      rgba(13, 110, 253, 0.2) 0%,
+      transparent 60%);
+  animation: pulseGlow 4s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+/* // 內容容器 */
+.spotlight-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* // 標題區 */
+.spotlight-header {
+  animation: slideInDown 0.6s ease-out 0.2s both;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.spotlight-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+  border-radius: 16px;
+  box-shadow:
+    0 8px 24px rgba(13, 110, 253, 0.4),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.2);
+  animation: iconPulse 2s ease-in-out infinite;
+
+  svg {
+    color: white;
+  }
+}
+
+@keyframes iconPulse {
+
+  0%,
+  100% {
+    box-shadow:
+      0 8px 24px rgba(13, 110, 253, 0.4),
+      inset 0 -2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  50% {
+    box-shadow:
+      0 12px 32px rgba(13, 110, 253, 0.6),
+      inset 0 -2px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.spotlight-title {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+}
+
+.spotlight-badge {
+  padding: 6px 16px;
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  color: #1a1a2e;
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+  animation: badgeShine 3s ease-in-out infinite;
+}
+
+@keyframes badgeShine {
+
+  0%,
+  100% {
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 4px 25px rgba(255, 215, 0, 0.7);
+  }
+}
+
+/* // 主卡片 */
+.spotlight-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 48px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  animation: cardSlideIn 0.8s ease-out 0.4s both;
+}
+
+@keyframes cardSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* // 卡片光效 */
+.card-light-effects {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.corner-light {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(13, 110, 253, 0.4) 0%, transparent 70%);
+  filter: blur(30px);
+  animation: cornerGlow 3s ease-in-out infinite;
+
+  &.tl {
+    top: -50px;
+    left: -50px;
+    animation-delay: 0s;
+  }
+
+  &.tr {
+    top: -50px;
+    right: -50px;
+    animation-delay: 0.75s;
+  }
+
+  &.bl {
+    bottom: -50px;
+    left: -50px;
+    animation-delay: 1.5s;
+  }
+
+  &.br {
+    bottom: -50px;
+    right: -50px;
+    animation-delay: 2.25s;
+  }
+}
+
+@keyframes cornerGlow {
+
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* // 創作者資訊 */
+.creator-spotlight-info {
+  animation: fadeInLeft 0.6s ease-out 0.6s both;
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* // 頭像容器 */
+.avatar-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+}
+
+.avatar-glow {
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(circle, rgba(13, 110, 253, 0.5) 0%, transparent 70%);
+  filter: blur(40px);
+  animation: avatarPulse 3s ease-in-out infinite;
+}
+
+@keyframes avatarPulse {
+
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+.avatar-ring {
+  position: absolute;
+  inset: -8px;
+  border: 4px solid transparent;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0d6efd, #6610f2, #0d6efd) border-box;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) padding-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) padding-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: ringRotate 4s linear infinite;
+}
+
+@keyframes ringRotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.creator-avatar-large {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  position: relative;
+  z-index: 1;
+}
+
+.spotlight-indicator {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.6);
+  z-index: 2;
+  animation: starSpin 4s linear infinite;
+
+  svg {
+    color: #1a1a2e;
+  }
+}
+
+@keyframes starSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* // 創作者詳情 */
+.creator-details {
+  color: white;
+}
+
+.creator-name {
+  font-size: 1.75rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.creator-subscribers {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.creator-description {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+/* // 訂閱按鈕 */
+.subscribe-btn {
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4);
+  transition: all 0.3s ease;
+  margin-top: 20px;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(13, 110, 253, 0.6);
+  }
+
+  &.subscribed {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+
+    &:hover {
+      box-shadow: 0 8px 30px rgba(40, 167, 69, 0.6);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+/* // 特色影片容器 */
+.featured-videos-container {
+  animation: fadeInRight 0.6s ease-out 0.8s both;
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* // 主影片展示 */
+.main-video-spotlight {
+  margin-bottom: 20px;
+}
+
+.video-wrapper {
+  position: relative;
+}
+
+.video-glow {
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(ellipse at center, rgba(13, 110, 253, 0.3) 0%, transparent 70%);
+  filter: blur(30px);
+  pointer-events: none;
+}
+
+.video-thumbnail-container {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+
+    .video-overlay {
+      opacity: 1;
+    }
+
+    .play-button {
+      transform: scale(1.1);
+    }
+  }
+}
+
+.video-thumbnail {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  display: block;
+}
+
+.video-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.play-button {
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+
+  svg {
+    color: #0d6efd;
+    margin-left: 4px;
+  }
+
+  &:hover {
+    background: white;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.video-duration {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  padding: 4px 10px;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 6px;
+  backdrop-filter: blur(10px);
+}
+
+/* // 影片資訊 */
+.video-info-spotlight {
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0 0 16px 16px;
+  margin-top: -6px;
+}
+
+.video-title-spotlight {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.video-stats-spotlight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+/* // 縮圖列表 */
+.video-thumbnails-list {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 10px 0;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+  }
+}
+
+.thumbnail-item {
+  position: relative;
+  flex-shrink: 0;
+  width: 160px;
+  height: 90px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: rgba(13, 110, 253, 0.5);
+  }
+
+  &.active {
+    border-color: #0d6efd;
+    box-shadow: 0 0 20px rgba(13, 110, 253, 0.6);
+  }
+}
+
+.thumbnail-small {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnail-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.6) 100%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 8px;
+}
+
+.thumbnail-duration {
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+/* // 圖標樣式 */
+.icon-inline {
+  vertical-align: middle;
+}
+
+/* // 響應式設計 */
+@media (max-width: 991.98px) {
+  .spotlight-card {
+    padding: 32px 24px;
+  }
+
+  .spotlight-title {
+    font-size: 1.5rem;
+  }
+
+  .avatar-container {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 30px;
+  }
+
+  .creator-name {
+    font-size: 1.5rem;
+  }
+
+  .video-thumbnail {
+    height: 300px;
+  }
+
+  .featured-videos-container {
+    margin-top: 30px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .spotlight-section {
+    padding: 40px 0;
+  }
+
+  .spotlight-card {
+    padding: 24px 16px;
+  }
+
+  .spotlight-title {
+    font-size: 1.25rem;
+  }
+
+  .spotlight-icon {
+    width: 48px;
+    height: 48px;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .avatar-container {
+    width: 120px;
+    height: 120px;
+  }
+
+  .video-thumbnail {
+    height: 220px;
+  }
+
+  .play-button {
+    width: 60px;
+    height: 60px;
+
+    svg {
+      width: 36px;
+      height: 36px;
+    }
+  }
+
+  .thumbnail-item {
+    width: 140px;
+    height: 80px;
+  }
+}

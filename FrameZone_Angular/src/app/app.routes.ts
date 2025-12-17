@@ -87,4 +87,9 @@ export const routes: Routes = [
     ]
   },
 
+
+  {
+    path: 'videos',
+    loadChildren: () => import('./videos/videos.routes').then(m => m.VIDEO_ROUTES)
+  },
 ];

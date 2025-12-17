@@ -12,3 +12,4 @@ obj/
 
 *.vsidx
 /FrameZone_WebApi/FrameZone_WebApi/obj/Release/net9.0
+/FrameZone_WebApi/FrameZone_WebApi/wwwroot/FFmpeg/

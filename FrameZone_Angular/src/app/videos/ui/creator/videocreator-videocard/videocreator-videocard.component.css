@@ -1,0 +1,98 @@
+ .creator-video-row {
+   transition: all 0.2s ease;
+ }
+
+ .creator-video-row:hover {
+   transform: translateY(-2px);
+   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+ }
+
+ .video-thumb-backstage {
+   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+ }
+
+ .video-thumb-backstage img {
+   transition: transform 0.3s ease;
+ }
+
+ .creator-video-row:hover .video-thumb-backstage img {
+   transform: scale(1.05);
+ }
+
+ .btn-icon {
+   width: 2.5rem;
+   height: 2.5rem;
+   padding: 0;
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   border-radius: 0.5rem;
+ }
+
+ .btn-ghost-secondary {
+   color: #6c757d;
+   background: transparent;
+   border: 1px solid transparent;
+ }
+
+ .btn-ghost-secondary:hover {
+   background: rgba(108, 117, 125, 0.1);
+   border-color: rgba(108, 117, 125, 0.2);
+ }
+
+ /* Tabler 風格的淺色 Badge */
+ .bg-azure-lt {
+   background-color: #d2e7f7 !important;
+ }
+
+ .text-azure {
+   color: #206bc4 !important;
+ }
+
+ .bg-cyan-lt {
+   background-color: #ccf5f7 !important;
+ }
+
+ .text-cyan {
+   color: #0c98a0 !important;
+ }
+
+ .bg-yellow-lt {
+   background-color: #fef0cd !important;
+ }
+
+ .text-yellow {
+   color: #c78016 !important;
+ }
+
+ .bg-green-lt {
+   background-color: #d4f4dd !important;
+ }
+
+ .text-green {
+   color: #2fb344 !important;
+ }
+
+ .bg-red-lt {
+   background-color: #f9dada !important;
+ }
+
+ .text-red {
+   color: #d63939 !important;
+ }
+
+ .bg-dark-lt {
+   background-color: #e8eaed !important;
+ }
+
+ .text-dark {
+   color: #182433 !important;
+ }
+
+ .bg-secondary-lt {
+   background-color: #e9ecef !important;
+ }
+
+ .text-secondary {
+   color: #6c757d !important;
+ }

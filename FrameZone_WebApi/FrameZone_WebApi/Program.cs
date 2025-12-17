@@ -3,24 +3,63 @@ using FrameZone_WebApi.Helpers;
 using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Repositories;
 using FrameZone_WebApi.Services;
+using FrameZone_WebApi.Videos.Repositories;
+using FrameZone_WebApi.Videos.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.StaticFiles;
+
 using System.Text;
+using Xabe.FFmpeg.Downloader;
+using Xabe.FFmpeg;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+//////////////--------------------------在應用程式啟動前下載 FFmpeg---------------
+//var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+//var ffmpegPath = Path.Combine(wwwrootPath, "FFmpeg");
+
+//// 確保目錄存在
+//Directory.CreateDirectory(ffmpegPath);
+
+//// 檢查是否已存在 FFmpeg
+//var ffmpegExe = Path.Combine(ffmpegPath, "ffmpeg.exe");
+//if (!File.Exists(ffmpegExe))
+//{
+//    Console.WriteLine("FFmpeg 不存在,正在下載...");
+//    try
+//    {
+//        await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Official, ffmpegPath);
+//        Console.WriteLine("! FFmpeg 下載完成!");
+//    }
+//    catch (Exception ex)
+//    {
+//        Console.WriteLine($"X FFmpeg 下載失敗: {ex.Message}");
+//        Console.WriteLine("請手動下載 FFmpeg 並放置到 wwwroot/FFmpeg/ 目錄");
+//    }
+//}
+//else
+//{
+//    Console.WriteLine("! FFmpeg 已存在");
+//}
+
+//// 設定 FFmpeg 路徑
+//FFmpeg.SetExecutablesPath(ffmpegPath);
+////////////--------------------------
 
 // Add services to the container.
 
 
-// ========== ��Ʈw�s�u�]�w ==========
+// ========== 資料庫連線設定 ==========
 
 builder.Services.AddDbContext<AAContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("AA");
     options.UseSqlServer(connectionString);
 
-    // �}�o����ܸԲӿ��~
+    // 開發時顯示詳細錯誤
     options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 });
 
@@ -36,7 +75,18 @@ builder.Services.Configure<VerificationSettings>(
 );
 
 
-// ========== CORS �]�w ==========
+//========== CORS 設定 ==========
+
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings")
+);
+
+builder.Services.Configure<VerificationSettings>(
+    builder.Configuration.GetSection("VerificationSettings")
+);
+
+
+// ========== CORS 設定 ==========
 
 var policyName = "Angular";
 builder.Services.AddCors(options =>
@@ -51,17 +101,17 @@ builder.Services.AddCors(options =>
         });
     });
 
-// ========== JWT �]�w ==========
+// ========== JWT 設定 ==========
 
 /// <summery>
-/// ���U JWT Bearer Token ����
+/// 註冊 JWT Bearer Token 驗證
 /// </summery>
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey ���]�w");
+var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey 未設定");
 
 builder.Services.AddAuthentication(options =>
 {
-    // �w�]�ϥ� JWT Bearer ����
+    // 預設使用 JWT Bearer 驗證
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
@@ -69,25 +119,25 @@ builder.Services.AddAuthentication(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,                          // ���ҵo���
-        ValidateAudience = true,                        // ���ұ�����
-        ValidateLifetime = true,                        // ���ҹL���ɶ�
-        ValidateIssuerSigningKey = true,                // ����ñ�����_
+        ValidateIssuer = true,                          // 驗證發行者
+        ValidateAudience = true,                        // 驗證接收者
+        ValidateLifetime = true,                        // 驗證過期時間
+        ValidateIssuerSigningKey = true,                // 驗證簽章金鑰
         ValidIssuer = jwtSettings["Issuer"],
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(secretKey)
         ),
-        ClockSkew = TimeSpan.Zero                       // �����\�ɶ�����
+        ClockSkew = TimeSpan.Zero                       // 不允許時間偏移
     };
 
-    // Token ���Ҩƥ�
+    // Token 驗證事件
     options.Events = new JwtBearerEvents
     {
         OnAuthenticationFailed = context =>
         {
-            // Token ���ҥ��Ѯ�
-            Console.WriteLine($"JWT ���ҥ���: {context.Exception.Message}");
+            // Token 驗證失敗時
+            Console.WriteLine($"JWT 驗證失敗: {context.Exception.Message}");
             return Task.CompletedTask;
         },
         OnTokenValidated = context =>
@@ -97,7 +147,7 @@ builder.Services.AddAuthentication(options =>
     };  
 });
 
-// ========== ���U�̿�`�J�A�� (DI�`�J) ==========
+// ========== 註冊依賴注入服務 (DI注入) ==========
 
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<PostRepository>();
@@ -107,6 +157,12 @@ builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddHttpContextAccessor();
+
+// ========== 影片服務 (DI注入) ==========
+builder.Services.AddScoped<VideoCardResponsity>(); // 註冊 Repository
+builder.Services.AddScoped<VideoServices>();
+//=======================================
+
 
 
 builder.Services.AddControllers()
@@ -132,6 +188,17 @@ var app = builder.Build();
 
 app.UseCors(policyName);
 
+// ==========  啟用 wwwroot 靜態檔案(影片要用的) ==========
+var provider = new FileExtensionContentTypeProvider();
+provider.Mappings[".m3u8"] = "application/vnd.apple.mpegurl";
+provider.Mappings[".ts"] = "video/mp2t";
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = provider
+});
+//=======================================
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
@@ -140,9 +207,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 Console.WriteLine("====================================");
-Console.WriteLine("FrameZone WebAPI ���b�Ұ�...");
-Console.WriteLine($"����: {app.Environment.EnvironmentName}");
-Console.WriteLine($"API ���I: https://localhost:7213/api/");
+Console.WriteLine("FrameZone WebAPI 正在啟動...");
+Console.WriteLine($"環境: {app.Environment.EnvironmentName}");
+Console.WriteLine($"API 端點: https://localhost:7213/api/");
 Console.WriteLine("====================================");
 
 app.Run();
