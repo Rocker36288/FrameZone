@@ -1,3 +1,4 @@
+@if(post){
 <div class="card mb-3" id="">
   <div class="card-body">
     <!-- 功能選單（右上角） -->
@@ -8,12 +9,12 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-xs">
           <li>
-            <button class="dropdown-item" onclick="">
+            <button class="dropdown-item" (click)="saveEdit()">
               編輯
             </button>
           </li>
           <li>
-            <button class="dropdown-item text-danger" onclick="">
+            <button class="dropdown-item text-danger" (click)="deletePost()">
               刪除
             </button>
           </li>
@@ -26,20 +27,25 @@
       <img src="~/img/social/Among Us.png" class="rounded-circle me-2" style="width:50px; height:50px" />
 
       <div>
-        <strong>UserId:1</strong><br />
+        <strong>UserId:{{post.userId}}</strong><br />
         <span class="text-muted" style="font-size: 0.85rem;">
-          yyyy-MM-dd HH:mm
+          {{post.createdAt | date:'yyyy-MM-dd HH:mm'}}
         </span>
       </div>
     </div>
     <!-- 顯示貼文文字內容 -->
-    <p id="content-@post.PostId">貼文文字內容</p>
+    @if(!isEditing){
+    <p>{{post.content}}</p>
+    }
 
-    <div id="edit-area-@post.PostId" style="display:none;">
-      <textarea id="edit-text-@post.PostId" class="form-control">貼文文字內容</textarea>
-      <button class="btn btn-success btn-sm mt-2" onclick="">保存</button>
-      <button class="btn btn-secondary btn-sm mt-2" onclick="">取消</button>
+    <!-- 編輯區 -->
+    @if(isEditing){
+    <div>
+      <textarea class="form-control" [(ngModel)]="editContent"></textarea>
+      <button class="btn btn-success btn-sm mt-2" (click)="saveEdit()">保存</button>
+      <button class="btn btn-secondary btn-sm mt-2" (click)="cancelEdit()">取消</button>
     </div>
+    }
 
     <div>
       👍 按讚數
@@ -47,3 +53,4 @@
     </div>
   </div>
 </div>
+}

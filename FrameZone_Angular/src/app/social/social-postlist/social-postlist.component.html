@@ -1,0 +1,11 @@
+<section class="post-list">
+  @if (posts.length === 0) {
+  <p class="text-muted text-center">目前沒有貼文</p>
+  }
+  @else {
+  @for (post of posts; track post.postId) {
+  <app-social-showposts [post]="post" (postDeleted)="onPostDeleted($event)">
+  </app-social-showposts>
+  }
+  }
+</section>
