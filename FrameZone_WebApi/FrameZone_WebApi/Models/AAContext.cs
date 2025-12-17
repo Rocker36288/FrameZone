@@ -13,6 +13,36 @@ public partial class AAContext : DbContext
     {
     }
 
+    public virtual DbSet<CommentImage> CommentImages { get; set; }
+
+    public virtual DbSet<CommentVideo> CommentVideos { get; set; }
+
+    public virtual DbSet<Event> Events { get; set; }
+
+    public virtual DbSet<EventMember> EventMembers { get; set; }
+
+    public virtual DbSet<Follow> Follows { get; set; }
+
+    public virtual DbSet<Group> Groups { get; set; }
+
+    public virtual DbSet<GroupMember> GroupMembers { get; set; }
+
+    public virtual DbSet<Post> Posts { get; set; }
+
+    public virtual DbSet<PostImage> PostImages { get; set; }
+
+    public virtual DbSet<PostLike> PostLikes { get; set; }
+
+    public virtual DbSet<PostShare> PostShares { get; set; }
+
+    public virtual DbSet<PostVideo> PostVideos { get; set; }
+
+    public virtual DbSet<PostView> PostViews { get; set; }
+
+    public virtual DbSet<ReportTarget> ReportTargets { get; set; }
+
+    public virtual DbSet<Sticker> Stickers { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<UserBankAccount> UserBankAccounts { get; set; }
@@ -51,6 +81,340 @@ public partial class AAContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<CommentImage>(entity =>
+        {
+            entity.ToTable("CommentImages", "SocialNetwork");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__CommentIm__Creat__29A20B3F")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DeletedAt).HasColumnType("datetime");
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<CommentVideo>(entity =>
+        {
+            entity.ToTable("CommentVideos", "SocialNetwork");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DeletedAt).HasColumnType("datetime");
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<Event>(entity =>
+        {
+            entity.HasKey(e => e.EventId).HasName("PK_Event");
+
+            entity.ToTable("Events", "SocialNetwork");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DeleteAt).HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.EndTime).HasColumnType("datetime");
+            entity.Property(e => e.Location).HasMaxLength(500);
+            entity.Property(e => e.StartTime).HasColumnType("datetime");
+            entity.Property(e => e.Title)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.UpdateAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<EventMember>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("EventMembers", "SocialNetwork");
+
+            entity.Property(e => e.EventId).ValueGeneratedOnAdd();
+            entity.Property(e => e.JoinAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.LeftAt).HasColumnType("datetime");
+            entity.Property(e => e.Status)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.UpdateAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Event).WithMany()
+                .HasForeignKey(d => d.EventId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_EventMembers_Events");
+
+            entity.HasOne(d => d.User).WithMany()
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_EventMembers_User");
+        });
+
+        modelBuilder.Entity<Follow>(entity =>
+        {
+            entity.HasKey(e => new { e.FollowerId, e.FollowingId }).HasName("PK_Follow");
+
+            entity.ToTable("Follows", "SocialNetwork");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DeleteAt).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Follower).WithMany(p => p.FollowFollowers)
+                .HasForeignKey(d => d.FollowerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Follows_User");
+
+            entity.HasOne(d => d.Following).WithMany(p => p.FollowFollowings)
+                .HasForeignKey(d => d.FollowingId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Follows_User1");
+        });
+
+        modelBuilder.Entity<Group>(entity =>
+        {
+            entity.HasKey(e => e.GroupId).HasName("PK_Group");
+
+            entity.ToTable("Groups", "SocialNetwork");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DeleteAt).HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.GroupName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.GroupType)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.UpdateAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Owner).WithMany(p => p.Groups)
+                .HasForeignKey(d => d.OwnerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Groups_User");
+        });
+
+        modelBuilder.Entity<GroupMember>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("GroupMembers", "SocialNetwork");
+
+            entity.Property(e => e.GroupId).ValueGeneratedOnAdd();
+            entity.Property(e => e.GroupLevel)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.JoinedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.LeftAt).HasColumnType("datetime");
+            entity.Property(e => e.Status)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.UpdateAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Group).WithMany()
+                .HasForeignKey(d => d.GroupId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_GroupMembers_Groups");
+
+            entity.HasOne(d => d.User).WithMany()
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_GroupMembers_User");
+        });
+
+        modelBuilder.Entity<Post>(entity =>
+        {
+            entity.HasKey(e => e.PostId).HasName("PK_Post");
+
+            entity.ToTable("Posts", "SocialNetwork");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__Post__CreatedAt__67E9567B")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DeletedAt).HasColumnType("datetime");
+            entity.Property(e => e.PostContent)
+                .IsRequired()
+                .HasMaxLength(500);
+            entity.Property(e => e.PostType).HasMaxLength(20);
+            entity.Property(e => e.Status)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__Post__UpdatedAt__68DD7AB4")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Posts)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Posts_User");
+        });
+
+        modelBuilder.Entity<PostImage>(entity =>
+        {
+            entity.HasKey(e => new { e.ImageId, e.PostId }).HasName("PK_PostImage");
+
+            entity.ToTable("PostImages", "SocialNetwork");
+
+            entity.Property(e => e.ImageId).ValueGeneratedOnAdd();
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__PostImage__Creat__604834B3")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DeleteAt).HasColumnType("datetime");
+            entity.Property(e => e.SortOrder).HasAnnotation("Relational:DefaultConstraintName", "DF__PostImage__SortO__5F54107A");
+            entity.Property(e => e.UpdateAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__PostImage__Updat__613C58EC")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Post).WithMany(p => p.PostImages)
+                .HasForeignKey(d => d.PostId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PostImages_Posts");
+        });
+
+        modelBuilder.Entity<PostLike>(entity =>
+        {
+            entity.HasKey(e => e.LikeId).HasName("PK_PostLike");
+
+            entity.ToTable("PostLikes", "SocialNetwork");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Post).WithMany(p => p.PostLikes)
+                .HasForeignKey(d => d.PostId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PostLikes_Posts");
+
+            entity.HasOne(d => d.User).WithMany(p => p.PostLikes)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PostLikes_User");
+        });
+
+        modelBuilder.Entity<PostShare>(entity =>
+        {
+            entity.HasKey(e => e.ShareId).HasName("PK_PostShare");
+
+            entity.ToTable("PostShares", "SocialNetwork");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Post).WithMany(p => p.PostShares)
+                .HasForeignKey(d => d.PostId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PostShares_Posts");
+
+            entity.HasOne(d => d.User).WithMany(p => p.PostShares)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PostShares_User");
+        });
+
+        modelBuilder.Entity<PostVideo>(entity =>
+        {
+            entity.HasKey(e => new { e.PostVideoId, e.PostId }).HasName("PK_PostVideo");
+
+            entity.ToTable("PostVideos", "SocialNetwork");
+
+            entity.Property(e => e.PostVideoId).ValueGeneratedOnAdd();
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__PostVideo__Creat__6CAE0B98")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DeleteAt).HasColumnType("datetime");
+            entity.Property(e => e.SortOrder).HasAnnotation("Relational:DefaultConstraintName", "DF__PostVideo__SortO__6BB9E75F");
+            entity.Property(e => e.UpdateAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__PostVideo__Updat__6DA22FD1")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Post).WithMany(p => p.PostVideos)
+                .HasForeignKey(d => d.PostId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PostVideos_Posts");
+        });
+
+        modelBuilder.Entity<PostView>(entity =>
+        {
+            entity.HasKey(e => e.ViewId).HasName("PK_PostView");
+
+            entity.ToTable("PostViews", "SocialNetwork");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Post).WithMany(p => p.PostViews)
+                .HasForeignKey(d => d.PostId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PostViews_Posts");
+
+            entity.HasOne(d => d.User).WithMany(p => p.PostViews)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PostViews_User");
+        });
+
+        modelBuilder.Entity<ReportTarget>(entity =>
+        {
+            entity.HasKey(e => e.ReportTargetId).HasName("PK_SocialNetwork_ReportTarget");
+
+            entity.ToTable("ReportTarget", "SocialNetwork");
+
+            entity.HasOne(d => d.Post).WithMany(p => p.ReportTargets)
+                .HasForeignKey(d => d.PostId)
+                .HasConstraintName("FK_ReportTarget_Posts");
+        });
+
+        modelBuilder.Entity<Sticker>(entity =>
+        {
+            entity.HasKey(e => e.StickerId).HasName("PK_Sticker");
+
+            entity.ToTable("Stickers", "SocialNetwork");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DeleteAt).HasColumnType("datetime");
+            entity.Property(e => e.Status)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.StickerName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.StickerType)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.StickerUrl)
+                .IsRequired()
+                .HasMaxLength(200)
+                .HasColumnName("StickerURL");
+            entity.Property(e => e.UpdateAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+        });
+
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.UserId).HasName("PK_Member");
@@ -564,9 +928,7 @@ public partial class AAContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_UserVerification_UpdatedAt")
                 .HasColumnType("datetime");
-            entity.Property(e => e.VerificationCode)
-                .IsRequired()
-                .HasMaxLength(20);
+            entity.Property(e => e.VerificationCode).HasMaxLength(20);
             entity.Property(e => e.VerificationToken).HasMaxLength(255);
             entity.Property(e => e.VerifiedAt).HasColumnType("datetime");
 

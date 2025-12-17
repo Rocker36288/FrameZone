@@ -64,5 +64,27 @@ export const routes: Routes = [
       { path: 'photo-price', loadComponent: () => import('./pages/photo/photo-price/photo-price.component').then(m => m.PhotoPriceComponent) },
       { path: 'photo-about', loadComponent: () => import('./pages/photo/photo-about/photo-about.component').then(m => m.PhotoAboutComponent) }
     ]
-  }
+  },
+  {
+    path: 'social',
+    loadComponent: () => import('./layouts/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./social/social.component').then(m => m.SocialComponent),
+        children: [
+          { path: '', redirectTo: 'index', pathMatch: 'full' },
+          {
+            path: 'index',
+            loadComponent: () => import('./social/social-index/social-index.component').then(m => m.SocialIndexComponent)
+          },
+          {
+            path: 'friends',
+            loadComponent: () => import('./social/social-friends/social-friends.component').then(m => m.SocialFriendsComponent)
+          },
+        ]
+      }
+    ]
+  },
+
 ];

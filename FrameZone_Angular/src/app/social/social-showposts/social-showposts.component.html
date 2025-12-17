@@ -1,0 +1,56 @@
+@if(post){
+<div class="card mb-3" id="">
+  <div class="card-body">
+    <!-- 功能選單（右上角） -->
+    <div class="position-absolute top-0 end-0 m-2">
+      <div class="dropdown">
+        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
+          ...
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-xs">
+          <li>
+            <button class="dropdown-item" (click)="saveEdit()">
+              編輯
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item text-danger" (click)="deletePost()">
+              刪除
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 頭貼 + UserId + 時間 -->
+    <div class="d-flex align-items-center mb-2">
+      <img src="~/img/social/Among Us.png" class="rounded-circle me-2" style="width:50px; height:50px" />
+
+      <div>
+        <strong>UserId:{{post.userId}}</strong><br />
+        <span class="text-muted" style="font-size: 0.85rem;">
+          {{post.createdAt | date:'yyyy-MM-dd HH:mm'}}
+        </span>
+      </div>
+    </div>
+    <!-- 顯示貼文文字內容 -->
+    @if(!isEditing){
+    <p>{{post.content}}</p>
+    }
+
+    <!-- 編輯區 -->
+    @if(isEditing){
+    <div>
+      <textarea class="form-control" [(ngModel)]="editContent"></textarea>
+      <button class="btn btn-success btn-sm mt-2" (click)="saveEdit()">保存</button>
+      <button class="btn btn-secondary btn-sm mt-2" (click)="cancelEdit()">取消</button>
+    </div>
+    }
+
+    <div>
+      👍 按讚數
+      💬 留言數
+    </div>
+  </div>
+</div>
+}
