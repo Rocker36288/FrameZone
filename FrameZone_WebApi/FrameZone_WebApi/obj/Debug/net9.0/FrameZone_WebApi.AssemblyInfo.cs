@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FrameZone_WebApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ed0268a0005162c591da17dbb7e74cc5826887ab")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4213035d94110c6d0bac753430262a2449ecbc6a")]
 [assembly: System.Reflection.AssemblyProductAttribute("FrameZone_WebApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FrameZone_WebApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
