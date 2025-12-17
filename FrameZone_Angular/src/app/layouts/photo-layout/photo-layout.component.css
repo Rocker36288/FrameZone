@@ -1,0 +1,127 @@
+/* ==========================================
+   全局樣式
+   ========================================== */
+:root {
+  /* 主要顏色 */
+  --primary-color: #3b82f6;
+  --primary-hover: #2563eb;
+  --secondary-color: #64748b;
+  --accent-color: #f59e0b;
+
+  /* 背景顏色 */
+  --bg-white: #ffffff;
+  --bg-gray-50: #f8fafc;
+  --bg-gray-100: #f1f5f9;
+  --bg-gray-900: #0f172a;
+
+  /* 文字顏色 */
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --text-white: #ffffff;
+
+  /* 邊框顏色 */
+  --border-color: #e2e8f0;
+
+  /* 陰影 */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* 確保頁面容器正確 */
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.page-wrapper {
+  flex: 1;
+}
+
+.page-body {
+  padding: 0;
+}
+
+/* 容器樣式 */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* ==========================================
+   導覽列樣式優化
+   ========================================== */
+.navbar {
+  background-color: var(--bg-white) !important;
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Logo 樣式 */
+.navbar-brand h2 {
+  color: var(--text-primary);
+  font-weight: 700;
+  margin: 0;
+}
+
+.navbar-brand svg {
+  color: var(--primary-color);
+}
+
+/* 導覽連結樣式 */
+.navbar-nav .nav-link {
+  color: var(--text-secondary) !important;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+  color: var(--primary-color) !important;
+}
+
+/* ==========================================
+   響應式設計
+   ========================================== */
+@media (max-width: 991px) {
+
+  /* 手機版導覽列 */
+  .navbar-collapse {
+    background-color: var(--bg-white);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    box-shadow: var(--shadow-md);
+  }
+
+  .navbar-nav {
+    gap: 0.5rem;
+  }
+
+  .navbar-nav .nav-item {
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .navbar-nav .nav-item:last-child {
+    border-bottom: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 1rem;
+  }
+}

@@ -37,7 +37,6 @@ export class UserMenuComponent implements OnInit, OnDestroy {
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
-        console.log('Header 收到使用者狀態更新:', user);
         this.updateUserState(user);
       });
   }

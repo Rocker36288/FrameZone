@@ -52,7 +52,17 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) },
-      { path: 'photo-home', loadComponent: () => import('./pages/photo-home/photo-home.component').then(m => m.PhotoHomeComponent) }
+    ]
+  },
+  {
+    path: '',
+    loadComponent: () => import('./layouts/photo-layout/photo-layout.component').then(m => m.PhotoLayoutComponent),
+    children: [
+      { path: 'photo-home', loadComponent: () => import('./pages/photo/photo-home/photo-home.component').then(m => m.PhotoHomeComponent) },
+      { path: 'photo-classify', loadComponent: () => import('./pages/photo/photo-classify/photo-classify.component').then(m => m.PhotoClassifyComponent) },
+      { path: 'photo-myphoto', loadComponent: () => import('./pages/photo/photo-myphoto/photo-myphoto.component').then(m => m.PhotoMyphotoComponent) },
+      { path: 'photo-price', loadComponent: () => import('./pages/photo/photo-price/photo-price.component').then(m => m.PhotoPriceComponent) },
+      { path: 'photo-about', loadComponent: () => import('./pages/photo/photo-about/photo-about.component').then(m => m.PhotoAboutComponent) }
     ]
   }
 ];
