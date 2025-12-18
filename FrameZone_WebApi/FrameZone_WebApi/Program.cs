@@ -1,9 +1,11 @@
-using FrameZone_WebApi.Configuration;
+ï»¿using FrameZone_WebApi.Configuration;
 using FrameZone_WebApi.Helpers;
 using FrameZone_WebApi.Models;
+using FrameZone_WebApi.Options;
 using FrameZone_WebApi.Repositories;
 using FrameZone_WebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -13,19 +15,19 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 
-// ========== ¸ê®Æ®w³s½u³]©w ==========
+// ========== è³‡æ–™åº«é€£ç·šè¨­å®š ==========
 
 builder.Services.AddDbContext<AAContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("AA");
     options.UseSqlServer(connectionString);
 
-    // ¶}µo®ÉÅã¥Ü¸Ô²Ó¿ù»~
+    // é–‹ç™¼æ™‚é¡¯ç¤ºè©³ç´°éŒ¯èª¤
     options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 });
 
 
-//========== µù¥U³]©w ==========
+//========== è¨»å†Šè¨­å®š ==========
 
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings")
@@ -36,7 +38,7 @@ builder.Services.Configure<VerificationSettings>(
 );
 
 
-// ========== CORS ³]©w ==========
+// ========== CORS è¨­å®š ==========
 
 var policyName = "Angular";
 builder.Services.AddCors(options =>
@@ -51,17 +53,17 @@ builder.Services.AddCors(options =>
         });
     });
 
-// ========== JWT ³]©w ==========
+// ========== JWT è¨­å®š ==========
 
 /// <summery>
-/// µù¥U JWT Bearer Token ÅçÃÒ
+/// è¨»å†Š JWT Bearer Token é©—è­‰
 /// </summery>
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey ¥¼³]©w");
+var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey æœªè¨­å®š");
 
 builder.Services.AddAuthentication(options =>
 {
-    // ¹w³]¨Ï¥Î JWT Bearer ÅçÃÒ
+    // é è¨­ä½¿ç”¨ JWT Bearer é©—è­‰
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
@@ -69,66 +71,91 @@ builder.Services.AddAuthentication(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,                          // ÅçÃÒµo¦æªÌ
-        ValidateAudience = true,                        // ÅçÃÒ±µ¦¬ªÌ
-        ValidateLifetime = true,                        // ÅçÃÒ¹L´Á®É¶¡
-        ValidateIssuerSigningKey = true,                // ÅçÃÒÃ±³¹ª÷Æ_
+        ValidateIssuer = true,                          // é©—è­‰ç™¼è¡Œè€…
+        ValidateAudience = true,                        // é©—è­‰æ¥æ”¶è€…
+        ValidateLifetime = true,                        // é©—è­‰éæœŸæ™‚é–“
+        ValidateIssuerSigningKey = true,                // é©—è­‰ç°½ç« é‡‘é‘°
         ValidIssuer = jwtSettings["Issuer"],
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(secretKey)
         ),
-        ClockSkew = TimeSpan.Zero                       // ¤£¤¹³\®É¶¡°¾²¾
+        ClockSkew = TimeSpan.Zero                       // ä¸å…è¨±æ™‚é–“åç§»
     };
 
-    // Token ÅçÃÒ¨Æ¥ó
+    // Token é©—è­‰äº‹ä»¶
     options.Events = new JwtBearerEvents
     {
         OnAuthenticationFailed = context =>
         {
-            // Token ÅçÃÒ¥¢±Ñ®É
-            Console.WriteLine($"JWT ÅçÃÒ¥¢±Ñ: {context.Exception.Message}");
+            // Token é©—è­‰å¤±æ•—æ™‚
+            Console.WriteLine($"JWT é©—è­‰å¤±æ•—: {context.Exception.Message}");
             return Task.CompletedTask;
         },
         OnTokenValidated = context =>
         {
-            // Token ÅçÃÒ¦¨¥\®É
-            Console.WriteLine("JWT ÅçÃÒ¦¨¥\");
+            // Token é©—è­‰æˆåŠŸæ™‚
+            Console.WriteLine("JWT é©—è­‰æˆåŠŸ");
             return Task.CompletedTask;
         }
     };  
 });
 
-// ========== µù¥U¨Ì¿àª`¤JªA°È (DIª`¤J) ==========
+// ========== è¨»å†Šä¾è³´æ³¨å…¥æœå‹™ (DIæ³¨å…¥) ==========
 
+builder.Services.AddScoped<IPhotoRepository, PhotoRepository>();
 builder.Services.AddScoped<UserRepository>();
+
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<IExifService, ExifService>();
+builder.Services.AddScoped<IPhotoService, PhotoService>();
+
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddHttpContextAccessor();
+
+// ========== æ—¥èªŒè¨­å®š ==========
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
+// ========== æª”æ¡ˆä¸Šå‚³å¤§å°é™åˆ¶è¨­å®š ==========
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 104857600;
+});
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Limits.MaxRequestBodySize = 104857600;
+});
 
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
      {
         options.JsonSerializerOptions.PropertyNamingPolicy = 
-            System.Text.Json.JsonNamingPolicy.CamelCase;            // ¨Ï¥Î¾m®p©R¦Wªk
-         options.JsonSerializerOptions.WriteIndented = true;        // ®æ¦¡¤Æ JSON
+            System.Text.Json.JsonNamingPolicy.CamelCase;            // ä½¿ç”¨é§å³°å‘½åæ³•
+         options.JsonSerializerOptions.WriteIndented = true;        // æ ¼å¼åŒ– JSON
      });
 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 //// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-//// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.MapOpenApi();
-//}
+// é–‹ç™¼ç’°å¢ƒå•Ÿç”¨ Swagger
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+
 
 app.UseCors(policyName);
 
@@ -140,9 +167,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 Console.WriteLine("====================================");
-Console.WriteLine("FrameZone WebAPI ¥¿¦b±Ò°Ê...");
-Console.WriteLine($"Àô¹Ò: {app.Environment.EnvironmentName}");
-Console.WriteLine($"API ºİÂI: https://localhost:7213/api/");
+Console.WriteLine("FrameZone WebAPI æ­£åœ¨å•Ÿå‹•...");
+Console.WriteLine($"ç’°å¢ƒ: {app.Environment.EnvironmentName}");
+Console.WriteLine($"API ç«¯é»: https://localhost:7213/api/");
 Console.WriteLine("====================================");
 
 app.Run();

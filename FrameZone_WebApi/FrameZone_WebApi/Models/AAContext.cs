@@ -13,6 +13,64 @@ public partial class AAContext : DbContext
     {
     }
 
+    public virtual DbSet<Photo> Photos { get; set; }
+
+    public virtual DbSet<PhotoAiclassificationLog> PhotoAiclassificationLogs { get; set; }
+
+    public virtual DbSet<PhotoAiclassificationSuggestion> PhotoAiclassificationSuggestions { get; set; }
+
+    public virtual DbSet<PhotoAlbum> PhotoAlbums { get; set; }
+
+    public virtual DbSet<PhotoCategory> PhotoCategories { get; set; }
+
+    public virtual DbSet<PhotoCategoryType> PhotoCategoryTypes { get; set; }
+
+    public virtual DbSet<PhotoClassificationSource> PhotoClassificationSources { get; set; }
+
+    public virtual DbSet<PhotoFeatureToggle> PhotoFeatureToggles { get; set; }
+
+    public virtual DbSet<PhotoGeneralSetting> PhotoGeneralSettings { get; set; }
+
+    public virtual DbSet<PhotoLocation> PhotoLocations { get; set; }
+
+    public virtual DbSet<PhotoMaintenanceSetting> PhotoMaintenanceSettings { get; set; }
+
+    public virtual DbSet<PhotoMetadatum> PhotoMetadata { get; set; }
+
+    public virtual DbSet<PhotoPhotoAlbum> PhotoPhotoAlbums { get; set; }
+
+    public virtual DbSet<PhotoPhotoCategory> PhotoPhotoCategories { get; set; }
+
+    public virtual DbSet<PhotoPhotoTag> PhotoPhotoTags { get; set; }
+
+    public virtual DbSet<PhotoQuotaType> PhotoQuotaTypes { get; set; }
+
+    public virtual DbSet<PhotoSecuritySetting> PhotoSecuritySettings { get; set; }
+
+    public virtual DbSet<PhotoShare> PhotoShares { get; set; }
+
+    public virtual DbSet<PhotoStorage> PhotoStorages { get; set; }
+
+    public virtual DbSet<PhotoStorageProvider> PhotoStorageProviders { get; set; }
+
+    public virtual DbSet<PhotoSubscriptionHistory> PhotoSubscriptionHistories { get; set; }
+
+    public virtual DbSet<PhotoSubscriptionPlan> PhotoSubscriptionPlans { get; set; }
+
+    public virtual DbSet<PhotoSubscriptionQuotum> PhotoSubscriptionQuota { get; set; }
+
+    public virtual DbSet<PhotoTag> PhotoTags { get; set; }
+
+    public virtual DbSet<PhotoThirdPartyConfig> PhotoThirdPartyConfigs { get; set; }
+
+    public virtual DbSet<PhotoThirdPartyServiceType> PhotoThirdPartyServiceTypes { get; set; }
+
+    public virtual DbSet<PhotoUploadLimitSetting> PhotoUploadLimitSettings { get; set; }
+
+    public virtual DbSet<PhotoUserQuotaUsage> PhotoUserQuotaUsages { get; set; }
+
+    public virtual DbSet<PhotoUserSubscription> PhotoUserSubscriptions { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<UserBankAccount> UserBankAccounts { get; set; }
@@ -51,6 +109,917 @@ public partial class AAContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.UseCollation("Chinese_Taiwan_Stroke_CI_AS");
+
+        modelBuilder.Entity<Photo>(entity =>
+        {
+            entity.ToTable("Photo");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_Photo_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DeletedAt).HasColumnType("datetime");
+            entity.Property(e => e.FileExtension)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.FileName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.Hash)
+                .IsRequired()
+                .HasMaxLength(64);
+            entity.Property(e => e.IsDeleted).HasAnnotation("Relational:DefaultConstraintName", "DF_Photo_IsDeletedAt");
+            entity.Property(e => e.PhotoData).IsRequired();
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_Photo_UpdatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.UploadedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_Photo_UploadedAt")
+                .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<PhotoAiclassificationLog>(entity =>
+        {
+            entity.HasKey(e => e.LogId);
+
+            entity.ToTable("PhotoAIClassificationLog");
+
+            entity.Property(e => e.Aimodel)
+                .IsRequired()
+                .HasMaxLength(50)
+                .HasColumnName("AIModel");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoAIClassificationLog_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.ErrorMessage).HasMaxLength(300);
+            entity.Property(e => e.ModelVersion).HasMaxLength(30);
+            entity.Property(e => e.QuotaUsed)
+                .HasDefaultValue(1)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoAIClassificationLog_QuotaUsed");
+            entity.Property(e => e.Status)
+                .IsRequired()
+                .HasMaxLength(20);
+
+            entity.HasOne(d => d.Photo).WithMany(p => p.PhotoAiclassificationLogs)
+                .HasForeignKey(d => d.PhotoId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoAIClassificationLog_Photo");
+        });
+
+        modelBuilder.Entity<PhotoAiclassificationSuggestion>(entity =>
+        {
+            entity.HasKey(e => e.SuggestionId);
+
+            entity.ToTable("PhotoAIClassificationSuggestion");
+
+            entity.Property(e => e.Confidence).HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoAIClassificationSuggestion_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsAdopted).HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoAIClassificationSuggestion_IsAdopted");
+
+            entity.HasOne(d => d.Category).WithMany(p => p.PhotoAiclassificationSuggestions)
+                .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoAIClassificationSuggestion_PhotoCategory");
+
+            entity.HasOne(d => d.Log).WithMany(p => p.PhotoAiclassificationSuggestions)
+                .HasForeignKey(d => d.LogId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoAIClassificationSuggestion_PhotoAIClassificationLog");
+        });
+
+        modelBuilder.Entity<PhotoAlbum>(entity =>
+        {
+            entity.HasKey(e => e.AlbumId).HasName("PK_Album");
+
+            entity.ToTable("PhotoAlbum");
+
+            entity.Property(e => e.AlbumName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_Album_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DeletedAt).HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(200);
+            entity.Property(e => e.IsDeleted).HasAnnotation("Relational:DefaultConstraintName", "DF_Album_IsDeleted");
+            entity.Property(e => e.IsPublic).HasAnnotation("Relational:DefaultConstraintName", "DF_Album_IsPublic");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_Album_UpdatedAt")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.User).WithMany(p => p.PhotoAlbums)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoAlbum_User");
+        });
+
+        modelBuilder.Entity<PhotoCategory>(entity =>
+        {
+            entity.HasKey(e => e.CategoryId);
+
+            entity.ToTable("PhotoCategory");
+
+            entity.Property(e => e.CategoryCode).HasMaxLength(50);
+            entity.Property(e => e.CategoryName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoCategory_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(200);
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoCategory_IsActive");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoCategory_UpdatedAt")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.CategoryType).WithMany(p => p.PhotoCategories)
+                .HasForeignKey(d => d.CategoryTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoCategory_PhotoCategoryType");
+
+            entity.HasOne(d => d.User).WithMany(p => p.PhotoCategories)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_PhotoCategory_User");
+        });
+
+        modelBuilder.Entity<PhotoCategoryType>(entity =>
+        {
+            entity.HasKey(e => e.CategoryTypeId).HasName("PK_CategoryType");
+
+            entity.ToTable("PhotoCategoryType");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_CategoryType_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(200);
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_CategoryType_IsActive");
+            entity.Property(e => e.TypeCode)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.TypeName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_CategoryType_UpdatedAt")
+                .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<PhotoClassificationSource>(entity =>
+        {
+            entity.HasKey(e => e.SourceId);
+
+            entity.ToTable("PhotoClassificationSource");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoClassificationSource_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(200);
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoClassificationSource_IsActive");
+            entity.Property(e => e.SourceCode)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.SourceName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoClassificationSource_UpdatedAt")
+                .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<PhotoFeatureToggle>(entity =>
+        {
+            entity.HasKey(e => e.FeaturedId);
+
+            entity.ToTable("PhotoFeatureToggle");
+
+            entity.Property(e => e.Category)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoFeatureToggle_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(200);
+            entity.Property(e => e.FeatureCode)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.FeatureName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.IsEnabled)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoFeatureToggle_IsEnabled");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoFeatureToggle_UpdatedAt")
+                .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<PhotoGeneralSetting>(entity =>
+        {
+            entity.HasKey(e => e.SettingId).HasName("PK_GeneralSetting");
+
+            entity.ToTable("PhotoGeneralSetting");
+
+            entity.Property(e => e.CompanyAddress).HasMaxLength(100);
+            entity.Property(e => e.CompanyName).HasMaxLength(100);
+            entity.Property(e => e.CompanyPhone).HasMaxLength(50);
+            entity.Property(e => e.CompanyTaxId).HasMaxLength(20);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_GeneralSetting_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.FaviconUrl)
+                .HasMaxLength(200)
+                .HasColumnName("FaviconURL");
+            entity.Property(e => e.LogoUrl)
+                .HasMaxLength(200)
+                .HasColumnName("LogoURL");
+            entity.Property(e => e.SupportEmail).HasMaxLength(200);
+            entity.Property(e => e.SystemName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.SystemVersion)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_GeneralSetting_UpdatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.WebSiteDescription).HasMaxLength(200);
+            entity.Property(e => e.WebSiteKeywords).HasMaxLength(200);
+            entity.Property(e => e.WebSiteTitle)
+                .IsRequired()
+                .HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<PhotoLocation>(entity =>
+        {
+            entity.HasKey(e => e.LocationId);
+
+            entity.ToTable("PhotoLocation");
+
+            entity.Property(e => e.Address).HasMaxLength(200);
+            entity.Property(e => e.City).HasMaxLength(50);
+            entity.Property(e => e.Country).HasMaxLength(50);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoLocation_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.District).HasMaxLength(50);
+            entity.Property(e => e.Latitude).HasColumnType("decimal(10, 7)");
+            entity.Property(e => e.Longitude).HasColumnType("decimal(10, 7)");
+            entity.Property(e => e.PlaceName).HasMaxLength(100);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoLocation_UpdatedAt")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Photo).WithMany(p => p.PhotoLocations)
+                .HasForeignKey(d => d.PhotoId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoLocation_Photo");
+
+            entity.HasOne(d => d.Source).WithMany(p => p.PhotoLocations)
+                .HasForeignKey(d => d.SourceId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoLocation_PhotoClassificationSource");
+        });
+
+        modelBuilder.Entity<PhotoMaintenanceSetting>(entity =>
+        {
+            entity.HasKey(e => e.SettingId);
+
+            entity.ToTable("PhotoMaintenanceSetting");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoMaintenanceSetting_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.MaintenanceEndTime).HasColumnType("datetime");
+            entity.Property(e => e.MaintenanceMessage).HasMaxLength(500);
+            entity.Property(e => e.MaintenanceStartTime).HasColumnType("datetime");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoMaintenanceSetting_UpdatedAt")
+                .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<PhotoMetadatum>(entity =>
+        {
+            entity.HasKey(e => e.MetadataId);
+
+            entity.Property(e => e.Aperture).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.CameraMake).HasMaxLength(200);
+            entity.Property(e => e.CameraModel).HasMaxLength(200);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoMetadata_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DateTaken).HasColumnType("datetime");
+            entity.Property(e => e.ExposureMode).HasMaxLength(50);
+            entity.Property(e => e.FocalLength).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.Gpslatitude)
+                .HasColumnType("decimal(10, 7)")
+                .HasColumnName("GPSLatitude");
+            entity.Property(e => e.Gpslongitude)
+                .HasColumnType("decimal(10, 7)")
+                .HasColumnName("GPSLongitude");
+            entity.Property(e => e.Iso).HasColumnName("ISO");
+            entity.Property(e => e.LensModel).HasMaxLength(200);
+            entity.Property(e => e.ShutterSpeed).HasMaxLength(50);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoMetadata_UpdatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.WhiteBalance).HasMaxLength(50);
+
+            entity.HasOne(d => d.Photo).WithMany(p => p.PhotoMetadata)
+                .HasForeignKey(d => d.PhotoId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoMetadata_Photo");
+        });
+
+        modelBuilder.Entity<PhotoPhotoAlbum>(entity =>
+        {
+            entity.HasKey(e => e.PhotoAlbumId);
+
+            entity.ToTable("PhotoPhotoAlbum");
+
+            entity.Property(e => e.AddedAt).HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoPhotoAlbum_CreatedAt")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Album).WithMany(p => p.PhotoPhotoAlbums)
+                .HasForeignKey(d => d.AlbumId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoPhotoAlbum_PhotoAlbum");
+
+            entity.HasOne(d => d.Photo).WithMany(p => p.PhotoPhotoAlbums)
+                .HasForeignKey(d => d.PhotoId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoPhotoAlbum_Photo");
+        });
+
+        modelBuilder.Entity<PhotoPhotoCategory>(entity =>
+        {
+            entity.HasKey(e => e.PhotoId);
+
+            entity.ToTable("PhotoPhotoCategory");
+
+            entity.Property(e => e.PhotoId).ValueGeneratedNever();
+            entity.Property(e => e.AssignedAt).HasColumnType("datetime");
+            entity.Property(e => e.Confidence).HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoPhotoCategory_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoPhotoCategory_UpdatedAt")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Category).WithMany(p => p.PhotoPhotoCategories)
+                .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoPhotoCategory_PhotoCategory");
+
+            entity.HasOne(d => d.Photo).WithOne(p => p.PhotoPhotoCategory)
+                .HasForeignKey<PhotoPhotoCategory>(d => d.PhotoId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoPhotoCategory_Photo");
+
+            entity.HasOne(d => d.Source).WithMany(p => p.PhotoPhotoCategories)
+                .HasForeignKey(d => d.SourceId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoPhotoCategory_PhotoClassificationSource");
+        });
+
+        modelBuilder.Entity<PhotoPhotoTag>(entity =>
+        {
+            entity.HasKey(e => e.PhotoTagId);
+
+            entity.ToTable("PhotoPhotoTag");
+
+            entity.Property(e => e.AddedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoPhotoTag_AddedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Confidence).HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoPhotoTag_CreatedAt")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Photo).WithMany(p => p.PhotoPhotoTags)
+                .HasForeignKey(d => d.PhotoId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoPhotoTag_Photo");
+
+            entity.HasOne(d => d.Source).WithMany(p => p.PhotoPhotoTags)
+                .HasForeignKey(d => d.SourceId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoPhotoTag_PhotoClassificationSource");
+
+            entity.HasOne(d => d.Tag).WithMany(p => p.PhotoPhotoTags)
+                .HasForeignKey(d => d.TagId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoPhotoTag_PhotoTag");
+        });
+
+        modelBuilder.Entity<PhotoQuotaType>(entity =>
+        {
+            entity.HasKey(e => e.QuotaTypeId).HasName("PK_QuotaType");
+
+            entity.ToTable("PhotoQuotaType");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_QuotaType_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(200);
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_QuotaType_IsActive");
+            entity.Property(e => e.QuotaTypeCode)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.QuotaTypeName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.QuotaUnit)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.ResetPeriod)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_QuotaType_UpdatedAt")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.System).WithMany(p => p.PhotoQuotaTypes)
+                .HasForeignKey(d => d.SystemId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoQuotaType_UserSystemModule");
+        });
+
+        modelBuilder.Entity<PhotoSecuritySetting>(entity =>
+        {
+            entity.HasKey(e => e.SettingId);
+
+            entity.ToTable("PhotoSecuritySetting");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoSecuritySetting_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoSecuritySetting_UpdatedAt")
+                .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<PhotoShare>(entity =>
+        {
+            entity.HasKey(e => e.ShareId);
+
+            entity.ToTable("PhotoShare");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoShare_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DownloadCount).HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoShare_DownloadCount");
+            entity.Property(e => e.ExpiresAt).HasColumnType("datetime");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoShare_IsActive");
+            entity.Property(e => e.Password).HasMaxLength(255);
+            entity.Property(e => e.ShareToken)
+                .IsRequired()
+                .HasMaxLength(255);
+            entity.Property(e => e.ShareType)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoShare_UpdatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.ViewCount).HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoShare_ViewCount");
+
+            entity.HasOne(d => d.Photo).WithMany(p => p.PhotoShares)
+                .HasForeignKey(d => d.PhotoId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoShare_Photo");
+
+            entity.HasOne(d => d.User).WithMany(p => p.PhotoShares)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoShare_User");
+        });
+
+        modelBuilder.Entity<PhotoStorage>(entity =>
+        {
+            entity.HasKey(e => e.StorageId);
+
+            entity.ToTable("PhotoStorage");
+
+            entity.Property(e => e.AccessUrl)
+                .HasMaxLength(1000)
+                .HasColumnName("AccessURL");
+            entity.Property(e => e.BucketName).HasMaxLength(255);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoStorage_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsPrimary)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoStorage_IsPrimary");
+            entity.Property(e => e.Region).HasMaxLength(100);
+            entity.Property(e => e.StoragePath)
+                .IsRequired()
+                .HasMaxLength(500);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoStorage_UpdatedAt")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Photo).WithMany(p => p.PhotoStorages)
+                .HasForeignKey(d => d.PhotoId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoStorage_Photo");
+
+            entity.HasOne(d => d.Provider).WithMany(p => p.PhotoStorages)
+                .HasForeignKey(d => d.ProviderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoStorage_PhotoStorageProvider");
+        });
+
+        modelBuilder.Entity<PhotoStorageProvider>(entity =>
+        {
+            entity.HasKey(e => e.ProviderId);
+
+            entity.ToTable("PhotoStorageProvider");
+
+            entity.Property(e => e.ProviderId).ValueGeneratedNever();
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoStorageProvider_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(200);
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoStorageProvider_IsActive");
+            entity.Property(e => e.ProviderCode)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.ProviderName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoStorageProvider_UpdatedAt")
+                .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<PhotoSubscriptionHistory>(entity =>
+        {
+            entity.HasKey(e => e.HistoryId);
+
+            entity.ToTable("PhotoSubscriptionHistory");
+
+            entity.Property(e => e.ActionType)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.ChangeReason).HasMaxLength(200);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoSubscriptionHistory_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.EffectiveDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoSubscriptionHistory_EffectiveDate")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Ipaddress)
+                .HasMaxLength(45)
+                .HasColumnName("IPAddress");
+            entity.Property(e => e.NewStatus)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.OldStatus).HasMaxLength(20);
+            entity.Property(e => e.PerformedBy)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.ProrationAmount).HasColumnType("decimal(10, 2)");
+
+            entity.HasOne(d => d.Subscription).WithMany(p => p.PhotoSubscriptionHistories)
+                .HasForeignKey(d => d.SubscriptionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoSubscriptionHistory_PhotoUserSubscription");
+
+            entity.HasOne(d => d.User).WithMany(p => p.PhotoSubscriptionHistories)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoSubscriptionHistory_User");
+        });
+
+        modelBuilder.Entity<PhotoSubscriptionPlan>(entity =>
+        {
+            entity.HasKey(e => e.PlanId);
+
+            entity.ToTable("PhotoSubscriptionPlan");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoSubscriptionPlan_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoSubscriptionPlan_IsActive");
+            entity.Property(e => e.IsPublic)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoSubscriptionPlan_IsPublic");
+            entity.Property(e => e.MonthlyPrice)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoSubscriptionPlan_MonthlyPrice")
+                .HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.PlanCode)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.PlanDescription).HasMaxLength(200);
+            entity.Property(e => e.PlanLevel)
+                .HasDefaultValue(1)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoSubscriptionPlan_PlanLevel");
+            entity.Property(e => e.PlanName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.UpdateAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoSubscriptionPlan_UpdateAt")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.System).WithMany(p => p.PhotoSubscriptionPlans)
+                .HasForeignKey(d => d.SystemId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoSubscriptionPlan_UserSystemModule");
+        });
+
+        modelBuilder.Entity<PhotoSubscriptionQuotum>(entity =>
+        {
+            entity.HasKey(e => e.QuotaId).HasName("PK_SubscriptionQuota");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_SubscriptionQuota_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_SubscriptionQuota_IsActive");
+            entity.Property(e => e.QuotaValue).HasAnnotation("Relational:DefaultConstraintName", "DF_SubscriptionQuota_QuotaValue");
+            entity.Property(e => e.ResetDay)
+                .HasDefaultValue(1)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_SubscriptionQuota_ResetDay");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_SubscriptionQuota_UpdatedAt")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Plan).WithMany(p => p.PhotoSubscriptionQuota)
+                .HasForeignKey(d => d.PlanId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoSubscriptionQuota_PhotoSubscriptionPlan");
+
+            entity.HasOne(d => d.QuotaType).WithMany(p => p.PhotoSubscriptionQuota)
+                .HasForeignKey(d => d.QuotaTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoSubscriptionQuota_PhotoQuotaType");
+        });
+
+        modelBuilder.Entity<PhotoTag>(entity =>
+        {
+            entity.HasKey(e => e.TagId);
+
+            entity.ToTable("PhotoTag");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoTag_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoTag_IsActive");
+            entity.Property(e => e.TagName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.TagType)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoTag_UpdatedAt")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.User).WithMany(p => p.PhotoTags)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_PhotoTag_User");
+        });
+
+        modelBuilder.Entity<PhotoThirdPartyConfig>(entity =>
+        {
+            entity.HasKey(e => e.ConfigId);
+
+            entity.ToTable("PhotoThirdPartyConfig");
+
+            entity.Property(e => e.Apikey)
+                .HasMaxLength(300)
+                .HasColumnName("APIKey");
+            entity.Property(e => e.Apisecret)
+                .HasMaxLength(300)
+                .HasColumnName("APISecret");
+            entity.Property(e => e.ConfigJson).HasColumnName("ConfigJSON");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoThirdPartyConfig_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.EndpointUrl)
+                .HasMaxLength(300)
+                .HasColumnName("EndpointURL");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoThirdPartyConfig_IsActive");
+            entity.Property(e => e.IsPrimary)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoThirdPartyConfig_IsPrimary");
+            entity.Property(e => e.ProviderName)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoThirdPartyConfig_UpdatedAt")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.ServiceType).WithMany(p => p.PhotoThirdPartyConfigs)
+                .HasForeignKey(d => d.ServiceTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoThirdPartyConfig_PhotoThirdPartyServiceType");
+        });
+
+        modelBuilder.Entity<PhotoThirdPartyServiceType>(entity =>
+        {
+            entity.HasKey(e => e.ServiceTypeId);
+
+            entity.ToTable("PhotoThirdPartyServiceType");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoThirdPartyServiceType_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(200);
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoThirdPartyServiceType_IsActive");
+            entity.Property(e => e.ServiceCode)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.ServiceName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoThirdPartyServiceType_UpdatedAt")
+                .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<PhotoUploadLimitSetting>(entity =>
+        {
+            entity.HasKey(e => e.SettingId);
+
+            entity.ToTable("PhotoUploadLimitSetting");
+
+            entity.Property(e => e.AllowedExtensions)
+                .IsRequired()
+                .HasMaxLength(200);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoUploadLimitSetting_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.FreeUserStorageGb).HasColumnName("FreeUserStorageGB");
+            entity.Property(e => e.MaxFileSizeMb).HasColumnName("MaxFileSizeMB");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoUploadLimitSetting_UpdatedAt")
+                .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<PhotoUserQuotaUsage>(entity =>
+        {
+            entity.HasKey(e => e.UsageId);
+
+            entity.ToTable("PhotoUserQuotaUsage");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoUserQuotaUsage_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.PeriodStartDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoUserQuotaUsage_PeriodStartDate")
+                .HasColumnType("datetime");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoUserQuotaUsage_UpdatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.UsedAmount).HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoUserQuotaUsage_UsedAmount");
+
+            entity.HasOne(d => d.QuotaType).WithMany(p => p.PhotoUserQuotaUsages)
+                .HasForeignKey(d => d.QuotaTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoUserQuotaUsage_PhotoQuotaType");
+
+            entity.HasOne(d => d.Subscription).WithMany(p => p.PhotoUserQuotaUsages)
+                .HasForeignKey(d => d.SubscriptionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoUserQuotaUsage_PhotoUserSubscription");
+
+            entity.HasOne(d => d.User).WithMany(p => p.PhotoUserQuotaUsages)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoUserQuotaUsage_User");
+        });
+
+        modelBuilder.Entity<PhotoUserSubscription>(entity =>
+        {
+            entity.HasKey(e => e.SubscriptionId).HasName("PK_UserSubscription");
+
+            entity.ToTable("PhotoUserSubscription");
+
+            entity.Property(e => e.AutoRenew)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_UserSubscription_AutoRenew");
+            entity.Property(e => e.BilingCycle)
+                .IsRequired()
+                .HasMaxLength(20)
+                .HasDefaultValue("Month")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_Table_1_QuotaValue");
+            entity.Property(e => e.CancellationReason).HasMaxLength(200);
+            entity.Property(e => e.CancelledAt).HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_UserSubscription_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.EndDate)
+                .HasDefaultValueSql("((0))")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_Table_1_ResetPeriod")
+                .HasColumnType("datetime");
+            entity.Property(e => e.StartDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoUserSubscription_StartDate")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Status)
+                .IsRequired()
+                .HasMaxLength(20)
+                .HasDefaultValue("Active")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoUserSubscription_Status");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_UserSubscription_UpdatedAt")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Plan).WithMany(p => p.PhotoUserSubscriptions)
+                .HasForeignKey(d => d.PlanId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoUserSubscription_PhotoSubscriptionPlan");
+
+            entity.HasOne(d => d.User).WithMany(p => p.PhotoUserSubscriptions)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoUserSubscription_User");
+        });
+
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.UserId).HasName("PK_Member");
@@ -564,9 +1533,7 @@ public partial class AAContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_UserVerification_UpdatedAt")
                 .HasColumnType("datetime");
-            entity.Property(e => e.VerificationCode)
-                .IsRequired()
-                .HasMaxLength(20);
+            entity.Property(e => e.VerificationCode).HasMaxLength(20);
             entity.Property(e => e.VerificationToken).HasMaxLength(255);
             entity.Property(e => e.VerifiedAt).HasColumnType("datetime");
 
