@@ -1,3 +1,4 @@
+using System.Text;
 using FrameZone_WebApi.Configuration;
 using FrameZone_WebApi.Helpers;
 using FrameZone_WebApi.Models;
@@ -6,47 +7,46 @@ using FrameZone_WebApi.Services;
 using FrameZone_WebApi.Videos.Repositories;
 using FrameZone_WebApi.Videos.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.StaticFiles;
-
-using System.Text;
-using Xabe.FFmpeg.Downloader;
 using Xabe.FFmpeg;
+using Xabe.FFmpeg.Downloader;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-//////////////--------------------------在應用程式啟動前下載 FFmpeg---------------
-//var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-//var ffmpegPath = Path.Combine(wwwrootPath, "FFmpeg");
+////////////--------------------------在應用程式啟動前下載 FFmpeg---------------
+var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+var ffmpegPath = Path.Combine(wwwrootPath, "FFmpeg");
 
-//// 確保目錄存在
-//Directory.CreateDirectory(ffmpegPath);
+// 確保目錄存在
+Directory.CreateDirectory(ffmpegPath);
 
-//// 檢查是否已存在 FFmpeg
-//var ffmpegExe = Path.Combine(ffmpegPath, "ffmpeg.exe");
-//if (!File.Exists(ffmpegExe))
-//{
-//    Console.WriteLine("FFmpeg 不存在,正在下載...");
-//    try
-//    {
-//        await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Official, ffmpegPath);
-//        Console.WriteLine("! FFmpeg 下載完成!");
-//    }
-//    catch (Exception ex)
-//    {
-//        Console.WriteLine($"X FFmpeg 下載失敗: {ex.Message}");
-//        Console.WriteLine("請手動下載 FFmpeg 並放置到 wwwroot/FFmpeg/ 目錄");
-//    }
-//}
-//else
-//{
-//    Console.WriteLine("! FFmpeg 已存在");
-//}
+// 檢查是否已存在 FFmpeg
+var ffmpegExe = Path.Combine(ffmpegPath, "ffmpeg.exe");
+if (!File.Exists(ffmpegExe))
+{
+    Console.WriteLine("FFmpeg 不存在,正在下載...");
+    try
+    {
+        await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Official, ffmpegPath);
+        Console.WriteLine("! FFmpeg 下載完成!");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"X FFmpeg 下載失敗: {ex.Message}");
+        Console.WriteLine("請手動下載 FFmpeg 並放置到 wwwroot/FFmpeg/ 目錄");
+    }
+}
+else
+{
+    Console.WriteLine("! FFmpeg 已存在");
+}
 
-//// 設定 FFmpeg 路徑
-//FFmpeg.SetExecutablesPath(ffmpegPath);
+// 設定 FFmpeg 路徑
+FFmpeg.SetExecutablesPath(ffmpegPath);
 ////////////--------------------------
 
 // Add services to the container.
@@ -159,9 +159,18 @@ builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddHttpContextAccessor();
 
 // ========== 影片服務 (DI注入) ==========
+builder.Services.AddHttpClient(); // 註冊 HttpClient 工廠
 builder.Services.AddScoped<VideoCardResponsity>(); // 註冊 Repository
+builder.Services.AddScoped<VideoUploadRepository>();// 註冊 Repository
+builder.Services.AddScoped<VideoTranscodeServices>();
 builder.Services.AddScoped<IVideoUploadService, VideoUploadService>();
 builder.Services.AddScoped<VideoServices>();
+
+// 調整上傳限制 (1GB)
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 1024L * 1024L * 1024L; // 1GB
+});
 //=======================================
 
 

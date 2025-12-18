@@ -1,5 +1,15 @@
 import { PrivacyStatus, ProcessStatus } from "./video.enum";
 
+//影片上傳回傳
+export interface VideoUploadResponse {
+  success: boolean;
+  message: String;
+  videoId: number;
+  guid: string;
+  status: string;
+
+}
+
 // 影片詳情資料（創作者工作室）
 export class VideoDetailData {
 

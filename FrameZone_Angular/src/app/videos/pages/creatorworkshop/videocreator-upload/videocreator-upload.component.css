@@ -1,0 +1,17 @@
+.thumbnail-item {
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  padding: 2px;
+  transition: all 0.2s ease;
+}
+
+.thumbnail-item:hover {
+  border-color: #999;
+}
+
+.thumbnail-item.selected {
+  border-color: #0d6efd;
+  /* Bootstrap primary */
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, .25);
+}

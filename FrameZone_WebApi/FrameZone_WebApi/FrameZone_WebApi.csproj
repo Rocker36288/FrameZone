@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\videos\thumbnail\**" />
+    <Content Remove="wwwroot\videos\thumbnail\**" />
+    <EmbeddedResource Remove="wwwroot\videos\thumbnail\**" />
+    <None Remove="wwwroot\videos\thumbnail\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="efpt.config.json.user" />
   </ItemGroup>
 
@@ -28,7 +35,6 @@
 
   <ItemGroup>
     <Folder Include="Middlewares\" />
-    <Folder Include="wwwroot\videos\thumbnail\" />
   </ItemGroup>
 
 </Project>
