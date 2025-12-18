@@ -9,7 +9,7 @@ import { ShoppingSellershopComponent } from "./shopping/shopping-sellershop/shop
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ShoppingcartComponent, ShoppingHeaderComponent, ShoppingCheckoutComponent, ShoppinghomeComponent, ShoppingProductDetailComponent, ShoppingSellershopComponent],
+  imports: [RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
