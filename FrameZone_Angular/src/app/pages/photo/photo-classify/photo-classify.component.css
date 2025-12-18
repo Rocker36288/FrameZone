@@ -1,0 +1,72 @@
+/* 上傳拖放區域 */
+.upload-zone {
+  border: 2px dashed var(--tblr-border-color);
+  border-radius: var(--tblr-border-radius);
+  padding: 3rem 2rem;
+  transition: all 0.3s ease;
+  background-color: var(--tblr-bg-surface);
+  cursor: pointer;
+}
+
+.upload-zone:hover {
+  border-color: var(--tblr-primary);
+  background-color: var(--tblr-bg-surface-secondary);
+}
+
+.upload-zone.dragging {
+  border-color: var(--tblr-primary);
+  background-color: rgba(var(--tblr-primary-rgb), 0.1);
+  border-style: solid;
+}
+
+/* 預覽圖片樣式 */
+.avatar img {
+  object-fit: cover;
+}
+
+/* 標籤樣式 */
+.badge {
+  font-weight: 500;
+}
+
+/* 空狀態調整 */
+.empty {
+  padding: 4rem 1rem;
+}
+
+/* 按鈕間距 */
+.btn-list {
+  display: flex;
+  gap: 0.25rem;
+}
+
+/* 列表項目 hover 效果 */
+.list-group-item:hover {
+  background-color: var(--tblr-bg-surface-secondary);
+}
+
+/* 動畫效果 */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ti-loader-2 {
+  animation: spin 1s linear infinite;
+}
+
+/* 響應式調整 */
+@media (max-width: 768px) {
+  .upload-zone {
+    padding: 2rem 1rem;
+  }
+
+  .h1 {
+    font-size: 1.5rem;
+  }
+}

@@ -1,1 +1,264 @@
-<p>photo-classify works!</p>
+<div class="container-xl">
+  <div class="page-header d-print-none">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <h2 class="page-title">
+          <i class="ti ti-photo-up me-2"></i>
+          照片上傳與分類
+        </h2>
+        <div class="text-secondary mt-1">
+          上傳照片後系統將自動解析 EXIF 資訊並進行智慧分類
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-body">
+    <!-- 上傳區域 -->
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="upload-zone" [class.dragging]="isDragging()" (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+          <div class="text-center">
+            <i class="ti ti-cloud-upload display-1 text-muted mb-3"></i>
+            <h3 class="mb-2">拖放照片到這裡</h3>
+            <p class="text-secondary mb-3">
+              或點擊下方按鈕選擇檔案
+            </p>
+
+            <label class="btn btn-primary">
+              <i class="ti ti-file-plus me-2"></i>
+              選擇照片
+              <input type="file" multiple accept="image/*" (change)="onFileSelect($event)" style="display: none;">
+            </label>
+
+            <div class="mt-3 text-secondary small">
+              支援格式: JPG, PNG, HEIC, GIF, BMP (最大 50MB)
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 統計資訊 -->
+    @if (uploadFiles().length > 0) {
+    <div class="row mb-3">
+      <div class="col-md-3 col-sm-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="subheader">總檔案數</div>
+              <div class="ms-auto">
+                <span class="badge bg-blue">{{ uploadFiles().length }}</span>
+              </div>
+            </div>
+            <div class="h1 mb-0">{{ uploadFiles().length }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="subheader">上傳成功</div>
+              <div class="ms-auto">
+                <i class="ti ti-check text-success"></i>
+              </div>
+            </div>
+            <div class="h1 mb-0 text-success">{{ successCount() }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="subheader">上傳失敗</div>
+              <div class="ms-auto">
+                <i class="ti ti-x text-danger"></i>
+              </div>
+            </div>
+            <div class="h1 mb-0 text-danger">{{ failedCount() }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-6">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="subheader">等待上傳</div>
+              <div class="ms-auto">
+                <i class="ti ti-clock text-secondary"></i>
+              </div>
+            </div>
+            <div class="h1 mb-0 text-secondary">
+              {{ pendingFilesCount() }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 操作按鈕 -->
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary" [disabled]="isUploading() || pendingFilesCount() === 0"
+            (click)="startBatchUpload()">
+            <i class="ti ti-upload me-2"></i>
+            @if (isUploading()) {
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            上傳中...
+            } @else {
+            開始批次上傳 ({{ pendingFilesCount() }})
+            }
+          </button>
+
+          <button class="btn btn-outline-danger" [disabled]="isUploading()" (click)="clearAll()">
+            <i class="ti ti-trash me-2"></i>
+            清空列表
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- 檔案列表 -->
+    @if (uploadFiles().length > 0) {
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">上傳清單</h3>
+      </div>
+      <div class="list-group list-group-flush">
+        @for (fileItem of uploadFiles(); track fileItem.fileName; let i = $index) {
+        <div class="list-group-item">
+          <div class="row align-items-center">
+            <!-- 預覽圖 -->
+            <div class="col-auto">
+              @if (fileItem.preview) {
+              <img [src]="fileItem.preview" class="avatar avatar-lg" alt="preview">
+              } @else {
+              <div class="avatar avatar-lg bg-secondary-lt">
+                <i class="ti ti-photo"></i>
+              </div>
+              }
+            </div>
+
+            <!-- 檔案資訊 -->
+            <div class="col">
+              <div class="d-flex align-items-center mb-1">
+                <strong class="me-2">{{ fileItem.fileName }}</strong>
+                <span class="badge bg-secondary-lt">{{ formatFileSize(fileItem.fileSize) }}</span>
+              </div>
+
+              <!-- 狀態 -->
+              <div class="text-secondary">
+                <i [class]="getStatusIconClass(fileItem.status)"></i>
+                {{ getStatusText(fileItem.status) }}
+                @if (fileItem.error) {
+                <span class="text-danger ms-2">- {{ fileItem.error }}</span>
+                }
+              </div>
+
+              <!-- EXIF 資訊 -->
+              @if (fileItem.metadata) {
+              <div class="mt-2">
+                <div class="row g-2">
+                  @if (fileItem.metadata.cameraMake || fileItem.metadata.cameraModel) {
+                  <div class="col-auto">
+                    <span class="badge bg-blue-lt">
+                      <i class="ti ti-camera me-1"></i>
+                      {{ fileItem.metadata.cameraMake }} {{ fileItem.metadata.cameraModel }}
+                    </span>
+                  </div>
+                  }
+
+                  @if (fileItem.metadata.dateTaken) {
+                  <div class="col-auto">
+                    <span class="badge bg-green-lt">
+                      <i class="ti ti-calendar me-1"></i>
+                      {{ fileItem.metadata.dateTaken | date:'yyyy-MM-dd HH:mm' }}
+                    </span>
+                  </div>
+                  }
+
+                  @if (fileItem.metadata.gpsLatitude && fileItem.metadata.gpsLongitude) {
+                  <div class="col-auto">
+                    <span class="badge bg-purple-lt">
+                      <i class="ti ti-map-pin me-1"></i>
+                      {{ fileItem.metadata.gpsLatitude }}, {{ fileItem.metadata.gpsLongitude }}
+                    </span>
+                  </div>
+                  }
+
+                  @if (fileItem.metadata.width && fileItem.metadata.height) {
+                  <div class="col-auto">
+                    <span class="badge bg-orange-lt">
+                      <i class="ti ti-dimensions me-1"></i>
+                      {{ fileItem.metadata.width }} × {{ fileItem.metadata.height }}
+                    </span>
+                  </div>
+                  }
+                </div>
+
+                <!-- 自動標籤 -->
+                @if (fileItem.metadata.autoTags && fileItem.metadata.autoTags.length > 0) {
+                <div class="mt-2">
+                  <div class="text-secondary small mb-1">自動標籤:</div>
+                  <div class="d-flex flex-wrap gap-1">
+                    @for (tag of fileItem.metadata.autoTags; track tag) {
+                    <span class="badge bg-cyan-lt">{{ tag }}</span>
+                    }
+                  </div>
+                </div>
+                }
+              </div>
+              }
+            </div>
+
+            <!-- 操作按鈕 -->
+            <div class="col-auto">
+              <div class="btn-list">
+
+                @if (fileItem.status !== 'uploading') {
+                <button class="btn btn-sm btn-ghost-danger" (click)="removeFile(i)" title="移除">
+                  <i class="ti ti-trash"></i>
+                </button>
+                }
+
+                @if (fileItem.status === 'uploading') {
+                <div class="spinner-border spinner-border-sm text-primary"></div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- 進度條 -->
+          @if (fileItem.status === 'uploading' && fileItem.progress > 0) {
+          <div class="progress mt-2" style="height: 4px;">
+            <div class="progress-bar" [style.width.%]="fileItem.progress"></div>
+          </div>
+          }
+        </div>
+        }
+      </div>
+    </div>
+    }
+
+    <!-- 空狀態 -->
+    @if (uploadFiles().length === 0) {
+    <div class="empty">
+      <div class="empty-img">
+        <img src="https://tabler.io/static/illustrations/undraw_photographing_re_fae2.svg" height="128" alt="">
+      </div>
+      <p class="empty-title">尚未上傳任何照片</p>
+      <p class="empty-subtitle text-secondary">
+        開始上傳照片，系統將自動解析 EXIF 資訊並進行分類
+      </p>
+    </div>
+    }
+  </div>
+</div>
