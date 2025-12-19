@@ -13,9 +13,9 @@ namespace FrameZone_WebApi.Videos.Services
             _videoRepo = videoRepo;
         }
 
-        public async Task<VideoCardDto?> GetVideoCardAsync(int videoid)
+        public async Task<VideoCardDto?> GetVideoCardAsync(string guid)
         {
-            var dto = await _videoRepo.GetVideoCard(videoid);
+            var dto = await _videoRepo.GetVideoCard(guid);
 
             if (dto == null)
             {
@@ -25,7 +25,20 @@ namespace FrameZone_WebApi.Videos.Services
             return dto;
         }
 
-       
+        public async Task<List<VideoCommentDto?>> GetVideoCommentsByGuid(string guid)
+        {
+            var dto = await _videoRepo.GetVideoWithComments(guid);
+
+            if (dto == null)
+            {
+                return null;
+            }
+
+            return dto;
+        }
+
+
+
 
         public async Task<VideoCommentDto?> GetVideoCommentByCommentidAsync(int videoid)
         {

@@ -1,4 +1,6 @@
-﻿namespace FrameZone_WebApi.Videos.DTOs
+﻿using Microsoft.Build.Framework;
+
+namespace FrameZone_WebApi.Videos.DTOs
 {
     public class VideoUploadDto
     {
@@ -47,5 +49,27 @@
 
         public static TranscodeResult Fail(string error, int? exitCode = null, string? stackTrace = null, List<string>? missingFiles = null)
             => new TranscodeResult(false, error: error, exitCode: exitCode, stackTrace: stackTrace, missingFiles: missingFiles);
+    }
+
+
+    //發布相關
+    public class VideoPublishRequest
+    {
+        [Required]
+        public string VideoGuid { get; set; } = string.Empty;
+
+        [Required]
+        public string Title { get; set; } = string.Empty;
+
+        public string? Description { get; set; }
+        public string PrivacyStatus { get; set; } = "PRIVATE";
+    }
+
+    public class VideoPublishResult //回傳
+    {
+        public string VideoGuid { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string ProcessStatus { get; set; } = string.Empty;
+        public DateTime PublishDate { get; set; }
     }
 }

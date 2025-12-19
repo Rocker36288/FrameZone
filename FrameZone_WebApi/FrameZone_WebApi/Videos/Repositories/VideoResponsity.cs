@@ -1,10 +1,11 @@
-﻿using FrameZone_WebApi.Models;
+﻿using System.ComponentModel;
+using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Videos.DTOs;
 using Humanizer;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.ComponentModel;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using static FrameZone_WebApi.Videos.DTOs.ChannelCardDto;
 
 namespace FrameZone_WebApi.Videos.Repositories
@@ -47,12 +48,12 @@ namespace FrameZone_WebApi.Videos.Repositories
         //}
 
         //獲取videocard資料(根據id單個)
-        public async Task<VideoCardDto> GetVideoCard(int id)
+        public async Task<VideoCardDto> GetVideoCard(string guid)
         {
             var video = await _context.Videos
              .Include(v => v.Channel)
              .ThenInclude(c => c.UserProfile)
-             .FirstOrDefaultAsync(v => v.VideoId == id);
+             .FirstOrDefaultAsync(v => v.VideoUrl == guid);
 
             if (video == null || video.Channel == null)
             {
@@ -129,6 +130,68 @@ namespace FrameZone_WebApi.Videos.Repositories
 
 
             return dto;
+        }
+
+        //獲取留言資料by 留言id
+        public async Task<List<VideoCommentDto>> GetVideoWithComments(string guid)
+        {
+            // 1️⃣ 取得影片
+            var video = await _context.Videos.FirstOrDefaultAsync(v => v.VideoUrl == guid);
+            if (video == null) return null!;
+
+            // 2️⃣ 取得 CommentTargets
+            var targets = await _context.CommentTargets
+                .Where(ct => ct.VideoId == video.VideoId)
+                .ToListAsync();
+            var targetIds = targets.Select(t => t.CommentTargetId).ToList();
+
+            // 3️⃣ 取得對應留言
+            var comments = await _context.Comments
+                .Where(c => targetIds.Contains(c.CommentTargetId))
+                .Include(c => c.User)
+                    .ThenInclude(u => u.Channel)
+                .Include(c => c.User)
+                    .ThenInclude(u => u.UserProfile)
+                .ToListAsync();
+
+            // 4️⃣ 計算喜歡數
+            var likes = await _context.CommentLikes
+                .Where(cl => comments.Select(c => c.CommentId).Contains(cl.CommentId))
+                .GroupBy(cl => cl.CommentId)
+                .Select(g => new { CommentId = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            // 5️⃣ 對應留言 DTO
+            var commentDtos = comments
+                .Where(c => c.ParentCommentId == null)
+                .Select(c =>
+                {
+                    var dto = new VideoCommentDto
+                    {
+                        Id = c.CommentId,
+                        UserName = c.User?.Channel?.ChannelName ?? "Unknown",
+                        Avatar = c.User?.UserProfile?.Avatar ?? "",
+                        Message = c.CommentContent,
+                        CreatedAt = c.CreatedAt,
+                        Likes = likes.FirstOrDefault(l => l.CommentId == c.CommentId)?.Count ?? 0,
+                        Replies = comments
+                            .Where(r => r.ParentCommentId == c.CommentId)
+                            .Select(r => new VideoCommentDto
+                            {
+                                Id = r.CommentId,
+                                UserName = r.User?.Channel?.ChannelName ?? "Unknown",
+                                Avatar = r.User?.UserProfile?.Avatar ?? "",
+                                Message = r.CommentContent,
+                                CreatedAt = r.CreatedAt,
+                                Likes = likes.FirstOrDefault(l => l.CommentId == r.CommentId)?.Count ?? 0,
+                                Replies = new List<VideoCommentDto>()
+                            }).ToList()
+                    };
+                    return dto;
+                }).ToList();
+
+            // 6️⃣ 回傳影片 DTO + 留言
+            return commentDtos;
         }
 
 

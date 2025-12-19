@@ -10,6 +10,6 @@ export class VideoUploadService {
   constructor(private http: HttpClient) { }
 
   getVideoStatus(videoGuid: string): Observable<any> {
-    return this.http.get(`/api/videos/${videoGuid}/status`);
+    return this.http.get(`https://localhost:7213/api/videoupload/${videoGuid}/status`);
   }
 }

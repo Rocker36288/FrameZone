@@ -80,6 +80,7 @@
             }
         }
 
+        //頻道首頁資料
         public class ChannelHomeDto
         {
             public long Id { get; set; } = 0;

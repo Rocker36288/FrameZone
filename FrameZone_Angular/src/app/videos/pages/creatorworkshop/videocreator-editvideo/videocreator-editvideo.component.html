@@ -1,0 +1,271 @@
+<div class="page-wrapper">
+
+  <!-- ===== Header ===== -->
+  <div class="page-header">
+    <div class="container-xl">
+      <div class="row align-items-center">
+        <div class="col">
+          <div class="page-pretitle">影片管理</div>
+          <h2 class="page-title">
+            <i class="ti ti-video me-2"></i>影片詳情
+          </h2>
+        </div>
+
+        <div class="col-auto ms-auto">
+          <div class="btn-list">
+
+            <button class="btn btn-danger" (click)="deleteVideo()">
+              <i class="ti ti-trash me-1"></i>刪除
+            </button>
+
+            <a routerLink="/videos" class="btn btn-outline-secondary">
+              <i class="ti ti-arrow-left me-1"></i>返回上一頁
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Body ===== -->
+  <div class="page-body">
+    <div class="container-xl">
+
+
+      <!-- 影片修改警示 -->
+      <div *ngIf="hasUnsavedChanges" class="alert alert-warning d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <i class="ti ti-alert-circle me-2"></i>
+          影片已修改，尚未儲存
+        </div>
+        <button class="btn btn-sm btn-primary" (click)="saveAllChanges()">
+          確認修改
+        </button>
+      </div>
+
+      <!-- ===== 標題（可編輯） ===== -->
+      <div class="card mb-3">
+        <div class="card-body">
+
+          <!-- 顯示 -->
+          <div *ngIf="!editingTitle" class="d-flex align-items-center gap-2">
+            <h3 class="mb-0">{{ video.title }}</h3>
+            <i class="ti ti-edit cursor-pointer" (click)="startEditTitle()"></i>
+          </div>
+
+          <!-- 編輯 -->
+          <div *ngIf="editingTitle">
+            <input class="form-control mb-2" [(ngModel)]="editTitle">
+            <div class="d-flex gap-2">
+              <button class="btn btn-primary btn-sm" (click)="saveTitle()">確認</button>
+              <button class="btn btn-outline-secondary btn-sm" (click)="cancelEditTitle()">取消</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="row">
+
+        <!-- ================= 左側：影片主內容 ================= -->
+        <div class="col-lg-8">
+
+          <!-- ===== 影片播放器 ===== -->
+          <div class="card mb-3">
+            <div class="card-body p-0">
+
+              <div *ngIf="video.videoUrl" class="ratio ratio-16x9">
+                <video controls [poster]="video.thumbnailUrl">
+                  <source [src]="video.videoUrl" type="video/mp4">
+                </video>
+              </div>
+
+              <img *ngIf="!video.videoUrl && video.thumbnailUrl" [src]="video.thumbnailUrl" class="card-img-top">
+
+              <div *ngIf="!video.videoUrl && !video.thumbnailUrl"
+                class="ratio ratio-16x9 bg-light d-flex justify-content-center align-items-center">
+                <div class="text-muted text-center">
+                  <i class="ti ti-video-off fs-1"></i>
+                  <p class="mb-0">無可用影片</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+
+          <!-- ===== 影片描述 ===== -->
+          <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h3 class="card-title mb-0">
+                <i class="ti ti-align-left me-2"></i>影片說明
+              </h3>
+              <i *ngIf="!editingDescription" class="ti ti-edit cursor-pointer" (click)="startEditDescription()"></i>
+            </div>
+
+            <div class="card-body">
+              <p *ngIf="!editingDescription" class="mb-0">
+                {{ video.description || '未提供描述' }}
+              </p>
+
+              <div *ngIf="editingDescription">
+                <textarea class="form-control mb-2" rows="5" [(ngModel)]="editDescription"></textarea>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-primary btn-sm" (click)="saveDescription()">確認</button>
+                  <button class="btn btn-outline-secondary btn-sm" (click)="cancelEditDescription()">取消</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================= 右側：管理 / 技術資訊 ================= -->
+        <div class="col-lg-4">
+
+          <!-- ===== 影片狀態（管理） ===== -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="ti ti-shield-lock me-2"></i>影片狀態
+              </h3>
+            </div>
+
+            <div class="card-body d-flex flex-column gap-3">
+
+              <!-- 隱私 -->
+              <div>
+                <div class="text-muted mb-1">隱私</div>
+
+                <span *ngIf="!editingPrivacy" class="badge cursor-pointer"
+                  [ngClass]="getPrivacyStatusClass(video.privacyStatus)" (click)="startEditPrivacy()">
+                  {{ video.privacyStatus }}
+                </span>
+
+                <div *ngIf="editingPrivacy" class="d-flex gap-1 mt-1">
+                  <select class="form-select form-select-sm w-auto" [(ngModel)]="editPrivacy">
+                    <option value="Public">公開</option>
+                    <option value="Unlisted">不公開列出</option>
+                    <option value="Private">私人</option>
+                  </select>
+                  <button class="btn btn-sm btn-primary" (click)="savePrivacy()">✔</button>
+                  <button class="btn btn-sm btn-outline-secondary" (click)="cancelEditPrivacy()">✖</button>
+                </div>
+              </div>
+
+              <!-- 處理狀態 -->
+              <div>
+                <div class="text-muted mb-1">處理狀態</div>
+                <span class="badge" [ngClass]="getProcessStatusClass(video.processStatus)">
+                  {{ video.processStatus }}
+                </span>
+              </div>
+
+              <!-- 時長 -->
+              <div>
+                <div class="text-muted mb-1">時長</div>
+                <strong>{{ getDuration(video.duration) }}</strong>
+              </div>
+
+              <!-- 解析度 -->
+              <div>
+                <div class="text-muted mb-1">解析度</div>
+                <span class="badge bg-azure-lt">
+                  {{ video.resolution }}
+                </span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- ===== 基本資訊 ===== -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="ti ti-info-circle me-2"></i>基本資訊
+              </h3>
+            </div>
+            <div class="card-body">
+              <div class="datagrid">
+                <div class="datagrid-item">
+                  <div class="datagrid-title">頻道 ID</div>
+                  <div class="datagrid-content">
+                    <span class="badge bg-secondary-lt">
+                      {{ video.channelId }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="datagrid-item">
+                  <div class="datagrid-title">建立時間</div>
+                  <div class="datagrid-content">
+                    {{ video.createdAt | date:'yyyy-MM-dd HH:mm' }}
+                  </div>
+                </div>
+
+                <div class="datagrid-item">
+                  <div class="datagrid-title">更新時間</div>
+                  <div class="datagrid-content">
+                    {{ video.updatedAt | date:'yyyy-MM-dd HH:mm' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== 技術細節 ===== -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="ti ti-settings me-2"></i>技術細節
+              </h3>
+            </div>
+            <div class="card-body">
+              <div class="datagrid">
+                <div class="datagrid-item">
+                  <div class="datagrid-title">檔案大小</div>
+                  <div class="datagrid-content">
+                    <strong>{{ getReadableSize(video.fileSize) }}</strong>
+                  </div>
+                </div>
+
+                <div class="datagrid-item">
+                  <div class="datagrid-title">解析度</div>
+                  <div class="datagrid-content">
+                    {{ video.resolution }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+
+        <!-- ===== 統計 ===== -->
+        <div class="row mt-3">
+          <div class="col-lg-4" *ngFor="let item of [
+               { label:'觀看次數', value:viewCount, icon:'eye', color:'text-blue' },
+               { label:'喜歡數', value:likeCount, icon:'heart', color:'text-red' },
+               { label:'留言數', value:commentCount, icon:'message', color:'text-green' },
+             ]">
+
+            <div class="card stat-card">
+              <div class="card-body">
+                <div class="subheader">{{ item.label }}</div>
+                <div class="h1">{{ item.value }}</div>
+              </div>
+              <div class="card-body border-top py-2">
+                <div [class]="item.color">
+                  <i class="ti ti-{{item.icon}} me-1"></i>
+                  總{{ item.label }}
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>

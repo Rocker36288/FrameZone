@@ -1,14 +1,17 @@
 ﻿using System.Diagnostics;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Videos.DTOs;
+using FrameZone_WebApi.Videos.Helpers;
 using FrameZone_WebApi.Videos.Repositories;
 using Humanizer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NuGet.Protocol.Core.Types;
 using Xabe.FFmpeg;
-using System.Net.Http.Headers;
 
 namespace FrameZone_WebApi.Videos.Services
 {
@@ -18,7 +21,8 @@ namespace FrameZone_WebApi.Videos.Services
         // 新增：生成 Base64 縮圖
         Task<List<string>> GenerateThumbnailsInMemoryAsync(string videoPath);
 
-        Task<Video> GetVideoByGuidAsync(Guid guid);
+        Task<Video> GetVideoByGuidAsync(string guid);
+        Task<VideoPublishResult> PublishedVideo([FromBody] VideoPublishRequest req);
     }
 
     public class VideoUploadService : IVideoUploadService
@@ -27,11 +31,13 @@ namespace FrameZone_WebApi.Videos.Services
         private readonly VideoUploadRepository _repository;
         private readonly HttpClient _httpClient;
         private readonly VideoTranscodeServices _videoTranscodeServices;
-        public VideoUploadService(VideoUploadRepository repository, HttpClient httpClient, IWebHostEnvironment env, VideoTranscodeServices transcodeService)
+        private readonly AaContextFactoryHelper _aaContextFactoryHelper;
+        public VideoUploadService(VideoUploadRepository repository, HttpClient httpClient, IWebHostEnvironment env, VideoTranscodeServices transcodeService, AaContextFactoryHelper AaContextFactoryHelper)
         {
             _repository = repository;
             _httpClient = httpClient;
             _videoTranscodeServices = transcodeService;
+            _aaContextFactoryHelper = AaContextFactoryHelper;
         }
         public async Task<VideoUploadResult> UploadAsync(IFormFile file)
         {
@@ -73,17 +79,18 @@ namespace FrameZone_WebApi.Videos.Services
                         Console.WriteLine($"開始轉碼 VideoGuid={guid}");
                         var transcodeResult = await _videoTranscodeServices.TranscodeAsync(guid, "source.mp4");
 
-                        // 更新資料庫狀態
-                        if (transcodeResult.Success)
+                        await using var context = await _aaContextFactoryHelper.CreateAsync();
+                        var video = await context.Videos.FindAsync(createdVideo.VideoId);
+
+                        if (video != null)
                         {
-                            //await _repository.VideoUpdateStatusAsync(createdVideo.VideoId, "READY");
-                            Console.WriteLine($"轉碼完成 VideoGuid={guid}");
+                            video.ProcessStatus = transcodeResult.Success ? "READY" : "FAILED_TRANSCODE";
+                            await context.SaveChangesAsync();
                         }
-                        else
-                        {
-                            //await _repository.VideoUpdateStatusAsync(createdVideo.VideoId, "TRANSCODE_FAILED");
-                            Console.WriteLine($"轉碼失敗 VideoGuid={guid}，原因: {transcodeResult.Error}");
-                        }
+
+                        Console.WriteLine(transcodeResult.Success
+                            ? $"轉碼完成 VideoGuid={guid}"
+                            : $"轉碼失敗 VideoGuid={guid}，原因: {transcodeResult.Error}");
                     }
                     catch (Exception ex)
                     {
@@ -177,7 +184,7 @@ namespace FrameZone_WebApi.Videos.Services
 
                 var mediaInfo = await FFmpeg.GetMediaInfo(videoPath);
                 var duration = mediaInfo.Duration.TotalSeconds;
-                var timestamps = new[] { duration * 0.1, duration * 0.3, duration * 0.5, duration * 0.7, duration * 0.9 };
+                var timestamps = new[] { duration * 0.1, duration * 0.3, duration * 0.5, duration * 0.7 };
 
                 for (int i = 0; i < timestamps.Length; i++)
                 {
@@ -330,7 +337,8 @@ namespace FrameZone_WebApi.Videos.Services
             };
         }
 
-        public async Task<Video> GetVideoByGuidAsync(Guid guid)
+        //用guid拿資料
+        public async Task<Video> GetVideoByGuidAsync(string guid)
         {
             var video = await _repository.GetVideoAsyncByGuid(guid);
 
@@ -341,6 +349,29 @@ namespace FrameZone_WebApi.Videos.Services
 
             return video;
         }
+
+        //影片發布服務
+        public async Task<VideoPublishResult> PublishedVideo([FromBody] VideoPublishRequest req)
+        {
+            var video = await _repository.GetVideoAsyncByGuid(req.VideoGuid);
+
+            if (video == null)
+                throw new KeyNotFoundException($"Video with guid {req.VideoGuid} not found");
+
+            video.Title = req.Title;
+            video.Description = req.Description;
+
+            var result = await _repository.VideoPublishedAsync(video);
+
+            return new VideoPublishResult
+            {
+                VideoGuid = result.VideoGuid,
+                Title = result.Title,
+                ProcessStatus = result.ProcessStatus,
+                PublishDate = result.PublishDate
+            };
+        }
+
 
     }
 }

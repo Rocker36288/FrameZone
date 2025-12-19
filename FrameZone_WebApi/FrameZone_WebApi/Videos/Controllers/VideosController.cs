@@ -23,10 +23,10 @@ namespace FrameZone_WebApi.Videos.Controllers
 
 
         //api/videos/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<VideoCardDto>> GetVideo(int id)
+        [HttpGet("{guid}")]
+        public async Task<ActionResult<VideoCardDto>> GetVideo(string guid)
         {
-            var dto = await _videoServices.GetVideoCardAsync(id);
+            var dto = await _videoServices.GetVideoCardAsync(guid);
 
             if(dto == null)
             {
@@ -38,10 +38,25 @@ namespace FrameZone_WebApi.Videos.Controllers
         }
 
         //api/videos/comment/{id}
-        [HttpGet("comment/{id}")]
-        public async Task<ActionResult<VideoCardDto>> GetComment(int id)
+        //[HttpGet("comment/{id}")]
+        //public async Task<ActionResult<VideoCardDto>> GetComment(int id)
+        //{
+        //    var dto = await _videoServices.GetVideoCommentByCommentidAsync(id);
+
+        //    if (dto == null)
+        //    {
+        //        Console.WriteLine("API呼叫成功，但失敗!");
+        //        return NotFound();
+        //    }
+
+        //    return Ok(dto);
+        //}
+
+        //api/videos/{guid}/comment
+        [HttpGet("{guid}/comment")]
+        public async Task<ActionResult<List<VideoCommentDto>>> GetVideoComments(string guid)
         {
-            var dto = await _videoServices.GetVideoCommentByCommentidAsync(id);
+            var dto = await _videoServices.GetVideoCommentsByGuid(guid);
 
             if (dto == null)
             {

@@ -20,7 +20,7 @@
 
             <!-- 播放器容器 -->
             <div class="ratio ratio-16x9 bg-dark rounded overflow-hidden">
-              <app-video-player [src]="'https://localhost:7213/videos/video/test/master.m3u8'"></app-video-player>
+              <app-video-player [src]="VideoUrI"></app-video-player>
             </div>
 
             <!-- 播放器角落裝飾 -->
@@ -66,7 +66,7 @@
                 <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
                 <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
               </svg>
-              <span class="fw-semibold">{{video.views}}</span> 次觀看
+              <span class="fw-semibold">{{video!.views}}</span> 次觀看
             </div>
             <span class="text-muted">•</span>
             <div class="stat-item">
@@ -78,7 +78,7 @@
                 <path d="M8 3v4"></path>
                 <path d="M4 11h16"></path>
               </svg>
-              {{video.uploadDate!| videoTimeago}}
+              {{video!.uploadDate| videoTimeago}}
             </div>
             <div class="ms-auto">
               <app-video-actions-bar></app-video-actions-bar>

@@ -10,6 +10,15 @@ export interface VideoUploadResponse {
 
 }
 
+
+
+export interface VideoPublishRequest {
+  videoGuid: string;
+  title: string;
+  description?: string;
+  privacyStatus: PrivacyStatus;
+}
+
 // 影片詳情資料（創作者工作室）
 export class VideoDetailData {
 
