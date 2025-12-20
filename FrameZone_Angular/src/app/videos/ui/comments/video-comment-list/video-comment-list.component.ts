@@ -2,7 +2,7 @@
 import { Component, Input } from '@angular/core';
 import { VideoCommentItemComponent } from "../video-comment-item/video-comment-item.component";
 import { NgForOf, NgIf } from '@angular/common';
-import { VideoCommentModel } from '../../../models/video-model';
+import { VideoCommentCard } from '../../../models/video-model';
 
 @Component({
   selector: 'app-video-comment-list',
@@ -11,5 +11,5 @@ import { VideoCommentModel } from '../../../models/video-model';
   styleUrl: './video-comment-list.component.css'
 })
 export class VideoCommentListComponent {
-  @Input() comments: VideoCommentModel[] = [];
+  @Input() comments: VideoCommentCard[] = [];
 }

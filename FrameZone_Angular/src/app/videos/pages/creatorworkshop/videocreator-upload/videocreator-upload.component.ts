@@ -2,11 +2,11 @@ import { HttpClient, HttpEventType } from '@angular/common/http';
 import { Component, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import { NgIf, NgForOf } from '@angular/common';
 import { interval, Subscription, switchMap, takeWhile, finalize, catchError, of } from 'rxjs';
-import { VideoUploadService } from '../../../service/video-upload.service';
 import { ProcessStatus, PrivacyStatus } from '../../../models/video.enum';
 import { VideoPlayerComponent } from "../../../ui/video/video-player/video-player.component";
 import { FormsModule } from '@angular/forms';
 import { VideoPublishRequest } from '../../../models/videocreator-model';
+import { VideoService } from '../../../service/video.service';
 
 interface VideoStatusResponse {
   videoUrl: string;
@@ -63,7 +63,7 @@ export class VideocreatorUploadComponent implements OnDestroy {
 
   constructor(
     private http: HttpClient,
-    private videoUploadService: VideoUploadService
+    private videoService: VideoService
   ) { }
 
   ngOnDestroy(): void {
@@ -323,7 +323,7 @@ export class VideocreatorUploadComponent implements OnDestroy {
       .pipe(
         switchMap(() => {
           console.log('輪詢中...');
-          return this.videoUploadService.getVideoStatus(this.videoGuid).pipe(
+          return this.videoService.getVideoStatus(this.videoGuid).pipe(
             catchError(err => {
               console.error('輪詢請求失敗:', err);
               return of(null);

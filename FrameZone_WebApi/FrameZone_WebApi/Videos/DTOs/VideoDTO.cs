@@ -83,35 +83,25 @@
         //頻道首頁資料
         public class ChannelHomeDto
         {
-            public long Id { get; set; } = 0;
-            public string Name { get; set; } = string.Empty;
-            public string Avatar { get; set; } = string.Empty;
-            public string Description { get; set; } = string.Empty;
-            public int Follows { get; set; } = 0;
-            public int VideosCount { get; set; } = 0;
-            public string Banner { get; set; } = string.Empty; // 橫幅圖片位置
-            public DateTime CreatedAt { get; set; } = DateTime.Now; // 頻道建立日期
-            public DateTime LastUpdateAt { get; set; } = DateTime.Now; // 最後一次上傳影片日期
+            public long Id { get; set; }
+            public string Name { get; set; }
+            public string Avatar { get; set; }
+            public string Description { get; set; }
+            public int Follows { get; set; }
+            public int VideosCount { get; set; }
+            public string Banner { get; set; }
+            public DateTime CreatedAt { get; set; }
+            public DateTime LastUpdateAt { get; set; }
+        }
 
-            // 預設建構子
-            public ChannelHomeDto() { }
+        public class VideoCommentRequest
+        {
+            public long UserId { get; set; }
+            public int Videoid { get; set; }
+            public int TargetTypeId { get; set; }
+            public string CommentContent { get; set; } = string.Empty;
+            public int? ParentCommentId { get; set; }
 
-            // 可透過傳入部分資料初始化
-            public ChannelHomeDto(ChannelHomeDto data)
-            {
-                if (data != null)
-                {
-                    Id = data.Id;
-                    Name = data.Name;
-                    Avatar = data.Avatar;
-                    Description = data.Description;
-                    Follows = data.Follows;
-                    VideosCount = data.VideosCount;
-                    Banner = data.Banner;
-                    CreatedAt = data.CreatedAt;
-                    LastUpdateAt = data.LastUpdateAt;
-                }
-            }
         }
     }
 }

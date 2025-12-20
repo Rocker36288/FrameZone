@@ -12,7 +12,7 @@ import { VideocreatorVideomanageComponent } from "./creatorworkshop/videocreator
 
 @Component({
   selector: 'app-videos-shell',
-  imports: [HeaderComponent, VideosSidebarComponent, VideoHomeComponent, VideolistCardComponent, ChannelComponent, ChannelLayoutComponent, VideocreatorUploadComponent, VideocreatorVideomanageComponent],
+  imports: [HeaderComponent, VideosSidebarComponent, VideoHomeComponent, VideolistCardComponent, ChannelComponent, ChannelLayoutComponent, VideocreatorVideomanageComponent],
   templateUrl: './videos-shell.component.html',
   styleUrl: './videos-shell.component.css'
 })

@@ -20,7 +20,7 @@
 
             <!-- 播放器容器 -->
             <div class="ratio ratio-16x9 bg-dark rounded overflow-hidden">
-              <app-video-player [src]="VideoUrI"></app-video-player>
+              <app-video-player [src]="videoUrl"></app-video-player>
             </div>
 
             <!-- 播放器角落裝飾 -->
@@ -51,9 +51,11 @@
                   <path d="M21 21l-4 -4"></path>
                 </svg>
               </div>
-              <h1 class="fs-4 fw-bold mb-0 lh-sm flex-grow-1 title-text">
-                {{video!.title}}
-              </h1>
+              <div class="fs-1 fw-bold mb-0 lh-sm flex-grow-1 title-text">
+                <div *ngIf="video">
+                  {{video?.title}}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -66,7 +68,7 @@
                 <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
                 <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"></path>
               </svg>
-              <span class="fw-semibold">{{video!.views}}</span> 次觀看
+              <span class="fw-semibold">{{video?.views}}</span> 次觀看
             </div>
             <span class="text-muted">•</span>
             <div class="stat-item">
@@ -78,7 +80,7 @@
                 <path d="M8 3v4"></path>
                 <path d="M4 11h16"></path>
               </svg>
-              {{video!.uploadDate| videoTimeago}}
+              <!-- {{video.publishDate| videoTimeago}} -->
             </div>
             <div class="ms-auto">
               <app-video-actions-bar></app-video-actions-bar>
@@ -132,6 +134,8 @@
       <!-- 評論區 -->
       <div class="card shadow-lg border-0 comments-card" [class.loaded]="isVideoLoaded">
         <div class="card-body p-4">
+
+          <!-- 標題 -->
           <div class="d-flex align-items-center gap-2 mb-3">
             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler text-primary" width="24" height="24"
               viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
@@ -142,10 +146,34 @@
             </svg>
             <h5 class="mb-0 fw-bold">留言討論</h5>
           </div>
-          <div class="text-muted text-center py-5">
-            <!-- 留言組件 -->
-            <app-video-comment-list [comments]="commentList"></app-video-comment-list>
+
+          <!-- ✏️ 使用者留言輸入區 -->
+          <div class="mb-4">
+            <div class="d-flex gap-3 align-items-start">
+              <!-- 使用者頭像 -->
+              <span class="avatar avatar-sm rounded-circle bg-primary text-white">
+                {{ currentUserInitial }}
+              </span>
+
+              <!-- 輸入框 -->
+              <div class="flex-grow-1">
+                <textarea class="form-control" rows="3" placeholder="留下你的留言..." [(ngModel)]="newComment"
+                  [disabled]="isSubmitting"></textarea>
+
+                <div class="d-flex justify-content-end mt-2">
+                  <button class="btn btn-primary" (click)="submitComment()"
+                    [disabled]="!newComment?.trim() || isSubmitting">
+                    <i class="ti ti-send me-1"></i>
+                    發送留言
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
+
+          <!-- 💬 留言列表 -->
+          <app-video-comment-list [comments]="commentList"></app-video-comment-list>
+
         </div>
       </div>
 

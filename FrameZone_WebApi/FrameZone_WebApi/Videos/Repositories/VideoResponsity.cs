@@ -246,5 +246,26 @@ namespace FrameZone_WebApi.Videos.Repositories
 
             return dto;
         }
+
+        //先查詢CommentTarget是否存在，不存在則建立，已存在就傳
+        public async Task<CommentTarget?> GetVideoCommentTarget(int videoId)
+        {
+            return await _context.CommentTargets
+                .FirstOrDefaultAsync(x => x.VideoId == videoId);
+        }
+
+        public async Task<CommentTarget> CreateVideoCommentTarget(CommentTarget target)
+        {
+            _context.CommentTargets.Add(target);
+            await _context.SaveChangesAsync();
+            return target;
+        }
+
+        public async Task<Comment> CreateComment(Comment comment)
+        {
+            _context.Comments.Add(comment);
+            await _context.SaveChangesAsync();
+            return comment;
+        }
     }
 }

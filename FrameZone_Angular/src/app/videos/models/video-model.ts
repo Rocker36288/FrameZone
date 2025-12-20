@@ -1,16 +1,19 @@
+import { TargetTypeEnum } from "./video.enum";
+
 // 影片卡片資訊
 export class VideoCardData {
   // ⚠️ 僅供內部使用（例如 trackBy）
   id?: number;
 
-  // ✅ 對外識別（從 VideoUrl 解析 GUID）
-  videoUri: string = '';
+  // 後端回傳的 videoId
+  videoId?: number;
 
+  videoUri: string = '';
   title: string = '';
   thumbnail: string = '';
   duration: number = 0;
   views: number = 0;
-  uploadDate: Date = new Date();
+  publishDate?: Date;
   description: string = '';
 
   channelName: string = '';
@@ -38,16 +41,16 @@ export class VideoListCard {
 }
 
 //留言卡片
-export class VideoCommentModel {
+export class VideoCommentCard {
   id: number = 0;
   userName: string = '';
   avatar: string = '';
   message: string = '';
   createdAt: Date = new Date();
   likes: number = 0;
-  replies?: VideoCommentModel[] = [];
+  replies?: VideoCommentCard[] = [];
 
-  constructor(data?: Partial<VideoCommentModel>) {
+  constructor(data?: Partial<VideoCommentCard>) {
     if (data) {
       Object.assign(this, data); // 如果傳入了部分資料，就用來覆蓋預設值
     }
@@ -87,4 +90,12 @@ export class ChannelHome {
       Object.assign(this, data); // 如果傳入了部分資料，就用來覆蓋預設值
     }
   }
+}
+
+export interface VideoCommentRequest {
+  UserId: number;          // long → number
+  VideoId: number;         // int → number（注意命名）
+  TargetTypeId: TargetTypeEnum.Video;    // enum / int
+  CommentContent: string;
+  ParentCommentId: number | undefined;
 }

@@ -24,7 +24,7 @@ export class MockChannelService {
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 2158,
     views: 551,
-    uploadDate: new Date('2002-02-07'),
+    publishDate: new Date('2002-02-07'),
     description: "我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明",
     videoUri: ''
   };
@@ -37,7 +37,7 @@ export class MockChannelService {
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 2158,
     views: 551,
-    uploadDate: new Date('2002-02-07'),
+    publishDate: new Date('2002-02-07'),
     description: "fff",
     videoUri: ''
   }, {
@@ -48,7 +48,7 @@ export class MockChannelService {
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 21558,
     views: 551,
-    uploadDate: new Date('2002-02-07'),
+    publishDate: new Date('2002-02-07'),
     description: "fff",
     videoUri: ''
   }, {
@@ -59,7 +59,7 @@ export class MockChannelService {
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 21558,
     views: 551,
-    uploadDate: new Date('2002-02-07'),
+    publishDate: new Date('2002-02-07'),
     description: "fff",
     videoUri: ''
   }, {
@@ -70,7 +70,7 @@ export class MockChannelService {
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 21558,
     views: 551,
-    uploadDate: new Date('2002-02-07'),
+    publishDate: new Date('2002-02-07'),
     description: "fff",
     videoUri: ''
   }, {
@@ -81,7 +81,7 @@ export class MockChannelService {
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 21558,
     views: 551,
-    uploadDate: new Date('2002-02-07'),
+    publishDate: new Date('2002-02-07'),
     description: "fff",
     videoUri: ''
   }, {
@@ -92,7 +92,7 @@ export class MockChannelService {
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 21558,
     views: 551,
-    uploadDate: new Date('2002-02-07'),
+    publishDate: new Date('2002-02-07'),
     description: "fff",
     videoUri: ''
   }

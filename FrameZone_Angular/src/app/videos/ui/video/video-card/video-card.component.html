@@ -17,7 +17,7 @@
             <p class="card-text mb-1 text-muted small">{{ video.channelName }}</p>
             <p class="card-text text-muted small">
               <span>觀看次數：{{ video.views }}次</span> ·
-              <span>{{ video.uploadDate! | videoTimeago }}</span>
+              <span>{{ video.publishDate! | videoTimeago }}</span>
             </p>
           </div>
         </div>
@@ -47,7 +47,7 @@
           <div class="small text-truncate">
             <div class="fw-semibold">創作者名稱</div>
             <div class="text-muted"><span>觀看次數：{{ video.views }}次</span> ·
-              <span>{{ video.uploadDate! | videoTimeago }}</span>
+              <span>{{ video.publishDate! | videoTimeago }}</span>
             </div>
           </div>
         </div>
@@ -87,7 +87,7 @@
             <!-- 日期 -->
             <div class="d-flex align-items-center gap-1">
               <i class="ti ti-calendar"></i>
-              <span>{{ video.uploadDate }}</span>
+              <span>{{ video.publishDate }}</span>
             </div>
 
             <!-- 觀看次數 -->

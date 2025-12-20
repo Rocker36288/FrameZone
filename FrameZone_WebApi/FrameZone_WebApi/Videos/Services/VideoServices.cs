@@ -1,6 +1,9 @@
 ﻿using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Videos.DTOs;
+using FrameZone_WebApi.Videos.Enums;
 using FrameZone_WebApi.Videos.Repositories;
+using Microsoft.AspNetCore.Mvc;
+using static FrameZone_WebApi.Videos.DTOs.ChannelCardDto;
 namespace FrameZone_WebApi.Videos.Services
 {
 
@@ -40,17 +43,17 @@ namespace FrameZone_WebApi.Videos.Services
 
 
 
-        public async Task<VideoCommentDto?> GetVideoCommentByCommentidAsync(int videoid)
-        {
-            var dto = await _videoRepo.GetVideoCommentByCommentid(videoid);
+        //public async Task<VideoCommentDto?> GetVideoCommentByCommentidAsync(int videoid)
+        //{
+        //    var dto = await _videoRepo.GetVideoCommentByCommentid(videoid);
 
-            if (dto == null)
-            {
-                return null;
-            }
+        //    if (dto == null)
+        //    {
+        //        return null;
+        //    }
 
-            return dto;
-        }
+        //    return dto;
+        //}
 
         public async Task<ChannelCardDto?> GetChannelbyid(int id)
         {
@@ -64,6 +67,37 @@ namespace FrameZone_WebApi.Videos.Services
             return dto;
         }
 
-       
+        public async Task<VideoCommentDto> PostVideoComment(VideoCommentRequest req)
+        {
+            // 1️⃣ 取得或建立 CommentTarget
+            var commentTarget = await _videoRepo.GetVideoCommentTarget(req.Videoid);
+
+            if (commentTarget == null)
+            {
+                commentTarget = await _videoRepo.CreateVideoCommentTarget(new CommentTarget
+                {
+                    VideoId = req.Videoid,
+                    TargetTypeId = (int)TargetTypeEnum.Video // 建議用 enum
+                });
+            }
+
+            // 2️⃣ 建立 Comment
+            var comment = new Comment
+            {
+                CommentContent = req.CommentContent,
+                CommentTargetId = commentTarget.CommentTargetId,
+                UserId = req.UserId,
+                ParentCommentId = req.ParentCommentId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+            };
+
+            var createdComment = await _videoRepo.CreateComment(comment);
+
+            // 3️⃣ 回傳 DTO
+            return await _videoRepo.GetVideoCommentByCommentid(createdComment.CommentId);
+        }
+
+
     }
 }
