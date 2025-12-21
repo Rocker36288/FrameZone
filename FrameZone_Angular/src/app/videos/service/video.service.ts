@@ -19,6 +19,11 @@ export class VideoService {
     return this.http.get<VideoCardData>(`${this.apiBase}/videos/${videoGuid}`);
   }
 
+  // ===== 取得影片推薦 =====
+  getVideoRecommend(): Observable<VideoCardData[]> {
+    return this.http.get<VideoCardData[]>(`${this.apiBase}/videos/Recommend`);
+  }
+
   // ===== 取得影片留言 =====
   getVideoComments(videoGuid: string): Observable<VideoCommentCard[]> {
     return this.http.get<VideoCommentCard[]>(`${this.apiBase}/videos/${videoGuid}/comment`);

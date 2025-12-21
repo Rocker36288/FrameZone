@@ -28,6 +28,16 @@ namespace FrameZone_WebApi.Videos.Services
             return dto;
         }
 
+        //=======================獲取影片推薦服務
+        public async Task<List<VideoCardDto>> GetVideoRecommendAsync()
+        {
+            var dto = await _videoRepo.RecommendVideos();
+
+            return dto ?? new List<VideoCardDto>();
+        }
+
+
+
         public async Task<List<VideoCommentDto?>> GetVideoCommentsByGuid(string guid)
         {
             var dto = await _videoRepo.GetVideoWithComments(guid);
@@ -88,8 +98,8 @@ namespace FrameZone_WebApi.Videos.Services
                 CommentTargetId = commentTarget.CommentTargetId,
                 UserId = req.UserId,
                 ParentCommentId = req.ParentCommentId,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now,
             };
 
             var createdComment = await _videoRepo.CreateComment(comment);

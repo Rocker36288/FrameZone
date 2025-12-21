@@ -7,6 +7,7 @@ import { VideoPlayerComponent } from "../../../ui/video/video-player/video-playe
 import { FormsModule } from '@angular/forms';
 import { VideoPublishRequest } from '../../../models/videocreator-model';
 import { VideoService } from '../../../service/video.service';
+import { Router } from '@angular/router';
 
 interface VideoStatusResponse {
   videoUrl: string;
@@ -63,7 +64,8 @@ export class VideocreatorUploadComponent implements OnDestroy {
 
   constructor(
     private http: HttpClient,
-    private videoService: VideoService
+    private videoService: VideoService,
+    private router: Router
   ) { }
 
   ngOnDestroy(): void {
@@ -448,7 +450,7 @@ export class VideocreatorUploadComponent implements OnDestroy {
       .subscribe({
         next: () => {
           this.statusMessage = '影片已成功發佈';
-          // TODO: 導向影片頁 or 後台
+          this.router.navigate(['/videos/watch', this.videoGuid!]);
         },
         error: (err) => {
           console.error(err);

@@ -18,6 +18,7 @@ export class VideosListComponent {
   @Input() variant:
     | 'list'
     | 'creator-list'
+    | 'search-list'
 
     | 'gridshow'
     | 'gridshow-scroll'

@@ -1,5 +1,5 @@
 
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { VideoCommentItemComponent } from "../video-comment-item/video-comment-item.component";
 import { NgForOf, NgIf } from '@angular/common';
 import { VideoCommentCard } from '../../../models/video-model';
@@ -12,4 +12,9 @@ import { VideoCommentCard } from '../../../models/video-model';
 })
 export class VideoCommentListComponent {
   @Input() comments: VideoCommentCard[] = [];
+  @Output() submitReply = new EventEmitter<{ parentId: number; message: string }>();
+
+  onSubmitReply(event: { parentId: number; message: string }) {
+    this.submitReply.emit(event);
+  }
 }

@@ -152,6 +152,7 @@ namespace FrameZone_WebApi.Videos.Repositories
                     .ThenInclude(u => u.Channel)
                 .Include(c => c.User)
                     .ThenInclude(u => u.UserProfile)
+                    .OrderByDescending(c => c.CreatedAt)
                 .ToListAsync();
 
             // 4️⃣ 計算喜歡數
@@ -210,7 +211,7 @@ namespace FrameZone_WebApi.Videos.Repositories
             var dto = new ChannelCardDto
             {
                 Id = data.ChannelId,
-                 Name = data.ChannelName,
+                Name = data.ChannelName,
                 Description = data.Description,
                 Avatar = data.UserProfile.Avatar,
                 Follows = followCount,
@@ -266,6 +267,54 @@ namespace FrameZone_WebApi.Videos.Repositories
             _context.Comments.Add(comment);
             await _context.SaveChangesAsync();
             return comment;
+        }
+        //推薦影片獲得
+        public async Task<List<VideoCardDto>> RecommendVideos()
+        {
+            var videos = await _context.Videos
+                .AsNoTracking()
+                .Include(v => v.Channel)
+                    .ThenInclude(c => c.UserProfile)
+                .OrderByDescending(v => v.CreatedAt)
+                .Take(10)
+                .ToListAsync();
+
+            var videoIds = videos.Select(v => v.VideoId).ToList();
+
+            // 一次把觀看數全部查出來
+            var viewCounts = await _context.Views
+                .Where(v => videoIds.Contains(v.VideoId))
+                .GroupBy(v => v.VideoId)
+                .Select(g => new
+                {
+                    VideoId = g.Key,
+                    Count = g.Count()
+                })
+                .ToDictionaryAsync(x => x.VideoId, x => x.Count);
+
+            var result = new List<VideoCardDto>();
+
+            foreach (var video in videos)
+            {
+                if (video?.Channel == null)
+                    continue;
+
+                result.Add(new VideoCardDto
+                {
+                    VideoId = video.VideoId,
+                    Title = video.Title ?? "",
+                    VideoUri = video.VideoUrl ?? "",
+                    Thumbnail = video.ThumbnailUrl ?? "",
+                    Duration = video.Duration ?? 0,
+                    Views = viewCounts.TryGetValue(video.VideoId, out var count) ? count : 0,
+                    PublishDate = video.PublishDate ?? DateTime.MinValue,
+                    Description = video.Description ?? "",
+                    ChannelName = video.Channel.ChannelName ?? "",
+                    Avatar = video.Channel.UserProfile?.Avatar ?? ""
+                });
+            }
+
+            return result;
         }
     }
 }

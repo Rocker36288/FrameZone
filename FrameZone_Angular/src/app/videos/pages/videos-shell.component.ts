@@ -9,10 +9,12 @@ import { ChannelLayoutComponent } from "./channel/channel-layout/channel-layout.
 import { ChannelCard, VideoCardData } from '../models/video-model';
 import { VideocreatorUploadComponent } from "./creatorworkshop/videocreator-upload/videocreator-upload.component";
 import { VideocreatorVideomanageComponent } from "./creatorworkshop/videocreator-videomanage/videocreator-videomanage.component";
+import { SearchboxComponent } from "../ui/searchbox/searchbox.component";
+import { VideoSearchComponent } from "./search/video-search/video-search.component";
 
 @Component({
   selector: 'app-videos-shell',
-  imports: [HeaderComponent, VideosSidebarComponent, VideoHomeComponent, VideolistCardComponent, ChannelComponent, ChannelLayoutComponent, VideocreatorVideomanageComponent],
+  imports: [HeaderComponent, VideosSidebarComponent, VideoHomeComponent, VideolistCardComponent, ChannelComponent, ChannelLayoutComponent, VideocreatorVideomanageComponent, SearchboxComponent, VideoSearchComponent],
   templateUrl: './videos-shell.component.html',
   styleUrl: './videos-shell.component.css'
 })

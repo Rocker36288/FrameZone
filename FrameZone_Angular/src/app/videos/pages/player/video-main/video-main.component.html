@@ -80,7 +80,7 @@
                 <path d="M8 3v4"></path>
                 <path d="M4 11h16"></path>
               </svg>
-              <!-- {{video.publishDate| videoTimeago}} -->
+              {{video?.publishDate!| videoTimeago}}
             </div>
             <div class="ms-auto">
               <app-video-actions-bar></app-video-actions-bar>
@@ -172,7 +172,8 @@
           </div>
 
           <!-- 💬 留言列表 -->
-          <app-video-comment-list [comments]="commentList"></app-video-comment-list>
+          <app-video-comment-list [comments]="commentList"
+            (submitReply)="submitReply($event)">"></app-video-comment-list>
 
         </div>
       </div>

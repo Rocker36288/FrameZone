@@ -55,7 +55,6 @@ namespace FrameZone_WebApi.Videos.Controllers
         }
 
         //==========================縮圖區塊=========================
-        //========================== 後端 =========================
         [HttpPost("thumbnails-preview")]
         public async Task<IActionResult> GetThumbnails([FromBody] VideoGuidDto dto)
         {

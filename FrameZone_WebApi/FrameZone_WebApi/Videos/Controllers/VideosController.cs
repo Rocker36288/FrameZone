@@ -38,6 +38,21 @@ namespace FrameZone_WebApi.Videos.Controllers
             return Ok(dto);
         }
 
+        //獲取縮圖
+        [HttpGet("video-thumbnail/{guid}")]
+        public IActionResult GetVideoThumbnail(string guid)
+        {
+            // 取得實際檔案路徑
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "videos", guid, "thumbnail.jpg");
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound();
+
+            var mimeType = "image/jpeg";
+            var fileBytes = System.IO.File.ReadAllBytes(filePath);
+            return File(fileBytes, mimeType);
+        }
+
         //api/videos/comment/{id}
         //[HttpGet("comment/{id}")]
         //public async Task<ActionResult<VideoCardDto>> GetComment(int id)
@@ -108,6 +123,22 @@ namespace FrameZone_WebApi.Videos.Controllers
             if (dto == null)
             {
                 Console.WriteLine("API呼叫成功，但失敗!");
+                return NotFound();
+            }
+
+            return Ok(dto);
+        }
+
+        //==============================獲取影片列表===========================
+
+        [HttpGet("Recommend")]
+        public async Task<ActionResult<List<VideoCardDto>>> GetVideoRecommend()
+
+        {
+            var dto = await _videoServices.GetVideoRecommendAsync();
+
+            if (dto == null)
+            {
                 return NotFound();
             }
 

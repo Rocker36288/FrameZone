@@ -6,6 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class VideoTimeagoPipe implements PipeTransform {
   transform(value: Date | string | number): string {
+    console.log(value)
     if (!value) return '未知時間';
 
     const date = new Date(value);

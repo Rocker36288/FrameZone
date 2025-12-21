@@ -63,3 +63,11 @@ video-thumb-container app-video-thumbnail {
   display: block;
   transition: transform 0.2s;
 }
+
+/* 搜尋結果縮圖尺寸（限制高度） */
+.video-card--search .video-thumb-medium {
+  width: 200px;
+  height: 112px;
+  /* 16:9 */
+  flex-shrink: 0;
+}

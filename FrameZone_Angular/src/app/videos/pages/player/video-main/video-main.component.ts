@@ -207,7 +207,7 @@ export class VideoMainComponent {
    * 送出留言（目前為前端佔位）
    * 之後可接後端 API
    */
-  submitComment(): void {
+  submitComment(parentId?: number): void {
     if (!this.newComment.trim()) return;
 
     this.isSubmitting = true;
@@ -217,7 +217,7 @@ export class VideoMainComponent {
       VideoId: Number(this.video?.videoId),
       TargetTypeId: TargetTypeEnum.Video,
       CommentContent: this.newComment,
-      ParentCommentId: undefined,
+      ParentCommentId: parentId,
     };
 
     this.videoService.postVideoComment(req).subscribe({
@@ -232,5 +232,26 @@ export class VideoMainComponent {
       }
     });
 
+  }
+
+  submitReply(event: { parentId: number; message: string }) {
+    const req: VideoCommentRequest = {
+      UserId: this.currentUserId,
+      VideoId: Number(this.video?.videoId),
+      TargetTypeId: TargetTypeEnum.Video,
+      CommentContent: event.message,
+      ParentCommentId: event.parentId // ✅ 父留言 ID
+    };
+
+    this.videoService.postVideoComment(req).subscribe({
+      next: (res) => {
+        const parent = this.commentList.find(c => c.id === event.parentId);
+        if (parent) {
+          parent.replies = parent.replies || [];
+          parent.replies.unshift(res);
+        }
+      },
+      error: () => console.error('回覆留言失敗')
+    });
   }
 }

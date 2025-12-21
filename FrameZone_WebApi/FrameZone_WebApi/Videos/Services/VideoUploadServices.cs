@@ -51,6 +51,13 @@ namespace FrameZone_WebApi.Videos.Services
             // 5.3 儲存檔案
             var filePath = await SaveFileAsync(file, videoDir);
 
+            // 🔹 解析影片資訊
+            var mediaInfo = await FFmpeg.GetMediaInfo(filePath);
+            var duration = mediaInfo.Duration.TotalSeconds;
+            var width = mediaInfo.VideoStreams.FirstOrDefault()?.Width ?? 0;
+            var height = mediaInfo.VideoStreams.FirstOrDefault()?.Height ?? 0;
+            var fileSize = new FileInfo(filePath).Length;
+
             // 6️ 生成草稿資料表
             var video = new Video
             {
@@ -61,6 +68,10 @@ namespace FrameZone_WebApi.Videos.Services
                 ProcessStatus = "UPLOADED",
                 IsDeleted = false,
                 IsFeatured = false,
+
+                // 🔹 儲存影片資訊
+                Duration = (int)Math.Round(mediaInfo.Duration.TotalSeconds),
+                FileSize = fileSize
             };
             var createdVideo = await _repository.VideoDraftCreateAsync(video);
 
