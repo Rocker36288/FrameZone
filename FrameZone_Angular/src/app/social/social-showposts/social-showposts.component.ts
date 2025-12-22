@@ -1,6 +1,6 @@
 import { PostService } from '../services/post.service';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { PostDto } from '../services/post.service';
+import { PostDto } from "../models/PostDto";
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 

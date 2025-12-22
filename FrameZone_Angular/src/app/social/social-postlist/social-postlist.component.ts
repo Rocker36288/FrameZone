@@ -1,6 +1,6 @@
 import { PostService } from '../services/post.service';
 import { Component } from '@angular/core';
-import { PostDto } from '../services/post.service';
+import { PostDto } from "../models/PostDto";
 import { SocialShowpostsComponent } from '../social-showposts/social-showposts.component';
 
 @Component({
