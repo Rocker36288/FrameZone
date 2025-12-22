@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.StaticFiles;
 using System.Text;
 using Xabe.FFmpeg.Downloader;
 using Xabe.FFmpeg;
+using FrameZone_WebApi.Socials.Repositories;
+using FrameZone_WebApi.Socials.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

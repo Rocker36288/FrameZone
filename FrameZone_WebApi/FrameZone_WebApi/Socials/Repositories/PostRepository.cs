@@ -1,7 +1,7 @@
 ﻿using FrameZone_WebApi.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace FrameZone_WebApi.Repositories
+namespace FrameZone_WebApi.Socials.Repositories
 {
     public class PostRepository
     {
