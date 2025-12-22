@@ -25,6 +25,38 @@ export class PhotoClassifyComponent {
     this.uploadFiles().filter(f => f.status === 'pending').length
   );
 
+  // 建議留 buffer：後端 batch-upload 上限 200MB，你用 180MB 比較安全
+  private readonly MAX_BATCH_BYTES = 180 * 1024 * 1024;
+
+  private buildBatches(items: UploadFileItem[]): UploadFileItem[][] {
+    const batches: UploadFileItem[][] = [];
+    let current: UploadFileItem[] = [];
+    let currentBytes = 0;
+
+    for (const item of items) {
+      const size = item.file.size;
+
+      // 防呆：若單檔超過上限（你前端已限制 50MB，通常不會發生）
+      if (size > this.MAX_BATCH_BYTES) {
+        batches.push([item]);
+        continue;
+      }
+
+      if (current.length > 0 && currentBytes + size > this.MAX_BATCH_BYTES) {
+        batches.push(current);
+        current = [];
+        currentBytes = 0;
+      }
+
+      current.push(item);
+      currentBytes += size;
+    }
+
+    if (current.length > 0) batches.push(current);
+    return batches;
+  }
+
+
   constructor(
     private photoService: PhotoService,
     private toastr: ToastrService
@@ -218,6 +250,11 @@ export class PhotoClassifyComponent {
   clearAll() {
     this.uploadFiles.set([]);
     this.resetStats();
+
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    fileInputs.forEach((input: any) => {
+      input.value = '';
+    })
   }
 
   /**
@@ -246,16 +283,18 @@ export class PhotoClassifyComponent {
     this.totalFiles.set(validFiles.length);
 
     try {
-      // 標記所有檔案為上傳中
-      validFiles.forEach(f => f.status = 'uploading');
-      this.uploadFiles.set([...files]);
+      const batches = this.buildBatches(validFiles);
 
-      // 呼叫批次上傳 API
-      const filesToUpload = validFiles.map(f => f.file);
-      const response = await firstValueFrom(this.photoService.batchUpload(filesToUpload));
+      for (const batch of batches) {
+        batch.forEach(f => (f.status = 'uploading'));
+        this.uploadFiles.set([...files]);
 
-      if (response) {
-        this.handleBatchUploadResponse(response);
+        const filesToUpload = batch.map(f => f.file);
+        const response = await firstValueFrom(this.photoService.batchUpload(filesToUpload));
+
+        if (response) {
+          this.handleBatchUploadResponse(response);
+        }
       }
     } catch (error: unknown) {
       console.error('❌ 批次上傳錯誤:', error);
@@ -285,8 +324,8 @@ export class PhotoClassifyComponent {
 
     const files = this.uploadFiles();
 
-    this.successCount.set(response.successCount || 0);
-    this.failedCount.set(response.failedCount || 0);
+    this.successCount.set(this.successCount() + (response.successCount || 0));
+    this.failedCount.set(this.failedCount() + (response.failedCount || 0));
 
     let duplicateCount = 0;
     let otherErrorCount = 0;
@@ -346,6 +385,11 @@ export class PhotoClassifyComponent {
         '✗ 上傳錯誤'
       );
     }
+
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    fileInputs.forEach((input: any) => {
+      input.value = '';
+    });
   }
 
   /**

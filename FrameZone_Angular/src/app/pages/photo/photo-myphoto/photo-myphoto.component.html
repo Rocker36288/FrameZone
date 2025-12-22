@@ -1,0 +1,381 @@
+<div class="container-xl photo-page-shell">
+  <div class="photo-page-layout" [class.edit-mode]="isEditMode()">
+
+    <!-- Sidebar（把 open 狀態傳入） -->
+    <app-photo-sidebar [class.sidebar-open]="isSidebarOpen()" (openChange)="isSidebarOpen.set($event)"
+      (tagSelectionChange)="onTagSelectionChange($event)" class="photo-sidebar-wrapper">
+    </app-photo-sidebar>
+
+    <!-- 手機 sidebar 背景遮罩 -->
+    @if (isSidebarOpen()) {
+    <div class="sidebar-backdrop" (click)="toggleSidebar()"></div>
+    }
+
+    <div class="photo-main-content">
+      <!-- Header -->
+      <div class="page-header d-print-none">
+        <div class="row g-2 align-items-center">
+          <div class="col">
+            <button class="btn btn-outline-primary d-lg-none me-2" (click)="toggleSidebar()" title="開啟篩選">
+              <i class="ti ti-filter"></i>
+            </button>
+
+            <h2 class="page-title d-inline-block">
+              <i class="ti ti-photo me-2"></i>
+              我的照片
+            </h2>
+
+            @if (hasFilter()) {
+            <span class="badge bg-primary-lt ms-2">
+              <i class="ti ti-filter-filled me-1"></i>
+              已篩選 {{ filterTagIds().length }} 個標籤
+            </span>
+            }
+
+            <div class="text-secondary mt-1">
+              @if (hasFilter()) {
+              <span>符合篩選條件的照片</span>
+              <button class="btn btn-sm btn-link text-danger p-0 ms-2" (click)="clearFilter()">
+                <i class="ti ti-x"></i>
+                清除篩選
+              </button>
+              } @else {
+              <span>管理您上傳的所有照片</span>
+              }
+            </div>
+          </div>
+
+          <!-- 右側：編輯 + 上傳 -->
+          <div class="col-auto ms-auto">
+            <div class="btn-list">
+              <button type="button" class="btn" [class.btn-outline-primary]="!isEditMode()"
+                [class.btn-primary]="isEditMode()" (click)="toggleEditMode()">
+                <i class="ti" [class.ti-edit]="!isEditMode()" [class.ti-check]="isEditMode()"></i>
+                {{ isEditMode() ? '完成編輯' : '編輯' }}
+              </button>
+
+              <a routerLink="/photo-classify" class="btn btn-primary">
+                <i class="ti ti-upload me-2"></i>
+                上傳照片
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-body">
+
+        <!-- 工具列：只在編輯模式顯示 -->
+        @if (isEditMode() && photos() && hasPhotos()) {
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-auto">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" [checked]="allSelected()" (change)="toggleSelectAll()"
+                    id="selectAll">
+                  <label class="form-check-label" for="selectAll">
+                    @if (selectedCount() > 0) {
+                    <span class="text-primary">已選取 {{ selectedCount() }} 張照片</span>
+                    } @else {
+                    <span>全選</span>
+                    }
+                  </label>
+                </div>
+              </div>
+
+              @if (selectedCount() > 0) {
+              <div class="col-auto">
+                <button class="btn btn-danger btn-sm" (click)="deleteSelectedPhotos()">
+                  <i class="ti ti-trash me-2"></i>
+                  刪除選取 ({{ selectedCount() }})
+                </button>
+              </div>
+              }
+
+              <div class="col-auto ms-auto">
+                <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-sm" [class.btn-primary]="viewMode() === 'grid'"
+                    [class.btn-outline-primary]="viewMode() !== 'grid'" (click)="viewMode.set('grid')" title="網格檢視">
+                    <i class="ti ti-layout-grid"></i>
+                  </button>
+                  <button type="button" class="btn btn-sm" [class.btn-primary]="viewMode() === 'list'"
+                    [class.btn-outline-primary]="viewMode() !== 'list'" (click)="viewMode.set('list')" title="列表檢視">
+                    <i class="ti ti-list"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="col-auto">
+                <div class="text-secondary">共 {{ totalCount() }} 張照片</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+
+        <!-- Loading -->
+        @if (isLoading()) {
+        <div class="card">
+          <div class="card-body text-center py-5">
+            <div class="spinner-border text-primary mb-3" role="status">
+              <span class="visually-hidden">載入中...</span>
+            </div>
+            <div class="text-secondary">載入照片中...</div>
+          </div>
+        </div>
+        }
+
+        <!-- Grid -->
+        @if (!isLoading() && hasPhotos() && viewMode() === 'grid') {
+        <div class="photo-grid">
+          @for (photo of photos(); track photo.photoId) {
+          <div class="photo-card" [class.selected]="isEditMode() && selectedPhotos().has(photo.photoId)"
+            (click)="onPhotoClick(photo)">
+
+            <!-- 編輯模式才顯示勾選 -->
+            @if (isEditMode()) {
+            <div class="photo-checkbox">
+              <input type="checkbox" class="form-check-input" [checked]="selectedPhotos().has(photo.photoId)"
+                (click)="$event.stopPropagation()" (change)="togglePhotoSelection(photo.photoId)">
+            </div>
+
+            <div class="photo-actions">
+              <button class="btn btn-sm btn-ghost-danger" (click)="deletePhoto(photo.photoId, $event)" title="刪除">
+                <i class="ti ti-trash"></i>
+              </button>
+            </div>
+            }
+
+            <div class="photo-thumbnail">
+              <img [src]="getThumbnailUrl(photo)" [alt]="photo.fileName" loading="lazy">
+            </div>
+
+            <div class="photo-info">
+              <div class="photo-filename" [title]="photo.fileName">{{ photo.fileName }}</div>
+              <div class="photo-meta">
+                <span class="meta-item">
+                  <i class="ti ti-calendar"></i>
+                  {{ formatDate(photo.dateTaken || photo.uploadedAt) }}
+                </span>
+              </div>
+
+              @if (photo.tags && photo.tags.length > 0) {
+              <div class="photo-tags">
+                @for (tag of photo.tags.slice(0, 3); track tag) {
+                <span class="badge bg-blue-lt">{{ tag }}</span>
+                }
+                @if (photo.tags.length > 3) {
+                <span class="badge bg-secondary-lt">+{{ photo.tags.length - 3 }}</span>
+                }
+              </div>
+              }
+            </div>
+          </div>
+          }
+        </div>
+        }
+
+        <!-- List -->
+        @if (!isLoading() && hasPhotos() && viewMode() === 'list') {
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table table-vcenter card-table">
+              <thead>
+                <tr>
+                  @if (isEditMode()) { <th class="w-1"></th> }
+                  <th>照片</th>
+                  <th>檔案名稱</th>
+                  <th>拍攝時間</th>
+                  <th>標籤</th>
+                  @if (isEditMode()) { <th class="w-1"></th> }
+                </tr>
+              </thead>
+
+              <tbody>
+                @for (photo of photos(); track photo.photoId) {
+                <tr class="photo-row" [class.table-active]="isEditMode() && selectedPhotos().has(photo.photoId)"
+                  (click)="onPhotoClick(photo)">
+
+                  @if (isEditMode()) {
+                  <td (click)="$event.stopPropagation()">
+                    <input type="checkbox" class="form-check-input" [checked]="selectedPhotos().has(photo.photoId)"
+                      (change)="togglePhotoSelection(photo.photoId)">
+                  </td>
+                  }
+
+                  <td>
+                    <div class="list-thumbnail">
+                      <img [src]="getThumbnailUrl(photo)" [alt]="photo.fileName">
+                    </div>
+                  </td>
+                  <td>
+                    <div class="text-truncate" style="max-width: 300px;" [title]="photo.fileName">
+                      {{ photo.fileName }}
+                    </div>
+                  </td>
+                  <td>
+                    <span class="text-secondary">{{ formatDate(photo.dateTaken || photo.uploadedAt) }}</span>
+                  </td>
+                  <td>
+                    @if (photo.tags && photo.tags.length > 0) {
+                    <div class="d-flex flex-wrap gap-1">
+                      @for (tag of photo.tags.slice(0, 5); track tag) {
+                      <span class="badge bg-blue-lt">{{ tag }}</span>
+                      }
+                      @if (photo.tags.length > 5) {
+                      <span class="badge bg-secondary-lt">+{{ photo.tags.length - 5 }}</span>
+                      }
+                    </div>
+                    } @else {
+                    <span class="text-secondary">-</span>
+                    }
+                  </td>
+
+                  @if (isEditMode()) {
+                  <td (click)="$event.stopPropagation()">
+                    <button class="btn btn-sm btn-ghost-danger" (click)="deletePhoto(photo.photoId, $event)" title="刪除">
+                      <i class="ti ti-trash"></i>
+                    </button>
+                  </td>
+                  }
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+        }
+
+        <!-- Pagination -->
+        @if (!isLoading() && hasPhotos() && totalPages() > 1) {
+        <div class="card mt-3">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <button class="btn btn-outline-primary" [disabled]="currentPage() === 1" (click)="previousPage()">
+                <i class="ti ti-chevron-left me-2"></i>
+                上一頁
+              </button>
+
+              <ul class="pagination pagination-sm m-0">
+                @if (getPageRange()[0] > 1) {
+                <li class="page-item"><a class="page-link" (click)="goToPage(1)">1</a></li>
+                @if (getPageRange()[0] > 2) {
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
+                }
+
+                @for (page of getPageRange(); track page) {
+                <li class="page-item" [class.active]="page === currentPage()">
+                  <a class="page-link" (click)="goToPage(page)">{{ page }}</a>
+                </li>
+                }
+
+                @if (getPageRange()[getPageRange().length - 1] < totalPages()) { @if
+                  (getPageRange()[getPageRange().length - 1] < totalPages() - 1) { <li class="page-item disabled"><span
+                    class="page-link">...</span></li>
+                  }
+                  <li class="page-item"><a class="page-link" (click)="goToPage(totalPages())">{{ totalPages() }}</a>
+                  </li>
+                  }
+              </ul>
+
+              <button class="btn btn-outline-primary" [disabled]="currentPage() === totalPages()" (click)="nextPage()">
+                下一頁 <i class="ti ti-chevron-right ms-2"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        }
+
+        <!-- Empty -->
+        @if (!isLoading() && !hasPhotos()) {
+        <div class="empty">
+          <div class="empty-img">
+            <img src="https://tabler.io/static/illustrations/undraw_photo_album_re_bhes.svg" height="128" alt="">
+          </div>
+          @if (hasFilter()) {
+          <p class="empty-title">找不到符合條件的照片</p>
+          <p class="empty-subtitle text-secondary">請嘗試調整篩選條件</p>
+          <div class="empty-action">
+            <button class="btn btn-primary" (click)="clearFilter()">
+              <i class="ti ti-x me-2"></i>清除篩選
+            </button>
+          </div>
+          } @else {
+          <p class="empty-title">還沒有照片</p>
+          <p class="empty-subtitle text-secondary">開始上傳您的第一張照片吧！</p>
+          <div class="empty-action">
+            <a routerLink="/photo-classify" class="btn btn-primary">
+              <i class="ti ti-upload me-2"></i>上傳照片
+            </a>
+          </div>
+          }
+        </div>
+        }
+
+      </div>
+    </div>
+
+    <!-- 詳細資訊 Modal（非編輯模式下點照片開） -->
+    @if (activePhoto()) {
+    <div class="photo-detail-backdrop" (click)="closePhotoDetail()"></div>
+
+    <div class="photo-detail-modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <div class="photo-detail-header">
+        <div class="title">
+          <i class="ti ti-photo"></i>
+          <span class="text-truncate">{{ activePhoto()!.fileName }}</span>
+        </div>
+
+        <button class="btn btn-sm btn-ghost-secondary" (click)="closePhotoDetail()" title="關閉">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <div class="photo-detail-body">
+        <div class="detail-image">
+          <img [src]="getThumbnailUrl(activePhoto()!)" [alt]="activePhoto()!.fileName">
+        </div>
+
+        <div class="detail-info">
+          <div class="info-row">
+            <span class="label">檔名</span>
+            <span class="value">{{ activePhoto()!.fileName }}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="label">時間</span>
+            <span class="value">{{ formatDate(activePhoto()!.dateTaken || activePhoto()!.uploadedAt) }}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="label">標籤</span>
+            <span class="value">
+              @if (activePhoto()!.tags?.length) {
+              <span class="d-flex flex-wrap gap-1">
+                @for (tag of activePhoto()!.tags; track tag) {
+                <span class="badge bg-blue-lt">{{ tag }}</span>
+                }
+              </span>
+              } @else {
+              <span class="text-secondary">-</span>
+              }
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="photo-detail-footer">
+        <button class="btn btn-outline-primary" (click)="toggleEditMode(); closePhotoDetail()">
+          <i class="ti ti-edit me-2"></i>進入編輯
+        </button>
+
+        <button class="btn btn-danger" (click)="deletePhoto(activePhoto()!.photoId, $event)">
+          <i class="ti ti-trash me-2"></i>刪除
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+</div>

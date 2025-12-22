@@ -1,13 +1,18 @@
 import CryptoJS from 'crypto-js';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   PhotoUploadResponse,
   BatchUploadResponse,
   PhotoMetadata,
   PhotoDetail,
-  PhotoListResponse
+  PhotoListResponse,
+  TagHierarchyResponse,
+  PhotoQueryRequest,
+  PhotoQueryResponse,
+  CreateCustomTagRequest,
+  CreateCustomTagResponse
 } from '../models/photo.models';
 
 @Injectable({
@@ -97,6 +102,61 @@ export class PhotoService {
           pageSize: pageSize.toString()
         }
       }
+    );
+  }
+
+  // ==================== 標籤階層與篩選 ====================
+
+  /**
+   * 取得標籤階層（用於 Sidebar）
+   */
+  getTagHierarchy(): Observable<TagHierarchyResponse> {
+    return this.http.get<TagHierarchyResponse>(
+      `${this.apiUrl}/tags/hierarchy`
+    );
+  }
+
+  /**
+   * 查詢照片（支援標籤篩選、多條件篩選）
+   * @param request 查詢請求
+   */
+  queryPhotos(request: PhotoQueryRequest): Observable<PhotoQueryResponse> {
+    return this.http.post<PhotoQueryResponse>(
+      `${this.apiUrl}/query`,
+      request
+    );
+  }
+
+  /**
+   * 根據標籤 ID 篩選照片（便捷方法）
+   * @param tagIds 標籤 ID 陣列
+   * @param pageNumber 頁碼
+   * @param pageSize 每頁筆數
+   */
+  getPhotosByTags(
+    tagIds: number[],
+    pageNumber: number = 1,
+    pageSize: number = 20
+  ): Observable<PhotoQueryResponse> {
+    const request: PhotoQueryRequest = {
+      tagIds: tagIds,
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      sortBy: 'DateTaken',
+      sortOrder: 'desc'
+    };
+
+    return this.queryPhotos(request);
+  }
+
+  /**
+   * 建立自訂標籤
+   * @param request 建立自訂標籤請求
+   */
+  createCustomTag(request: CreateCustomTagRequest): Observable<CreateCustomTagResponse> {
+    return this.http.post<CreateCustomTagResponse>(
+      `${this.apiUrl}/tags/custom`,
+      request
     );
   }
 
