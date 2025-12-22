@@ -115,6 +115,16 @@ public partial class AAContext : DbContext
         {
             entity.ToTable("Photo");
 
+            entity.HasIndex(e => new { e.UserId, e.IsDeleted }, "IX_Photo_UserId_IsDeleted");
+
+            entity.HasIndex(e => new { e.UserId, e.IsDeleted, e.UploadedAt }, "IX_Photo_UserId_IsDeleted_UploadedAt").IsDescending(false, false, true);
+
+            entity.HasIndex(e => new { e.UserId, e.UploadedAt }, "IX_Photo_UserId_UploadedAt").IsDescending(false, true);
+
+            entity.HasIndex(e => new { e.UserId, e.Hash }, "UX_Photo_UserId_Hash")
+                .IsUnique()
+                .HasFilter("([IsDeleted]=(0))");
+
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_Photo_CreatedAt")
@@ -228,6 +238,8 @@ public partial class AAContext : DbContext
 
             entity.ToTable("PhotoCategory");
 
+            entity.HasIndex(e => e.CategoryId, "IX_PhotoCategory_CategoryId_CategoryName");
+
             entity.Property(e => e.CategoryCode).HasMaxLength(50);
             entity.Property(e => e.CategoryName)
                 .IsRequired()
@@ -240,6 +252,11 @@ public partial class AAContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoCategory_IsActive");
+            entity.Property(e => e.UiType)
+                .IsRequired()
+                .HasMaxLength(20)
+                .HasDefaultValue("flat")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoCategory_UiType_1");
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoCategory_UpdatedAt")
@@ -380,6 +397,14 @@ public partial class AAContext : DbContext
 
             entity.ToTable("PhotoLocation");
 
+            entity.HasIndex(e => new { e.City, e.District }, "IX_PhotoLocation_City_District");
+
+            entity.HasIndex(e => new { e.Country, e.City, e.District }, "IX_PhotoLocation_Country_City");
+
+            entity.HasIndex(e => e.PhotoId, "IX_PhotoLocation_PhotoId");
+
+            entity.HasIndex(e => new { e.PhotoId, e.SourceId }, "UQ_PhotoLocation_PhotoId_SourceId").IsUnique();
+
             entity.Property(e => e.Address).HasMaxLength(200);
             entity.Property(e => e.City).HasMaxLength(50);
             entity.Property(e => e.Country).HasMaxLength(50);
@@ -429,6 +454,12 @@ public partial class AAContext : DbContext
         modelBuilder.Entity<PhotoMetadatum>(entity =>
         {
             entity.HasKey(e => e.MetadataId);
+
+            entity.HasIndex(e => e.DateTaken, "IX_PhotoMetadata_DateTaken").IsDescending();
+
+            entity.HasIndex(e => e.PhotoId, "IX_PhotoMetadata_PhotoId");
+
+            entity.HasIndex(e => new { e.PhotoId, e.DateTaken }, "IX_PhotoMetadata_PhotoId_DateTaken").IsDescending(false, true);
 
             entity.Property(e => e.Aperture).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.CameraMake).HasMaxLength(200);
@@ -486,11 +517,16 @@ public partial class AAContext : DbContext
 
         modelBuilder.Entity<PhotoPhotoCategory>(entity =>
         {
-            entity.HasKey(e => e.PhotoId);
+            entity.HasKey(e => new { e.PhotoId, e.CategoryId, e.SourceId });
 
             entity.ToTable("PhotoPhotoCategory");
 
-            entity.Property(e => e.PhotoId).ValueGeneratedNever();
+            entity.HasIndex(e => new { e.CategoryId, e.PhotoId }, "IX_PhotoPhotoCategory_CategoryId_PhotoId");
+
+            entity.HasIndex(e => e.PhotoId, "IX_PhotoPhotoCategory_PhotoId");
+
+            entity.HasIndex(e => new { e.PhotoId, e.SourceId }, "IX_PhotoPhotoCategory_PhotoId_SourceId");
+
             entity.Property(e => e.AssignedAt).HasColumnType("datetime");
             entity.Property(e => e.Confidence).HasColumnType("decimal(5, 2)");
             entity.Property(e => e.CreatedAt)
@@ -507,8 +543,8 @@ public partial class AAContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PhotoPhotoCategory_PhotoCategory");
 
-            entity.HasOne(d => d.Photo).WithOne(p => p.PhotoPhotoCategory)
-                .HasForeignKey<PhotoPhotoCategory>(d => d.PhotoId)
+            entity.HasOne(d => d.Photo).WithMany(p => p.PhotoPhotoCategories)
+                .HasForeignKey(d => d.PhotoId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PhotoPhotoCategory_Photo");
 
@@ -520,9 +556,15 @@ public partial class AAContext : DbContext
 
         modelBuilder.Entity<PhotoPhotoTag>(entity =>
         {
-            entity.HasKey(e => e.PhotoTagId);
+            entity.HasKey(e => new { e.PhotoId, e.TagId, e.SourceId });
 
             entity.ToTable("PhotoPhotoTag");
+
+            entity.HasIndex(e => e.PhotoId, "IX_PhotoPhotoTag_PhotoId");
+
+            entity.HasIndex(e => new { e.PhotoId, e.SourceId }, "IX_PhotoPhotoTag_PhotoId_SourceId");
+
+            entity.HasIndex(e => new { e.TagId, e.PhotoId }, "IX_PhotoPhotoTag_TagId_PhotoId");
 
             entity.Property(e => e.AddedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -825,10 +867,13 @@ public partial class AAContext : DbContext
 
             entity.ToTable("PhotoTag");
 
+            entity.HasIndex(e => e.TagId, "IX_PhotoTag_TagId_TagName");
+
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoTag_CreatedAt")
                 .HasColumnType("datetime");
+            entity.Property(e => e.DisplayOrder).HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoTag_DisplayOrder");
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoTag_IsActive");
@@ -843,9 +888,14 @@ public partial class AAContext : DbContext
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoTag_UpdatedAt")
                 .HasColumnType("datetime");
 
-            entity.HasOne(d => d.User).WithMany(p => p.PhotoTags)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK_PhotoTag_User");
+            entity.HasOne(d => d.Category).WithMany(p => p.PhotoTags)
+                .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoTag_PhotoCategory");
+
+            entity.HasOne(d => d.ParentTag).WithMany(p => p.InverseParentTag)
+                .HasForeignKey(d => d.ParentTagId)
+                .HasConstraintName("FK_PhotoTag_PhotoTag");
         });
 
         modelBuilder.Entity<PhotoThirdPartyConfig>(entity =>

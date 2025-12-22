@@ -7,8 +7,6 @@ namespace FrameZone_WebApi.Models;
 
 public partial class PhotoPhotoTag
 {
-    public long PhotoTagId { get; set; }
-
     public long PhotoId { get; set; }
 
     public int TagId { get; set; }

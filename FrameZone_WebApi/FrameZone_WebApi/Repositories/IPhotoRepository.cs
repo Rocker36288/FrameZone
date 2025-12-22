@@ -53,6 +53,10 @@ namespace FrameZone_WebApi.Repositories
         /// <returns>照片列表</returns>
         Task<List<Photo>> GetPhotosByUserIdAsync(long userId, int pageIndex = 1, int pageSize = 20);
 
+        Task<int> GetUserPhotoCountAsync(long userId);
+
+        Task<long?> GetPhotoOwnerUserIdAsync(long photoId);
+
         #endregion
 
         #region PhotoMetadata 表操作
@@ -95,9 +99,11 @@ namespace FrameZone_WebApi.Repositories
         /// </summary>
         /// <param name="tagName">標籤名稱</param>
         /// <param name="tagType">標籤類型</param>
-        /// <param name="userId">使用者 ID</param>
+        /// <param name="categoryId">分類 ID (必填)</param>
+        /// <param name="parentTagId">父標籤 ID (可選)</param>
+        /// <param name="userId">使用者 ID (可選)</param>
         /// <returns>標籤物件</returns>
-        Task<PhotoTag> GetOrCreateTagAsync(string tagName, string tagType, long? userId = null);
+        Task<PhotoTag> GetOrCreateTagAsync(string tagName, string tagType, int categoryId, int? parentTagId = null, long? userId = null);
 
         #endregion
 
@@ -166,6 +172,80 @@ namespace FrameZone_WebApi.Repositories
 
         #endregion
 
+        #region PhotoCategory 表操作
+
+        /// <summary>
+        /// 根據分類代碼查詢分類
+        /// </summary>
+        /// <param name="categoryCode">分類代碼</param>
+        /// <returns>分類物件</returns>
+        Task<PhotoCategory> GetCategoryByCodeAsync(string categoryCode);
+
+        /// <summary>
+        /// 根據分類 ID 查詢分類
+        /// </summary>
+        /// <param name="categoryId">分類 ID</param>
+        /// <returns>分類物件</returns>
+        Task<PhotoCategory> GetCategoryByIdAsync(int categoryId);
+
+        /// <summary>
+        /// 根據分類類型查詢所有分類
+        /// </summary>
+        /// <param name="categoryTypeCode">分類類型代碼</param>
+        /// <returns>分類列表</returns>
+        Task<List<PhotoCategory>> GetCategoriesByTypeAsync(string categoryTypeCode);
+
+        /// <summary>
+        /// 取得或建立分類
+        /// </summary>
+        /// <param name="categoryName">分類名稱</param>
+        /// <param name="categoryCode">分類代碼</param>
+        /// <param name="categoryTypeId">分類類型 ID</param>
+        /// <param name="parentCategoryId">父分類 ID</param>
+        /// <param name="userId">使用者 ID（自定義分類時使用）</param>
+        /// <returns>分類物件</returns>
+        Task<PhotoCategory> GetOrCreateCategoryAsync(
+            string categoryName,
+            string categoryCode,
+            int categoryTypeId,
+            int? parentCategoryId = null,
+            long? userId = null);
+
+        /// <summary>
+        /// 取得分類樹（包含照片數量統計）
+        /// </summary>
+        /// <param name="userId">使用者 ID</param>
+        /// <param name="parentCategoryId">父分類 ID（null 表示根節點）</param>
+        /// <returns>分類樹節點列表</returns>
+        Task<List<CategoryTreeNodeDTO>> GetCategoryTreeWithCountsAsync(long userId, int? parentCategoryId = null);
+
+        #endregion
+
+        #region PhotoPhotoCategory 表操作
+
+        /// <summary>
+        /// 批次新增照片與分類的關聯
+        /// </summary>
+        /// <param name="photoId">照片 ID</param>
+        /// <param name="categoryIds">分類 ID 列表</param>
+        /// <param name="sourceId">來源 ID</param>
+        /// <param name="confidence">信心度</param>
+        /// <returns>新增的記錄數量</returns>
+        Task<int> AddPhotoCategoriesAsync(
+            long photoId,
+            List<int> categoryIds,
+            int sourceId,
+            decimal? confidence = null);
+
+        /// <summary>
+        /// 查詢照片的所有分類
+        /// </summary>
+        /// <param name="photoId">照片 ID</param>
+        /// <returns>分類列表</returns>
+        Task<List<PhotoCategory>> GetPhotoCategoriesByPhotoIdAsync(long photoId);
+
+        #endregion
+
         #region 進階查詢
 
         /// <summary>
@@ -196,6 +276,16 @@ namespace FrameZone_WebApi.Repositories
         /// <returns>照片列表</returns>
         Task<List<Photo>> GetPhotosByDateRangeAsync(long userId, DateTime? startDate, DateTime? endDate, int pageIndex = 1, int pageSize = 20);
 
+        /// <summary>
+        /// 查詢照片（支援多條件篩選、分頁、排序）
+        /// 這是最核心的查詢方法，支援所有篩選條件
+        /// </summary>
+        /// <param name="request">查詢請求 DTO</param>
+        /// <param name="userId">使用者 ID</param>
+        /// <returns>照片列表和總筆數</returns>
+        Task<(List<Photo> Photos, int TotalCount)> QueryPhotosAsync(PhotoQueryRequestDTO request, long userId);
+
+
         #endregion
 
         #region Transaction 相關
@@ -221,5 +311,39 @@ namespace FrameZone_WebApi.Repositories
 
         Task<bool> ExistsPhotoByHashAsync(long userId, string hash);
 
+        #region 縮圖優化相關
+
+        /// <summary>
+        /// 只取得縮圖資料
+        /// </summary>
+        /// <param name="photoId">照片 ID</param>
+        /// <returns>縮圖資料 DTO</returns>
+        Task<ThumbnailDataDTO> GetThumbnailDataAsync(long photoId);
+
+        /// <summary>
+        /// 只取得照片原圖資料
+        /// </summary>
+        /// <param name="photoId">照片 ID</param>
+        /// <returns>原圖資料 DTO</returns>
+        Task<PhotoDataDTO> GetPhotoDataAsync(long photoId);
+
+        /// <summary>
+        /// 更新縮圖資料
+        /// </summary>
+        /// <param name="photoId">照片 ID</param>
+        /// <param name="thumbnailData">縮圖資料</param>
+        /// <returns>是否更新成功</returns>
+        Task<bool> UpdateThumbnailAsync(long photoId, byte[] thumbnailData);
+
+        #endregion
+
+        /// <summary>
+        /// 根據標籤 ID 查詢標籤
+        /// </summary>
+        Task<PhotoTag> GetTagByIdAsync(int tagId);
+
+        Task<List<CategoryWithTagsDTO>> GetTagHierarchyAsync(long userId);
+        Task<Dictionary<int, int>> GetTagPhotoCountsAsync(long userId);
+        Task<PhotoTag> CreateCustomTagAsync(string tagName, int categoryId, int? parentTagId, long userId);
     }
 }

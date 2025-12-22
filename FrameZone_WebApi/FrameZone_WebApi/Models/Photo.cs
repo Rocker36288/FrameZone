@@ -19,6 +19,8 @@ public partial class Photo
 
     public byte[] PhotoData { get; set; }
 
+    public byte[] ThumbnailData { get; set; }
+
     public string Hash { get; set; }
 
     public DateTime UploadedAt { get; set; }
@@ -39,7 +41,7 @@ public partial class Photo
 
     public virtual ICollection<PhotoPhotoAlbum> PhotoPhotoAlbums { get; set; } = new List<PhotoPhotoAlbum>();
 
-    public virtual PhotoPhotoCategory PhotoPhotoCategory { get; set; }
+    public virtual ICollection<PhotoPhotoCategory> PhotoPhotoCategories { get; set; } = new List<PhotoPhotoCategory>();
 
     public virtual ICollection<PhotoPhotoTag> PhotoPhotoTags { get; set; } = new List<PhotoPhotoTag>();
 

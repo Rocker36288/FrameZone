@@ -1,19 +1,18 @@
-﻿using FrameZone_WebApi.Configuration;
+﻿using FrameZone_WebApi.Middlewares;
+using FrameZone_WebApi.Configuration;
 using FrameZone_WebApi.Helpers;
 using FrameZone_WebApi.Models;
-using FrameZone_WebApi.Options;
 using FrameZone_WebApi.Repositories;
 using FrameZone_WebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
+using SixLabors.ImageSharp;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
 
 // ========== 資料庫連線設定 ==========
 
@@ -101,6 +100,13 @@ builder.Services.AddAuthentication(options =>
     };  
 });
 
+// 配置記憶體快取
+builder.Services.AddMemoryCache(options =>
+{
+    options.SizeLimit = 1024 * 1024 * 200;
+    options.CompactionPercentage = 0.25;
+});
+
 // ========== 註冊依賴注入服務 (DI注入) ==========
 
 builder.Services.AddScoped<IPhotoRepository, PhotoRepository>();
@@ -111,6 +117,12 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IExifService, ExifService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
+builder.Services.AddScoped<ITagCategorizationService, TagCategorizationService>();
+builder.Services.AddScoped<IBackgroundGeocodingService, BackgroundGeocodingService>();
+
+
+builder.Services.AddHttpClient<IGeocodingService, GeocodingService>();
+builder.Services.AddScoped<IGeocodingService, GeocodingService>();
 
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddHttpContextAccessor();
@@ -156,10 +168,10 @@ if (app.Environment.IsDevelopment())
 }
 
 
-
 app.UseCors(policyName);
-
 app.UseHttpsRedirection();
+
+app.UseQueryStringToken();
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -39,8 +39,6 @@ public partial class User
 
     public virtual ICollection<PhotoSubscriptionHistory> PhotoSubscriptionHistories { get; set; } = new List<PhotoSubscriptionHistory>();
 
-    public virtual ICollection<PhotoTag> PhotoTags { get; set; } = new List<PhotoTag>();
-
     public virtual ICollection<PhotoUserQuotaUsage> PhotoUserQuotaUsages { get; set; } = new List<PhotoUserQuotaUsage>();
 
     public virtual ICollection<PhotoUserSubscription> PhotoUserSubscriptions { get; set; } = new List<PhotoUserSubscription>();

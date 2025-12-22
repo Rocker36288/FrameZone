@@ -6,14 +6,14 @@ namespace FrameZone_WebApi.DTOs
     /// <summary>
     /// 照片元數據 DTO
     /// </summary>
-    public class PhotoMetadataDtos
+    public class PhotoMetadataDTO
     {
         // 基本資訊
         public string FileName { get; set; }
         public long FileSize { get; set; }
         public string FileExtension { get; set; }
         public int Width { get; set; }
-        public int Height { get; set; } 
+        public int Height { get; set; }
 
         // 拍攝時間
         public DateTime? DateTaken { get; set; }
@@ -60,9 +60,10 @@ namespace FrameZone_WebApi.DTOs
         public long PhotoId { get; set; }
         public string FileName { get; set; }
         public long FileSize { get; set; }
-        public PhotoMetadataDtos Metadata { get; set; }
+        public PhotoMetadataDTO Metadata { get; set; }
         public List<string> AutoTags { get; set; }
         public string BlobUrl { get; set; }
+        public string ThumbnailUrl { get; set; }
     }
 
     public class BatchUploadResponseDTO
@@ -88,9 +89,8 @@ namespace FrameZone_WebApi.DTOs
     public class ExifTestResponseDTO
     {
         public bool Success { get; set; }
-        public PhotoMetadataDtos Metadata { get; set; }
+        public PhotoMetadataDTO Metadata { get; set; }
     }
-
 
     /// <summary>
     /// 照片詳細資訊 DTO
@@ -105,9 +105,9 @@ namespace FrameZone_WebApi.DTOs
         public string BlobUrl { get; set; }
         public string ThumbnailUrl { get; set; }
         public DateTime UploadedAt { get; set; }
-        
+
         // EXIF 元數據
-        public PhotoMetadataDtos Metadata { get; set; }
+        public PhotoMetadataDTO Metadata { get; set; }
 
         // 標籤
         public List<string> ExifTags { get; set; } = new List<string>();
