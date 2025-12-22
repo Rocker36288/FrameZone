@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Xabe.FFmpeg;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-using static FrameZone_WebApi.Videos.DTOs.ChannelCardDto;
 
 namespace FrameZone_WebApi.Videos.Controllers
 {
@@ -53,27 +52,57 @@ namespace FrameZone_WebApi.Videos.Controllers
             return File(fileBytes, mimeType);
         }
 
-        //api/videos/comment/{id}
-        //[HttpGet("comment/{id}")]
-        //public async Task<ActionResult<VideoCardDto>> GetComment(int id)
-        //{
-        //    var dto = await _videoServices.GetVideoCommentByCommentidAsync(id);
-
-        //    if (dto == null)
-        //    {
-        //        Console.WriteLine("API呼叫成功，但失敗!");
-        //        return NotFound();
-        //    }
-
-        //    return Ok(dto);
-        //}
-
         //呼叫獲取影片底下的留言
         //api/videos/{guid}/comment
         [HttpGet("{guid}/comment")]
         public async Task<ActionResult<List<VideoCommentDto>>> GetVideoComments(string guid)
         {
             var dto = await _videoServices.GetVideoCommentsByGuid(guid);
+
+            if (dto == null)
+            {
+                Console.WriteLine("API呼叫成功，但失敗!");
+                return NotFound();
+            }
+
+            return Ok(dto);
+        }
+        //===============================獲取頻道資訊========================================
+
+        //api/videos/channel/{id}
+        [HttpGet("channel/{id}")]
+        public async Task<ActionResult<ChannelCardDto>> Getchannel(int id)
+        {
+            var dto = await _videoServices.GetChannelbyid(id);
+
+            if (dto == null)
+            {
+                Console.WriteLine("API呼叫成功，但失敗!");
+                return NotFound();
+            }
+
+            return Ok(dto);
+        }
+
+        //===============================獲取頻道首頁資訊========================================
+        [HttpGet("channel/home/{id}")]
+        public async Task<ActionResult<ChannelHomeDto>> GetChannelHome(int id)
+        {
+            var dto = await _videoServices.GetChannelHome(id);
+
+            if (dto == null)
+            {
+                Console.WriteLine("API呼叫成功，但失敗!");
+                return NotFound();
+            }
+
+            return Ok(dto);
+        }
+        
+        [HttpGet("channel/{id}/videos")]
+        public async Task<ActionResult<ChannelHomeDto>> GetChannelVideos(int id)
+        {
+            var dto = await _videoServices.GetChannelVideosAsync(id);
 
             if (dto == null)
             {
@@ -112,22 +141,6 @@ namespace FrameZone_WebApi.Videos.Controllers
             }
         }
 
-        //
-
-        //api/videos/channel/{id}
-        [HttpGet("channel/{id}")]
-        public async Task<ActionResult<VideoCardDto>> Getchannel(int id)
-        {
-            var dto = await _videoServices.GetChannelbyid(id);
-
-            if (dto == null)
-            {
-                Console.WriteLine("API呼叫成功，但失敗!");
-                return NotFound();
-            }
-
-            return Ok(dto);
-        }
 
         //==============================獲取影片列表===========================
 

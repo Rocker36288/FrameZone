@@ -2,6 +2,7 @@ import { NgSwitch, NgSwitchCase } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { SubscribeButtonComponent } from "../../actions/subscribe-button/subscribe-button.component";
 import { ChannelCard } from '../../../models/video-model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-channel-card',
@@ -12,11 +13,14 @@ import { ChannelCard } from '../../../models/video-model';
 export class ChannelCardComponent {
   @Input() channel!: ChannelCard
   @Input() variant: 'small' | 'middle' | 'large' = 'small';
-  // channel: Partial<ChannelData> = {
-  //   Name: '頻道名稱示例',
-  //   UserAvatarUrl: 'https://placehold.co/80x80',
-  //   Follows: 12345,
-  // };
+
+
+  constructor(private router: Router) { }
+
+  goToChannelHome(): void {
+    const url = `/videos/channel/${this.channel.id}/home`;
+    window.open(url, '_blank');
+  }
 
   FollowerBtn() {
 

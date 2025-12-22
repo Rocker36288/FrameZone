@@ -12,22 +12,17 @@ import { ActivatedRoute } from '@angular/router';
 import { TargetTypeEnum } from '../../../models/video.enum';
 import { VideoService } from '../../../service/video.service';
 import { ChangeDetectorRef } from '@angular/core';
+import { VideosSidebarComponent } from "../../../ui/videos-sidebar/videos-sidebar.component";
 
 @Component({
   selector: 'app-video-main',
-  imports: [FormsModule, VideoPlayerComponent, VideoTimeagoPipe, VideoActionsBarComponent, ChannelCardComponent, NgIf, VideoCommentListComponent, VideosListComponent],
+  imports: [FormsModule, VideoPlayerComponent, VideoTimeagoPipe, VideoActionsBarComponent, ChannelCardComponent, NgIf, VideoCommentListComponent, VideosListComponent, VideosSidebarComponent],
   templateUrl: './video-main.component.html',
   styleUrl: './video-main.component.css'
 })
 export class VideoMainComponent {
 
-  channel: ChannelCard = {
-    id: 1,
-    Name: '頻道名稱示例',
-    Avatar: 'https://i.pravatar.cc/48',
-    Description: "這個人很懶，甚麼都沒留",
-    Follows: 12345,
-  };
+  channel: ChannelCard | undefined
 
   commentList: VideoCommentCard[] = []; // 留言列表
 
@@ -117,6 +112,15 @@ export class VideoMainComponent {
 
     /* 3️⃣ 設定播放器來源 */
     this.setVideoSource(this.guid);
+
+    //讀取頻道
+    this.videoService.getChannelCard(1).subscribe({
+      next: (channel: ChannelCard) => {
+        this.channel = channel;
+        console.log(this.channel)
+      },
+      error: (err) => console.error(err)
+    });
 
     //讀取留言
     this.videoService.getVideoComments(this.guid).subscribe({

@@ -16,6 +16,7 @@ export class VideoCardData {
   publishDate?: Date;
   description: string = '';
 
+  ChannelId: number = 0;
   channelName: string = '';
   avatar: string = '';
 
@@ -58,31 +59,25 @@ export class VideoCommentCard {
 }
 
 //頻道卡片資訊
-export class ChannelCard {
-  id: number = 0;
-  Name: string = '';
-  Avatar: string = '';
-  Description: string = '';
-  Follows: number = 0;
-
-  constructor(data?: Partial<ChannelCard>) {
-    if (data) {
-      Object.assign(this, data); // 如果傳入了部分資料，就用來覆蓋預設值
-    }
-  }
+export interface ChannelCard {
+  id: number;
+  name: string;
+  avatar: string | null;
+  description: string;
+  follows: number;
 }
 
 //頻道主頁資訊
 export class ChannelHome {
   id: number = 0;
-  Name: string = '';
-  Avatar: string = '';
-  Description: string = '';
-  Follows: number = 0;
-  VideosCount: number = 0;
-  Banner: string = ''; //橫幅圖片位置
-  CreatedAt = new Date(); //頻道建立日期
-  LastUpdateAt = new Date(); //最後一次上船影片日期
+  name: string = '';
+  avatar: string = '';
+  description: string = '';
+  follows: number = 0;
+  videosCount: number = 0;
+  banner: string = ''; //橫幅圖片位置
+  createdAt = new Date(); //頻道建立日期
+  lastUpdateAt = new Date(); //最後一次上船影片日期
 
 
   constructor(data?: Partial<ChannelHome>) {

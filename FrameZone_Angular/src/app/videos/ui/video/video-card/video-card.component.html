@@ -38,9 +38,9 @@
           <h6 class="card-title text-truncate">{{ video.title }}</h6>
           <p class="card-text text-muted small text-truncate mb-2">{{ video.description }}</p>
           <div class="d-flex align-items-center">
-            <img src="https://placehold.co/40x40" class="rounded-circle me-2" alt="創作者頭像">
+            <img src={{video.avatar}} class="rounded-circle me-2" alt="創作者頭像">
             <div class="small text-truncate">
-              <div class="fw-semibold">創作者名稱</div>
+              <div class="fw-semibold">{{video.channelName}}</div>
               <div class="text-muted">
                 <span>觀看次數：{{ video.views }}次</span> ·
                 <span>{{ video.publishDate! | videoTimeago }}</span>

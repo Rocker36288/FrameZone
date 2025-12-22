@@ -1,3 +1,4 @@
+<app-videos-sidebar></app-videos-sidebar>
 <div class="spotlight-wrapper container-xl py-4">
   <div class="row g-4">
 
@@ -90,8 +91,8 @@
           <div class="divider-glow my-3"></div>
 
           <!-- 頻道資訊 -->
-          <div class="channel-section mb-3">
-            <app-channel-card [channel]="channel!"></app-channel-card>
+          <div class="channel-section mb-3" *ngIf="channel">
+            <app-channel-card [channel]="channel"></app-channel-card>
           </div>
 
           <!-- 影片描述 - 霓虹邊框效果 -->

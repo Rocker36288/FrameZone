@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 // import { environment } from '../../environments/environment';
-import { VideoCardData, VideoCommentCard, VideoCommentRequest } from '../models/video-model';
+import { ChannelCard, ChannelHome, VideoCardData, VideoCommentCard, VideoCommentRequest } from '../models/video-model';
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +27,21 @@ export class VideoService {
   // ===== 取得影片留言 =====
   getVideoComments(videoGuid: string): Observable<VideoCommentCard[]> {
     return this.http.get<VideoCommentCard[]>(`${this.apiBase}/videos/${videoGuid}/comment`);
+  }
+
+  // ===== 取得頻道資訊 =====
+  getChannelCard(id: number): Observable<ChannelCard> {
+    return this.http.get<ChannelCard>(`${this.apiBase}/videos/channel/${id}`);
+  }
+
+  // ===== 取得頻道首頁資訊 =====
+  getChannelHome(id: number): Observable<ChannelHome> {
+    return this.http.get<ChannelHome>(`${this.apiBase}/videos/channel/home/${id}`);
+  }
+
+  // ===== 取得頻道首頁影片 =====
+  getChannelVideos(id: number): Observable<VideoCardData[]> {
+    return this.http.get<VideoCardData[]>(`${this.apiBase}/videos/channel/${id}/videos`);
   }
 
   // ===== 發表影片留言 =====

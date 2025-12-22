@@ -164,7 +164,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<AaContextFactoryHelper>();
 builder.Services.AddHttpClient(); // 註冊 HttpClient 工廠
-builder.Services.AddScoped<VideoCardResponsity>(); // 註冊 Repository
+builder.Services.AddScoped<VideoRespository>(); // 註冊 Repository
 builder.Services.AddScoped<VideoUploadRepository>();// 註冊 Repository
 builder.Services.AddScoped<VideoTranscodeServices>();
 builder.Services.AddScoped<IVideoUploadService, VideoUploadService>();
