@@ -1,0 +1,18 @@
+/* 當選單有 .show 時，強制顯示 */
+.dropdown-menu.show {
+  display: block !important;
+  position: absolute !important;
+  inset: 0px 0px auto auto !important;
+  /* 定位在右上角 */
+  transform: translate(0px, 35px) !important;
+  /* 往下偏移一點 */
+  z-index: 1060 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* 防止被卡片邊緣切掉 */
+.card,
+.card-body {
+  overflow: visible !important;
+}

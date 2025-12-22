@@ -30,8 +30,8 @@ export class PostService {
   }
 
   /**編輯貼文 */
-  editPost(postId: number, content: string): Observable<PostDto> {
-    return this.http.put<PostDto>(`${this.apiUrl}/${postId}`, { content: content })
+  editPost(postId: number, postContent: string): Observable<PostDto> {
+    return this.http.put<PostDto>(`${this.apiUrl}/${postId}`, { postContent: postContent })
   }
 
   /**刪除貼文 */

@@ -4,17 +4,17 @@
     <!-- 功能選單（右上角） -->
     <div class="position-absolute top-0 end-0 m-2">
       <div class="dropdown">
-        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
+        <button class="btn btn-sm btn-light" type="button" (click)="toggleMenu(); $event.stopPropagation()">
           ...
         </button>
-        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-xs">
+        <ul class="dropdown-menu dropdown-menu-end" [class.show]="isMenuOpen">
           <li>
-            <button class="dropdown-item" (click)="saveEdit()">
+            <button class="dropdown-item" type="button" (click)="startEdit();toggleMenu()">
               編輯
             </button>
           </li>
           <li>
-            <button class="dropdown-item text-danger" (click)="deletePost()">
+            <button class="dropdown-item text-danger" type="button" (click)="deletePost();toggleMenu()">
               刪除
             </button>
           </li>
