@@ -15,7 +15,13 @@ export class SocialPostlistComponent {
   constructor(private postService: PostService) { }
 
   ngOnInit(): void {
+    // 1. 初始載入
     this.loadPosts();
+
+    // 2. 訂閱「重新整理」訊號
+    this.postService.refreshNeeded$.subscribe(() => {
+      this.loadPosts();
+    });
   }
 
   loadPosts() {

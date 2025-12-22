@@ -17,7 +17,7 @@ export class SocialPostsComponent {
     this.postService.createPost(this.postContent)
       .subscribe({
         next: res => {
-          alert("發布成功");
+          // alert("發布成功");
           this.postContent = "";
         },
         error: err => {

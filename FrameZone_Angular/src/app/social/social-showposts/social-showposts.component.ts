@@ -47,10 +47,22 @@ export class SocialShowpostsComponent {
       this.isEditing = false
       return;
     }
+    // 2. 呼叫 Service 進行更新
     this.postService.editPost(this.post.postId, this.editContent)
-      .subscribe(updatePost => {
-        this.post.postContent = updatePost.postContent;
-        this.isEditing = false;
+      .subscribe({
+        next: (updatedPost: PostDto) => {
+          // 【關鍵修改】：直接將後端回傳的最新物件賦值給 this.post
+          // 這樣 post.postContent 和 post.updatedAt 都會同步更新
+          this.post = updatedPost;
+
+          this.isEditing = false;
+          this.isMenuOpen = false; // 存檔後建議一併關閉選單
+          console.log('更新成功，最新時間為：', updatedPost.updatedAt);
+        },
+        error: (err) => {
+          console.error('更新失敗：', err);
+          alert('儲存失敗，請稍後再試');
+        }
       });
   }
 
