@@ -21,7 +21,7 @@ export class SocialShowpostsComponent {
 
   startEdit() {
     this.isEditing = true;
-    this.editContent = this.post.content;
+    this.editContent = this.post.postContent;
   }
 
   cancelEdit() {
@@ -31,7 +31,7 @@ export class SocialShowpostsComponent {
   saveEdit() {
     this.postService.editPost(this.post.postId, this.editContent)
       .subscribe(updatePost => {
-        this.post.content = updatePost.content;
+        this.post.postContent = updatePost.postContent;
         this.isEditing = false;
       });
   }

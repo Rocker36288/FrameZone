@@ -1,13 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { PostDto } from '../models/post.dto';
 
-export interface PostDto {
-  postId: number;
-  userId: number;
-  content: string;
-  createdAt: string;
-}
+
 
 @Injectable({
   providedIn: 'root'
