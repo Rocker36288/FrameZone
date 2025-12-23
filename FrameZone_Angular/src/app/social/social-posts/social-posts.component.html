@@ -24,7 +24,7 @@
 
     <!-- 頭貼 + UserId + 時間 -->
     <div class="d-flex align-items-center mb-2">
-      <img src="~/img/social/Among Us.png" class="rounded-circle me-2" style="width:50px; height:50px" />
+      <img src="images/social/AmongUs.png" class="rounded-circle me-2" style="width:50px; height:50px" />
 
       <div>
         <strong>UserId:{{post.userId}}</strong><br />
@@ -53,10 +53,58 @@
       <button class="btn btn-secondary btn-sm mt-2" (click)="cancelEdit()">取消</button>
     </div>
     }
-
+    <br>
     <div>
       👍 按讚數
       💬 留言數
+    </div>
+    <hr class="my-2">
+
+    <div class="row text-center">
+      <div class="col-4">
+        <button class="btn btn-ghost-dark w-100 py-2 d-flex align-items-center justify-content-center">
+          <i class="bi bi-hand-thumbs-up me-2"></i>讚
+        </button>
+      </div>
+      <div class="col-4">
+        <button class="btn btn-ghost-dark w-100 py-2 d-flex align-items-center justify-content-center">
+          <i class="bi bi-chat-square me-2"></i>留言
+        </button>
+      </div>
+      <div class="col-4">
+        <button class="btn btn-ghost-dark w-100 py-2 d-flex align-items-center justify-content-center">
+          <i class="bi bi-share me-2"></i>分享
+        </button>
+      </div>
+    </div>
+
+    <hr class="my-2">
+
+    <div class="mt-3">
+      <div class="d-flex align-items-center">
+        <img src="images/social/AmongUs.png" class="rounded-circle me-2"
+          style="width:35px; height:35px; object-fit: cover;" />
+
+        <div class="position-relative flex-grow-1">
+          <input type="text"
+            class="form-control form-control-sm rounded-pill bg-light border-0 pe-5 comment-input-custom"
+            placeholder="發佈留言...">
+
+          <button class="btn position-absolute end-0 top-50 translate-middle-y p-0 me-3 btn-send-comment" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="icon icon-tabler icons-tabler-outline icon-tabler-send-2">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path
+                d="M4.698 4.034l16.302 7.966l-16.302 7.966a.503 .503 0 0 1 -.546 -.124a.555 .555 0 0 1 -.12 -.568l2.468 -7.274l-2.468 -7.274a.555 .555 0 0 1 .12 -.568a.503 .503 0 0 1 .546 -.124z" />
+              <path d="M6.5 12h14.5" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div>
+      放留言的地方
     </div>
   </div>
 </div>

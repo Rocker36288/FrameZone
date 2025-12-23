@@ -3,10 +3,11 @@ import { Component, ElementRef, EventEmitter, HostListener, Input, Output } from
 import { PostDto } from "../models/PostDto";
 import { DatePipe, SlicePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SocialCommentsComponent } from "../social-comments/social-comments.component";
 
 @Component({
   selector: 'app-social-posts',
-  imports: [DatePipe, SlicePipe, FormsModule],
+  imports: [DatePipe, SlicePipe, FormsModule, SocialCommentsComponent],
   templateUrl: './social-posts.component.html',
   styleUrl: './social-posts.component.css'
 })

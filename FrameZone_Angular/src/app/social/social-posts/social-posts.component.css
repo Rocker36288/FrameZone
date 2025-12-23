@@ -1,18 +1,96 @@
-/* 當選單有 .show 時，強制顯示 */
+/* ==========================================================================
+   1. 貼文框架與選單 (Post Structure & Dropdown)
+   ========================================================================== */
+
+/* 防止選單被卡片邊緣切掉 */
+.card,
+.card-body {
+  overflow: visible !important;
+}
+
+/* 強制修正 Dropdown 定位與顯示 */
 .dropdown-menu.show {
   display: block !important;
   position: absolute !important;
   inset: 0px 0px auto auto !important;
   /* 定位在右上角 */
   transform: translate(0px, 35px) !important;
-  /* 往下偏移一點 */
+  /* 往下偏移避免重疊 */
   z-index: 1060 !important;
   opacity: 1 !important;
   visibility: visible !important;
 }
 
-/* 防止被卡片邊緣切掉 */
-.card,
-.card-body {
-  overflow: visible !important;
+/* ==========================================================================
+   2. 按讚/留言/分享 按鈕 (Action Buttons - Ghost Style)
+   ========================================================================== */
+
+.btn-ghost-dark {
+  border: none;
+  background: transparent;
+  color: #65676b;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-ghost-dark:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  color: #050505;
+}
+
+.btn-ghost-dark i {
+  font-size: 1.2rem;
+}
+
+/* ==========================================================================
+   3. 留言輸入區 (Comment Input Section)
+   ========================================================================== */
+
+/* 輸入框樣式 */
+.comment-input-custom {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  transition: all 0.2s ease;
+}
+
+.comment-input-custom:focus {
+  box-shadow: none !important;
+  background-color: #f0f2f5 !important;
+  /* 點擊時顏色稍微加深 */
+}
+
+/* 發送按鈕 (箭頭) 樣式 */
+.btn-send-comment {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  color: #0d6efd;
+  /* 預設藍色 */
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+/* 發送按鈕 互動狀態 (Hover, Focus, Active) */
+.btn-send-comment:hover,
+.btn-send-comment:focus,
+.btn-send-comment:active {
+  background-color: transparent !important;
+  color: #0a58ca !important;
+  /* 懸停時變深藍 */
+  transform: translateY(-50%) scale(1.1) !important;
+  /* 保持垂直置中並微放大 */
+}
+
+/* 發送按鈕 禁用狀態 (未輸入內容時) */
+.btn-send-comment:disabled {
+  color: #ccc !important;
+  cursor: not-allowed;
+  transform: translateY(-50%) scale(1) !important;
+  /* 禁用時不放大 */
+}
+
+/* 通用連結型按鈕移除底線 */
+.btn-link {
+  text-decoration: none !important;
+  box-shadow: none !important;
 }
