@@ -1,10 +1,11 @@
 import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 
 import { isPlatformBrowser } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-photographerbooking-header',
-  imports: [],
+  imports: [RouterModule],
   templateUrl: './photographerbooking-header.component.html',
   styleUrl: './photographerbooking-header.component.css',
 })

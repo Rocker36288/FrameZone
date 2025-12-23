@@ -40,3 +40,9 @@
   padding: 0 18px;
   font-weight: 600;
 }
+
+/* photographerbooking-search.component.css */
+:host {
+  display: block;
+  margin-top: 80px; /* 和 header 高度一致 */
+}
