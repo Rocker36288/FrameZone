@@ -1,0 +1,57 @@
+<div class="hero-container">
+  <!-- 背景輪播圖 -->
+  <div
+    *ngFor="let img of dbImages; let i = index"
+    class="carousel-item"
+    [class.active]="i === currentIndex"
+    [style.backgroundImage]="'url(' + img.url + ')'"
+  >
+    <div class="photographer-tag">
+      攝影師：{{ img.author }} | {{ img.style }}
+    </div>
+  </div>
+
+  <div class="overlay"></div>
+
+  <div class="hero-content">
+    <h1>捕捉您的專屬瞬間</h1>
+    <p>搜尋超過 500 位高品質攝影師，即時查看檔期</p>
+
+    <!-- 搜尋表單 -->
+    <form class="search-bar" (ngSubmit)="onSearch()">
+      <div class="search-group">
+        <i data-lucide="map-pin"></i>
+        <select [(ngModel)]="city" name="city">
+          <option value="">選擇地區</option>
+          <option value="taipei">台北市</option>
+          <option value="taichung">台中市</option>
+          <option value="kaohsiung">高雄市</option>
+        </select>
+      </div>
+      <div class="search-group">
+        <i data-lucide="calendar"></i>
+        <input type="date" [(ngModel)]="date" name="date" min="2025-12-23" />
+      </div>
+      <div class="search-group">
+        <i data-lucide="camera"></i>
+        <select [(ngModel)]="type" name="type">
+          <option value="">拍攝類型</option>
+          <option value="wedding">婚紗攝影</option>
+          <option value="portrait">人像寫真</option>
+          <option value="event">活動紀錄</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-search">
+        <i data-lucide="search"></i>開始搜尋
+      </button>
+    </form>
+
+    <!-- 快速標籤 -->
+    <div class="quick-tags">
+      <span style="opacity: 0.8; font-size: 14px">熱門：</span>
+      <div *ngFor="let tag of tags" class="tag" (click)="quickSearch(tag)">
+        #{{ tag }}
+      </div>
+    </div>
+  </div>
+</div>
