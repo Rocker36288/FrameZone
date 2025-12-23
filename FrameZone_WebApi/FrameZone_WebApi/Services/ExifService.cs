@@ -194,10 +194,19 @@ namespace FrameZone_WebApi.Services
 
             if (gpsDirectory != null)
             {
-                if (gpsDirectory.TryGetGeoLocation(out var location))
+                try
                 {
-                    metadata.GPSLatitude = (decimal)location.Latitude;
-                    metadata.GPSLongitude = (decimal)location.Longitude;
+                    var location = gpsDirectory.GetGeoLocation();
+
+                    if (location != null)
+                    {
+                        metadata.GPSLatitude = (decimal)location.Latitude;
+                        metadata.GPSLongitude = (decimal)location.Longitude;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogDebug("無法提取 GPS 資訊: {Message}", ex.Message);
                 }
             }
         }

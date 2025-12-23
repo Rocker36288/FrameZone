@@ -681,48 +681,274 @@ namespace FrameZone_WebApi.Services
                 return cachedThumbnail;
             }
 
+            const int maxRetries = 3;
+            int retryCount = 0;
+
+            while (retryCount < maxRetries)
+            {
+                try
+                {
+                    _logger.LogInformation("生成縮圖: {Width}x{Height} (嘗試 {RetryCount}/{MaxRetries})",
+                        width, height, retryCount + 1, maxRetries);
+
+                    // 判斷是否為 HEIC 格式
+                    bool isHeic = IsHeicFormat(imageData);
+
+                    Image<Rgba32> image;
+
+                    if (isHeic)
+                    {
+                        var asm = typeof(MetadataExtractor.ImageMetadataReader).Assembly;
+                        _logger.LogInformation("MetadataExtractor loaded: {FullName}", asm.FullName);
+                        _logger.LogInformation("MetadataExtractor path: {Path}", asm.Location);
+
+                        var heicAsm = typeof(Openize.Heic.Decoder.HeicImage).Assembly;
+                        _logger.LogInformation("Openize.HEIC loaded: {FullName}", heicAsm.FullName);
+                        _logger.LogInformation("Openize.HEIC path: {Path}", heicAsm.Location);
+
+
+
+                        // HEIC 格式：使用 Openize.HEIC 解碼
+                        _logger.LogInformation("🎨 偵測到 HEIC 格式，使用 Openize.HEIC 解碼");
+                        image = await DecodeHeicToImageSharpAsync(imageData);
+                    }
+                    else
+                    {
+                        // 其他格式：直接用 ImageSharp 載入
+                        _logger.LogInformation("🎨 使用 ImageSharp 直接載入圖片");
+                        using var inputStream = new MemoryStream(imageData);
+                        image = await Image.LoadAsync<Rgba32>(inputStream);
+                    }
+
+                    // 使用 ImageSharp 處理縮圖
+                    using (image)
+                    {
+                        // 計算縮圖尺寸（保持寬高比）
+                        var (thumbnailWidth, thumbnailHeight) = CalculateThumbnailSize(
+                            image.Width,
+                            image.Height,
+                            width,
+                            height
+                        );
+
+                        _logger.LogInformation("原始尺寸: {OriginalWidth}x{OriginalHeight}, 縮圖尺寸: {ThumbnailWidth}x{ThumbnailHeight}",
+                            image.Width, image.Height, thumbnailWidth, thumbnailHeight);
+
+                        // 調整大小
+                        image.Mutate(x => x.Resize(thumbnailWidth, thumbnailHeight));
+
+                        // 儲存為 JPEG
+                        using var outputStream = new MemoryStream();
+                        var encoder = new JpegEncoder { Quality = 85 };
+                        await image.SaveAsync(outputStream, encoder);
+
+                        var thumbnail = outputStream.ToArray();
+
+                        // 存入快取
+                        var cacheOptions = new MemoryCacheEntryOptions()
+                            .SetSlidingExpiration(TimeSpan.FromHours(1))
+                            .SetSize(thumbnail.Length);
+
+                        _cache.Set(cacheKey, thumbnail, cacheOptions);
+
+                        _logger.LogInformation("✅ 縮圖生成成功: {Width}x{Height}, 大小: {Size} bytes",
+                            thumbnailWidth, thumbnailHeight, thumbnail.Length);
+
+                        return thumbnail;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    retryCount++;
+                    _logger.LogError(ex, "❌ 生成縮圖時發生錯誤（第 {RetryCount}/{MaxRetries} 次）",
+                        retryCount, maxRetries);
+
+                    if (retryCount < maxRetries)
+                    {
+                        // 等待後重試
+                        await Task.Delay(TimeSpan.FromMilliseconds(500 * retryCount));
+                    }
+                    else
+                    {
+                        _logger.LogWarning("⚠️ 縮圖生成失敗達上限，使用預設縮圖");
+                        return await GenerateDefaultThumbnailAsync(width, height);
+                    }
+                }
+            }
+
+            // 不應該到達這裡，但作為保護
+            return await GenerateDefaultThumbnailAsync(width, height);
+        }
+
+        /// <summary>
+        /// 使用 Openize.HEIC 解碼 HEIC 並轉換為 ImageSharp 格式
+        /// </summary>
+        private async Task<Image<Rgba32>> DecodeHeicToImageSharpAsync(byte[] heicData)
+        {
             try
             {
-                _logger.LogInformation("生成縮圖: {Width}x{Height}", width, height);
+                _logger.LogInformation("開始 HEIC 解碼...");
 
-                using var inputStream = new MemoryStream(imageData);
-                using var image = await Image.LoadAsync(inputStream);
+                // 使用 Openize.HEIC 解碼
+                using var inputStream = new MemoryStream(heicData);
 
-                // 計算縮放比例（保持比例）
-                var ratioX = (double)width / image.Width;
-                var ratioY = (double)height / image.Height;
-                var ratio = Math.Min(ratioX, ratioY);
+                var heicImage = HeicImage.Load(inputStream);
 
-                var newWidth = (int)(image.Width * ratio);
-                var newHeight = (int)(image.Height * ratio);
+                int width = (int)heicImage.Width;
+                int height = (int)heicImage.Height;
 
-                // 縮放圖片
-                image.Mutate(x => x.Resize(newWidth, newHeight));
+                _logger.LogInformation("✅ HEIC 解碼成功，尺寸: {Width}x{Height}", width, height);
 
-                // 輸出為 JPEG
-                using var outputStream = new MemoryStream();
-                await image.SaveAsync(outputStream, new JpegEncoder
+                byte[] pixelData = heicImage.GetByteArray(
+                    Openize.Heic.Decoder.PixelFormat.Rgba32,
+                    new System.Drawing.Rectangle(0, 0, width, height)
+                );
+
+                _logger.LogInformation("📊 像素資料大小: {Size} bytes ({Width}x{Height}x3)", pixelData.Length, width, height);
+
+                // 建立 ImageSharp Image
+                var image = new Image<Rgba32>(width, height);
+
+                // 填充像素資料
+                int pixelIndex = 0;
+                for (int y = 0; y < height; y++)
                 {
-                    Quality = 90
-                });
+                    for (int x = 0; x < width; x++)
+                    {
+                        byte r = pixelData[pixelIndex++];
+                        byte g = pixelData[pixelIndex++];
+                        byte b = pixelData[pixelIndex++];
+                        byte a = pixelData[pixelIndex++];
 
-                var thumbnail = outputStream.ToArray();
+                        image[x, y] = new Rgba32(r, g, b, a);
+                    }
+                }
 
-                var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromHours(1))
-                    .SetSize(thumbnail.Length);
+                _logger.LogInformation("✅ HEIC 轉換為 ImageSharp 完成");
 
-                _cache.Set(cacheKey, thumbnail, cacheOptions);
+                return image;
 
-                _logger.LogInformation("縮圖已快取: {CacheKey}, 大小: {Size} bytes",
-                    cacheKey, thumbnail.Length);
-
-                return thumbnail;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "生成縮圖時發生錯誤");
+                _logger.LogError(ex, "❌ HEIC 解碼失敗");
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// 判斷是否為 HEIC 格式   
+        /// </summary>
+        private bool IsHeicFormat(byte[] data)
+        {
+            // 檢查檔案頭 (Magic Number)
+            // HEIC 檔案以 "ftyp" 開頭（在 offset 4）
+            if (data.Length >= 12)
+            {
+                try
+                {
+                    string header = System.Text.Encoding.ASCII.GetString(data, 4, 4);
+                    if (header == "ftyp")
+                    {
+                        // 進一步檢查 brand
+                        string brand = System.Text.Encoding.ASCII.GetString(data, 8, 4);
+
+                        // HEIC/HEIF 的各種 brand
+                        if (brand.StartsWith("heic") || brand.StartsWith("heix") ||
+                            brand.StartsWith("hevc") || brand.StartsWith("hevx") ||
+                            brand.StartsWith("heim") || brand.StartsWith("heis") ||
+                            brand.StartsWith("mif1") || brand.StartsWith("msf1"))
+                        {
+                            _logger.LogInformation("✅ 偵測到 HEIC 格式，brand: {Brand}", brand);
+                            return true;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "⚠️ 檢查 HEIC 格式時發生錯誤");
+                }
+            }
+
+            return false;
+        }
+
+        private (int width, int height) CalculateThumbnailSize(int originalWidth, int originalHeight, int maxWidth, int maxHeight)
+        {
+            double aspectRatio = (double)originalWidth / originalHeight;
+
+            int thumbnailWidth;
+            int thumbnailHeight;
+
+            if (originalWidth > originalHeight)
+            {
+                // 橫向圖片
+                thumbnailWidth = maxWidth;
+                thumbnailHeight = (int)(maxWidth / aspectRatio);
+
+                if (thumbnailHeight > maxHeight)
+                {
+                    thumbnailHeight = maxHeight;
+                    thumbnailWidth = (int)(maxHeight * aspectRatio);
+                }
+            }
+            else
+            {
+                // 直向圖片
+                thumbnailHeight = maxHeight;
+                thumbnailWidth = (int)(maxHeight * aspectRatio);
+
+                if (thumbnailWidth > maxWidth)
+                {
+                    thumbnailWidth = maxWidth;
+                    thumbnailHeight = (int)(maxWidth / aspectRatio);
+                }
+            }
+
+            // 確保至少 1 像素
+            thumbnailWidth = Math.Max(1, thumbnailWidth);
+            thumbnailHeight = Math.Max(1, thumbnailHeight);
+
+            return (thumbnailWidth, thumbnailHeight);
+        }
+
+        /// <summary>
+        /// 生成預設縮圖（純色背景）
+        /// 當無法處理原始圖片時使用
+        /// </summary>
+        private async Task<byte[]> GenerateDefaultThumbnailAsync(int width, int height)
+        {
+            try
+            {
+                _logger.LogInformation("🎨 生成預設縮圖: {Width}x{Height}", width, height);
+
+                using var image = new Image<Rgba32>(width, height);
+
+                // 填充灰色背景 #E8E8E8
+                image.Mutate(x => x.BackgroundColor(Color.FromRgb(232, 232, 232)));
+
+                // 儲存為 JPEG
+                using var outputStream = new MemoryStream();
+                var encoder = new JpegEncoder { Quality = 85 };
+                await image.SaveAsync(outputStream, encoder);
+
+                _logger.LogInformation("✅ 預設縮圖生成成功");
+
+                return outputStream.ToArray();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ 生成預設縮圖時發生錯誤");
+
+                // 返回最小的有效 JPEG (1x1 灰色像素)
+                return new byte[] {
+                    0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46,
+                    0x49, 0x46, 0x00, 0x01, 0x01, 0x01, 0x00, 0x60,
+                    0x00, 0x60, 0x00, 0x00, 0xFF, 0xC0, 0x00, 0x11,
+                    0x08, 0x00, 0x01, 0x00, 0x01, 0x03, 0x01, 0x22,
+                    0x00, 0x02, 0x11, 0x01, 0x03, 0x11, 0x01, 0xFF,
+                    0xD9
+                };
             }
         }
 
