@@ -1,0 +1,103 @@
+/* 下拉選單容器 */
+.nav-item.dropdown {
+  position: relative;
+}
+
+/* 下拉選單本體 */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1000;
+  display: none;
+  min-width: 280px;
+  padding: 0.5rem 0;
+  margin: 0.125rem 0 0;
+  font-size: 0.875rem;
+  color: #1e293b;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(98, 105, 118, 0.16);
+  border-radius: 4px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* 顯示下拉選單 */
+.dropdown-menu.show {
+  display: block;
+}
+
+/* 下拉選單項目 */
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  clear: both;
+  font-weight: 400;
+  color: #1e293b;
+  text-align: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  color: #0f172a;
+  background-color: #f1f5f9;
+}
+
+/* 分隔線 */
+.dropdown-divider {
+  height: 0;
+  margin: 0.5rem 0;
+  overflow: hidden;
+  border-top: 1px solid rgba(98, 105, 118, 0.16);
+}
+
+/* 使用者資訊區塊 */
+.dropdown-item .avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 4px;
+}
+
+/* 圖示樣式 */
+.dropdown-item .icon {
+  flex-shrink: 0;
+}
+
+/* 危險按鈕樣式 */
+.dropdown-item.text-danger {
+  color: #d63939;
+}
+
+.dropdown-item.text-danger:hover {
+  color: #d63939;
+  background-color: #fef2f2;
+}
+
+/* 頭像按鈕 */
+.nav-link {
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+}
+
+.nav-link:hover {
+  opacity: 0.8;
+}
+
+/* 響應式調整 */
+@media (max-width: 576px) {
+  .dropdown-menu {
+    min-width: 240px;
+    right: -1rem;
+  }
+}
