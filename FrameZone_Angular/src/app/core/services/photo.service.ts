@@ -1,3 +1,4 @@
+import heic2any from 'heic2any';
 import CryptoJS from 'crypto-js';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -14,12 +15,29 @@ import {
   CreateCustomTagRequest,
   CreateCustomTagResponse
 } from '../models/photo.models';
+import { splitNsName } from '@angular/compiler';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PhotoService {
   private apiUrl = 'https://localhost:7213/api/photos';
+
+  private isHeic(file: File): boolean {
+    const ext = file.name.split('.').pop()?.toLocaleLowerCase();
+    const t = (file.type || '').toLocaleLowerCase();
+
+    return ext === 'heic' || ext === 'heif' || t === 'image/heic' || t === 'image/heif';
+  }
+
+  private readAsDataUrl(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target?.result as string);
+      reader.onerror = () => reject(new Error('讀取失敗'));
+      reader.readAsDataURL(blob);
+    });
+  }
 
   constructor(private http: HttpClient) { }
 
@@ -191,20 +209,23 @@ export class PhotoService {
    * 產生圖片預覽
    * @param file 圖片檔案
    */
-  generatePreview(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
+  async generatePreview(file: File): Promise<string> {
+    // HEIC/HEIF：先轉成 JPEG 再給 <img>
+    if (this.isHeic(file)) {
+      // heic2any 可能回 Blob 或 Blob[]
+      const output = await heic2any({
+        blob: file,
+        toType: 'image/jpeg',
+        quality: 0.85
+      });
 
-      reader.onload = (e: any) => {
-        resolve(e.target.result);
-      };
+      const jpegBlob = Array.isArray(output) ? output[0] : output;
 
-      reader.onerror = (error) => {
-        reject(error);
-      };
+      return this.readAsDataUrl(jpegBlob);
+    }
 
-      reader.readAsDataURL(file);
-    })
+    // 其他常見格式：直接讀成 DataURL
+    return this.readAsDataUrl(file);
   }
 
   /**

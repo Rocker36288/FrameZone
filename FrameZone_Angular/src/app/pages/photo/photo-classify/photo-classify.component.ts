@@ -110,7 +110,7 @@ export class PhotoClassifyComponent {
    * 處理選擇的檔案
    */
   async handleFiles(files: File[]) {
-    console.log('🔄 開始處理檔案，數量:', files.length);
+    console.log('📄 開始處理檔案，數量:', files.length);
 
     const currentFiles = this.uploadFiles();
 
@@ -186,12 +186,10 @@ export class PhotoClassifyComponent {
       };
 
       // 產生預覽圖
-      if (file.type.startsWith('image/')) {
-        try {
-          uploadItem.preview = await this.photoService.generatePreview(file);
-        } catch (error) {
-          console.error('產生預覽圖失敗:', error);
-        }
+      try {
+        uploadItem.preview = await this.photoService.generatePreview(file);
+      } catch (error) {
+        console.error('產生預覽圖失敗:', error);
       }
 
       addedCount++;
@@ -208,7 +206,7 @@ export class PhotoClassifyComponent {
 
     // 顯示處理結果
     if (addedCount > 0) {
-      this.toastr.success(`已加入 ${addedCount} 張照片到上傳清單`, '✓ 成功');
+      this.toastr.success(`已加入 ${addedCount} 張照片到上傳清單`, '✔ 成功');
     }
 
     if (duplicateInListCount > 0) {
@@ -368,7 +366,7 @@ export class PhotoClassifyComponent {
     if (response.successCount > 0) {
       this.toastr.success(
         `成功上傳 ${response.successCount} 張照片`,
-        '✓ 上傳完成'
+        '✔ 上傳完成'
       );
     }
 
@@ -436,6 +434,19 @@ export class PhotoClassifyComponent {
       case 'success': return '上傳成功';
       case 'error': return '上傳失敗';
       default: return '未知狀態';
+    }
+  }
+
+  /**
+   * 取得狀態文字顏色 class
+   */
+  getStatusTextClass(status: string): string {
+    switch (status) {
+      case 'pending': return 'status-pending';
+      case 'uploading': return 'status-uploading';
+      case 'success': return 'status-success';
+      case 'error': return 'status-error';
+      default: return '';
     }
   }
 }

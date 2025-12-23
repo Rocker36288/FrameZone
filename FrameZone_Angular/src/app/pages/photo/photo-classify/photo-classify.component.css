@@ -1,11 +1,34 @@
-/* 上傳拖放區域 */
+/* ==========================================
+   統計卡片樣式
+   ========================================== */
+.card-sm {
+  transition: all 0.3s ease;
+}
+
+.card-sm:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--tblr-box-shadow-lg);
+}
+
+/* ==========================================
+   上傳區域樣式
+   ========================================== */
+.upload-card {
+  height: 100%;
+  min-height: 500px;
+}
+
 .upload-zone {
   border: 2px dashed var(--tblr-border-color);
   border-radius: var(--tblr-border-radius);
-  padding: 3rem 2rem;
+  padding: 4rem 2rem;
   transition: all 0.3s ease;
   background-color: var(--tblr-bg-surface);
   cursor: pointer;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .upload-zone:hover {
@@ -19,33 +42,169 @@
   border-style: solid;
 }
 
-/* 預覽圖片樣式 */
-.avatar img {
-  object-fit: cover;
-}
-
-/* 標籤樣式 */
-.badge {
-  font-weight: 500;
-}
-
-/* 空狀態調整 */
-.empty {
-  padding: 4rem 1rem;
-}
-
-/* 按鈕間距 */
-.btn-list {
+/* ==========================================
+   右側上傳清單樣式
+   ========================================== */
+.upload-list-card {
+  height: 100%;
+  min-height: 500px;
   display: flex;
-  gap: 0.25rem;
+  flex-direction: column;
 }
 
-/* 列表項目 hover 效果 */
-.list-group-item:hover {
+.upload-list-card .card-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.upload-list {
+  overflow-y: auto;
+  max-height: 100%;
+  padding: 0.75rem;
+}
+
+/* 自訂捲軸樣式 */
+.upload-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.upload-list::-webkit-scrollbar-track {
+  background: var(--tblr-bg-surface-secondary);
+  border-radius: 4px;
+}
+
+.upload-list::-webkit-scrollbar-thumb {
+  background: var(--tblr-border-color);
+  border-radius: 4px;
+}
+
+.upload-list::-webkit-scrollbar-thumb:hover {
+  background: var(--tblr-primary);
+}
+
+/* ==========================================
+   上傳清單項目樣式
+   ========================================== */
+.upload-list-item {
+  padding: 0.75rem;
+  border: 1px solid var(--tblr-border-color);
+  border-radius: var(--tblr-border-radius);
+  margin-bottom: 0.75rem;
+  background-color: var(--tblr-bg-surface);
+  transition: all 0.2s ease;
+}
+
+.upload-list-item:last-child {
+  margin-bottom: 0;
+}
+
+.upload-list-item:hover {
+  background-color: var(--tblr-bg-surface-secondary);
+  box-shadow: var(--tblr-box-shadow-sm);
+}
+
+/* 縮圖 */
+.upload-list-thumbnail {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--tblr-border-radius);
+  overflow: hidden;
+  flex-shrink: 0;
   background-color: var(--tblr-bg-surface-secondary);
 }
 
-/* 動畫效果 */
+.upload-list-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.upload-list-thumbnail-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--tblr-secondary);
+}
+
+/* 檔案資訊 */
+.upload-list-filename {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--tblr-body-color);
+  margin-bottom: 0.25rem;
+  word-break: break-all;
+  line-height: 1.3;
+}
+
+.upload-list-filesize {
+  font-size: 0.75rem;
+  color: var(--tblr-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.upload-list-status {
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.upload-list-status i {
+  font-size: 0.875rem;
+}
+
+.upload-list-error {
+  font-size: 0.75rem;
+  color: var(--tblr-danger);
+  margin-top: 0.25rem;
+}
+
+/* 狀態文字顏色 */
+.status-pending {
+  color: var(--tblr-secondary);
+}
+
+.status-uploading {
+  color: var(--tblr-primary);
+}
+
+.status-success {
+  color: var(--tblr-success);
+}
+
+.status-error {
+  color: var(--tblr-danger);
+}
+
+/* ==========================================
+   空狀態樣式
+   ========================================== */
+.empty-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  height: 100%;
+}
+
+.empty-list i {
+  font-size: 3rem;
+}
+
+.empty-list p {
+  font-size: 0.875rem;
+}
+
+/* ==========================================
+   動畫效果
+   ========================================== */
 @keyframes spin {
   from {
     transform: rotate(0deg);
@@ -60,13 +219,82 @@
   animation: spin 1s linear infinite;
 }
 
-/* 響應式調整 */
+/* ==========================================
+   響應式設計
+   ========================================== */
+@media (max-width: 992px) {
+  .upload-card {
+    min-height: 400px;
+  }
+
+  .upload-list-card {
+    min-height: 400px;
+    margin-top: 1rem;
+  }
+
+  .upload-zone {
+    padding: 3rem 1.5rem;
+  }
+}
+
 @media (max-width: 768px) {
+  .upload-card {
+    min-height: 350px;
+  }
+
+  .upload-list-card {
+    min-height: 350px;
+  }
+
   .upload-zone {
     padding: 2rem 1rem;
   }
 
-  .h1 {
+  .upload-zone h3 {
+    font-size: 1.25rem;
+  }
+
+  .upload-list-thumbnail {
+    width: 50px;
+    height: 50px;
+  }
+
+  .card-sm .display-6 {
     font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .upload-card {
+    min-height: 300px;
+  }
+
+  .upload-list-card {
+    min-height: 300px;
+  }
+
+  .upload-zone {
+    padding: 1.5rem 1rem;
+  }
+
+  .upload-zone .display-1 {
+    font-size: 3rem;
+  }
+
+  .upload-zone h3 {
+    font-size: 1.125rem;
+  }
+
+  .upload-list-item {
+    padding: 0.5rem;
+  }
+
+  .upload-list-thumbnail {
+    width: 45px;
+    height: 45px;
+  }
+
+  .upload-list-filename {
+    font-size: 0.8125rem;
   }
 }
