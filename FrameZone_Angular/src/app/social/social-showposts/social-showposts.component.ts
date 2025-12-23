@@ -1,12 +1,12 @@
 import { PostService } from '../services/post.service';
 import { Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { PostDto } from "../models/PostDto";
-import { DatePipe } from '@angular/common';
+import { DatePipe, SlicePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-social-showposts',
-  imports: [DatePipe, FormsModule],
+  imports: [DatePipe, SlicePipe, FormsModule],
   templateUrl: './social-showposts.component.html',
   styleUrl: './social-showposts.component.css'
 })
@@ -17,6 +17,7 @@ export class SocialShowpostsComponent {
   isEditing = false;
   editContent = "";
   isMenuOpen = false; // 控制選單開關
+  isFullContent = false; // 控制是否顯示全部內容
 
   constructor(private postService: PostService, private eRef: ElementRef) { }
 
@@ -30,6 +31,10 @@ export class SocialShowpostsComponent {
 
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  toggleContent() {
+    this.isFullContent = !this.isFullContent;
   }
 
   startEdit() {

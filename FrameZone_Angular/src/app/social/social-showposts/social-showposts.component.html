@@ -35,7 +35,14 @@
     </div>
     <!-- 顯示貼文文字內容 -->
     @if(!isEditing){
-    <p>{{post.postContent}}</p>
+    <h2>
+      @if(post.postContent.length<=10){ {{post.postContent}} } @else{ {{ isFullContent ? post.postContent :
+        (post.postContent | slice:0:10) + '...' }}<button class="btn btn-link btn-sm p-0 ms-1"
+        (click)="toggleContent()">
+        {{ isFullContent ? '收起' : '顯示全部' }}
+        </button>
+        }
+    </h2>
     }
 
     <!-- 編輯區 -->
