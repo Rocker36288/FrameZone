@@ -55,13 +55,22 @@
   <!-- 影片處理區域 (上傳完成後) -->
   <div *ngIf="uploadFinished">
 
-    <!-- 影片播放器 (轉碼完成後) -->
-    <div class="card mb-4" *ngIf="isReady">
+    <div class="card mb-4">
       <div class="card-header fw-bold">
         <i class="ti ti-player-play me-2"></i>影片預覽
       </div>
       <div class="card-body p-0">
-        <app-video-player [src]="videoplayuri"></app-video-player>
+        <div class="video-wrapper">
+          <ng-container *ngIf="isReady; else placeholder">
+            <app-video-player [src]="videoplayuri"></app-video-player>
+          </ng-container>
+
+          <ng-template #placeholder>
+            <div class="placeholder">
+              <i class="ti ti-refresh me-2"></i>影片尚在轉碼中...
+            </div>
+          </ng-template>
+        </div>
       </div>
     </div>
 

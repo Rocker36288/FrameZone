@@ -299,9 +299,14 @@ export class VideocreatorUploadComponent implements OnDestroy {
     reader.onload = () => {
       this.customThumbnailPreview = reader.result as string;
 
-      // 設為目前選擇的縮圖（沿用既有 saveThumbnail）
+      // ✅ 設為目前選擇的縮圖
       this.selectedThumbnail = this.customThumbnailPreview;
       this.statusMessage = '已選擇自訂縮圖';
+
+      // ✅ 將自訂縮圖加入縮圖列表，讓網格也能顯示
+      if (!this.thumbnails.includes(this.customThumbnailPreview)) {
+        this.thumbnails.push(this.customThumbnailPreview);
+      }
     };
 
     reader.readAsDataURL(file);

@@ -15,6 +15,7 @@ export class VideoCardData {
   views: number = 0;
   publishDate?: Date;
   description: string = '';
+  likes: number = 0;
 
   ChannelId: number = 0;
   channelName: string = '';
@@ -93,4 +94,14 @@ export interface VideoCommentRequest {
   TargetTypeId: TargetTypeEnum.Video;    // enum / int
   CommentContent: string;
   ParentCommentId: number | undefined;
+}
+
+
+export interface VideoLikesRequest {
+  isLikes: boolean;
+  videoId: number;
+}
+
+export interface VideoLikesDto {
+  isLikes: boolean;
 }

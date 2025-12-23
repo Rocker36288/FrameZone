@@ -1,9 +1,11 @@
-﻿using System.Diagnostics;
-using FrameZone_WebApi.Videos.DTOs;
+﻿using FrameZone_WebApi.Videos.DTOs;
 using FrameZone_WebApi.Videos.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
+using System.Security.Claims;
 using Xabe.FFmpeg;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -155,6 +157,46 @@ namespace FrameZone_WebApi.Videos.Controllers
                 return NotFound();
             }
 
+            return Ok(dto);
+        }
+
+        //==============================Likes相關===========================
+        //[Authorize]
+        [HttpGet("{guid}/likecheck")]
+        public async Task<ActionResult<VideoLikesDto>> GetVideoLikes(string guid)
+        {
+
+            var identity = new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, "1")
+            }, "TestAuth");
+
+            HttpContext.User = new ClaimsPrincipal(identity);
+
+            var userId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+            );
+
+            var dto = await _videoServices.CheckVideoLike(userId, guid);
+            return Ok(dto);
+        }
+
+        [HttpPost("{guid}/liketoggle")]
+        public async Task<ActionResult<VideoLikesDto>> ToggleVideoLikes(string guid)
+        {
+
+            var identity = new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, "1")
+            }, "TestAuth");
+
+            HttpContext.User = new ClaimsPrincipal(identity);
+
+            var userId = int.Parse(
+                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
+            );
+
+            var dto = await _videoServices.VideosLikeToggle(userId, guid);
             return Ok(dto);
         }
     }

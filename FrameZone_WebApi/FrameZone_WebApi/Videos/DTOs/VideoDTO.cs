@@ -16,6 +16,7 @@
         public string Thumbnail { get; set; } = "";
         public int Duration { get; set; }
         public int Views { get; set; }
+        public int Likes { get; set; }
         public DateTime PublishDate { get; set; }
         public string? Description { get; set; }
 
@@ -91,5 +92,15 @@
         public DateTime LastUpdateAt { get; set; }
     }
 
+    //影片likes DTO
+    public class VideoLikesRequset
+    {
+        public bool IsLikes { get; set; }
+        public int VideoId { get; set; }
+    }
 
+    public class VideoLikesDto
+    {
+       public bool IsLikes { get; set; }
+    }
 }

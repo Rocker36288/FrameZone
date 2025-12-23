@@ -14,17 +14,7 @@ export class ChannelComponent {
 
   @Input() LastUploadVideos: VideoCardData[] | undefined
 
-  @Input() PupularVideos: VideoCardData[] = [{
-    videoUri: '',
-    title: '',
-    thumbnail: '',
-    duration: 0,
-    views: 0,
-    description: '',
-    ChannelId: 0,
-    channelName: '',
-    avatar: ''
-  }]
+  @Input() PupularVideos: VideoCardData[] | undefined
 
   @Input() VideoPlaylists: VideoListCard[] = [{
     Id: 0,

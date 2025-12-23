@@ -1,4 +1,18 @@
 <!-- 跟隨按鈕 -->
-<button class="btn btn-primary d-flex align-items-center ms-3" (click)="FollowerBtn()">
-  <i class="ti ti-plus me-1"></i> 跟隨
+<button class="btn d-flex align-items-center gap-2" [ngClass]="isFollowing ? 'btn-secondary' : 'btn-primary'"
+  (click)="toggleFollow()">
+
+  <svg *ngIf="!isFollowing" xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="20" height="20"
+    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 5v14m-7-7h14" />
+  </svg>
+
+  <svg *ngIf="isFollowing" xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="20" height="20"
+    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M5 12l5 5l10 -10" />
+  </svg>
+
+  <span>{{ isFollowing ? '已跟隨' : '跟隨' }}</span>
 </button>

@@ -7,7 +7,7 @@ import { ChannelCardComponent } from "../../../ui/channel/channel-card/channel-c
 import { NgIf } from '@angular/common';
 import { VideoCommentListComponent } from "../../../ui/comments/video-comment-list/video-comment-list.component";
 import { VideosListComponent } from "../../../ui/video/videos-list/videos-list.component";
-import { ChannelCard, VideoCardData, VideoCommentCard, VideoCommentRequest } from '../../../models/video-model';
+import { ChannelCard, VideoCardData, VideoCommentCard, VideoCommentRequest, VideoLikesDto, VideoLikesRequest } from '../../../models/video-model';
 import { ActivatedRoute } from '@angular/router';
 import { TargetTypeEnum } from '../../../models/video.enum';
 import { VideoService } from '../../../service/video.service';
@@ -45,6 +45,8 @@ export class VideoMainComponent {
   /** 實際影片播放來源（HLS / MP4） */
   videoUrl: string = '';
 
+  //是否喜歡
+  isLiked: boolean = false;
 
   /* =====================================================
    * 🎬 播放器 & 畫面狀態
@@ -256,6 +258,32 @@ export class VideoMainComponent {
         }
       },
       error: () => console.error('回覆留言失敗')
+    });
+  }
+
+  //====================like相關=====================
+  checkLikeStatus() {
+    this.videoService.getVideoLikes(this.guid!).subscribe({
+      next: (res: VideoLikesDto) => {
+        this.isLiked = res.isLikes;
+      },
+      error: (err) => console.error('檢測失敗', err)
+    });
+  }
+
+  onLikeChanged(liked: boolean) {
+    this.isLiked = liked;
+
+    const req: VideoLikesRequest = {
+      videoId: this.videoid,
+      isLikes: !this.isLiked
+    };
+
+    this.videoService.ToggleVideoLikes(this.guid!, req).subscribe({
+      next: (res: VideoLikesDto) => {
+        this.isLiked = res.isLikes;
+      },
+      error: (err) => console.error('按讚失敗', err)
     });
   }
 }

@@ -27,7 +27,8 @@ export class MockChannelService {
     publishDate: new Date('2002-02-07'),
     description: "我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明",
     videoUri: '',
-    ChannelId: 0
+    ChannelId: 0,
+    likes: 0
   };
 
   videos: VideoCardData[] = [{
@@ -41,7 +42,8 @@ export class MockChannelService {
     publishDate: new Date('2002-02-07'),
     description: "fff",
     videoUri: '',
-    ChannelId: 0
+    ChannelId: 0,
+    likes: 0
   }, {
     id: 1,
     avatar: 'https://i.pravatar.cc/49',
@@ -53,7 +55,8 @@ export class MockChannelService {
     publishDate: new Date('2002-02-07'),
     description: "fff",
     videoUri: '',
-    ChannelId: 0
+    ChannelId: 0,
+    likes: 0
   }, {
     id: 1,
     avatar: 'https://i.pravatar.cc/49',
@@ -65,7 +68,8 @@ export class MockChannelService {
     publishDate: new Date('2002-02-07'),
     description: "fff",
     videoUri: '',
-    ChannelId: 0
+    ChannelId: 0,
+    likes: 0
   }, {
     id: 1,
     avatar: 'https://i.pravatar.cc/49',
@@ -77,7 +81,8 @@ export class MockChannelService {
     publishDate: new Date('2002-02-07'),
     description: "fff",
     videoUri: '',
-    ChannelId: 0
+    ChannelId: 0,
+    likes: 0
   }, {
     id: 1,
     avatar: 'https://i.pravatar.cc/49',
@@ -89,7 +94,8 @@ export class MockChannelService {
     publishDate: new Date('2002-02-07'),
     description: "fff",
     videoUri: '',
-    ChannelId: 0
+    ChannelId: 0,
+    likes: 0
   }, {
     id: 1,
     avatar: 'https://i.pravatar.cc/49',
@@ -101,7 +107,8 @@ export class MockChannelService {
     publishDate: new Date('2002-02-07'),
     description: "fff",
     videoUri: '',
-    ChannelId: 0
+    ChannelId: 0,
+    likes: 0
   }
   ];
 

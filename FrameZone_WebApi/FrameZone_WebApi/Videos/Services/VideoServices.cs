@@ -71,7 +71,7 @@ namespace FrameZone_WebApi.Videos.Services
             return dto;
         }
 
-        //=======================獲取影片首頁相關=======================
+        //#獲取首頁上船影片
 
         public async Task<List<VideoCardDto>> GetChannelVideosAsync(int channelId)
         {
@@ -95,7 +95,7 @@ namespace FrameZone_WebApi.Videos.Services
 
             return dto;
         }
-        
+
 
         public async Task<Comment> PostVideoComment(VideoCommentRequest req)
         {
@@ -128,6 +128,16 @@ namespace FrameZone_WebApi.Videos.Services
             return createdComment;
         }
 
+        //==============================影片按讚================================
+        //#確認是否按讚
+        public async Task<VideoLikesDto> CheckVideoLike(int userId, string guid)
+        {
+            return await _videoRepo.CheckLikesAsync(userId, guid);
+        }
 
+        public async Task<VideoLikesDto> VideosLikeToggle(int userId, string guid)
+        {
+            return await _videoRepo.VideosLikeToggleAsync(userId, guid);
+        }
     }
 }

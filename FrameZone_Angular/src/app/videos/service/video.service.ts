@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 // import { environment } from '../../environments/environment';
-import { ChannelCard, ChannelHome, VideoCardData, VideoCommentCard, VideoCommentRequest } from '../models/video-model';
+import { ChannelCard, ChannelHome, VideoCardData, VideoCommentCard, VideoCommentRequest, VideoLikesDto, VideoLikesRequest } from '../models/video-model';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +28,17 @@ export class VideoService {
   getVideoComments(videoGuid: string): Observable<VideoCommentCard[]> {
     return this.http.get<VideoCommentCard[]>(`${this.apiBase}/videos/${videoGuid}/comment`);
   }
+
+  // ===== 取得影片喜歡狀態 =====
+  getVideoLikes(videoGuid: string): Observable<VideoLikesDto> {
+    return this.http.get<VideoLikesDto>(`${this.apiBase}/videos/${videoGuid}/likecheck`);
+  }
+
+  //======影片按讚切換==========
+  ToggleVideoLikes(videoGuid: string, req: VideoLikesRequest): Observable<VideoLikesDto> {
+    return this.http.post<VideoLikesDto>(`${this.apiBase}/videos/${videoGuid}/liketoggle`, req);
+  }
+
 
   // ===== 取得頻道資訊 =====
   getChannelCard(id: number): Observable<ChannelCard> {

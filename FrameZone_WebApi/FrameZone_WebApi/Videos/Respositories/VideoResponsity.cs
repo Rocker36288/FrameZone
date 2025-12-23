@@ -1,6 +1,10 @@
 ﻿using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Videos.DTOs;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Asn1.X509;
+using System.Threading.Channels;
+using System.Xml.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FrameZone_WebApi.Videos.Repositories
 {
@@ -19,6 +23,7 @@ namespace FrameZone_WebApi.Videos.Repositories
 
         public async Task<VideoCardDto?> GetVideoCardByGuidAsync(string guid)
         {
+            //檢索影片是否存在
             var video = await _context.Videos
                 .AsNoTracking()
                 .Include(v => v.Channel)
@@ -28,8 +33,14 @@ namespace FrameZone_WebApi.Videos.Repositories
             if (video == null || video.Channel == null)
                 return null;
 
+            //計算觀看次數數量
             var viewCount = await _context.Views
                 .CountAsync(v => v.VideoId == video.VideoId);
+
+            // 4️⃣ 計算喜歡數
+            var likesCount = await _context.Likes
+                .CountAsync(l => l.VideoId == video.VideoId);
+
 
             return new VideoCardDto
             {
@@ -39,6 +50,7 @@ namespace FrameZone_WebApi.Videos.Repositories
                 Thumbnail = video.ThumbnailUrl ?? "",
                 Duration = video.Duration ?? 0,
                 Views = viewCount,
+                Likes = likesCount,
                 PublishDate = video.PublishDate ?? DateTime.MinValue,
                 Description = video.Description ?? "",
                 ChannelId = video.ChannelId,
@@ -78,6 +90,7 @@ namespace FrameZone_WebApi.Videos.Repositories
                 .GroupBy(cl => cl.CommentId)
                 .Select(g => new { CommentId = g.Key, Count = g.Count() })
                 .ToListAsync();
+
 
             // 5️⃣ 對應留言 DTO
             var commentDtos = comments
@@ -247,5 +260,77 @@ namespace FrameZone_WebApi.Videos.Repositories
                 Avatar = v.Channel.UserProfile?.Avatar ?? ""
             }).ToList();
         }
+
+        /* =====================================================
+        * Likes
+        * ===================================================== */
+        public async Task<VideoLikesDto> CheckLikesAsync(int userid, string guid)
+        {
+            var video = await _context.Videos
+             .AsNoTracking()
+             .FirstOrDefaultAsync(v => v.VideoUrl == guid);
+
+            if (video == null)
+            {
+                return new VideoLikesDto
+                {
+                    IsLikes = false
+                };
+            }
+
+            var data = await _context.Likes
+                .AsNoTracking()
+                .AnyAsync(l => l.UserId == userid && l.VideoId == video.VideoId);
+
+            return new VideoLikesDto
+            {
+                IsLikes = data
+            };
+        }
+
+        //#LikeToggle
+        public async Task<VideoLikesDto> VideosLikeToggleAsync(int userId, string guid)
+        {
+            var video = await _context.Videos
+                .AsNoTracking()
+                .FirstOrDefaultAsync(v => v.VideoUrl == guid);
+
+            if (video == null)
+                throw new KeyNotFoundException("Video not found.");
+
+            var like = await _context.Likes
+                .FirstOrDefaultAsync(l => l.UserId == userId && l.VideoId == video.VideoId);
+
+            if (like == null)
+            {
+                // 不追蹤實體，EF 只生成 INSERT
+                var newLike = new Like
+                {
+                    UserId = userId,
+                    VideoId = video.VideoId,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.Likes.Attach(newLike); // 告訴 EF 這個實體存在
+                _context.Entry(newLike).State = EntityState.Added; // 明確指定新增
+
+                await _context.SaveChangesAsync();
+                return new VideoLikesDto { IsLikes = true };
+            }
+            else
+            {
+                _context.Likes.Remove(like);
+                await _context.SaveChangesAsync();
+                return new VideoLikesDto { IsLikes = false };
+            }
+        }
+
+        /* =====================================================
+        * 搜尋
+        * ===================================================== */
+        //public async Task<List<VideoCardDto>> VideoSearchAsync()
+        //{
+
+        //}
     }
 }

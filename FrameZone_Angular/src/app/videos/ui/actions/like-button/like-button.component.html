@@ -1,4 +1,11 @@
-<button id="likeBtn" class="btn btn-outline-secondary d-flex align-items-center gap-1">
-  <i id="likeIcon" class="ti ti-thumb-up"></i>
-  <span id="likeText">Like</span>
+<button class="btn d-flex align-items-center gap-2" [ngClass]="isLiked ? 'btn-primary' : 'btn-outline-primary'"
+  (click)="toggleLike()">
+
+  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="20" height="20" viewBox="0 0 24 24"
+    stroke-width="2" stroke="currentColor" fill="none">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 21l-1 -1c-4 -4 -7 -7 -7 -11a5 5 0 0 1 10 0a5 5 0 0 1 10 0c0 4 -3 7 -7 11l-1 1" />
+  </svg>
+
+  <span>喜歡({{ likes }})</span>
 </button>

@@ -199,7 +199,20 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  color: #1a202c;
+  letter-spacing: -0.02em;
 }
+
+/* 標題區域 */
+.title-section {
+  opacity: 0;
+  transition: opacity 0.5s ease-out 0.2s;
+}
+
+.title-section.loaded {
+  opacity: 1;
+}
+
 
 /* // 統計欄 */
 .stats-bar {
