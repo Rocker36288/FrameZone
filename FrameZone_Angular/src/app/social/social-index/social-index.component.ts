@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
+import { SocialPostsSubmitComponent } from "../social-posts-submit/social-posts-submit.component";
 import { SocialPostsComponent } from "../social-posts/social-posts.component";
-import { SocialShowpostsComponent } from "../social-showposts/social-showposts.component";
-import { SocialPostlistComponent } from "../social-postlist/social-postlist.component";
+import { SocialPostsListComponent } from "../social-posts-list/social-posts-list.component";
 
 @Component({
   selector: 'app-social-index',
-  imports: [SocialPostsComponent, SocialShowpostsComponent, SocialPostlistComponent],
+  imports: [SocialPostsSubmitComponent, SocialPostsComponent, SocialPostsListComponent],
   templateUrl: './social-index.component.html',
   styleUrl: './social-index.component.css'
 })

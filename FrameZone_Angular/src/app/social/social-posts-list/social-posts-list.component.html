@@ -4,8 +4,8 @@
   }
   @else {
   @for (post of posts; track post.postId) {
-  <app-social-showposts [post]="post" (postDeleted)="onPostDeleted($event)">
-  </app-social-showposts>
+  <app-social-posts [post]="post" (postDeleted)="onPostDeleted($event)">
+  </app-social-posts>
   }
   }
 </section>

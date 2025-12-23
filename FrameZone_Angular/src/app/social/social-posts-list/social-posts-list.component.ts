@@ -1,15 +1,15 @@
 import { PostService } from '../services/post.service';
 import { Component } from '@angular/core';
 import { PostDto } from "../models/PostDto";
-import { SocialShowpostsComponent } from '../social-showposts/social-showposts.component';
+import { SocialPostsComponent } from '../social-posts/social-posts.component';
 
 @Component({
-  selector: 'app-social-postlist',
-  imports: [SocialShowpostsComponent],
-  templateUrl: './social-postlist.component.html',
-  styleUrl: './social-postlist.component.css'
+  selector: 'app-social-posts-list',
+  imports: [SocialPostsComponent],
+  templateUrl: './social-posts-list.component.html',
+  styleUrl: './social-posts-list.component.css'
 })
-export class SocialPostlistComponent {
+export class SocialPostsListComponent {
   posts: PostDto[] = [];
 
   constructor(private postService: PostService) { }

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SocialPostsComponent } from './social-posts.component';
 
-describe('SocialPostsComponent', () => {
+describe('SocialShowpostsComponent', () => {
   let component: SocialPostsComponent;
   let fixture: ComponentFixture<SocialPostsComponent>;
 
@@ -10,7 +10,7 @@ describe('SocialPostsComponent', () => {
     await TestBed.configureTestingModule({
       imports: [SocialPostsComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(SocialPostsComponent);
     component = fixture.componentInstance;
