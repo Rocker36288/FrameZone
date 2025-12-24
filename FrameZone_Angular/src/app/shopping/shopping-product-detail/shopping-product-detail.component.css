@@ -175,7 +175,7 @@
 
 
 /* 收藏按鈕 */
-.product-images .side-actions {
+/* .product-images .side-actions {
   display: flex;
   gap: 10px;
   flex-shrink: 0;
@@ -202,12 +202,11 @@
 
 .product-images .side-actions .action-btn.favorited {
   color: #dc3545;
-  /* 實心紅 */
 }
 
 .product-images .side-actions .action-btn.favorited svg {
   fill: currentColor;
-}
+} */
 
 
 /* 3. 左側：賣家資訊區塊 (SELLER INFO) */
@@ -448,7 +447,7 @@
 }
 
 .product-options .add-to-cart-btn {
-  background: linear-gradient(to right, #5a62d4, #8f24e6);
+  background: linear-gradient(to right, #657bf8, #7738eb);
   color: #fff !important;
   border: none !important;
   padding: 12px 25px;
@@ -869,4 +868,32 @@
     border-radius: 50%;
     padding: 5px;
   }
+}
+
+.icon-border {
+  /* 讓自定義標籤變成區塊塊，才能設定寬高 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 尺寸與外框 */
+  width: 30px;
+  height: 30px;
+  border: 2px solid #5c4aff;
+  border-radius: 30%;
+
+  /* 背景與位置微調 */
+  margin: 10px auto;
+  /* 居中並增加一點間距 */
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  /* 解決位置奇怪：如果它被擠壓到，可以用這個 */
+  flex-shrink: 0;
+}
+
+/* 穿透進去讓愛心 SVG 在圓框正中間 */
+.test ::ng-deep .favorite-icon {
+  display: flex !important;
+  line-height: 0;
 }
