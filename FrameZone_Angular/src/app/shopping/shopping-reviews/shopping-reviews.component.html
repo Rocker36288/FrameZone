@@ -1,0 +1,153 @@
+<div class="page-wrapper">
+  <div class="page-body">
+    <div class="container-xl">
+      <!-- 頁面標題 -->
+      <div class="page-header mb-4">
+        <h1 class="page-title">我的評價</h1>
+      </div>
+
+      <!-- 切換標籤 -->
+      <div class="tabs-container mb-4">
+        <button class="tab-btn" [class.active]="viewMode === 'buyer'" (click)="switchViewMode('buyer')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          我給賣家的評價
+        </button>
+        <button class="tab-btn" [class.active]="viewMode === 'seller'" (click)="switchViewMode('seller')"
+          *ngIf="isSeller">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" />
+            <path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9" />
+            <path d="M12 3v6" />
+          </svg>
+          買家給我的評價
+        </button>
+      </div>
+
+      <!-- 評價統計 -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="rating-summary">
+            <div class="rating-left">
+              <div class="score-number">{{ averageRating.toFixed(1) }}</div>
+              <div class="stars mb-2">
+                <svg *ngFor="let filled of getStarArray(roundedRating)" xmlns="http://www.w3.org/2000/svg" width="24"
+                  height="24" viewBox="0 0 24 24" [attr.fill]="filled ? '#fbbf24' : 'none'" stroke="#fbbf24"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="star-icon">
+                  <path
+                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+              </div>
+              <div class="total-reviews">共 {{ totalReviews }} 則評價</div>
+            </div>
+            <div class="rating-bars">
+              <div class="rating-bar-item" *ngFor="let dist of getRatingDistribution()">
+                <span class="rating-label">{{ dist.star }} 星</span>
+                <div class="rating-bar">
+                  <div class="rating-bar-fill" [style.width.%]="dist.percentage"></div>
+                </div>
+                <span class="rating-count">{{ dist.count }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 評價列表 -->
+      <div class="row">
+        <div class="col-12">
+          <div class="reviews-list">
+            <div class="review-card" *ngFor="let review of displayedReviews">
+              <div class="review-header">
+                <div class="reviewer-info">
+                  <span class="avatar" [style.background-image]="'url(' + review.reviewer.avatar + ')'"></span>
+                  <div class="reviewer-details">
+                    <div class="reviewer-name">{{ review.reviewer.name }}</div>
+                    <div class="review-date">{{ review.date }}</div>
+                  </div>
+                </div>
+                <div class="rating-stars">
+                  <svg *ngFor="let filled of getStarArray(review.rating)" xmlns="http://www.w3.org/2000/svg" width="18"
+                    height="18" viewBox="0 0 24 24" [attr.fill]="filled ? '#fbbf24' : 'none'" stroke="#fbbf24"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="star-icon-small">
+                    <path
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                </div>
+              </div>
+
+              <div class="review-body">
+                <div class="product-info-row">
+                  <img [src]="review.productImage" [alt]="review.productName" class="product-thumbnail" />
+                  <div class="product-details">
+                    <div class="product-name">{{ review.productName }}</div>
+                    <div class="seller-info-text">
+                      <span *ngIf="viewMode === 'buyer'">賣家：{{ review.seller }}</span>
+                      <span *ngIf="viewMode === 'seller'">買家：{{ review.reviewer.name }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="review-comment">{{ review.comment }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 分頁 -->
+      <div class="row mt-4" *ngIf="totalPages > 1">
+        <div class="col-12 d-flex justify-content-center">
+          <ul class="pagination">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" href="#" (click)="goToFirstPage(); $event.preventDefault()" tabindex="-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 7l-5 5l5 5" />
+                  <path d="M17 7l-5 5l5 5" />
+                </svg>
+              </a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" href="#" (click)="goToPreviousPage(); $event.preventDefault()" tabindex="-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 6l-6 6l6 6" />
+                </svg>
+              </a>
+            </li>
+            <li class="page-item" *ngFor="let page of pages" [class.active]="page === currentPage">
+              <a class="page-link" href="#" (click)="goToPage(page); $event.preventDefault()">{{ page }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <a class="page-link" href="#" (click)="goToNextPage(); $event.preventDefault()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 6l6 6l-6 6" />
+                </svg>
+              </a>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <a class="page-link" href="#" (click)="goToLastPage(); $event.preventDefault()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M7 7l5 5l-5 5" />
+                  <path d="M13 7l5 5l-5 5" />
+                </svg>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <app-footer></app-footer>
+</div>

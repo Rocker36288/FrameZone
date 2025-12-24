@@ -1,0 +1,406 @@
+/* 頁面整體 */
+.page-wrapper {
+  background: #f8fafc;
+  min-height: 100vh;
+  /* padding: 2rem 0; */
+  /* padding-top: 100px; */
+}
+
+.page-body {
+  padding-top: 0;
+}
+
+/* 頁面標題 */
+.page-header {
+  padding: 1.5rem 0;
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.page-subtitle {
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+/* 切換標籤 */
+.tabs-container {
+  display: flex;
+  gap: 1rem;
+  background: white;
+  padding: 0.5rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.tab-btn:hover {
+  background: #f8fafc;
+  color: #334155;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.tab-btn svg {
+  flex-shrink: 0;
+}
+
+/* 評價統計區 */
+.rating-summary {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+}
+
+.rating-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 180px;
+}
+
+.score-number {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: #667eea;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.stars {
+  display: flex;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.star-icon {
+  width: 26px;
+  height: 26px;
+}
+
+.total-reviews {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+}
+
+/* 評分條 */
+.rating-bars {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rating-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.rating-label {
+  font-size: 0.875rem;
+  color: #64748b;
+  min-width: 40px;
+}
+
+.rating-bar {
+  flex: 1;
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.rating-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+  transition: width 0.3s ease;
+}
+
+.rating-count {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  min-width: 40px;
+  text-align: right;
+}
+
+/* 評價列表 */
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.review-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.review-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* 評價標題區 */
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.reviewer-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid #f1f5f9;
+  flex-shrink: 0;
+}
+
+.reviewer-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.reviewer-name {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.95rem;
+}
+
+.review-date {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 0.2rem;
+}
+
+.star-icon-small {
+  width: 18px;
+  height: 18px;
+}
+
+/* 評價內容區 */
+.review-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.product-info-row {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.product-thumbnail {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.product-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.product-name {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.seller-info-text {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.review-comment {
+  color: #334155;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* 分頁樣式 */
+.pagination {
+  background: white;
+  border-radius: 10px;
+  padding: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.page-item {
+  margin: 0 0.2rem;
+}
+
+.page-link {
+  border: none;
+  color: #667eea;
+  background: transparent;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.page-link:hover {
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.page-item.active .page-link {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.page-item.disabled .page-link {
+  color: #cbd5e1;
+  cursor: not-allowed;
+  background: transparent;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .page-header {
+    padding: 1rem 0;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .page-wrapper {
+    padding: 1rem 0;
+  }
+
+  .tabs-container {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .tab-btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .rating-summary {
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .rating-left {
+    min-width: auto;
+  }
+
+  .score-number {
+    font-size: 3rem;
+  }
+
+  .star-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .rating-bars {
+    width: 100%;
+  }
+
+  .review-card {
+    padding: 1.25rem;
+  }
+
+  .review-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .reviewer-info {
+    gap: 0.75rem;
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .product-info-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .product-thumbnail {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+}
+
+@media (max-width: 576px) {
+  .review-comment {
+    font-size: 0.875rem;
+  }
+
+  .rating-label,
+  .rating-count {
+    font-size: 0.8rem;
+  }
+}
