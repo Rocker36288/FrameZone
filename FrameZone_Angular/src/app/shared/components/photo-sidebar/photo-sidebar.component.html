@@ -1,0 +1,133 @@
+<div class="sidebar" [class.sidebar-open]="isSidebarOpen()">
+  <!-- Sidebar Header -->
+  <div class="sidebar-header">
+    <h3 class="sidebar-title">
+      <i class="ti ti-filter"></i>
+      標籤篩選
+    </h3>
+
+    @if (hasSelection()) {
+      <button
+        class="btn btn-sm btn-ghost-secondary"
+        (click)="clearSelection()"
+        title="清除篩選">
+        <i class="ti ti-x"></i>
+        清除 ({{ getSelectedCount() }})
+      </button>
+    }
+  </div>
+
+  <!-- 載入中 -->
+  @if (isLoading()) {
+    <div class="sidebar-loading">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">載入中...</span>
+      </div>
+      <p class="mt-2 text-secondary">載入標籤中...</p>
+    </div>
+  }
+
+  <!-- 標籤階層列表 -->
+  @if (!isLoading()) {
+    <div class="sidebar-content">
+      @if (tagHierarchy().length === 0) {
+        <!-- 空狀態 -->
+        <div class="sidebar-empty">
+          <i class="ti ti-tag-off"></i>
+          <p>目前沒有標籤</p>
+        </div>
+      } @else {
+        <!-- 分類列表 -->
+        @for (category of tagHierarchy(); track category.categoryId) {
+          <div class="category-group" [class.category-coming-soon]="category.isComingSoon">
+            <!-- 分類標題 -->
+            <div
+              class="category-header"
+              (click)="toggleCategory(category.categoryId)"
+              [class.active]="category.isExpanded">
+
+              <div class="category-info">
+                <i [class]="getCategoryIconClass(category.icon)"></i>
+                <span class="category-name">{{ category.categoryName }}</span>
+
+                @if (category.isComingSoon) {
+                  <span class="badge bg-secondary-lt ms-2">即將推出</span>
+                }
+              </div>
+
+              @if (hasTags(category)) {
+                <i
+                  class="category-toggle"
+                  [class.ti-chevron-down]="category.isExpanded"
+                  [class.ti-chevron-right]="!category.isExpanded">
+                </i>
+              }
+            </div>
+
+            <!-- 標籤列表 -->
+            @if (category.isExpanded && hasTags(category)) {
+              <div class="tags-list">
+                @for (tag of category.tags; track tag.tagId) {
+                  <!-- 遞迴渲染標籤 -->
+                  <ng-container *ngTemplateOutlet="tagTemplate; context: { $implicit: tag, level: 0 }"></ng-container>
+                }
+              </div>
+            }
+          </div>
+        }
+      }
+    </div>
+  }
+</div>
+
+<!-- 標籤遞迴模板 -->
+<ng-template #tagTemplate let-tag let-level="level">
+  <div class="tag-item" [style.padding-left.rem]="level * 1.5">
+    <!-- 標籤主體 -->
+    <div
+      class="tag-content"
+      [class.tag-selected]="tag.isSelected"
+      [class.tag-has-children]="hasChildren(tag)"
+      (click)="hasChildren(tag) ? toggleTag(tag.tagId) : selectTag(tag.tagId)">
+
+      <!-- 展開/收合圖示（僅有子標籤時顯示） -->
+      @if (hasChildren(tag)) {
+        <i
+          class="tag-toggle"
+          [class.ti-chevron-down]="tag.isExpanded"
+          [class.ti-chevron-right]="!tag.isExpanded"
+          (click)="toggleTag(tag.tagId); $event.stopPropagation()">
+        </i>
+      } @else {
+        <span class="tag-spacer"></span>
+      }
+
+      <!-- 複選框 -->
+      <input
+        type="checkbox"
+        class="form-check-input tag-checkbox"
+        [checked]="tag.isSelected"
+        (change)="selectTag(tag.tagId, $event)"
+        (click)="$event.stopPropagation()">
+
+      <!-- 標籤名稱 -->
+      <span class="tag-name" [title]="tag.tagName">
+        {{ tag.tagName }}
+      </span>
+
+      <!-- 照片數量 -->
+      @if (tag.photoCount > 0) {
+        <span class="tag-count">{{ tag.photoCount }}</span>
+      }
+    </div>
+
+    <!-- 子標籤（遞迴） -->
+    @if (tag.isExpanded && hasChildren(tag)) {
+      <div class="tag-children">
+        @for (childTag of tag.children; track childTag.tagId) {
+          <ng-container *ngTemplateOutlet="tagTemplate; context: { $implicit: childTag, level: level + 1 }"></ng-container>
+        }
+      </div>
+    }
+  </div>
+</ng-template>

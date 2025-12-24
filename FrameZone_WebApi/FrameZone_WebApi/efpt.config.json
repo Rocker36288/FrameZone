@@ -183,6 +183,122 @@
          "ObjectType": 0
       },
       {
+         "Name": "[dbo].[Photo]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoAIClassificationLog]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoAIClassificationSuggestion]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoAlbum]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoCategory]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoCategoryType]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoClassificationSource]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoFeatureToggle]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoGeneralSetting]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoLocation]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoMaintenanceSetting]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoMetadata]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoPhotoAlbum]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoPhotoCategory]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoPhotoTag]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoQuotaType]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoSecuritySetting]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoShare]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoStorage]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoStorageProvider]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoSubscriptionHistory]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoSubscriptionPlan]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoSubscriptionQuota]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoTag]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoThirdPartyConfig]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoThirdPartyServiceType]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoUploadLimitSetting]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoUserQuotaUsage]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[PhotoUserSubscription]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[User]",
          "ObjectType": 0
       },

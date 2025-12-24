@@ -27,6 +27,9 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+  --navbar-height: 96px;
+  --navbar-gap: 0px;
 }
 
 /* 確保頁面容器正確 */
@@ -38,18 +41,30 @@
 
 .page-wrapper {
   flex: 1;
+  padding-top: 0px;
+}
+
+.page-wrapper--home {
+  padding-top: 0 !important;
+  background: transparent !important;
 }
 
 .page-body {
-  padding: 0;
+  padding-top: 0;
 }
 
-/* 容器樣式 */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
+.page-body--home {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
 }
+
+/* 若灰色仍存在，通常是首頁第一個區塊自帶 margin-top */
+.page-body--home > :first-child {
+  margin-top: 0 !important;
+}
+
+
+
 
 /* ==========================================
    導覽列樣式優化
@@ -58,9 +73,10 @@
   background-color: var(--bg-white) !important;
   border-bottom: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
+
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 1100;
 }
 
 /* Logo 樣式 */
@@ -86,6 +102,13 @@
 .navbar-nav .nav-link.active {
   color: var(--primary-color) !important;
 }
+
+.navbar,
+.navbar.navbar-transparent {
+  background: #fff !important;
+  opacity: 1 !important;
+}
+
 
 /* ==========================================
    響應式設計
@@ -123,5 +146,35 @@
 @media (max-width: 480px) {
   .container {
     padding: 0 1rem;
+  }
+}
+
+/* ...你原本的 CSS 保留... */
+
+.navbar .container {
+  position: relative;
+}
+
+.navbar-toggler {
+  border: 1px solid var(--border-color);
+  background: var(--bg-white);
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.navbar-toggler i {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+
+/* 小螢幕 collapse 展開時的樣式 */
+@media (max-width: 991px) {
+  .navbar-collapse {
+    background-color: var(--bg-white);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    margin-top: 0.75rem;
+    box-shadow: var(--shadow-md);
   }
 }

@@ -24,4 +24,6 @@ public partial class PhotoClassificationSource
     public virtual ICollection<PhotoLocation> PhotoLocations { get; set; } = new List<PhotoLocation>();
 
     public virtual ICollection<PhotoPhotoCategory> PhotoPhotoCategories { get; set; } = new List<PhotoPhotoCategory>();
+
+    public virtual ICollection<PhotoPhotoTag> PhotoPhotoTags { get; set; } = new List<PhotoPhotoTag>();
 }

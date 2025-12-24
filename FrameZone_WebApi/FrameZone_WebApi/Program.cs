@@ -1,3 +1,4 @@
+﻿using FrameZone_WebApi.Middlewares;
 using FrameZone_WebApi.Configuration;
 using FrameZone_WebApi.Helpers;
 using FrameZone_WebApi.Models;
@@ -6,10 +7,13 @@ using FrameZone_WebApi.Services;
 using FrameZone_WebApi.Videos.Repositories;
 using FrameZone_WebApi.Videos.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.StaticFiles;
 
+using Microsoft.OpenApi;
+using SixLabors.ImageSharp;
 using System.Text;
 using Xabe.FFmpeg.Downloader;
 using Xabe.FFmpeg;
@@ -64,7 +68,7 @@ builder.Services.AddDbContext<AAContext>(options =>
 });
 
 
-//========== ���U�]�w ==========
+//========== 註冊設定 ==========
 
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings")
@@ -147,14 +151,33 @@ builder.Services.AddAuthentication(options =>
     };  
 });
 
+// 配置記憶體快取
+builder.Services.AddMemoryCache(options =>
+{
+    options.SizeLimit = 1024 * 1024 * 200;
+    options.CompactionPercentage = 0.25;
+});
+
+// ========== 註冊依賴注入服務 (DI注入) ==========
 // ========== 註冊依賴注入服務 (DI注入) ==========
 
+builder.Services.AddScoped<IPhotoRepository, PhotoRepository>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<PostRepository>();
+
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<PostService>();
+builder.Services.AddScoped<IExifService, ExifService>();
+builder.Services.AddScoped<IPhotoService, PhotoService>();
+builder.Services.AddScoped<ITagCategorizationService, TagCategorizationService>();
+builder.Services.AddScoped<IBackgroundGeocodingService, BackgroundGeocodingService>();
+
+
+builder.Services.AddHttpClient<IGeocodingService, GeocodingService>();
+builder.Services.AddScoped<IGeocodingService, GeocodingService>();
+
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddHttpContextAccessor();
 
@@ -164,27 +187,46 @@ builder.Services.AddScoped<VideoServices>();
 //=======================================
 
 
+// ========== 日誌設定 ==========
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
+// ========== 檔案上傳大小限制設定 ==========
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 104857600;
+});
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Limits.MaxRequestBodySize = 104857600;
+});
+
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
      {
         options.JsonSerializerOptions.PropertyNamingPolicy = 
-            System.Text.Json.JsonNamingPolicy.CamelCase;            // �ϥξm�p�R�W�k
-         options.JsonSerializerOptions.WriteIndented = true;        // �榡�� JSON
+            System.Text.Json.JsonNamingPolicy.CamelCase;            // 使用駝峰命名法
+         options.JsonSerializerOptions.WriteIndented = true;        // 格式化 JSON
      });
 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 //// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-//// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.MapOpenApi();
-//}
+// 開發環境啟用 Swagger
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 
 app.UseCors(policyName);
 
@@ -198,8 +240,9 @@ app.UseStaticFiles(new StaticFileOptions
     ContentTypeProvider = provider
 });
 //=======================================
-
 app.UseHttpsRedirection();
+
+app.UseQueryStringToken();
 
 app.UseAuthentication();
 app.UseAuthorization();

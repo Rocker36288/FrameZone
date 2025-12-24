@@ -95,6 +95,18 @@ public partial class User
 
     public virtual ICollection<Review> ReviewReviewerUsers { get; set; } = new List<Review>();
 
+    public virtual ICollection<PhotoAlbum> PhotoAlbums { get; set; } = new List<PhotoAlbum>();
+
+    public virtual ICollection<PhotoCategory> PhotoCategories { get; set; } = new List<PhotoCategory>();
+
+    public virtual ICollection<PhotoShare> PhotoShares { get; set; } = new List<PhotoShare>();
+
+    public virtual ICollection<PhotoSubscriptionHistory> PhotoSubscriptionHistories { get; set; } = new List<PhotoSubscriptionHistory>();
+
+    public virtual ICollection<PhotoUserQuotaUsage> PhotoUserQuotaUsages { get; set; } = new List<PhotoUserQuotaUsage>();
+
+    public virtual ICollection<PhotoUserSubscription> PhotoUserSubscriptions { get; set; } = new List<PhotoUserSubscription>();
+
     public virtual ICollection<UserBankAccount> UserBankAccounts { get; set; } = new List<UserBankAccount>();
 
     public virtual ICollection<UserLog> UserLogs { get; set; } = new List<UserLog>();
