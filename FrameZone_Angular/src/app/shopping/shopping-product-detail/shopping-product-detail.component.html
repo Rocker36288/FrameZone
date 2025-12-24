@@ -42,7 +42,7 @@
             </div>
 
             <div class="side-actions">
-              <button class="action-btn fav-btn" title="收藏" (click)="toggleFavorite()" [class.favorited]="isFavorite">
+              <!-- <button class="action-btn fav-btn" title="收藏" (click)="toggleFavorite()" [class.favorited]="isFavorite">
 
                 <svg *ngIf="isFavorite" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                   fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -55,7 +55,10 @@
                   class="icon icon-tabler-heart">
                   <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
                 </svg>
-              </button>
+              </button> -->
+              <app-favorite-button class="icon-border" [isFavorite]="product.isFavorite" [itemName]="product.name"
+                (favoriteChange)="product.isFavorite = $event">
+              </app-favorite-button>
             </div>
           </div>
         </section>
@@ -190,7 +193,7 @@
             </a>
             <div class="card-body d-flex flex-column">
               <h3 class="card-title">
-                <a [routerLink]="['/shopping/product', item.id]">{{ item.name }}</a>
+                <a [routerLink]="['/shopping/product-detail', item.id]">{{ item.name }}</a>
               </h3>
               <div class="text-secondary text-truncate mb-2 card-description-override">
                 {{ item.desc }}
@@ -200,7 +203,7 @@
                 <div class="fw-bold price-color-override me-auto">NT$ {{ item.price }}</div>
 
                 <div class="ms-auto">
-                  <a href="javascript:void(0)" class="icon d-none d-md-inline-block ms-3 similar-fav-btn"
+                  <!-- <a href="javascript:void(0)" class="icon d-none d-md-inline-block ms-3 similar-fav-btn"
                     [class.favorited]="item.isFavorite" (click)="toggleSimilarFavorite(item)">
 
                     <svg *ngIf="item.isFavorite" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -214,7 +217,11 @@
                       stroke-linejoin="round" class="icon icon-tabler-heart">
                       <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
                     </svg>
-                  </a>
+                  </a> -->
+                  <app-favorite-button [isFavorite]="item.isFavorite" [itemName]="product.name"
+                    (favoriteChange)="item.isFavorite = $event">
+                  </app-favorite-button>
+
                 </div>
               </div>
             </div>
@@ -308,9 +315,9 @@
     </div>
   </div>
 
-  <div class="app-toast" *ngIf="showToast">
+  <!-- <div class="app-toast" *ngIf="showToast">
     {{ toastMessage }}
-  </div>
+  </div> -->
 </div>
 
 <div class="app-image-modal-overlay" *ngIf="showImageModal" (click)="toggleImageModal(false)">
@@ -327,4 +334,12 @@
 
     <img [src]="currentImage" alt="放大圖片" class="image-modal-content">
   </div>
+</div>
+
+<div>
+  <app-toast-notification></app-toast-notification>
+</div>
+
+<div>
+  <app-footer></app-footer>
 </div>

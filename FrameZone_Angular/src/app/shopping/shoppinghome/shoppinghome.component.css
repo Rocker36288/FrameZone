@@ -89,7 +89,7 @@
   /* 設定一致的最小寬度 */
   min-width: 120px;
   /* 項目之間水平間距 (例如 1.5rem) */
-  margin: 1.4rem;
+  margin: 1.2rem;
   cursor: pointer;
 }
 
@@ -321,16 +321,55 @@
   color: #764ba2 !important;
 }
 
-/* 收藏圖示 */
-.icon svg {
-  transition: all 0.3s ease;
-  stroke: #9ca3af;
+/* 收藏按鈕樣式 */
+.similar-fav-btn {
+  transition: transform 0.2s ease-in-out;
 }
 
-.icon:hover svg {
-  stroke: #764ba2;
-  fill: rgba(118, 75, 162, 0.1);
+.similar-fav-btn:active {
   transform: scale(1.2);
+  /* 點擊時縮放一下 */
+}
+
+/* 紅色實心狀態 */
+.text-danger {
+  color: #ff4d4f !important;
+  fill: #ff4d4f !important;
+  /* 針對 SVG 的填充色 */
+}
+
+/* Toast 簡易動畫 */
+.toast {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.toast.show {
+  display: block;
+  opacity: 1;
+}
+
+.toast-container {
+  pointer-events: none;
+  /* 避免擋住下方的按鈕點擊 */
+}
+
+.toast-body {
+  font-size: 1rem;
+  padding: 1rem 1.5rem;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* 為圖片的 <a> 標籤設定固定高度並隱藏溢出 */
@@ -378,5 +417,43 @@
   .category-item .img-responsive {
     height: 70px;
     width: 70px;
+  }
+}
+
+/* 查看所有商品連結 */
+.view-all-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.view-all-link .arrow {
+  transition: transform 0.3s ease;
+}
+
+/* hover 動畫 */
+.view-all-link:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.view-all-link:hover .arrow {
+  transform: translateX(4px);
+}
+
+/* 手機版微調 */
+@media (max-width: 768px) {
+  .view-all-link {
+    font-size: 0.85rem;
+    padding: 5px 12px;
   }
 }

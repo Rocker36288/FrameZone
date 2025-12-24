@@ -1,0 +1,145 @@
+<!-- src/app/shopping/seller/wallet-management/wallet-management.component.html -->
+
+<div class="wallet-management">
+  <!-- 頁面標題 -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>財務中心</h1>
+      <p class="page-subtitle">管理您的收入與提領記錄</p>
+    </div>
+    <button class="btn-withdraw" (click)="requestWithdraw()">
+      <i class="ti ti-cash"></i>
+      申請提領
+    </button>
+  </div>
+
+  <!-- 主要餘額卡片 -->
+  <div class="main-balance-card">
+    <div class="balance-bg">
+      <div class="balance-content">
+        <div class="balance-label">
+          <i class="ti ti-wallet"></i>
+          <span>可用餘額</span>
+        </div>
+        <div class="balance-amount">NT$ {{ balance.toLocaleString() }}</div>
+        <div class="balance-info">
+          <div class="info-item">
+            <i class="ti ti-clock"></i>
+            <span>待入帳: NT$ {{ pendingAmount.toLocaleString() }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="balance-decoration">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 統計卡片 -->
+  <div class="stats-cards">
+    <div class="stat-card income">
+      <div class="stat-icon">
+        <i class="ti ti-arrow-down-circle"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">累計收入</div>
+        <div class="stat-value">NT$ {{ totalIncome.toLocaleString() }}</div>
+        <div class="stat-trend up">
+          <i class="ti ti-trending-up"></i>
+          <span>+18.2%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card withdraw">
+      <div class="stat-icon">
+        <i class="ti ti-arrow-up-circle"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">累計提領</div>
+        <div class="stat-value">NT$ {{ totalWithdraw.toLocaleString() }}</div>
+        <div class="stat-trend">
+          <i class="ti ti-minus"></i>
+          <span>本月已提領 3 次</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 交易記錄區塊 -->
+  <div class="transactions-section">
+    <div class="section-header">
+      <h2>交易記錄</h2>
+
+      <div class="transaction-controls">
+        <div class="search-box">
+          <i class="ti ti-search"></i>
+          <input type="text" placeholder="搜尋交易記錄..." [(ngModel)]="searchQuery" (input)="onSearchChange()">
+        </div>
+
+        <div class="filter-chips">
+          <button class="filter-chip" [class.active]="currentFilter === 'all'" (click)="onFilterChange('all')">
+            全部
+          </button>
+          <button class="filter-chip income" [class.active]="currentFilter === 'income'"
+            (click)="onFilterChange('income')">
+            <i class="ti ti-arrow-down-circle"></i>
+            收入
+          </button>
+          <button class="filter-chip withdraw" [class.active]="currentFilter === 'withdraw'"
+            (click)="onFilterChange('withdraw')">
+            <i class="ti ti-arrow-up-circle"></i>
+            提領
+          </button>
+          <button class="filter-chip refund" [class.active]="currentFilter === 'refund'"
+            (click)="onFilterChange('refund')">
+            <i class="ti ti-arrow-back-up"></i>
+            退款
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 交易列表 -->
+    <div class="transactions-list">
+      <div class="transaction-item" *ngFor="let transaction of filteredTransactions">
+        <div class="transaction-icon-wrapper" [ngClass]="getTypeClass(transaction.type)">
+          <i *ngIf="transaction.type === 'income'" class="ti ti-arrow-down-circle"></i>
+          <i *ngIf="transaction.type === 'withdraw'" class="ti ti-arrow-up-circle"></i>
+          <i *ngIf="transaction.type === 'refund'" class="ti ti-arrow-back-up"></i>
+        </div>
+
+        <div class="transaction-details">
+          <div class="transaction-description">{{ transaction.description }}</div>
+          <div class="transaction-meta">
+            <span class="transaction-date">
+              <i class="ti ti-clock"></i>
+              {{ transaction.date | date:'yyyy/MM/dd HH:mm' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="transaction-right">
+          <div class="transaction-amount" [ngClass]="getTypeClass(transaction.type)">
+            <span *ngIf="transaction.type === 'income'">+</span>
+            <span *ngIf="transaction.type === 'withdraw' || transaction.type === 'refund'">-</span>
+            NT$ {{ transaction.amount.toLocaleString() }}
+          </div>
+          <span class="transaction-status" [ngClass]="getStatusClass(transaction.status)">
+            <i class="ti ti-circle-filled"></i>
+            {{ getStatusText(transaction.status) }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 空狀態 -->
+  <div *ngIf="filteredTransactions.length === 0" class="empty-state">
+    <i class="ti ti-receipt-off"></i>
+    <h3>沒有找到相關交易記錄</h3>
+    <p>試試調整搜尋條件或篩選器</p>
+  </div>
+</div>

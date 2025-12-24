@@ -1,0 +1,182 @@
+<div class="settings-container">
+  <div class="settings-header">
+    <div>
+      <h1 class="settings-title">物流設定</h1>
+    </div>
+    <button class="btn-add" (click)="openAddModal()">
+      + 新增物流方式
+    </button>
+  </div>
+
+  <div class="shipping-methods-grid">
+    <div *ngFor="let method of shippingMethods" class="method-card" [class.disabled]="!method.isEnabled">
+      <div class="card-header">
+        <div class="method-info">
+          <h3 class="method-name">{{ method.name }}</h3>
+          <span class="provider-badge">{{ method.provider }}</span>
+        </div>
+        <div class="status-badge" [class.active]="method.isEnabled">
+          {{ method.isEnabled ? '啟用中' : '已停用' }}
+        </div>
+      </div>
+
+      <div class="card-body">
+        <p class="method-description">{{ method.description }}</p>
+
+        <div class="method-details">
+          <div class="detail-item">
+            <span class="detail-icon">💰</span>
+            <div>
+              <div class="detail-label">基本運費</div>
+              <div class="detail-value">NT$ {{ method.basePrice }}</div>
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-icon">⏱️</span>
+            <div>
+              <div class="detail-label">配送時間</div>
+              <div class="detail-value">{{ method.estimatedDays }} 工作天</div>
+            </div>
+          </div>
+
+          <div class="detail-item" *ngIf="method.freeShippingThreshold">
+            <span class="detail-icon">🎁</span>
+            <div>
+              <div class="detail-label">免運門檻</div>
+              <div class="detail-value">NT$ {{ method.freeShippingThreshold }}</div>
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-icon">📍</span>
+            <div>
+              <div class="detail-label">配送範圍</div>
+              <div class="detail-value">{{ method.coverageAreas.join(', ') }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <button class="btn-icon" (click)="openEditModal(method)" title="編輯">
+          ✏️ 編輯
+        </button>
+        <button class="btn-icon" (click)="toggleMethod(method)" title="切換狀態">
+          {{ method.isEnabled ? '🔴 停用' : '🟢 啟用' }}
+        </button>
+        <button class="btn-icon delete" (click)="deleteMethod(method.id)" title="刪除">
+          🗑️ 刪除
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 新增物流方式 Modal -->
+<div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>新增物流方式</h2>
+      <button class="btn-close" (click)="closeAddModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label>物流名稱 *</label>
+        <input type="text" [(ngModel)]="newMethod.name" placeholder="例如: 7-11 取貨">
+      </div>
+
+      <div class="form-group">
+        <label>物流商 *</label>
+        <input type="text" [(ngModel)]="newMethod.provider" placeholder="例如: 7-ELEVEN">
+      </div>
+
+      <div class="form-group">
+        <label>描述</label>
+        <textarea [(ngModel)]="newMethod.description" placeholder="簡單描述此物流方式" rows="3"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>基本運費 (NT$) *</label>
+          <input type="number" [(ngModel)]="newMethod.basePrice" min="0">
+        </div>
+
+        <div class="form-group">
+          <label>預估天數 *</label>
+          <input type="text" [(ngModel)]="newMethod.estimatedDays" placeholder="例如: 2-3">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>免運門檻 (NT$)</label>
+        <input type="number" [(ngModel)]="newMethod.freeShippingThreshold" min="0" placeholder="選填">
+      </div>
+
+      <div class="form-group">
+        <label>配送範圍</label>
+        <input type="text" [(ngModel)]="newMethod.coverageAreas" placeholder="以逗號分隔,例如: 台灣本島,離島">
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeAddModal()">取消</button>
+      <button class="btn-primary" (click)="saveNewMethod()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 編輯物流方式 Modal -->
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>編輯物流方式</h2>
+      <button class="btn-close" (click)="closeEditModal()">✕</button>
+    </div>
+
+    <div class="modal-body" *ngIf="currentMethod">
+      <div class="form-group">
+        <label>物流名稱 *</label>
+        <input type="text" [(ngModel)]="currentMethod.name">
+      </div>
+
+      <div class="form-group">
+        <label>物流商 *</label>
+        <input type="text" [(ngModel)]="currentMethod.provider">
+      </div>
+
+      <div class="form-group">
+        <label>描述</label>
+        <textarea [(ngModel)]="currentMethod.description" rows="3"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>基本運費 (NT$) *</label>
+          <input type="number" [(ngModel)]="currentMethod.basePrice" min="0">
+        </div>
+
+        <div class="form-group">
+          <label>預估天數 *</label>
+          <input type="text" [(ngModel)]="currentMethod.estimatedDays">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>免運門檻 (NT$)</label>
+        <input type="number" [(ngModel)]="currentMethod.freeShippingThreshold" min="0">
+      </div>
+
+      <div class="form-group">
+        <label>配送範圍</label>
+        <input type="text" [value]="currentMethod.coverageAreas.join(', ')" placeholder="以逗號分隔">
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeEditModal()">取消</button>
+      <button class="btn-primary" (click)="saveEditMethod()">儲存</button>
+    </div>
+  </div>
+</div>

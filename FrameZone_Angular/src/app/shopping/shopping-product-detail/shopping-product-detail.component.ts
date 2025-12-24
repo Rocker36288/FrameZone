@@ -3,6 +3,11 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ShoppinghomeComponent } from "../shoppinghome/shoppinghome.component";
+import { FooterComponent } from "../../shared/components/footer/footer.component";
+import { ToastNotificationComponent } from "../shared/components/toast-notification/toast-notification.component";
+import { FavoriteButtonComponent } from '../shared/components/favorite-button/favorite-button.component';
+import { ToastService } from '../shared/services/toast.service';
+import { CartService } from '../shared/services/cart.service';
 
 interface ProductDetail {
   id: number;
@@ -16,7 +21,7 @@ interface ProductDetail {
 @Component({
   selector: 'app-shopping-product-detail',
   standalone: true,
-  imports: [FormsModule, CommonModule, ShoppinghomeComponent, RouterLink],
+  imports: [FormsModule, CommonModule, ShoppinghomeComponent, RouterLink, FooterComponent, ToastNotificationComponent, FavoriteButtonComponent],
   templateUrl: './shopping-product-detail.component.html',
   styleUrl: './shopping-product-detail.component.css'
 })
@@ -32,7 +37,11 @@ export class ShoppingProductDetailComponent implements OnInit {
   thumbnailScrollContainer!: ElementRef;
 
   // 注入 ActivatedRoute 服務
-  constructor(private route: ActivatedRoute) { }
+  constructor(
+    private route: ActivatedRoute,
+    private toastService: ToastService,
+    private cartService: CartService
+  ) { }
 
   // 實作 ngOnInit 函式，用於在元件初始化時執行邏輯
   ngOnInit(): void {
@@ -69,7 +78,7 @@ export class ShoppingProductDetailComponent implements OnInit {
       this.product.name = foundProduct.name;
       this.product.price = foundProduct.price;
       this.currentImage = foundProduct.img;
-      this.isFavorite = foundProduct.isFavorite;
+      this.product.isFavorite = foundProduct.isFavorite;
 
       console.log(`成功載入商品 ID: ${targetId}，名稱: ${foundProduct.name}`);
     } else {
@@ -85,9 +94,11 @@ export class ShoppingProductDetailComponent implements OnInit {
 
   // --- 基礎商品資訊 ---
   product = {
-    name: '相機', price: 1580,
+    name: '相機',
+    price: 1580,
+    isFavorite: false
   };
-  quantity: number = 1;
+  quantity: number = 1;  // 確保 HTML 的數量輸入框綁定到這個變數
   selectedSpec: string = '精裝版';
   specs: string[] = ['精裝版', '電子書', '平裝版'];
 
@@ -151,57 +162,57 @@ export class ShoppingProductDetailComponent implements OnInit {
   }
 
   similarProducts = [
-    { id: 1, name: '相機', price: 1899, img: 'images/products/1.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 2, name: '相機', price: 899, img: 'images/products/6.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 3, name: '相機', price: 2899, img: 'images/products/4.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 4, name: '相機', price: 889, img: 'images/products/7.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 5, name: '相機', price: 7009, img: 'images/products/1.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 6, name: '相機', price: 4490, img: 'images/products/4.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 7, name: '相機', price: 899, img: 'images/products/4.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 8, name: '相機', price: 899, img: 'images/products/5.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 9, name: '相機', price: 9999, img: 'images/products/8.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 10, name: '相機', price: 869, img: 'images/products/6.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 11, name: '相機', price: 699, img: 'images/products/7.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 12, name: '相機', price: 8979, img: 'images/products/8.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 13, name: '相機', price: 1299, img: 'images/products/1.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 14, name: '相機', price: 2399, img: 'images/products/4.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 15, name: '相機', price: 3499, img: 'images/products/5.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 16, name: '相機', price: 5699, img: 'images/products/6.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 17, name: '相機', price: 7899, img: 'images/products/7.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 18, name: '相機', price: 4899, img: 'images/products/8.jpg', desc: '二手使用過', isFavorite: true },
-    { id: 101, name: '物件導向設計原則', price: 899, img: 'images/products/1.jpg', desc: '深入設計模式', isFavorite: true },
+    { id: 1, name: '相機', price: 1899, img: 'images/products/1.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 2, name: '相機', price: 899, img: 'images/products/6.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 3, name: '相機', price: 2899, img: 'images/products/4.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 4, name: '相機', price: 889, img: 'images/products/7.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 5, name: '相機', price: 7009, img: 'images/products/1.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 6, name: '相機', price: 4490, img: 'images/products/4.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 7, name: '相機', price: 899, img: 'images/products/4.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 8, name: '相機', price: 899, img: 'images/products/5.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 9, name: '相機', price: 9999, img: 'images/products/8.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 10, name: '相機', price: 869, img: 'images/products/6.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 11, name: '相機', price: 699, img: 'images/products/7.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 12, name: '相機', price: 8979, img: 'images/products/8.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 13, name: '相機', price: 1299, img: 'images/products/1.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 14, name: '相機', price: 2399, img: 'images/products/4.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 15, name: '相機', price: 3499, img: 'images/products/5.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 16, name: '相機', price: 5699, img: 'images/products/6.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 17, name: '相機', price: 7899, img: 'images/products/7.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 18, name: '相機', price: 4899, img: 'images/products/8.jpg', desc: '二手使用過', isFavorite: false },
+    { id: 101, name: '物件導向設計原則', price: 899, img: 'images/products/1.jpg', desc: '深入設計模式', isFavorite: false },
     { id: 102, name: '資料結構與演算法精解', price: 1250, img: 'images/products/1.jpg', desc: '提升程式效率', isFavorite: false },
     { id: 103, name: '前端框架實戰', price: 950, img: 'images/products/4.jpg', desc: 'React/Vue/Angular', isFavorite: false },
-    { id: 104, name: 'UX/UI 設計入門', price: 780, img: 'images/products/5.jpg', desc: '用戶體驗與介面', isFavorite: true },
+    { id: 104, name: 'UX/UI 設計入門', price: 780, img: 'images/products/5.jpg', desc: '用戶體驗與介面', isFavorite: false },
     { id: 105, name: '雲端運算架構', price: 1500, img: 'images/products/1.jpg', desc: 'AWS/Azure/GCP', isFavorite: false },
     { id: 106, name: 'Python 資料科學', price: 1100, img: 'images/products/6.jpg', desc: 'Pandas/Numpy', isFavorite: false },
     { id: 107, name: '產品經理實務', price: 850, img: 'images/products/1.jpg', desc: '從概念到上市', isFavorite: false },
-    { id: 108, name: '區塊鏈技術概論', price: 1350, img: 'images/products/2.jpg', desc: 'Web3 基礎', isFavorite: true },
+    { id: 108, name: '區塊鏈技術概論', price: 1350, img: 'images/products/2.jpg', desc: 'Web3 基礎', isFavorite: false },
     { id: 109, name: '現代 CSS 排版', price: 650, img: 'images/products/8.jpg', desc: 'Flexbox & Grid', isFavorite: false },
     { id: 110, name: '全棧開發指南', price: 1400, img: 'images/products/8.jpg', desc: '前後端整合', isFavorite: false },
-    { id: 111, name: '軟體測試藝術', price: 990, img: 'images/products/7.jpg', desc: '單元與整合測試', isFavorite: true },
+    { id: 111, name: '軟體測試藝術', price: 990, img: 'images/products/7.jpg', desc: '單元與整合測試', isFavorite: false },
     { id: 112, name: '敏捷開發方法', price: 720, img: 'images/products/6.jpg', desc: 'Scrum 實戰', isFavorite: false },
   ];
 
-  showToastMessage(message: string) {
-    this.toastMessage = message;
-    this.showToast = true;
-    setTimeout(() => {
-      this.showToast = false;
-    }, 2500);
-  }
+  // showToastMessage(message: string) {
+  //   this.toastMessage = message;
+  //   this.showToast = true;
+  //   setTimeout(() => {
+  //     this.showToast = false;
+  //   }, 2500);
+  // }
 
-  toggleFavorite() {
-    this.isFavorite = !this.isFavorite;
-    const message = this.isFavorite ? '已成功加入收藏！' : '已從收藏移除。';
-    this.showToastMessage(message);
-  }
+  // toggleFavorite() {
+  //   this.isFavorite = !this.isFavorite;
+  //   const message = this.isFavorite ? '已成功加入收藏！' : '已從收藏移除。';
+  //   this.showToastMessage(message);
+  // }
 
-  toggleSimilarFavorite(item: any) {
-    item.isFavorite = !item.isFavorite;
-    const message = item.isFavorite ? `${item.title} 已收藏！` : `${item.title} 已移除收藏。`;
-    this.showToastMessage(message);
-  }
+  // toggleSimilarFavorite(item: any) {
+  //   item.isFavorite = !item.isFavorite;
+  //   const message = item.isFavorite ? `${item.title} 已收藏！` : `${item.title} 已移除收藏。`;
+  //   this.showToastMessage(message);
+  // }
 
   toggleShippingModal(show: boolean) {
     this.showShippingModal = show;
@@ -212,17 +223,47 @@ export class ShoppingProductDetailComponent implements OnInit {
   }
 
   goToStore() {
-    this.showToastMessage('正在導向賣場頁面...');
+    this.toastService.show('正在導向賣場頁面...');
   }
 
-  addToCart() { this.showToastMessage('已將商品加入購物車'); }
-  selectImage(image: string) { this.currentImage = image; }
+  /**
+   * addToCart 方法
+   * 根據currentProductDetail 結構進行資料封裝
+   */
+  addToCart(): void {
+    // 安全檢查：確保商品資料已正確載入
+    if (!this.currentProductDetail) {
+      this.toastService.show('商品資訊載入中，請稍後再試');
+      return;
+    }
+
+    // 封裝成 CartService 需要的 CartItem 格式
+    const itemToAdd = {
+      id: this.currentProductDetail.id,
+      name: this.currentProductDetail.name,
+      price: this.currentProductDetail.price,
+      quantity: this.quantity,  // 取得畫面上選取的數量
+      imageUrl: this.currentProductDetail.img, // 將您的 img 欄位對應到購物車需要的 imageUrl
+      selected: true   // 加入時預設為勾選狀態
+    };
+
+    // 呼叫 Service 執行加入動作
+    this.cartService.addToCart(itemToAdd);
+
+    // 顯示提示訊息
+    this.toastService.show(`已將 ${this.quantity} 件 ${this.currentProductDetail.name} 加入購物車`);
+  }
+
+  selectImage(image: string) {
+    this.currentImage = image;
+  }
+
   claimCoupon(coupon: any) {
     if (!coupon.isClaimed) {
       coupon.isClaimed = true;
-      this.showToastMessage(`已領取 ${coupon.name}！`);
+      this.toastService.show(`已領取 ${coupon.name}！`);
     } else {
-      this.showToastMessage('此優惠券已領取。');
+      this.toastService.show('此優惠券已領取。');
     }
   }
 

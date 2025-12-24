@@ -1,9 +1,22 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  /* 防止水平捲軸出現 */
+}
+
 .app-footer {
   background: linear-gradient(135deg, #7999f1 0%, #764ba2 100%);
   ;
   color: #f0f2f5;
   font-size: 1rem;
-  /* padding-top: 0.5rem; */
+  width: 100vw;
+  /* 強制寬度等於視窗寬度 */
+  position: relative;
+  left: 50%;
+  margin-left: -50vw;
 }
 
 /* Footer 連結和文字樣式 */

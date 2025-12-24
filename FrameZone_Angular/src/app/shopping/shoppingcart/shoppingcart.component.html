@@ -1,7 +1,55 @@
-<div class="container py-4">
+<!-- 固定在頂端的導覽列 -->
+<div class="page-header">
+  <!-- 上層導覽列 -->
+  <div class="top-navbar">
+    <div class="top-nav-container d-flex justify-content-between align-items-center">
+      <!-- 左側連結 -->
+      <div class="d-flex top-nav-left">
+        <a routerLink="/shopping/home" class="logo-link me-4">
+          <img src="favicon5.png" alt="FrameZone Logo" class="brand-logo">
+        </a>
+      </div>
 
+      <!-- 右側連結 -->
+      <div class="d-flex top-nav-right">
+        <a routerLink="/home" class="member-profile-link">
+          <img [src]="memberAvatarUrl" alt="會員頭像" class="member-avatar">
+          <span class="member-name">{{ memberName }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="checkout-stepper mb-5">
+    <div class="step" [class.active]="currentStep >= 1">
+      <div class="step-icon">1</div>
+      <div class="step-label">購物車</div>
+    </div>
+    <div class="step-line" [class.active]="currentStep >= 2"></div>
+    <div class="step" [class.active]="currentStep >= 2">
+      <div class="step-icon">2</div>
+      <div class="step-label">填寫資料</div>
+    </div>
+    <div class="step-line" [class.active]="currentStep >= 3"></div>
+    <div class="step" [class.active]="currentStep >= 3">
+      <div class="step-icon">3</div>
+      <div class="step-label">完成訂單</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
   <div class="cart mb-4">
-    <h2> ←返回</h2>
+    <a routerLink="/shopping/home" class="text-decoration-none text-secondary mb-3 d-inline-block">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left"
+        viewBox="0 0 16 16">
+        <path fill-rule="evenodd"
+          d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+      </svg>
+      繼續購物
+    </a>
     <div class="card card-long">
       <div class="card-body">
         <p class="cart-title fw-bold text-center">購物車</p>
@@ -9,10 +57,8 @@
     </div>
   </div>
 
-  <div class="row">
-
+  <div class="row" *ngIf="cartService.items().length > 0; else emptyCart">
     <div class="col-lg-8">
-
       <div class="card mb-4 seller-group">
         <div class="card-header">
           <div class="col-auto ps-1 pt-1">
@@ -23,26 +69,27 @@
           </div>
           <h3 class="card-title">
             <div class="d-flex align-items-center pt-1 mt-auto">
-              <span class="avatar" style="background-image: url(/static/avatars/029m.jpg)"></span>
+              <span class="avatar" style="background-image: url(https://i.pravatar.cc/150?u=seller)"></span>
               <div class="ms-3">
-                <a href="#" class="text-body">賣家帳號</a>
+                <a href="#" class="text-body">官方賣場</a>
               </div>
             </div>
           </h3>
         </div>
         <div class="card-body">
-          <div *ngFor="let item of cartItems" class="card mb-3">
+          <div *ngFor="let item of cartService.items()" class="card mb-3">
             <div class="row row-0 flex-fill align-items-center">
               <div class="col-auto ps-3">
                 <label class="form-check m-0">
-                  <input class="form-check-input" type="checkbox" [(ngModel)]="item.selected"
-                    (change)="updateMasterCheckbox()">
+                  <input class="form-check-input" type="checkbox" [checked]="item.selected"
+                    (change)="cartService.toggleItemSelection(item.id)">
                 </label>
               </div>
 
               <div class="col-md-3">
                 <a href="#">
-                  <img src="images/products/4.jpg" class="w-100 h-100 object-cover" alt="Card side image" />
+                  <img [src]="item.imageUrl || 'images/products/4.jpg'" class="w-100 h-100 object-cover"
+                    alt="Product image" />
                 </a>
               </div>
               <div class="col">
@@ -51,25 +98,26 @@
                     <h2><a href="#">{{item.name}}</a></h2>
                   </h3>
                   <div class="text-secondary">
-                    <h3>{{item.price}}</h3>
+                    <h3>${{item.price}}</h3>
                   </div>
                   <div class="mt-2 d-flex align-items-center">
                     <div class="input-group input-group-sm" style="width: 120px;">
                       <button class="btn btn-outline-secondary" type="button"
-                        (click)="item.quantity = item.quantity > 1 ? item.quantity - 1 : 1">
+                        (click)="cartService.updateItemQuantity(item.id, item.quantity - 1)">
                         -
                       </button>
-                      <input type="text" class="form-control text-center" [(ngModel)]="item.quantity" min="1">
+                      <input type="text" class="form-control text-center" [value]="item.quantity" readonly>
                       <button class="btn btn-outline-secondary" type="button"
-                        (click)="item.quantity = item.quantity + 1">
+                        (click)="cartService.updateItemQuantity(item.id, item.quantity + 1)">
                         +
                       </button>
                     </div>
-                    <small class="text-secondary ms-3">庫存 1 件</small>
+                    <small class="text-secondary ms-3">庫存充足</small>
                     <div class="ms-auto">
-                      <a href="#" class="icon d-none d-md-inline-block ms-3 text-red">
+                      <a href="javascript:void(0)" class="icon d-none d-md-inline-block ms-3 text-red"
+                        (click)="cartService.removeFromCart(item.id)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                          stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                          stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                           class="icon icon-tabler icons-tabler-outline icon-tabler-trash">
                           <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                           <path d="M4 7l16 0" />
@@ -90,24 +138,24 @@
     </div>
 
     <div class="col-lg-4 sticky-top pt-4">
-
       <div class="subtotal">
         <div class="card">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-2">
               <h2 class="m-0">數量:</h2>
-              <h2 class="m-0 text-end">x {{ getTotalQuantity() }}</h2>
+              <h2 class="m-0 text-end">x {{ cartService.selectedTotalQuantity() }}</h2>
             </div>
             <br>
             <div class="d-flex justify-content-between align-items-center mb-2">
               <h2 class="m-0">總金額:</h2>
-              <h2 class="m-0 text-end">${{ getTotalAmount() }}</h2>
+              <h2 class="m-0 text-end">${{ cartService.totalAmount() }}</h2>
             </div>
             <br>
             <div class="d-flex justify-content-between align-items-center mb-4">
               <h2 class="m-0">優惠券:</h2>
-              <a href="#" class="text-danger text-decoration-none d-flex align-items-center" data-bs-toggle="modal"
-                (click)="saveCouponState()" data-bs-target="#couponModal" style="cursor: pointer;font-size: 1rem;">
+              <a href="javascript:void(0)" class="text-danger text-decoration-none d-flex align-items-center"
+                data-bs-toggle="modal" (click)="saveCouponState()" data-bs-target="#couponModal"
+                style="cursor: pointer;font-size: 1rem;">
                 {{ getDiscountDisplay() }}
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                   class="bi bi-chevron-right ms-1" viewBox="0 0 16 16">
@@ -121,16 +169,15 @@
               <h2 class="m-0">小計:</h2>
               <h2 class="m-0 text-end">${{ getFinalTotal() }}</h2>
             </div>
-            <a class="btn btn-animate-icon w-100" style="background-color: rgb(139, 168, 231);"
-              [routerLink]="['/checkout']">
+            <button class="btn btn-animate-icon w-100" style="background-color: rgb(139, 168, 231);"
+              [routerLink]="['/checkout']" [disabled]="cartService.selectedTotalQuantity() === 0">
               下一步
-              <!-- Download SVG icon from http://tabler.io/icons/icon/chevron-right -->
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 class="icon icon-end icon-2">
                 <path d="M9 6l6 6l-6 6" />
               </svg>
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -158,12 +205,24 @@
         <h4>可選折扣券</h4>
         <hr>
 
-        <!-- 如果沒有優惠券,顯示提示 -->
         <div *ngIf="availableCoupons.length === 0" class="alert alert-info text-center">
           目前沒有可用的優惠券。
         </div>
 
-        <!-- 優惠券列表 -->
+        <!-- 不使用折扣券 -->
+        <div class="card mb-3 p-3 border" [class.border-primary]="!anyCouponSelected()">
+          <div class="d-flex align-items-center">
+            <div class="form-check me-3">
+              <input class="form-check-input" type="radio" name="selectedCouponRadio" [checked]="!anyCouponSelected()"
+                (change)="clearCouponSelection()">
+            </div>
+            <div>
+              <h5 class="m-0">不使用折扣券</h5>
+              <small class="text-muted">以商品原價結帳</small>
+            </div>
+          </div>
+        </div>
+
         <div *ngFor="let coupon of availableCoupons" class="card mb-3 p-3">
           <div class="d-flex align-items-center">
             <div class="form-check me-3">
@@ -171,7 +230,11 @@
                 [checked]="coupon.isSelected" (change)="selectCoupon(coupon)">
             </div>
             <div>
-              <h5 class="m-0 text-danger">{{ coupon.name }}</h5>
+              <h5 class="m-0 text-danger d-flex align-items-center">{{ coupon.name }}
+                <span class="badge bg-light text-dark ms-2">
+                  {{ coupon.code }}
+                </span>
+              </h5>
               <p class="text-secondary m-0">折扣金額: -${{ coupon.discount }}</p>
               <small>使用期限: {{ coupon.expiryDate | date }}</small>
             </div>
@@ -179,14 +242,33 @@
         </div>
       </div>
 
-      <!-- modal-footer 必須在 modal-content 裡面,與 modal-body 同層 -->
       <div class="modal-footer">
         <button type="button" class="btn btn-light" data-bs-dismiss="modal" (click)="restoreCouponState()">取消</button>
         <button type="button" class="btn text-white" style="background-color: #5988ee;" (click)="calculateFinalTotal()"
-          data-bs-dismiss="modal" [disabled]="getAppliedDiscount() === 0">
+          data-bs-dismiss="modal" [disabled]="false">
           確認使用
         </button>
       </div>
     </div>
   </div>
 </div>
+
+<ng-template #emptyCart>
+  <div class="card shadow-sm border-0 mt-3">
+    <div class="card-body text-center py-5">
+      <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="#e9ecef" class="bi bi-cart-x mb-4"
+        viewBox="0 0 16 16">
+        <path
+          d="M7.354 5.646a.5.5 0 1 0-.708.708L7.793 7.5 6.646 8.646a.5.5 0 1 0 .708.708L8.5 8.207l1.146 1.147a.5.5 0 0 0 .708-.708L9.207 7.5l1.147-1.146a.5.5 0 0 0-.708-.708L8.5 6.793z" />
+        <path
+          d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17z" />
+      </svg>
+      <h2 class="text-secondary fw-bold">您的購物車目前是空的</h2>
+      <p class="text-muted mb-4">似乎還沒挑選到喜歡的商品嗎？</p>
+      <button class="btn btn-primary px-5 py-2 fw-bold" routerLink="/shopping/home"
+        style="background-color: #5988ee; border: none; border-radius: 8px;">
+        回賣場逛逛
+      </button>
+    </div>
+  </div>
+</ng-template>

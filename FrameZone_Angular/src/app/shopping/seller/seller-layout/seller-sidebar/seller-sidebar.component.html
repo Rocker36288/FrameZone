@@ -1,0 +1,42 @@
+<!-- src/app/shopping/seller/seller-layout/seller-sidebar/seller-sidebar.component.html -->
+
+<aside class="seller-sidebar">
+  <div class="sidebar-header">
+    <h3>管理選單</h3>
+  </div>
+
+  <nav class="sidebar-menu">
+    <ng-container *ngFor="let item of menuItems">
+      <!-- 有子選單的項目 -->
+      <div *ngIf="item.children" class="menu-group">
+        <div class="menu-item parent" (click)="toggleSubmenu(item)" [class.expanded]="item.expanded">
+          <i [class]="'ti ti-' + item.icon"></i>
+          <span>{{ item.label }}</span>
+          <i class="ti ti-chevron-down arrow"></i>
+        </div>
+
+        <div class="submenu" [class.show]="item.expanded">
+          <a *ngFor="let child of item.children" [routerLink]="child.route" routerLinkActive="active"
+            class="menu-item child">
+            <i [class]="'ti ti-' + child.icon"></i>
+            <span>{{ child.label }}</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 沒有子選單的項目 -->
+      <a *ngIf="!item.children" [routerLink]="item.route" routerLinkActive="active" class="menu-item">
+        <i [class]="'ti ti-' + item.icon"></i>
+        <span>{{ item.label }}</span>
+        <span *ngIf="item.badge" class="badge">{{ item.badge }}</span>
+      </a>
+    </ng-container>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button routerLink="/shopping/home" class="btn-back-to-shop">
+      <i class="ti ti-arrow-left"></i>
+      <span>回到購物首頁</span>
+    </button>
+  </div>
+</aside>

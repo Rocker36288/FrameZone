@@ -1,0 +1,126 @@
+<!-- src/app/shopping/seller/review-management/review-management.component.html -->
+
+<div class="review-management">
+  <!-- 頁面標題 -->
+  <div class="page-header">
+    <h1>評價管理</h1>
+  </div>
+
+  <!-- 統計卡片 -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon total">
+        <i class="ti ti-star"></i>
+      </div>
+      <div class="stat-info">
+        <div class="stat-label">總評價數</div>
+        <div class="stat-value">{{ stats.total }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card" (click)="onFilterChange('pending')" [class.active]="currentFilter === 'pending'">
+      <div class="stat-icon pending">
+        <i class="ti ti-clock"></i>
+      </div>
+      <div class="stat-info">
+        <div class="stat-label">待回覆</div>
+        <div class="stat-value">{{ stats.pending }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card" (click)="onFilterChange('replied')" [class.active]="currentFilter === 'replied'">
+      <div class="stat-icon replied">
+        <i class="ti ti-message-check"></i>
+      </div>
+      <div class="stat-info">
+        <div class="stat-label">已回覆</div>
+        <div class="stat-value">{{ stats.replied }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon rating">
+        <i class="ti ti-star-filled"></i>
+      </div>
+      <div class="stat-info">
+        <div class="stat-label">平均評分</div>
+        <div class="stat-value">{{ stats.averageRating.toFixed(1) }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 搜尋工具列 -->
+  <div class="toolbar">
+    <div class="search-box">
+      <i class="ti ti-search"></i>
+      <input type="text" placeholder="搜尋商品名稱、客戶姓名、評價內容..." [(ngModel)]="searchQuery" (input)="onSearchChange()">
+    </div>
+
+    <div class="filter-buttons">
+      <button class="filter-btn" [class.active]="currentFilter === 'all'" (click)="onFilterChange('all')">
+        全部
+      </button>
+      <button class="filter-btn" [class.active]="currentFilter === 'pending'" (click)="onFilterChange('pending')">
+        待回覆
+      </button>
+      <button class="filter-btn" [class.active]="currentFilter === 'replied'" (click)="onFilterChange('replied')">
+        已回覆
+      </button>
+    </div>
+  </div>
+
+  <!-- 評價列表 -->
+  <div class="reviews-list">
+    <div *ngFor="let review of filteredReviews" class="review-card">
+      <!-- 評價頭部 -->
+      <div class="review-header">
+        <div class="product-info">
+          <img [src]="review.productImage" [alt]="review.productName" class="product-image">
+          <div class="product-details">
+            <div class="product-name">{{ review.productName }}</div>
+            <div class="review-date">{{ review.reviewDate | date:'yyyy/MM/dd HH:mm' }}</div>
+          </div>
+        </div>
+        <div class="customer-rating">
+          <div class="customer-name">{{ review.customerName }}</div>
+          <div class="stars">
+            <i *ngFor="let star of getStars(review.rating)" [class]="'ti ti-' + star"
+              [class.filled]="star === 'star-filled'">
+            </i>
+          </div>
+        </div>
+      </div>
+
+      <!-- 評價內容 -->
+      <div class="review-content">
+        <p class="review-comment">{{ review.comment }}</p>
+      </div>
+
+      <!-- 賣家回覆區 -->
+      <div class="reply-section">
+        <div *ngIf="review.replied" class="seller-reply">
+          <div class="reply-header">
+            <i class="ti ti-user-circle"></i>
+            <span>賣家回覆</span>
+          </div>
+          <p class="reply-text">{{ review.reply }}</p>
+        </div>
+
+        <div *ngIf="!review.replied" class="reply-form">
+          <textarea [(ngModel)]="replyText[review.id]" placeholder="輸入您的回覆..." rows="3"
+            class="reply-textarea"></textarea>
+          <button class="btn-submit-reply" (click)="submitReply(review)">
+            <i class="ti ti-send"></i>
+            送出回覆
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 空狀態 -->
+  <div *ngIf="filteredReviews.length === 0" class="empty-state">
+    <i class="ti ti-message-off"></i>
+    <p>沒有找到相關評價</p>
+  </div>
+</div>

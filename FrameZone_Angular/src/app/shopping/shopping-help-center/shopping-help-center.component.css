@@ -1,0 +1,204 @@
+.card-stacked {
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-5px);
+    border-color: #6a11cb;
+  }
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: rgba(106, 17, 203, 0.05);
+  color: #6a11cb;
+}
+
+.form-control-rounded {
+  border-radius: 50px;
+  padding-left: 1.5rem;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.page-header {
+  margin: auto;
+  background: linear-gradient(135deg, #79a3f1 0%, #764ba2 100%);
+  /* padding: 0 20px 30px; */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.top-nav-left {
+  margin-left: 20px;
+}
+
+.top-nav-right {
+  margin-right: 20px;
+}
+
+/* 會員頭像及名稱的整體連結容器 */
+.member-profile-link {
+  /* 調整間距，確保與右側的通知連結不重疊 */
+  margin-left: 15px;
+  text-decoration: none;
+}
+
+/* 會員頭像樣式：實現圓形、大小和間距 */
+.member-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 8px;
+  /* 確保圖片內容填滿 */
+  object-fit: cover;
+}
+
+/* 帳號名稱樣式：使用與導覽列小字相似的樣式 */
+.member-name {
+  color: white;
+  font-size: 1rem;
+  margin-right: 10px;
+  text-decoration: none;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+
+}
+
+/* 確保頭像連結 hover 時保持樣式一致 */
+.member-profile-link:hover .member-name {
+  color: #131b33;
+}
+
+.logo-link-simple {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.brand-logo {
+  width: 60px;
+  height: 60px;
+}
+
+.container {
+  padding-top: 70px;
+  padding-bottom: 70px;
+}
+
+/* --- 搜尋列 --- */
+.custom-search-group {
+  border-radius: 50px !important;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+  transition: all 0.2s ease-in-out;
+  /* 增加變色平滑度 */
+  background: white;
+  /* 確保背景一致 */
+}
+
+/* 當內部的 input 被 focus 時，改變整個外框的顏色 */
+.custom-search-group:focus-within {
+  border-color: #6a11cb;
+  /* 統一變成你想要的紫色 */
+  box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.15);
+  /* 增加一點淡紫色外發光 */
+}
+
+/* 移除輸入框原生的 focus 藍色邊框與陰影，避免衝突 */
+.custom-search-group .form-control {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* 確保左側圖示區塊的邊框也消失，達成一體化 */
+.custom-search-group .input-group-text {
+  border: none !important;
+}
+
+.custom-search-btn {
+  background: linear-gradient(135deg, #6a68ee 0%, #714fee 100%) !important;
+  border: none !important;
+  padding: 0 2rem !important;
+  font-weight: 500;
+  margin: 0;
+  /* 移除間距確保貼合 */
+}
+
+/* --- 方塊樣式 (Help Box) --- */
+.help-box {
+  background: white;
+  border-radius: 20px;
+  padding: 40px 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 1px solid #f0f0f0;
+  height: 100%;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.help-box:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 35px rgba(106, 17, 203, 0.1);
+  border-color: #6a11cb;
+}
+
+/* 圖示容器：在這裡調整圖示大小 */
+.icon-wrapper {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.icon-wrapper i {
+  font-size: 3rem;
+  /* 直接在這裡把圖示調大 */
+}
+
+/* 四種分類的背景色與圖示色 */
+.color-1 {
+  background: rgba(106, 17, 203, 0.1);
+  color: #6a11cb;
+}
+
+.color-2 {
+  background: rgba(37, 117, 252, 0.1);
+  color: #2575fc;
+}
+
+.color-3 {
+  background: rgba(0, 210, 255, 0.1);
+  color: #00d2ff;
+}
+
+.color-4 {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+}
+
+.help-box-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.help-box-text {
+  font-size: 0.9rem;
+  color: #777;
+  margin: 0;
+}
+
+.fw-bold {
+  font-size: 40px;
+
+}

@@ -1,0 +1,69 @@
+<div class="page-header">
+  <div class="top-navbar">
+    <div class="top-nav-container d-flex justify-content-between align-items-center">
+      <div class="d-flex top-nav-left">
+        <a routerLink="/shopping/home" class="logo-link me-4">
+          <img src="favicon5.png" alt="FrameZone Logo" class="brand-logo">
+        </a>
+      </div>
+      <div class="d-flex top-nav-right">
+        <a routerLink="/home" class="member-profile-link">
+          <img [src]="memberAvatarUrl" alt="會員頭像" class="member-avatar">
+          <span class="member-name">{{ memberName }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="checkout-stepper mb-5">
+    <div class="step" [class.active]="currentStep >= 1">
+      <div class="step-icon">1</div>
+      <div class="step-label">購物車</div>
+    </div>
+    <div class="step-line" [class.active]="currentStep >= 2"></div>
+    <div class="step" [class.active]="currentStep >= 2">
+      <div class="step-icon">2</div>
+      <div class="step-label">填寫資料</div>
+    </div>
+    <div class="step-line" [class.active]="currentStep >= 3"></div>
+    <div class="step" [class.active]="currentStep >= 3">
+      <div class="step-icon">3</div>
+      <div class="step-label">完成訂單</div>
+    </div>
+  </div>
+</div>
+
+<div class="order-success-page">
+
+  <div class="success-card">
+
+    <!-- 打勾圖示 -->
+    <div class="icon-wrapper">
+      <i class="bi bi-check-circle-fill"></i>
+    </div>
+
+    <!-- 成功文字 -->
+    <h1 class="title">訂單已完成</h1>
+    <p class="subtitle">
+      感謝您的購買，我們已成功收到您的訂單。
+    </p>
+
+    <p class="hint">
+      您可以前往訂單列表查看訂單狀態，或返回購物首頁繼續逛逛。
+    </p>
+
+    <!-- 操作按鈕 -->
+    <div class="action-buttons">
+      <button class="btn btn-primary" type="button" (click)="goToOrders()">
+        前往訂單列表
+      </button>
+
+      <button class="btn btn-outline-secondary" type="button" (click)="goToHome()">
+        返回購物首頁
+      </button>
+    </div>
+
+  </div>
+</div>

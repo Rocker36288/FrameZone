@@ -1,7 +1,50 @@
-<div class="container py-4">
+<div class="page-header">
+  <div class="top-navbar">
+    <div class="top-nav-container d-flex justify-content-between align-items-center">
+      <div class="d-flex top-nav-left">
+        <a routerLink="/shopping/home" class="logo-link me-4">
+          <img src="favicon5.png" alt="FrameZone Logo" class="brand-logo">
+        </a>
+      </div>
+      <div class="d-flex top-nav-right">
+        <a routerLink="/home" class="member-profile-link">
+          <img [src]="memberAvatarUrl" alt="會員頭像" class="member-avatar">
+          <span class="member-name">{{ memberName }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 
-  <div class="checkout mb-4">
-    <h2> ←返回購物車</h2>
+<div class="container py-4">
+  <div class="checkout-stepper mb-5">
+    <div class="step" [class.active]="currentStep >= 1">
+      <div class="step-icon">1</div>
+      <div class="step-label">購物車</div>
+    </div>
+    <div class="step-line" [class.active]="currentStep >= 2"></div>
+    <div class="step" [class.active]="currentStep >= 2">
+      <div class="step-icon">2</div>
+      <div class="step-label">填寫資料</div>
+    </div>
+    <div class="step-line" [class.active]="currentStep >= 3"></div>
+    <div class="step" [class.active]="currentStep >= 3">
+      <div class="step-icon">3</div>
+      <div class="step-label">完成訂單</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="cart mb-4">
+    <a routerLink="/shoppingcart" class="text-decoration-none text-secondary mb-3 d-inline-block">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left"
+        viewBox="0 0 16 16">
+        <path fill-rule="evenodd"
+          d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z" />
+      </svg>
+      返回購物車
+    </a>
     <div class="card card-long">
       <div class="card-body">
         <p class="checkout-title fw-bold text-center">結帳</p>
@@ -9,37 +52,84 @@
     </div>
   </div>
 
-  <div class="row">
-
-    <div class="col-lg-8">
-
-      <div class="card mb-4 seller-group">
-        <div class="card-header">
-          <h3 class="card-title">
-            <div class="d-flex align-items-center pt-1 mt-auto">
-              <span class="avatar" style="background-image: url(/static/avatars/029m.jpg)"></span>
-              <div class="ms-3">
-                <a href="#" class="text-body">賣家帳號</a>
+  <form [formGroup]="checkoutForm">
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="card mb-4 seller-group">
+          <div class="card-header">
+            <h3 class="card-title">
+              <div class="d-flex align-items-center pt-1 mt-auto">
+                <span class="avatar" style="background-image: url(/static/avatars/029m.jpg)"></span>
+                <div class="ms-3">
+                  <a href="#" class="text-body">賣家帳號</a>
+                </div>
+              </div>
+            </h3>
+          </div>
+          <div class="card-body">
+            <div *ngFor="let item of selectedItems()" class="card mb-2 border-0 border-bottom pb-2">
+              <div class="row align-items-center">
+                <div class="col-3 col-md-2">
+                  <img [src]="item.imageUrl || 'images/products/1.jpg'" class="img-fluid rounded" />
+                </div>
+                <div class="col-9 col-md-10">
+                  <div class="fw-bold">{{item.name}}</div>
+                  <div class="text-secondary">${{item.price}} x {{item.quantity}}</div>
+                </div>
               </div>
             </div>
-          </h3>
+          </div>
         </div>
-        <div class="card-body">
-          <div *ngFor="let item of cartItems" class="card mb-3">
-            <div class="row row-0 flex-fill align-items-center">
-              <div class="col-md-3">
-                <a href="#">
-                  <img src="images/products/1.jpg" class="w-100 h-100 object-cover" alt="Card side image" />
-                </a>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3 class="card-title">付款方式</h3>
+          </div>
+          <div class="card-body">
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" value="credit" formControlName="paymentMethod" id="p1">
+              <label class="form-check-label" for="p1">信用卡</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3 class="card-title">運送方式</h3>
+          </div>
+          <div class="card-body p-0">
+            <div class="p-3 border-bottom">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" value="post" formControlName="shippingMethod" id="s1"
+                  (change)="checkoutForm.get('selectedAddressId')?.reset()">
+                <label class="form-check-label fw-bold" for="s1">郵寄 ($65)</label>
               </div>
-              <div class="col">
-                <div class="card-body h-full d-flex flex-column">
-                  <h3 class="card-title">
-                    <h2><a href="#">{{item.name}}</a></h2>
-                  </h3>
-                  <div class="text-secondary">
-                    <h3>{{item.price}}</h3>
-                  </div>
+              <div class="mt-3 ms-4 px-3 border-start" *ngIf="checkoutForm.get('shippingMethod')?.value === 'post'">
+                <p class="text-muted small mb-2">請選擇收件地址：</p>
+                <div *ngFor="let addr of savedAddresses" class="form-check mb-2">
+                  <input class="form-check-input" type="radio" [value]="addr.id" formControlName="selectedAddressId"
+                    [id]="'post'+addr.id">
+                  <label class="form-check-label small" [for]="'post'+addr.id">
+                    {{addr.name}} | {{addr.address}}
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-3">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" value="711" formControlName="shippingMethod" id="s2"
+                  (change)="checkoutForm.get('selectedAddressId')?.reset()">
+                <label class="form-check-label fw-bold" for="s2">7-11 取貨 ($60)</label>
+              </div>
+              <div class="mt-3 ms-4 px-3 border-start" *ngIf="checkoutForm.get('shippingMethod')?.value === '711'">
+                <p class="text-muted small mb-2">請選擇取貨門市：</p>
+                <div *ngFor="let addr of savedAddresses" class="form-check mb-2">
+                  <input class="form-check-input" type="radio" [value]="addr.id" formControlName="selectedAddressId"
+                    [id]="'s2'+addr.id">
+                  <label class="form-check-label small" [for]="'s2'+addr.id">
+                    {{addr.name}}門市 | {{addr.address}}
+                  </label>
                 </div>
               </div>
             </div>
@@ -47,84 +137,44 @@
         </div>
       </div>
 
-      <div class="card mb-4">
-        <div class="card-header">
-          <h3 class="card-title">付款方式</h3>
-        </div>
-        <div class="card-body">
-          <p class="text-secondary">信用卡</p>
-          <p class="text-secondary">郵局/銀行轉帳</p>
-          <p class="text-secondary">貨到付款</p>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">運送方式</h3>
-        </div>
-        <div class="card-body">
-          <p class="text-secondary">郵寄</p>
-          <p class="text-secondary">7-11取貨</p>
-          <p class="text-secondary">7-11取貨付款</p>
-          <p class="text-secondary">全家取貨</p>
-          <p class="text-secondary">全家取貨付款</p>
-        </div>
-      </div>
-
-    </div>
-
-
-    <div class="col-lg-4 sticky-top pt-4">
-
-      <div class="subtotal">
-        <div class="card">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <h2 class="m-0">優惠券:</h2>
-              <a href="#" class="text-danger text-decoration-none d-flex align-items-center" data-bs-toggle="modal"
-                (click)="saveCouponState()" data-bs-target="#couponModal" style="cursor: pointer;font-size: 1rem;">
-                {{ getDiscountDisplay() }}
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                  class="bi bi-chevron-right ms-1" viewBox="0 0 16 16">
-                  <path fill-rule="evenodd"
-                    d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708" />
-                </svg>
-              </a>
+      <div class="col-lg-4 sticky-top pt-4">
+        <div class="subtotal">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h2 class="m-0">優惠券:</h2>
+                <div class="text-danger fw-bold d-flex align-items-center">
+                  {{ cartService.selectedCoupon()?.code }}
+                  {{ getDiscountDisplay() }}
+                </div>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-2 mt-4">
+                <h2 class="m-0">小計:</h2>
+                <h2 class="m-0 text-end">${{ getTotalAmount() }}</h2>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-2 mt-4">
+                <h2 class="m-0">運費:</h2>
+                <h2 class="m-0 text-end">${{ getShippingFee() }}</h2>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="m-0">應付總金額:</h2>
+                <h2 class="m-0 text-end text-primary fw-bold">${{ getFinalTotal() }}</h2>
+              </div>
+              <button type="button" (click)="onConfirmCheckout()" [disabled]="checkoutForm.invalid"
+                class="btn btn-animate-icon w-100 checkout-button text-white"
+                [style.background-color]="checkoutForm.invalid ? '#cccccc' : '#764ba2'"
+                [style.cursor]="checkoutForm.invalid ? 'not-allowed' : 'pointer'">
+                {{ checkoutForm.invalid ? '請完整填寫資料' : '確認結帳 ' }}
+                >
+              </button>
             </div>
-            <br>
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <h2 class="m-0">小計:</h2>
-              <h2 class="m-0 text-end">${{ getTotalAmount() }}</h2>
-            </div>
-            <br>
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <h2 class="m-0">運費:</h2>
-              <h2 class="m-0 text-end">${{ getTotalAmount() }}</h2>
-            </div>
-            <hr>
-            <div class="d-flex justify-content-between align-items-center mb-4">
-              <h2 class="m-0">應付總金額:</h2>
-              <h2 class="m-0 text-end">${{ getFinalTotal() }}</h2>
-            </div>
-            <a class="btn btn-animate-icon w-100 checkout-button" style="background-color: rgb(139, 168, 231);">
-
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="icon icon-tabler icons-tabler-outline icon-tabler-basket-check">
-
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M17 10l-2 -6" />
-                <path d="M7 10l2 -6" />
-                <path
-                  d="M11 20h-3.756a3 3 0 0 1 -2.965 -2.544l-1.255 -7.152a2 2 0 0 1 1.977 -2.304h13.999a2 2 0 0 1 1.977 2.304l-.479 2.729" />
-                <path d="M10 14a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-                <path d="M15 19l2 2l4 -4" />
-              </svg>
-              結帳
-            </a>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </form>
+</div>
+
+<div class="modal fade" id="couponModal" tabindex="-1" #couponModalElement>
 </div>

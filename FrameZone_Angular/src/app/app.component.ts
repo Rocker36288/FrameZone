@@ -6,10 +6,11 @@ import { ShoppingCheckoutComponent } from "./shopping/shopping-checkout/shopping
 import { ShoppinghomeComponent } from "./shopping/shoppinghome/shoppinghome.component";
 import { ShoppingProductDetailComponent } from "./shopping/shopping-product-detail/shopping-product-detail.component";
 import { ShoppingSellershopComponent } from "./shopping/shopping-sellershop/shopping-sellershop.component";
+import { ShoppingBuyerCenterComponent } from "./shopping/shopping-buyer-center/shopping-buyer-center.component";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ShoppingcartComponent, ShoppingHeaderComponent, ShoppingCheckoutComponent, ShoppinghomeComponent, ShoppingProductDetailComponent, ShoppingSellershopComponent],
+  imports: [RouterOutlet, ShoppingcartComponent, ShoppingHeaderComponent, ShoppingCheckoutComponent, ShoppinghomeComponent, ShoppingProductDetailComponent, ShoppingSellershopComponent, ShoppingBuyerCenterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

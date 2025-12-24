@@ -1,0 +1,44 @@
+.favorite-icon {
+  color: #6c757d;
+  transition: all 0.3s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border-radius: 50%;
+}
+
+.favorite-icon:hover {
+  color: #dc3545;
+  transform: scale(1.2);
+}
+
+.favorite-icon.favorited {
+  color: #dc3545 !important;
+  animation: heartBeat 0.3s ease-in-out;
+}
+
+.favorite-icon.favorited svg {
+  fill: #dc3545 !important;
+}
+
+@keyframes heartBeat {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  25% {
+    transform: scale(1.3);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  75% {
+    transform: scale(1.2);
+  }
+}

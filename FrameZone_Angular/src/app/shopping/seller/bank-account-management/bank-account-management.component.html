@@ -1,0 +1,86 @@
+<!-- bank-account.component.html -->
+<div class="bank-account">
+  <div class="page-header">
+    <div>
+      <h1>銀行帳號管理</h1>
+      <p class="page-subtitle">管理您的提領帳號資訊</p>
+    </div>
+    <button class="btn-add" (click)="addAccount()" *ngIf="!showAddForm">
+      <i class="ti ti-plus"></i>
+      新增帳號
+    </button>
+  </div>
+
+  <!-- 新增表單 -->
+  <div class="add-form-card" *ngIf="showAddForm">
+    <h3>新增銀行帳號</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>銀行名稱 *</label>
+        <input type="text" [(ngModel)]="newAccount.bankName" placeholder="例：國泰世華銀行">
+      </div>
+      <div class="form-group">
+        <label>銀行代碼</label>
+        <input type="text" [(ngModel)]="newAccount.bankCode" placeholder="例：013">
+      </div>
+      <div class="form-group">
+        <label>帳號 *</label>
+        <input type="text" [(ngModel)]="newAccount.accountNumber" placeholder="請輸入完整帳號">
+      </div>
+      <div class="form-group">
+        <label>戶名 *</label>
+        <input type="text" [(ngModel)]="newAccount.accountName" placeholder="必須與身分證相符">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" (click)="cancelAdd()">取消</button>
+      <button class="btn-save" (click)="saveAccount()">儲存</button>
+    </div>
+  </div>
+
+  <!-- 帳號列表 -->
+  <div class="accounts-list">
+    <div *ngFor="let account of accounts" class="account-card">
+      <div class="account-header">
+        <div class="bank-icon">
+          <i class="ti ti-building-bank"></i>
+        </div>
+        <div class="bank-info">
+          <div class="bank-name">{{ account.bankName }}</div>
+          <div class="account-number">{{ maskAccountNumber(account.accountNumber) }}</div>
+        </div>
+        <div class="account-badges">
+          <span class="badge default" *ngIf="account.isDefault">預設</span>
+          <span class="badge verified" *ngIf="account.verified">已驗證</span>
+          <span class="badge pending" *ngIf="!account.verified">待驗證</span>
+        </div>
+      </div>
+
+      <div class="account-body">
+        <div class="info-row">
+          <span class="label">戶名：</span>
+          <span class="value">{{ account.accountName }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">銀行代碼：</span>
+          <span class="value">{{ account.bankCode }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">新增日期：</span>
+          <span class="value">{{ account.createdAt | date:'yyyy/MM/dd' }}</span>
+        </div>
+      </div>
+
+      <div class="account-actions">
+        <button class="btn-action" (click)="setDefault(account)" *ngIf="!account.isDefault && account.verified">
+          <i class="ti ti-star"></i>
+          設為預設
+        </button>
+        <button class="btn-action delete" (click)="deleteAccount(account)">
+          <i class="ti ti-trash"></i>
+          刪除
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

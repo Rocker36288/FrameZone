@@ -1,0 +1,138 @@
+<div class="page-wrapper">
+  <div class="page-body">
+    <div class="container-fluid">
+      <!-- 頁面標題 -->
+      <div class="page-header mb-3">
+        <h1 class="page-title">聊天室</h1>
+      </div>
+
+      <!-- 聊天主體 -->
+      <div class="chat-container">
+        <!-- 左側：聊天列表 -->
+        <div class="chat-list-panel">
+          <!-- 搜尋框 -->
+          <div class="search-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input type="text" class="search-input" placeholder="搜尋聊天..." [(ngModel)]="searchText" />
+          </div>
+
+          <!-- 聊天列表 -->
+          <div class="chat-list">
+            <div class="chat-item" *ngFor="let chat of filteredChats" [class.active]="selectedChat?.id === chat.id"
+              (click)="selectChat(chat)">
+              <div class="chat-avatar-wrapper">
+                <span class="avatar" [style.background-image]="'url(' + chat.user.avatar + ')'"></span>
+                <span class="online-status" *ngIf="chat.isOnline"></span>
+              </div>
+
+              <div class="chat-info">
+                <div class="chat-header-row">
+                  <div class="chat-user-name">{{ chat.user.name }}</div>
+                  <div class="chat-time">{{ chat.lastMessageTime }}</div>
+                </div>
+                <div class="chat-product-name">商品：{{ chat.product.name }}</div>
+                <div class="chat-last-message">{{ chat.lastMessage }}</div>
+              </div>
+
+              <div class="chat-badge" *ngIf="chat.unreadCount > 0">
+                {{ chat.unreadCount }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右側：對話區 -->
+        <div class="chat-content-panel">
+          <div *ngIf="selectedChat; else noChat" class="chat-content-wrapper">
+            <!-- 對話標題 -->
+            <div class="chat-header">
+              <div class="chat-header-left">
+                <div class="chat-header-user">
+                  <span class="avatar" [style.background-image]="'url(' + selectedChat.user.avatar + ')'"></span>
+                  <div class="header-user-info">
+                    <div class="header-user-name">{{ selectedChat.user.name }}</div>
+                    <div class="header-user-status" *ngIf="selectedChat.isOnline">
+                      <span class="online-dot"></span> 在線上
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="chat-header-right">
+                <div class="chat-header-product">
+                  <img [src]="selectedChat.product.image" [alt]="selectedChat.product.name" class="product-thumbnail" />
+                  <div class="product-info">
+                    <div class="product-label">商品</div>
+                    <div class="product-name-text">{{ selectedChat.product.name }}</div>
+                  </div>
+                </div>
+                <div class="header-actions">
+                  <button class="action-btn" title="鎖頭">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                  </button>
+                  <button class="action-btn" title="線頭">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="1" />
+                      <circle cx="12" cy="5" r="1" />
+                      <circle cx="12" cy="19" r="1" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 訊息區域 -->
+            <div class="messages-container">
+              <div class="message" *ngFor="let message of selectedChat.messages" [class.own]="message.isOwn">
+                <div class="message-bubble">
+                  <div class="message-content">{{ message.content }}</div>
+                  <div class="message-time">{{ formatTime(message.timestamp) }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 輸入框 -->
+            <div class="message-input-area">
+              <div class="input-wrapper">
+                <input type="text" class="message-input" placeholder="輸入訊息..." [(ngModel)]="newMessage"
+                  (keyup.enter)="sendMessage()" />
+                <button class="send-button" (click)="sendMessage()" [disabled]="!newMessage.trim()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m22 2-7 20-4-9-9-4Z" />
+                    <path d="M22 2 11 13" />
+                  </svg>
+                  發送
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 未選擇聊天時的提示 -->
+          <ng-template #noChat>
+            <div class="no-chat-selected">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                class="empty-icon">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+              <div class="empty-text">選擇一個聊天開始對話</div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <app-footer></app-footer>
+</div>
