@@ -4,7 +4,7 @@ export interface CartItem {
   price: number;
   quantity: number;
   selected: boolean; // <-- 關鍵: 用來追蹤是否被勾選
-  // 您可以加入其他屬性，例如: quantity: number;
+  imageUrl?: string;
 }
 
 export interface Coupon {
