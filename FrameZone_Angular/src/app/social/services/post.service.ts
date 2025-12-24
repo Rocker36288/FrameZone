@@ -1,19 +1,23 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject, tap } from 'rxjs';
+import { PostDto } from "../models/PostDto";
 
-export interface PostDto {
-  postId: number;
-  userId: number;
-  content: string;
-  createdAt: string;
-}
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class PostService {
   private apiUrl = 'https://localhost:7213/api/posts';
+
+  // 1. 建立一個 Subject 訊號
+  private _refreshNeeded$ = new Subject<void>();
+
+  // 2. 暴露一個 Observable 供列表元件訂閱
+  get refreshNeeded$() {
+    return this._refreshNeeded$;
+  }
 
   constructor(private http: HttpClient) { }
 
@@ -30,12 +34,15 @@ export class PostService {
   createPost(postContent: string): Observable<any> {
     return this.http.post(this.apiUrl, {
       postContent: postContent
-    });
+    }).pipe(tap(() => {
+      // 3. 發送「需要重新整理」的通知
+      this._refreshNeeded$.next();
+    }));
   }
 
   /**編輯貼文 */
-  editPost(postId: number, content: string): Observable<PostDto> {
-    return this.http.put<PostDto>(`${this.apiUrl}/${postId}`, { content: content })
+  editPost(postId: number, postContent: string): Observable<PostDto> {
+    return this.http.put<PostDto>(`${this.apiUrl}/${postId}`, { postContent: postContent })
   }
 
   /**刪除貼文 */

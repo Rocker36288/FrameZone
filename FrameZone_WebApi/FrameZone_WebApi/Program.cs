@@ -22,6 +22,8 @@ using System.Text;
 using Xabe.FFmpeg;
 using Xabe.FFmpeg.Downloader;
 using static FrameZone_WebApi.Videos.Helpers.AaContextFactoryHelper;
+using FrameZone_WebApi.Socials.Repositories;
+using FrameZone_WebApi.Socials.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

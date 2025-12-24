@@ -1,8 +1,8 @@
-﻿using FrameZone_WebApi.DTOs;
-using FrameZone_WebApi.Services;
+﻿using FrameZone_WebApi.Socials.DTOs;
+using FrameZone_WebApi.Socials.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FrameZone_WebApi.Controllers
+namespace FrameZone_WebApi.Socials.Controllers
 {
     [ApiController]
     [Route("api/posts")]

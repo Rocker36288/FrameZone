@@ -1,7 +1,7 @@
 ﻿using FrameZone_WebApi.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace FrameZone_WebApi.Repositories
+namespace FrameZone_WebApi.Socials.Repositories
 {
     public class PostRepository
     {
@@ -21,8 +21,8 @@ namespace FrameZone_WebApi.Repositories
                     .Where(p =>
                         p.Status != "Deleted" &&
                         p.DeletedAt == null)
-                    //依照最新更新時間排序
-                    .OrderByDescending(p => p.UpdatedAt)
+                    //依照貼文建立時間排序
+                    .OrderByDescending(p => p.CreatedAt)
                     .ToListAsync();
             }
             catch (Exception ex)

@@ -103,7 +103,7 @@ export const routes: Routes = [
   },
   {
     path: 'social',
-    loadComponent: () => import('./layouts/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
+    loadComponent: () => import('./layouts/social-layout/social-layout.component').then(m => m.SocialLayoutComponent),
     children: [
       {
         path: '',

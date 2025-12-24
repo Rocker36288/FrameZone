@@ -1,8 +1,8 @@
-﻿using FrameZone_WebApi.DTOs;
-using FrameZone_WebApi.Models;
-using FrameZone_WebApi.Repositories;
+﻿using FrameZone_WebApi.Models;
+using FrameZone_WebApi.Socials.DTOs;
+using FrameZone_WebApi.Socials.Repositories;
 
-namespace FrameZone_WebApi.Services
+namespace FrameZone_WebApi.Socials.Services
 {
     public class PostService
     {

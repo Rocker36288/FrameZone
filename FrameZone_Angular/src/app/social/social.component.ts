@@ -1,8 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 import { SocialMenuComponent } from "./social-menu/social-menu.component";
 import { SocialFriendsComponent } from "./social-friends/social-friends.component";
+import { SocialPostsSubmitComponent } from "./social-posts-submit/social-posts-submit.component";
 import { SocialPostsComponent } from "./social-posts/social-posts.component";
-import { SocialShowpostsComponent } from "./social-showposts/social-showposts.component";
 import { NgClass } from '@angular/common';
 import { RouterModule } from "@angular/router";
 import { SocialIndexComponent } from "./social-index/social-index.component";
@@ -10,7 +10,7 @@ import { SocialChatComponent } from "./social-chat/social-chat.component";
 
 @Component({
   selector: 'app-social',
-  imports: [SocialMenuComponent, SocialFriendsComponent, SocialPostsComponent, SocialShowpostsComponent, NgClass, RouterModule, SocialIndexComponent, SocialChatComponent],
+  imports: [SocialMenuComponent, SocialFriendsComponent, SocialPostsSubmitComponent, SocialPostsComponent, NgClass, RouterModule, SocialIndexComponent, SocialChatComponent],
   templateUrl: './social.component.html',
   styleUrl: './social.component.css'
 })

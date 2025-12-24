@@ -13,3 +13,34 @@
   border-radius: 50%;
   cursor: pointer;
 }
+
+.middle {
+  min-height: 120vh;
+}
+
+.sidebar {
+  margin-top: 0;
+  padding: 0;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 112px;
+
+  z-index: 1;
+
+  /* 關鍵修正：限制側欄的最大高度，並允許內部滾動 */
+  /* calc(100vh - 100px) 代表：視窗高度 - (Top偏移量 + 底部緩衝) */
+  max-height: calc(100vh - 100px);
+
+  /* 當選單內容超過視窗高度時，側欄內部會出現卷軸，而不是把整個頁面撐長 */
+  overflow-y: auto;
+}
+
+/* 美化卷軸 (選用)：讓側欄內的卷軸不要那麼明顯 */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}

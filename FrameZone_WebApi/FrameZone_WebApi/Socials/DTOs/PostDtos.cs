@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FrameZone_WebApi.DTOs
+namespace FrameZone_WebApi.Socials.DTOs
 {
     // =========== 貼文相關 ========== 
 
