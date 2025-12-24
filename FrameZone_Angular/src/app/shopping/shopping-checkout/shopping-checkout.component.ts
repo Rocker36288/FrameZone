@@ -1,183 +1,210 @@
 import { HeaderComponent } from './../../shared/components/header/header.component';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, ViewChild } from '@angular/core';
 import { CartItem, Coupon } from '../interfaces/cart';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
+import { CartService } from '../shared/services/cart.service';
 
 @Component({
   selector: 'app-shopping-checkout',
-  imports: [FormsModule, CommonModule, ReactiveFormsModule, HeaderComponent],
+  standalone: true,
+  imports: [FormsModule, CommonModule, ReactiveFormsModule, HeaderComponent, RouterLink],
   templateUrl: './shopping-checkout.component.html',
   styleUrl: './shopping-checkout.component.css'
 })
 export class ShoppingCheckoutComponent {
+  // 在 constructor 注入
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    public cartService: CartService // 改為 public 方便 HTML 直接讀取 Service 的 Signal
+  ) { }
+
+
+  currentStep: number = 2;
+
   @ViewChild('couponModalElement') couponModalElement!: ElementRef;
 
+  // 定義表單模型
+  checkoutForm!: FormGroup;
 
-  // 2. 屬性 (Property): 模擬購物車資料
-  cartItems: CartItem[] = [
-    { id: 1, name: '相機 A', price: 2500, quantity: 1, selected: false },
-    { id: 2, name: '相機 B', price: 3500, quantity: 1, selected: false },
-    { id: 3, name: '相機 C', price: 4500, quantity: 1, selected: false },
-    { id: 4, name: '相機 D', price: 5500, quantity: 1, selected: false },
-    { id: 5, name: '相機 E', price: 6500, quantity: 1, selected: false },
-    { id: 6, name: '相機 F', price: 7500, quantity: 1, selected: false },
+  // 定義運費對照表
+  shippingRates: { [key: string]: number } = {
+    'post': 65,
+    '711': 60,
+    '711_pay': 60,
+    'fami': 60,
+    'fami_pay': 60
+  };
 
-    // 這裡的資料會從 API 服務中獲取，但目前先以硬編碼模擬
+  // 定義收件人資料陣列
+  savedAddresses = [
+    {
+      id: 1,
+      name: '王小明',
+      phone: '0912-345-678',
+      address: '110 台北市信義區信義路五段7號 (台北 101)'
+    },
+    {
+      id: 2,
+      name: '家裡 (李大華)',
+      phone: '0988-123-456',
+      address: '220 新北市板橋區中山路一段1號'
+    }
   ];
 
-  constructor() { }
+  // 使用 Signal 的 Computed 屬性：從 Service 篩選出「已勾選」商品
+  selectedItems = computed(() =>
+    this.cartService.items().filter(item => item.selected)
+  );
 
-  ngOnInit(): void {
-    // 可以在這裡執行元件初始化時的邏輯，例如從服務中載入資料
-  }
+  // 2. 屬性 (Property): 模擬購物車資料
+  // cartItems: CartItem[] = [
+  //   { id: 1, name: '相機 A', price: 2500, quantity: 1, selected: false },
+  //   { id: 2, name: '相機 B', price: 3500, quantity: 1, selected: false },
+  //   { id: 3, name: '相機 C', price: 4500, quantity: 1, selected: false },
+  //   { id: 4, name: '相機 D', price: 5500, quantity: 1, selected: false },
+  //   { id: 5, name: '相機 E', price: 6500, quantity: 1, selected: false },
+  //   { id: 6, name: '相機 F', price: 7500, quantity: 1, selected: false },
 
-  // 3. 方法 (Method): 實現「賣家點擊 -> 所有商品連動」邏輯
-  /**
-   * 賣家勾選框被點擊時，連動所有商品
-   * @param isChecked 賣家勾選框的狀態 (true/false)
-   */
-  toggleAllItems(isChecked: boolean): void {
-    this.cartItems.forEach(item => {
-      item.selected = isChecked;
-    });
-  }
+  //   // 這裡的資料會從 API 服務中獲取，但目前先以硬編碼模擬
+  // ];
 
-  // 4. 方法 (Method): 實現「商品點擊 -> 賣家勾勾連動」邏輯
-  /**
-   * 當任一商品勾選框被點擊時，更新賣家勾選框的狀態。
-   * * 備註：這個方法主要觸發 Angular 偵測，讓 areAllItemsChecked() 重新計算。
-   */
-  updateMasterCheckbox(): void {
-    // 檢查邏輯實際上在 areAllItemsChecked() 內執行，這裡無需重複計算。
-    // 呼叫此方法是為了讓 Angular 知道資料可能已變動，進而更新 HTML 模板。
-    console.log('商品狀態已變動，觸發檢查主勾選框狀態。');
-  }
-
-  // 5. 方法 (Method): 用於主勾選框的 [checked] 屬性綁定
-  /**
-   * 判斷是否所有商品都被勾選。
-   * * @returns boolean
-   */
-  areAllItemsChecked(): boolean {
-    // 使用 Array.prototype.every() 檢查陣列中是否所有元素的 selected 屬性都是 true
-    return this.cartItems.every(item => item.selected);
-  }
-
-  getTotalQuantity(): number {
-    return this.cartItems.reduce((total, item) => {
-      // 只有在商品被選取時才加入計算
-      if (item.selected) {
-        return total + item.quantity;
-      }
-      return total;
-    }, 0);
-  }
-
-  getTotalAmount(): number {
-    return this.cartItems.reduce((total, item) => {
-      // 只有在商品被選取時才加入計算 (價格 * 數量)
-      if (item.selected) {
-        return total + (item.price * item.quantity);
-      }
-      return total;
-    }, 0);
-  }
-
-  couponCodeInput: string = ''; // 用於綁定輸入框
-  selectedDiscount: number = 0; // 儲存最終選定的折扣金額
-  private tempFinalAppliedDiscount: number = 0;// 新增一個屬性來儲存 Modal 開啟前的 finalAppliedDiscount
-  finalAppliedDiscount: number = 0;  // 儲存最終套用的折扣金額，這個值才真正影響購物車小計
+  // --- 優惠券相關屬性 ---
+  couponCodeInput: string = '';
+  selectedDiscount: number = 0;
+  private tempFinalAppliedDiscount: number = 0;
+  finalAppliedDiscount: number = 0;
+  private tempCouponState: Coupon[] = [];
 
   availableCoupons: Coupon[] = [
     { id: 1, name: '運費抵用券', discount: 60, code: 'FREESHIP', expiryDate: new Date('2025/12/31'), isSelected: false },
     { id: 2, name: '滿千折百券', discount: 100, code: 'SAVE100', expiryDate: new Date('2025/11/30'), isSelected: false },
-    // ... 更多優惠券
   ];
 
-  // 處理點擊優惠券列表中的勾選框
+  // 會員資料
+  memberAvatarUrl: string = 'https://i.pravatar.cc/30?img=68';
+  memberName: string = 'Angular用戶001';
+
+  ngOnInit(): void {
+    // 初始化表單
+    this.checkoutForm = this.fb.group({
+      paymentMethod: ['credit', Validators.required],
+      shippingMethod: ['', Validators.required], // 預設改為空，讓用戶必須點選
+      selectedAddressId: ['', Validators.required] // 必選收件人
+    });
+
+    // 2. 從 Service 同步優惠券狀態
+    // 這樣進入頁面時，finalAppliedDiscount 就不會是 0
+    const savedCoupon = this.cartService.selectedCoupon();
+    if (savedCoupon) {
+      this.finalAppliedDiscount = savedCoupon.discount;
+    }
+    // 監聽運送方式變動：切換運送方式時，清空已選收件人，強迫重新選擇
+    this.checkoutForm.get('shippingMethod')?.valueChanges.subscribe(() => {
+      this.checkoutForm.get('selectedAddressId')?.reset('');
+    });
+
+    // 安全檢查：若無勾選商品，退回購物車
+    if (this.selectedItems().length === 0) {
+      this.router.navigate(['/shoppingcart']);
+    }
+  }
+
+  // 取得目前選取的運費金額
+  getShippingFee(): number {
+    const method = this.checkoutForm?.get('shippingMethod')?.value;
+    return this.shippingRates[method] || 0;
+  }
+
+  /** 取得商品小計 (從 Service 直接獲取已選商品總額) */
+  getTotalAmount(): number {
+    return this.cartService.totalAmount();
+  }
+
+  /** 最終應付金額計算 (商品總額 - 折扣 + 運費) */
+  getFinalTotal(): number {
+    // 直接從 Service 讀取折扣金額，最保險
+    const discount = this.cartService.appliedDiscount();
+    const totalAmount = this.getTotalAmount();
+    const shipping = this.getShippingFee();
+
+    return Math.max(0, totalAmount - discount + shipping);
+  }
+
   selectCoupon(clickedCoupon: Coupon): void {
-    // 實現單選邏輯：只允許勾選一個優惠券
     this.availableCoupons.forEach(coupon => {
       if (coupon.id === clickedCoupon.id) {
-        coupon.isSelected = !coupon.isSelected; // 切換自身狀態
+        coupon.isSelected = !coupon.isSelected;
       } else {
-        coupon.isSelected = false; // 取消其他優惠券的選取
+        coupon.isSelected = false;
       }
     });
   }
 
-  // 處理手動輸入代碼 (這裡僅為範例，實際邏輯需連線後端驗證)
   applyCouponCode(): void {
     const enteredCode = this.couponCodeInput.trim().toUpperCase();
     const foundCoupon = this.availableCoupons.find(c => c.code === enteredCode);
 
     if (foundCoupon) {
-      this.selectCoupon(foundCoupon); // 如果代碼匹配，則視為選中該優惠券
+      this.selectCoupon(foundCoupon);
       alert(`折扣碼 ${enteredCode} 已選取!`);
     } else {
       alert(`折扣碼 ${enteredCode} 無效或不可用。`);
     }
   }
 
-  // 計算最終總折扣
   getAppliedDiscount(): number {
     const selectedCoupon = this.availableCoupons.find(c => c.isSelected);
-    // 如果有選中的優惠券，則使用其折扣金額，否則為 0
     return selectedCoupon ? selectedCoupon.discount : 0;
   }
 
-  // 計算最終小計
-  getFinalTotal(): number {
-    const totalAmount = this.getTotalAmount(); // 購物車商品總額
-
-    // 使用已確認的最終折扣
-    const discount = this.finalAppliedDiscount;
-
-    // 確保最終金額不為負數
-    return Math.max(0, totalAmount - discount);
-  }
-  // 更新小計區域的優惠券金額
   getDiscountDisplay(): string {
-    const discount = this.finalAppliedDiscount;
-    return discount > 0 ? `-$${discount}` : '選擇/輸入折扣碼';
+    const coupon = this.cartService.selectedCoupon();
+    // 如果有優惠券，顯示折扣金額；沒有則顯示預設文字
+    return coupon ? `-$${coupon.discount}` : '未套用優惠券';
   }
 
-
+  // 當 Modal 點擊「確定」時呼叫的方法
   calculateFinalTotal(): void {
-    // 呼叫 getAppliedDiscount() 取得使用者目前在 Modal 中選定的折扣金額
-    const currentDiscount = this.getAppliedDiscount();
-
-    // 將計算出的折扣金額存入 finalAppliedDiscount
-    this.finalAppliedDiscount = currentDiscount;
-
-    // 備註：您不需要在這裡呼叫 getFinalTotal()。
-    // Angular 的變動偵測會自動偵測到 this.finalAppliedDiscount 變了，
-    // 進而重新執行所有綁定到它的函式（包括 getFinalTotal()），並更新畫面。
+    const selectedCoupon = this.availableCoupons.find(c => c.isSelected) || null;
+    this.cartService.applyCoupon(selectedCoupon);
+    // 這裡也要同步更新本地變數，讓 getDiscountDisplay() 能正確顯示
+    this.finalAppliedDiscount = selectedCoupon ? selectedCoupon.discount : 0;
   }
-  private tempCouponState: Coupon[] = [];
 
-  /** * 在 Modal 開啟前呼叫，儲存當前的優惠券選取狀態。*/
   saveCouponState(): void {
-    // 深層複製當前狀態，避免直接引用
     this.tempCouponState = this.availableCoupons.map(coupon => ({ ...coupon }));
-
-    // ***儲存當前已套用的最終折扣 ***
     this.tempFinalAppliedDiscount = this.finalAppliedDiscount;
   }
 
-  /*** 在 Modal 被取消時呼叫，還原優惠券選取狀態。*/
   restoreCouponState(): void {
-    // 將暫存的狀態寫回實際的 availableCoupons 陣列
     this.availableCoupons = this.tempCouponState.map(coupon => ({ ...coupon }));
-
-    // *** 還原最終套用的折扣金額 ***
     this.finalAppliedDiscount = this.tempFinalAppliedDiscount;
+  }
 
-    // 由於狀態改變了，也需要手動觸發一次最終總計的計算，
-    // 確保小計區塊立刻更新回取消前的狀態 (即原本的 finalAppliedDiscount)。
-    // 如果 finalAppliedDiscount 是唯一參考，則不需要，但為了安全起見，建議呼叫。
-    // 更好的做法是確保 getAppliedDiscount() 保持使用最新的 this.availableCoupons 狀態
+
+  //取得優惠券顯示
+  discountInfo = computed(() => {
+    const coupon = this.cartService.selectedCoupon();
+    return coupon ? `${coupon.code} (-$${coupon.discount})` : '選擇折扣碼';
+  });
+
+  /** 結帳完成（模擬訂單成功） */
+  onConfirmCheckout(): void {
+    if (this.checkoutForm.invalid) {
+      return;
+    }
+
+    // 這裡未來可以換成呼叫 API 建立訂單
+    // this.orderService.createOrder(...)
+
+    // 訂單完成：清空購物車 + 優惠券
+    this.cartService.markOrderCompleted();
+
+    // 前往成功頁
+    this.router.navigate(['/order-success']);
   }
 
 }
