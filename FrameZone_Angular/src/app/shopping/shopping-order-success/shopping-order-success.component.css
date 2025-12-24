@@ -1,0 +1,205 @@
+.order-success-page {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  /* align-items: center; */
+  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.success-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 48px 40px;
+  max-width: 480px;
+  width: 100%;
+  height: 370px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  animation: fadeInUp 0.6s ease;
+}
+
+.icon-wrapper {
+  font-size: 72px;
+  color: #6f5bd3;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #333333;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #555555;
+  margin-bottom: 8px;
+}
+
+.hint {
+  font-size: 14px;
+  color: #888888;
+  margin-bottom: 32px;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.action-buttons .btn {
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+.action-buttons .btn-primary {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border: none;
+  color: #ffffff;
+}
+
+.action-buttons .btn-outline-secondary {
+  border: 1px solid #cccccc;
+  color: #555555;
+  background: transparent;
+}
+
+/* 動畫 */
+/* @keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} */
+
+.logo-link-simple {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.brand-logo {
+  width: 60px;
+  height: 60px;
+}
+
+/* 進度條核心樣式 */
+.checkout-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 600px;
+  margin: 0 auto;
+  padding-top: 80px;
+}
+
+.step {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.step-icon {
+  width: 35px;
+  height: 35px;
+  background-color: #e0e0e0;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.step-label {
+  font-size: 0.9rem;
+  color: #9e9e9e;
+  font-weight: 500;
+}
+
+/* 啟動狀態 (Active) */
+.step.active .step-icon {
+  background-color: #764ba2;
+  /* 使用您標題的深紫色 */
+  box-shadow: 0 0 0 4px rgba(118, 75, 162, 0.2);
+}
+
+.step.active .step-label {
+  color: #764ba2;
+  font-weight: bold;
+}
+
+/* 連接線 */
+.step-line {
+  flex: 1;
+  height: 2px;
+  background-color: #e0e0e0;
+  margin: 0 15px;
+  transform: translateY(-12px);
+  /* 向上偏移以對齊圖標中心 */
+}
+
+.page-header {
+  margin: auto;
+  background: linear-gradient(135deg, #79a3f1 0%, #764ba2 100%);
+  /* padding: 0 20px 30px; */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.top-nav-left {
+  margin-left: 20px;
+}
+
+.top-nav-right {
+  margin-right: 20px;
+}
+
+/* 會員頭像及名稱的整體連結容器 */
+.member-profile-link {
+  /* 調整間距，確保與右側的通知連結不重疊 */
+  margin-left: 15px;
+  text-decoration: none;
+}
+
+/* 會員頭像樣式：實現圓形、大小和間距 */
+.member-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 8px;
+  /* 確保圖片內容填滿 */
+  object-fit: cover;
+}
+
+/* 帳號名稱樣式：使用與導覽列小字相似的樣式 */
+.member-name {
+  color: white;
+  font-size: 1rem;
+  margin-right: 10px;
+  text-decoration: none;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+
+}
+
+/* 確保頭像連結 hover 時保持樣式一致 */
+.member-profile-link:hover .member-name {
+  color: #131b33;
+}
