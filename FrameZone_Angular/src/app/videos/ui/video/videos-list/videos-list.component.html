@@ -79,4 +79,12 @@
     }
   </ng-container>
 
+  <!-- 搜索長清單 -->
+  <ng-container *ngSwitchCase="'search-list'">
+    @for (video of videos; track $index) {
+    <app-video-card [video]="video" [variant]="'search'">
+    </app-video-card>
+    }
+  </ng-container>
+
 </ng-container>

@@ -1,0 +1,228 @@
+/* ═══════════════════════════════════
+   上傳區域樣式
+   ═══════════════════════════════════ */
+
+.upload-zone {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.upload-zone:hover {
+  background-color: rgba(13, 110, 253, 0.05);
+  border-color: var(--bs-primary) !important;
+}
+
+.upload-zone.drag-over {
+  background-color: rgba(13, 110, 253, 0.1);
+  border-color: var(--bs-primary) !important;
+  transform: scale(1.02);
+}
+
+/* ═══════════════════════════════════
+   縮圖選擇樣式
+   ═══════════════════════════════════ */
+
+.thumbnail-item {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 3px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.thumbnail-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.thumbnail-item.selected {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.2);
+}
+
+.thumbnail-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.thumbnail-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(13, 110, 253, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ═══════════════════════════════════
+   隱私設定卡片樣式
+   ═══════════════════════════════════ */
+
+.privacy-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid var(--bs-border-color);
+}
+
+.privacy-card:hover {
+  border-color: var(--bs-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-check:checked+.privacy-card {
+  border-color: var(--bs-primary);
+  background-color: rgba(13, 110, 253, 0.05);
+}
+
+.btn-check:checked+.privacy-card i {
+  color: var(--bs-primary) !important;
+}
+
+/* ═══════════════════════════════════
+   進度條動畫優化
+   ═══════════════════════════════════ */
+
+.progress {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  transition: width 0.3s ease;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ═══════════════════════════════════
+   表單樣式優化
+   ═══════════════════════════════════ */
+
+.form-control:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* ═══════════════════════════════════
+   卡片樣式優化
+   ═══════════════════════════════════ */
+
+.card {
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.card-header {
+  background-color: rgba(13, 110, 253, 0.05);
+  border-bottom: 2px solid var(--bs-border-color);
+}
+
+/* ═══════════════════════════════════
+   響應式設計
+   ═══════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .thumbnail-item {
+    margin-bottom: 1rem;
+  }
+
+  .privacy-card {
+    margin-bottom: 1rem;
+  }
+}
+
+/* ═══════════════════════════════════
+   載入動畫
+   ═══════════════════════════════════ */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ti-refresh.spinning {
+  animation: spin 1s linear infinite;
+}
+
+/* ═══════════════════════════════════
+   按鈕樣式優化
+   ═══════════════════════════════════ */
+
+.btn {
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ═══════════════════════════════════
+   Alert 樣式優化
+   ═══════════════════════════════════ */
+
+.alert {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  /* 16:9 高寬比，100/16*9 = 56.25% */
+  background-color: #f8f9fa;
+}
+
+.video-wrapper app-video-player,
+.video-wrapper .placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.video-wrapper app-video-player {
+  object-fit: contain;
+  /* 保持影片完整比例 */
+}
+
+.video-wrapper .placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #6c757d;
+}

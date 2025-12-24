@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { LikeButtonComponent } from "../like-button/like-button.component";
 import { ReportButtonComponent } from "../report-button/report-button.component";
 import { SaveButtonComponent } from "../save-button/save-button.component";
@@ -11,6 +11,13 @@ import { ShareButtonComponent } from "../share-button/share-button.component";
   styleUrl: './video-actions-bar.component.css'
 })
 export class VideoActionsBarComponent {
-  @Input() videoid: number = 0
+  @Output() likeChanged = new EventEmitter<boolean>();
+  @Input() isLiked: boolean = false;
+  @Input() likes?: number = 0;
 
+  onLikeToggled(liked: boolean) {
+    // 可以在這裡做局部 UI 更新
+    // 再發射事件到 VideoMainComponent
+    this.likeChanged.emit(liked);
+  }
 }

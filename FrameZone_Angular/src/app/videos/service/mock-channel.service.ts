@@ -10,10 +10,10 @@ import { PrivacyStatus, ProcessStatus } from '../models/video.enum';
 export class MockChannelService {
   channel: ChannelCard = {
     id: 1,
-    Name: '頻道名稱示例',
-    Avatar: 'https://i.pravatar.cc/48',
-    Description: "他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下",
-    Follows: 12345,
+    name: '頻道名稱示例',
+    avatar: 'https://i.pravatar.cc/48',
+    description: "他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下他很懶甚麼都沒留下",
+    follows: 12345,
   };
 
   video: VideoCardData = {
@@ -24,9 +24,11 @@ export class MockChannelService {
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 2158,
     views: 551,
-    uploadDate: new Date('2002-02-07'),
+    publishDate: new Date('2002-02-07'),
     description: "我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明我是很長的說明",
-    videoUri: ''
+    videoUri: '',
+    ChannelId: 0,
+    likes: 0
   };
 
   videos: VideoCardData[] = [{
@@ -37,9 +39,11 @@ export class MockChannelService {
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 2158,
     views: 551,
-    uploadDate: new Date('2002-02-07'),
+    publishDate: new Date('2002-02-07'),
     description: "fff",
-    videoUri: ''
+    videoUri: '',
+    ChannelId: 0,
+    likes: 0
   }, {
     id: 1,
     avatar: 'https://i.pravatar.cc/49',
@@ -48,9 +52,11 @@ export class MockChannelService {
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 21558,
     views: 551,
-    uploadDate: new Date('2002-02-07'),
+    publishDate: new Date('2002-02-07'),
     description: "fff",
-    videoUri: ''
+    videoUri: '',
+    ChannelId: 0,
+    likes: 0
   }, {
     id: 1,
     avatar: 'https://i.pravatar.cc/49',
@@ -59,9 +65,11 @@ export class MockChannelService {
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 21558,
     views: 551,
-    uploadDate: new Date('2002-02-07'),
+    publishDate: new Date('2002-02-07'),
     description: "fff",
-    videoUri: ''
+    videoUri: '',
+    ChannelId: 0,
+    likes: 0
   }, {
     id: 1,
     avatar: 'https://i.pravatar.cc/49',
@@ -70,9 +78,11 @@ export class MockChannelService {
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 21558,
     views: 551,
-    uploadDate: new Date('2002-02-07'),
+    publishDate: new Date('2002-02-07'),
     description: "fff",
-    videoUri: ''
+    videoUri: '',
+    ChannelId: 0,
+    likes: 0
   }, {
     id: 1,
     avatar: 'https://i.pravatar.cc/49',
@@ -81,9 +91,11 @@ export class MockChannelService {
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 21558,
     views: 551,
-    uploadDate: new Date('2002-02-07'),
+    publishDate: new Date('2002-02-07'),
     description: "fff",
-    videoUri: ''
+    videoUri: '',
+    ChannelId: 0,
+    likes: 0
   }, {
     id: 1,
     avatar: 'https://i.pravatar.cc/49',
@@ -92,9 +104,11 @@ export class MockChannelService {
     thumbnail: 'https://picsum.photos/480/270', // 假圖片
     duration: 21558,
     views: 551,
-    uploadDate: new Date('2002-02-07'),
+    publishDate: new Date('2002-02-07'),
     description: "fff",
-    videoUri: ''
+    videoUri: '',
+    ChannelId: 0,
+    likes: 0
   }
   ];
 
@@ -108,14 +122,14 @@ export class MockChannelService {
 
   Channelhome: ChannelHome = {
     id: 0,
-    Name: 'RR',
-    Avatar: 'https://i.pravatar.cc/49',
-    Description: 'FFFF',
-    Follows: 15,
-    VideosCount: 18,
-    Banner: '',
-    CreatedAt: new Date('2002-02-07'),
-    LastUpdateAt: new Date('2002-02-07')
+    name: 'RR',
+    avatar: 'https://i.pravatar.cc/49',
+    description: 'FFFF',
+    follows: 15,
+    videosCount: 18,
+    banner: '',
+    createdAt: new Date('2002-02-07'),
+    lastUpdateAt: new Date('2002-02-07')
   }
 
   VideoDetailData: VideoDetailData = {

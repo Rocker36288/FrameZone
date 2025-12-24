@@ -16,7 +16,7 @@ export const VIDEO_ROUTES: Routes = [
     component: VideosShellComponent,
   },
   {
-    path: 'watch',
+    path: 'watch/:guid',
     component: VideoMainComponent,
   },
   {

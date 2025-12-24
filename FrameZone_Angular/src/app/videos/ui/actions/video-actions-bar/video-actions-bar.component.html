@@ -1,5 +1,5 @@
 <div class="d-flex align-items-center gap-3">
-  <app-like-button></app-like-button>
+  <app-like-button [likes]="likes" [isLiked]="isLiked" (likeToggled)="onLikeToggled($event)"></app-like-button>
   <app-share-button></app-share-button>
   <app-save-button></app-save-button>
   <app-report-button></app-report-button>

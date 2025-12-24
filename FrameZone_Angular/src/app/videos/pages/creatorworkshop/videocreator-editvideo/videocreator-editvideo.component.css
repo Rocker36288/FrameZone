@@ -1,0 +1,13 @@
+.edit-icon {
+  cursor: pointer;
+  color: #999;
+  margin-left: 6px;
+}
+
+.edit-icon:hover {
+  color: #206bc4;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}

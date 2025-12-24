@@ -16,10 +16,12 @@
         public string Thumbnail { get; set; } = "";
         public int Duration { get; set; }
         public int Views { get; set; }
+        public int Likes { get; set; }
         public DateTime PublishDate { get; set; }
         public string? Description { get; set; }
 
         // ── 頻道資訊 ─────────────────────
+        public long ChannelId { get; set; }
         public string ChannelName { get; set; } = "";
         public string Avatar { get; set; } = "";
     }
@@ -55,62 +57,50 @@
             }
         }
     }
-    // 頻道卡片資訊
+
+    public class VideoCommentRequest
+    {
+        public long UserId { get; set; }
+        public int Videoid { get; set; }
+        public int TargetTypeId { get; set; }
+        public string CommentContent { get; set; } = string.Empty; public int? ParentCommentId { get; set; }
+    }
+
+
     public class ChannelCardDto
     {
-        public long Id { get; set; } = 0;
+        public long Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Avatar { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public int Follows { get; set; } = 0;
+        public int Follows { get; set; }
+    }
 
-        // 預設建構子
-        public ChannelCardDto() { }
+    // 頻道首頁完整資料
+    public class ChannelHomeDto
+    {
+        public long Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Avatar { get; set; } = string.Empty;
+        public string Banner { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
 
-        // 可透過傳入部分資料初始化
-        public ChannelCardDto(ChannelCardDto data)
-        {
-            if (data != null)
-            {
-                Id = data.Id;
-                Name = data.Name;
-                Avatar = data.Avatar;
-                Description = data.Description;
-                Follows = data.Follows;
-            }
-        }
+        public int Follows { get; set; }
+        public int VideosCount { get; set; }
 
-        public class ChannelHomeDto
-        {
-            public long Id { get; set; } = 0;
-            public string Name { get; set; } = string.Empty;
-            public string Avatar { get; set; } = string.Empty;
-            public string Description { get; set; } = string.Empty;
-            public int Follows { get; set; } = 0;
-            public int VideosCount { get; set; } = 0;
-            public string Banner { get; set; } = string.Empty; // 橫幅圖片位置
-            public DateTime CreatedAt { get; set; } = DateTime.Now; // 頻道建立日期
-            public DateTime LastUpdateAt { get; set; } = DateTime.Now; // 最後一次上傳影片日期
+        public DateTime CreatedAt { get; set; }
+        public DateTime LastUpdateAt { get; set; }
+    }
 
-            // 預設建構子
-            public ChannelHomeDto() { }
+    //影片likes DTO
+    public class VideoLikesRequset
+    {
+        public bool IsLikes { get; set; }
+        public int VideoId { get; set; }
+    }
 
-            // 可透過傳入部分資料初始化
-            public ChannelHomeDto(ChannelHomeDto data)
-            {
-                if (data != null)
-                {
-                    Id = data.Id;
-                    Name = data.Name;
-                    Avatar = data.Avatar;
-                    Description = data.Description;
-                    Follows = data.Follows;
-                    VideosCount = data.VideosCount;
-                    Banner = data.Banner;
-                    CreatedAt = data.CreatedAt;
-                    LastUpdateAt = data.LastUpdateAt;
-                }
-            }
-        }
+    public class VideoLikesDto
+    {
+       public bool IsLikes { get; set; }
     }
 }

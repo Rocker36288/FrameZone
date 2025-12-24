@@ -52,7 +52,7 @@
             <div class="avatar-container">
               <div class="avatar-glow"></div>
               <div class="avatar-ring"></div>
-              <img [src]="channel?.Avatar" [alt]="channel?.Name" class="creator-avatar-large">
+              <img [src]="channel?.avatar" [alt]="channel?.name" class="creator-avatar-large">
               <div class="spotlight-indicator">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <path
@@ -63,7 +63,7 @@
 
             <!-- 創作者資訊 -->
             <div class="creator-details text-center mt-4">
-              <h3 class="creator-name mb-2">{{channel?.Name}}</h3>
+              <h3 class="creator-name mb-2">{{channel?.name}}</h3>
               <p class="creator-subscribers mb-3">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon-inline" width="16" height="16" viewBox="0 0 24 24"
                   stroke-width="2" stroke="currentColor" fill="none">
@@ -71,9 +71,9 @@
                   <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"></path>
                   <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
                 </svg>
-                {{channel?.Follows}} 位追蹤者
+                {{channel?.follows}} 位追蹤者
               </p>
-              <p class="creator-description">{{channel?.Description}}</p>
+              <p class="creator-description">{{channel?.description}}</p>
 
               <!-- 訂閱按鈕 -->
               <!-- <button class="btn subscribe-btn" [class.subscribed]="channel?.isSubscribed" (click)="toggleSubscribe()">
@@ -127,7 +127,7 @@
                       {{Videos![currentVideoIndex].views}} 次觀看
                     </span>
                     <span>•</span>
-                    <span>{{Videos![currentVideoIndex].uploadDate}}</span>
+                    <span>{{Videos![currentVideoIndex].publishDate}}</span>
                   </div>
                 </div>
               </div>

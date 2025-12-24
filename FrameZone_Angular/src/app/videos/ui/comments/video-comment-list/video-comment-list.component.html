@@ -2,7 +2,7 @@
   <div class="card-body">
 
     <div *ngFor="let comment of comments" class="mb-3">
-      <app-video-comment-item [comment]="comment"></app-video-comment-item>
+      <app-video-comment-item [comment]="comment" (submitReply)="onSubmitReply($event)"></app-video-comment-item>
     </div>
 
     <div *ngIf="comments.length === 0" class="text-secondary text-center py-3">

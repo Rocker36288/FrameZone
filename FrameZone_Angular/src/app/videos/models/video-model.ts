@@ -1,18 +1,23 @@
+import { TargetTypeEnum } from "./video.enum";
+
 // 影片卡片資訊
 export class VideoCardData {
   // ⚠️ 僅供內部使用（例如 trackBy）
   id?: number;
 
-  // ✅ 對外識別（從 VideoUrl 解析 GUID）
-  videoUri: string = '';
+  // 後端回傳的 videoId
+  videoId?: number;
 
+  videoUri: string = '';
   title: string = '';
   thumbnail: string = '';
   duration: number = 0;
   views: number = 0;
-  uploadDate: Date = new Date();
+  publishDate?: Date;
   description: string = '';
+  likes: number = 0;
 
+  ChannelId: number = 0;
   channelName: string = '';
   avatar: string = '';
 
@@ -38,16 +43,16 @@ export class VideoListCard {
 }
 
 //留言卡片
-export class VideoCommentModel {
+export class VideoCommentCard {
   id: number = 0;
   userName: string = '';
   avatar: string = '';
   message: string = '';
   createdAt: Date = new Date();
   likes: number = 0;
-  replies?: VideoCommentModel[] = [];
+  replies?: VideoCommentCard[] = [];
 
-  constructor(data?: Partial<VideoCommentModel>) {
+  constructor(data?: Partial<VideoCommentCard>) {
     if (data) {
       Object.assign(this, data); // 如果傳入了部分資料，就用來覆蓋預設值
     }
@@ -55,31 +60,25 @@ export class VideoCommentModel {
 }
 
 //頻道卡片資訊
-export class ChannelCard {
-  id: number = 0;
-  Name: string = '';
-  Avatar: string = '';
-  Description: string = '';
-  Follows: number = 0;
-
-  constructor(data?: Partial<ChannelCard>) {
-    if (data) {
-      Object.assign(this, data); // 如果傳入了部分資料，就用來覆蓋預設值
-    }
-  }
+export interface ChannelCard {
+  id: number;
+  name: string;
+  avatar: string | null;
+  description: string;
+  follows: number;
 }
 
 //頻道主頁資訊
 export class ChannelHome {
   id: number = 0;
-  Name: string = '';
-  Avatar: string = '';
-  Description: string = '';
-  Follows: number = 0;
-  VideosCount: number = 0;
-  Banner: string = ''; //橫幅圖片位置
-  CreatedAt = new Date(); //頻道建立日期
-  LastUpdateAt = new Date(); //最後一次上船影片日期
+  name: string = '';
+  avatar: string = '';
+  description: string = '';
+  follows: number = 0;
+  videosCount: number = 0;
+  banner: string = ''; //橫幅圖片位置
+  createdAt = new Date(); //頻道建立日期
+  lastUpdateAt = new Date(); //最後一次上船影片日期
 
 
   constructor(data?: Partial<ChannelHome>) {
@@ -87,4 +86,22 @@ export class ChannelHome {
       Object.assign(this, data); // 如果傳入了部分資料，就用來覆蓋預設值
     }
   }
+}
+
+export interface VideoCommentRequest {
+  UserId: number;          // long → number
+  VideoId: number;         // int → number（注意命名）
+  TargetTypeId: TargetTypeEnum.Video;    // enum / int
+  CommentContent: string;
+  ParentCommentId: number | undefined;
+}
+
+
+export interface VideoLikesRequest {
+  isLikes: boolean;
+  videoId: number;
+}
+
+export interface VideoLikesDto {
+  isLikes: boolean;
 }
