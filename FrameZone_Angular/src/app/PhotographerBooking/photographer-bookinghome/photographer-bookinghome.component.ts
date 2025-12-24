@@ -1,10 +1,12 @@
+import { PhotographerTagstylesComponent } from './../../photographer-tagstyles/photographer-tagstyles.component';
+import { PhotographerBookingheroComponent } from './../photographer-bookinghero/photographer-bookinghero.component';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PhotographerbookingSearchComponent } from '../photographerbooking-search/photographerbooking-search.component';
 import { PhotographerbookingCardComponent } from '../photographerbooking-card/photographerbooking-card.component';
-import { HeaderComponent } from '../../shared/components/header/header.component';
 import { PhotographerbookingHeaderComponent } from '../photographerbooking-header/photographerbooking-header.component';
+import { PhotographerServicetypeComponent } from '../../photographer-servicetype/photographer-servicetype.component';
 
 @Component({
   selector: 'app-photographer-bookinghome',
@@ -14,6 +16,7 @@ import { PhotographerbookingHeaderComponent } from '../photographerbooking-heade
     PhotographerbookingSearchComponent,
     PhotographerbookingCardComponent,
     PhotographerbookingHeaderComponent,
+    PhotographerBookingheroComponent,
   ],
   templateUrl: './photographer-bookinghome.component.html',
   styleUrl: './photographer-bookinghome.component.css',
@@ -35,7 +38,7 @@ export class PhotographerBookinghomeComponent {
       price: 3500,
       availability: '本週末',
       tags: ['自然光', '清新'],
-      img: 'images/1.jpg',
+      img: '/images/Photographer/photographercard001',
     },
     {
       name: 'Mia Photo',
@@ -45,7 +48,7 @@ export class PhotographerBookinghomeComponent {
       price: 6000,
       availability: '下週',
       tags: ['唯美', '棚拍'],
-      img: 'images/1.jpg',
+      img: '/images/Photographer/photographercard001',
     },
     {
       name: 'Leo Works',
@@ -55,7 +58,7 @@ export class PhotographerBookinghomeComponent {
       price: 2800,
       availability: '今日',
       tags: ['紀實', '快速交件'],
-      img: 'images/1.jpg',
+      img: '/images/Photographer/photographercard001',
     },
     {
       name: 'Nina Studio',
@@ -65,7 +68,7 @@ export class PhotographerBookinghomeComponent {
       price: 4200,
       availability: '本月',
       tags: ['專業修圖', '商務'],
-      img: 'images/1.jpg',
+      img: '/images/Photographer/photographercard001',
     },
   ];
 
