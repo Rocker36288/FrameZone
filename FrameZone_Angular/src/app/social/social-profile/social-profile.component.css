@@ -1,0 +1,116 @@
+/* --- 1. 容器與背景設定 --- */
+:host {
+  display: block;
+  min-height: 100vh;
+  padding: 0 !important;
+  /* 移除元件最外層內距 */
+}
+
+.profile-container {
+
+  margin: 0 auto;
+  padding: 0;
+  /* 確保左右對齊滿版 */
+}
+
+/* --- 2. 個人檔案標頭 --- */
+.profile-header {
+  background: #ffffff;
+  border-bottom: 1px solid #dddfe2;
+  padding: 24px 16px 0 16px;
+  /* 底部設為 0 讓 tab-nav 貼齊底線 */
+  margin-bottom: 12px;
+}
+
+.top-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #eee;
+  border: 1px solid #ddd;
+}
+
+.user-text h1 {
+  font-size: 24px;
+  margin: 0;
+  font-weight: bold;
+}
+
+/* --- 3. 元件滿版設定 (核心) --- */
+.content-area {
+  padding: 0;
+  /* 內容區不留白 */
+}
+
+/* 讓自定義標籤變成 block 才能 100% 撐開 */
+app-social-posts-submit,
+app-social-posts-list {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- 4. Tab 選單樣式 --- */
+.tab-nav {
+  display: flex;
+  justify-content: center;
+}
+
+.tab-nav button {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 15px 0;
+  font-weight: 600;
+  color: #65676b;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  /* 預留底線空間 */
+  transition: all 0.2s;
+}
+
+.tab-nav button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.tab-nav button.active {
+  color: #0095f6;
+  border-bottom-color: #0095f6;
+}
+
+/* --- 5. 按鈕樣式 --- */
+.action-group {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  color: white;
+}
+
+.btn-secondary {
+  background: #efefef;
+  color: #050505;
+}

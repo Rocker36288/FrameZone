@@ -1,0 +1,64 @@
+/* 卡片整體微調 */
+.friend-list-card .card-body {
+  padding: 0.75rem;
+}
+
+/* 標題樣式 */
+.friend-list-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 0.75rem;
+  padding-left: 0.25rem;
+}
+
+/* 好友按鈕基礎樣式 */
+.friend-btn {
+  background-color: transparent;
+  border: none !important;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  outline: none !important;
+}
+
+/* 滑鼠懸停效果 */
+.friend-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  /* 淡淡的灰色 */
+  transform: translateX(2px);
+  /* 稍微向右位移，增加互動感 */
+}
+
+/* 點擊時效果 */
+.friend-btn:active {
+  background-color: rgba(0, 0, 0, 0.1);
+  transform: scale(0.98);
+  /* 輕微縮小感覺有按下去 */
+}
+
+/* 好友頭像 */
+.friend-avatar {
+  width: 35px;
+  height: 35px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+/* 好友名稱 */
+.friend-name {
+  font-size: 0.9rem;
+  color: #333;
+  font-weight: 500;
+}
+
+/* 線上狀態燈 */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-left: auto;
+}
