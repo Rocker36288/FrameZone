@@ -23,13 +23,19 @@ public partial class Comment
 
     public DateTime? DeletedAt { get; set; }
 
+    public virtual ICollection<CommentImage> CommentImages { get; set; } = new List<CommentImage>();
+
     public virtual ICollection<CommentLike> CommentLikes { get; set; } = new List<CommentLike>();
 
     public virtual ICollection<CommentTarget> CommentTargets { get; set; } = new List<CommentTarget>();
 
+    public virtual ICollection<CommentVideo> CommentVideos { get; set; } = new List<CommentVideo>();
+
     public virtual ICollection<Comment> InverseParentComment { get; set; } = new List<Comment>();
 
     public virtual Comment ParentComment { get; set; }
+
+    public virtual ICollection<ReportTarget1> ReportTarget1s { get; set; } = new List<ReportTarget1>();
 
     public virtual User User { get; set; }
 }

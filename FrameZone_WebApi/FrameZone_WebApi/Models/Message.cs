@@ -39,7 +39,15 @@ public partial class Message
 
     public virtual ICollection<MessageRead> MessageReads { get; set; } = new List<MessageRead>();
 
+    public virtual Order Order { get; set; }
+
+    public virtual Product Product { get; set; }
+
+    public virtual ICollection<ReportTarget1> ReportTarget1s { get; set; } = new List<ReportTarget1>();
+
     public virtual ChatRoom Room { get; set; }
 
     public virtual User SenderUser { get; set; }
+
+    public virtual Sticker Sticker { get; set; }
 }

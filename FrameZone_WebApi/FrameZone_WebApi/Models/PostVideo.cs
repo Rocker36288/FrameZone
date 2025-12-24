@@ -22,4 +22,6 @@ public partial class PostVideo
     public DateTime? DeleteAt { get; set; }
 
     public virtual Post Post { get; set; }
+
+    public virtual Video Video { get; set; }
 }

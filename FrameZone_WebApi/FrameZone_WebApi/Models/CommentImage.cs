@@ -20,4 +20,8 @@ public partial class CommentImage
     public DateTime? UpdatedAt { get; set; }
 
     public DateTime? DeletedAt { get; set; }
+
+    public virtual Comment Comment { get; set; }
+
+    public virtual Photo Photo { get; set; }
 }

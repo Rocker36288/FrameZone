@@ -21,5 +21,7 @@ public partial class PostImage
 
     public DateTime? DeleteAt { get; set; }
 
+    public virtual Photo Photo { get; set; }
+
     public virtual Post Post { get; set; }
 }

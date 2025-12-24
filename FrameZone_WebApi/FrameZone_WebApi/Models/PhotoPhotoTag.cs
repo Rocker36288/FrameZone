@@ -7,6 +7,8 @@ namespace FrameZone_WebApi.Models;
 
 public partial class PhotoPhotoTag
 {
+    public long PhotoTagId { get; set; }
+
     public long PhotoId { get; set; }
 
     public int TagId { get; set; }
@@ -22,8 +24,6 @@ public partial class PhotoPhotoTag
     public DateTime CreatedAt { get; set; }
 
     public virtual Photo Photo { get; set; }
-
-    public virtual PhotoClassificationSource Source { get; set; }
 
     public virtual PhotoTag Tag { get; set; }
 }

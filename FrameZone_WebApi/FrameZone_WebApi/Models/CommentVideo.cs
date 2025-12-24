@@ -20,4 +20,8 @@ public partial class CommentVideo
     public DateTime? UpdatedAt { get; set; }
 
     public DateTime? DeletedAt { get; set; }
+
+    public virtual Comment Comment { get; set; }
+
+    public virtual Video Video { get; set; }
 }

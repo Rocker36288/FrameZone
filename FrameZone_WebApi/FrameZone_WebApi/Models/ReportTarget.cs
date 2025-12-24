@@ -11,18 +11,11 @@ public partial class ReportTarget
 
     public int TargetTypeId { get; set; }
 
-    public int? CommentId { get; set; }
+    public long ProductId { get; set; }
 
-    public int? PostId { get; set; }
-
-    public int? MessageId { get; set; }
-
-    public virtual Post Post { get; set; }
-    public int VideoId { get; set; }
+    public virtual Product Product { get; set; }
 
     public virtual ICollection<Report> Reports { get; set; } = new List<Report>();
 
     public virtual TargetType TargetType { get; set; }
-
-    public virtual Video Video { get; set; }
 }

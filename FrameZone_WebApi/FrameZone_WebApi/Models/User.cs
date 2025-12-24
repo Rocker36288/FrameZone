@@ -31,19 +31,13 @@ public partial class User
 
     public DateTime UpdatedAt { get; set; }
 
-    public virtual ICollection<Follow> FollowFollowers { get; set; } = new List<Follow>();
+    public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
-    public virtual ICollection<Follow> FollowFollowings { get; set; } = new List<Follow>();
+    public virtual ICollection<BuyerAbnormal> BuyerAbnormals { get; set; } = new List<BuyerAbnormal>();
 
-    public virtual ICollection<Group> Groups { get; set; } = new List<Group>();
+    public virtual ICollection<BuyerCoupon> BuyerCoupons { get; set; } = new List<BuyerCoupon>();
 
-    public virtual ICollection<PostLike> PostLikes { get; set; } = new List<PostLike>();
-
-    public virtual ICollection<PostShare> PostShares { get; set; } = new List<PostShare>();
-
-    public virtual ICollection<PostView> PostViews { get; set; } = new List<PostView>();
-
-    public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
+    public virtual ICollection<BuyerDetail> BuyerDetails { get; set; } = new List<BuyerDetail>();
 
     public virtual Channel Channel { get; set; }
 
@@ -53,7 +47,15 @@ public partial class User
 
     public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
+    public virtual ICollection<Coupon> Coupons { get; set; } = new List<Coupon>();
+
     public virtual ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
+
+    public virtual ICollection<Follow> FollowFollowers { get; set; } = new List<Follow>();
+
+    public virtual ICollection<Follow> FollowFollowings { get; set; } = new List<Follow>();
+
+    public virtual ICollection<Group> Groups { get; set; } = new List<Group>();
 
     public virtual ICollection<InvoiceSetting> InvoiceSettings { get; set; } = new List<InvoiceSetting>();
 
@@ -63,9 +65,13 @@ public partial class User
 
     public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
 
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
     public virtual ICollection<PaymentMethod> PaymentMethods { get; set; } = new List<PaymentMethod>();
 
     public virtual ICollection<PaymentTransaction> PaymentTransactions { get; set; } = new List<PaymentTransaction>();
+
+    public virtual ICollection<PayoutBatch> PayoutBatches { get; set; } = new List<PayoutBatch>();
 
     public virtual ICollection<PhotoAlbum> PhotoAlbums { get; set; } = new List<PhotoAlbum>();
 
@@ -81,7 +87,25 @@ public partial class User
 
     public virtual ICollection<PhotoUserSubscription> PhotoUserSubscriptions { get; set; } = new List<PhotoUserSubscription>();
 
+    public virtual ICollection<Photographer> Photographers { get; set; } = new List<Photographer>();
+
+    public virtual ICollection<PickupConvenienceStore> PickupConvenienceStores { get; set; } = new List<PickupConvenienceStore>();
+
     public virtual ICollection<Playlist> Playlists { get; set; } = new List<Playlist>();
+
+    public virtual ICollection<PostLike> PostLikes { get; set; } = new List<PostLike>();
+
+    public virtual ICollection<PostShare> PostShares { get; set; } = new List<PostShare>();
+
+    public virtual ICollection<PostView> PostViews { get; set; } = new List<PostView>();
+
+    public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
+
+    public virtual ICollection<ProductAudit> ProductAudits { get; set; } = new List<ProductAudit>();
+
+    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+
+    public virtual ICollection<ReceivingAddress> ReceivingAddresses { get; set; } = new List<ReceivingAddress>();
 
     public virtual ICollection<RefundRequest> RefundRequests { get; set; } = new List<RefundRequest>();
 
@@ -95,17 +119,19 @@ public partial class User
 
     public virtual ICollection<Review> ReviewReviewerUsers { get; set; } = new List<Review>();
 
-    public virtual ICollection<PhotoAlbum> PhotoAlbums { get; set; } = new List<PhotoAlbum>();
+    public virtual ICollection<SellerAuditHistory> SellerAuditHistoryAdministratorUsers { get; set; } = new List<SellerAuditHistory>();
 
-    public virtual ICollection<PhotoCategory> PhotoCategories { get; set; } = new List<PhotoCategory>();
+    public virtual ICollection<SellerAuditHistory> SellerAuditHistorySellerUsers { get; set; } = new List<SellerAuditHistory>();
 
-    public virtual ICollection<PhotoShare> PhotoShares { get; set; } = new List<PhotoShare>();
+    public virtual ICollection<SellerCategory> SellerCategories { get; set; } = new List<SellerCategory>();
 
-    public virtual ICollection<PhotoSubscriptionHistory> PhotoSubscriptionHistories { get; set; } = new List<PhotoSubscriptionHistory>();
+    public virtual ICollection<SellerDetail> SellerDetailAdministratorUsers { get; set; } = new List<SellerDetail>();
 
-    public virtual ICollection<PhotoUserQuotaUsage> PhotoUserQuotaUsages { get; set; } = new List<PhotoUserQuotaUsage>();
+    public virtual ICollection<SellerDetail> SellerDetailSellerUsers { get; set; } = new List<SellerDetail>();
 
-    public virtual ICollection<PhotoUserSubscription> PhotoUserSubscriptions { get; set; } = new List<PhotoUserSubscription>();
+    public virtual ICollection<ShoppingCart> ShoppingCarts { get; set; } = new List<ShoppingCart>();
+
+    public virtual ICollection<StoreBasicInformation> StoreBasicInformations { get; set; } = new List<StoreBasicInformation>();
 
     public virtual ICollection<UserBankAccount> UserBankAccounts { get; set; } = new List<UserBankAccount>();
 
@@ -130,4 +156,6 @@ public partial class User
     public virtual ICollection<UserSession> UserSessions { get; set; } = new List<UserSession>();
 
     public virtual ICollection<UserVerification> UserVerifications { get; set; } = new List<UserVerification>();
+
+    public virtual ICollection<WalletTransaction> WalletTransactions { get; set; } = new List<WalletTransaction>();
 }

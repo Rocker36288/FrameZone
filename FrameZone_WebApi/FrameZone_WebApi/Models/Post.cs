@@ -35,7 +35,7 @@ public partial class Post
 
     public virtual ICollection<PostView> PostViews { get; set; } = new List<PostView>();
 
-    public virtual ICollection<ReportTarget> ReportTargets { get; set; } = new List<ReportTarget>();
+    public virtual ICollection<ReportTarget1> ReportTarget1s { get; set; } = new List<ReportTarget1>();
 
     public virtual User User { get; set; }
 }

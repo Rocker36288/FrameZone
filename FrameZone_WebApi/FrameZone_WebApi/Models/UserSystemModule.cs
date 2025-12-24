@@ -21,6 +21,8 @@ public partial class UserSystemModule
 
     public DateTime UpdatedAt { get; set; }
 
+    public virtual ICollection<FrequentlyAskedQuestion> FrequentlyAskedQuestions { get; set; } = new List<FrequentlyAskedQuestion>();
+
     public virtual ICollection<PhotoQuotaType> PhotoQuotaTypes { get; set; } = new List<PhotoQuotaType>();
 
     public virtual ICollection<PhotoSubscriptionPlan> PhotoSubscriptionPlans { get; set; } = new List<PhotoSubscriptionPlan>();

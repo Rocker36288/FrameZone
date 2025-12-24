@@ -37,5 +37,9 @@ public partial class UserBankAccount
 
     public virtual BankBranch Branch { get; set; }
 
+    public virtual ICollection<PayoutBatch> PayoutBatches { get; set; } = new List<PayoutBatch>();
+
+    public virtual ICollection<SellerDetail> SellerDetails { get; set; } = new List<SellerDetail>();
+
     public virtual User User { get; set; }
 }

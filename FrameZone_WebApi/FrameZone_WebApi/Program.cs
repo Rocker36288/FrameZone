@@ -161,7 +161,7 @@ builder.Services.AddMemoryCache(options =>
 // ========== 註冊依賴注入服務 (DI注入) ==========
 // ========== 註冊依賴注入服務 (DI注入) ==========
 
-builder.Services.AddScoped<IPhotoRepository, PhotoRepository>();
+//builder.Services.AddScoped<IPhotoRepository, PhotoRepository>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<PostRepository>();
 
@@ -170,7 +170,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<IExifService, ExifService>();
-builder.Services.AddScoped<IPhotoService, PhotoService>();
+//builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<ITagCategorizationService, TagCategorizationService>();
 builder.Services.AddScoped<IBackgroundGeocodingService, BackgroundGeocodingService>();
 

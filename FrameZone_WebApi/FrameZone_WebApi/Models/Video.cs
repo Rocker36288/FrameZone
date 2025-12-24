@@ -47,5 +47,9 @@ public partial class Video
 
     public virtual ICollection<CommentTarget> CommentTargets { get; set; } = new List<CommentTarget>();
 
-    public virtual ICollection<ReportTarget> ReportTargets { get; set; } = new List<ReportTarget>();
+    public virtual ICollection<CommentVideo> CommentVideos { get; set; } = new List<CommentVideo>();
+
+    public virtual ICollection<PostVideo> PostVideos { get; set; } = new List<PostVideo>();
+
+    public virtual ICollection<ReportTarget2> ReportTarget2s { get; set; } = new List<ReportTarget2>();
 }

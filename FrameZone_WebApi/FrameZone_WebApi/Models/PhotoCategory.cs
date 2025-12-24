@@ -21,16 +21,6 @@ public partial class PhotoCategory
 
     public int? ParentCategoryId { get; set; }
 
-    public int DisplayOrder { get; set; }
-
-    public bool IsComingSoon { get; set; }
-
-    public bool IsDefaultExpanded { get; set; }
-
-    public int MaxItemsToShow { get; set; }
-
-    public string UiType { get; set; }
-
     public bool IsActive { get; set; }
 
     public DateTime CreatedAt { get; set; }
@@ -42,8 +32,6 @@ public partial class PhotoCategory
     public virtual ICollection<PhotoAiclassificationSuggestion> PhotoAiclassificationSuggestions { get; set; } = new List<PhotoAiclassificationSuggestion>();
 
     public virtual ICollection<PhotoPhotoCategory> PhotoPhotoCategories { get; set; } = new List<PhotoPhotoCategory>();
-
-    public virtual ICollection<PhotoTag> PhotoTags { get; set; } = new List<PhotoTag>();
 
     public virtual User User { get; set; }
 }

@@ -9,15 +9,11 @@ public partial class PhotoTag
 {
     public int TagId { get; set; }
 
-    public int CategoryId { get; set; }
+    public long? UserId { get; set; }
 
     public string TagName { get; set; }
 
     public string TagType { get; set; }
-
-    public int? ParentTagId { get; set; }
-
-    public int DisplayOrder { get; set; }
 
     public bool IsActive { get; set; }
 
@@ -25,11 +21,7 @@ public partial class PhotoTag
 
     public DateTime UpdatedAt { get; set; }
 
-    public virtual PhotoCategory Category { get; set; }
-
-    public virtual ICollection<PhotoTag> InverseParentTag { get; set; } = new List<PhotoTag>();
-
-    public virtual PhotoTag ParentTag { get; set; }
-
     public virtual ICollection<PhotoPhotoTag> PhotoPhotoTags { get; set; } = new List<PhotoPhotoTag>();
+
+    public virtual User User { get; set; }
 }

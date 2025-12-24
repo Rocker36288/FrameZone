@@ -31,6 +31,10 @@ public partial class Report
 
     public virtual ReportTarget ReportTarget { get; set; }
 
+    public virtual ReportTarget2 ReportTarget1 { get; set; }
+
+    public virtual ReportTarget1 ReportTargetNavigation { get; set; }
+
     public virtual User ReportedUser { get; set; }
 
     public virtual User ReporterUser { get; set; }

@@ -7,7 +7,7 @@ namespace FrameZone_WebApi.Models;
 
 public partial class PhotoMetadatum
 {
-    public long MetadataId { get; set; }
+    public long PhotoMetadata { get; set; }
 
     public long PhotoId { get; set; }
 
@@ -24,26 +24,6 @@ public partial class PhotoMetadatum
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
-
-    public decimal? FocalLength { get; set; }
-
-    public decimal? Aperture { get; set; }
-
-    public string ShutterSpeed { get; set; }
-
-    public int? Iso { get; set; }
-
-    public string ExposureMode { get; set; }
-
-    public string WhiteBalance { get; set; }
-
-    public string LensModel { get; set; }
-
-    public int? Orientation { get; set; }
-
-    public int? Width { get; set; }
-
-    public int? Height { get; set; }
 
     public virtual Photo Photo { get; set; }
 }

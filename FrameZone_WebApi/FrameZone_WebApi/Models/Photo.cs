@@ -19,19 +19,19 @@ public partial class Photo
 
     public byte[] PhotoData { get; set; }
 
-    public byte[] ThumbnailData { get; set; }
-
     public string Hash { get; set; }
 
     public DateTime UploadedAt { get; set; }
 
-    public bool IsDeleted { get; set; }
+    public bool IsDeletedAt { get; set; }
 
     public DateTime? DeletedAt { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
+
+    public virtual ICollection<CommentImage> CommentImages { get; set; } = new List<CommentImage>();
 
     public virtual ICollection<PhotoAiclassificationLog> PhotoAiclassificationLogs { get; set; } = new List<PhotoAiclassificationLog>();
 
@@ -41,11 +41,13 @@ public partial class Photo
 
     public virtual ICollection<PhotoPhotoAlbum> PhotoPhotoAlbums { get; set; } = new List<PhotoPhotoAlbum>();
 
-    public virtual ICollection<PhotoPhotoCategory> PhotoPhotoCategories { get; set; } = new List<PhotoPhotoCategory>();
+    public virtual PhotoPhotoCategory PhotoPhotoCategory { get; set; }
 
     public virtual ICollection<PhotoPhotoTag> PhotoPhotoTags { get; set; } = new List<PhotoPhotoTag>();
 
     public virtual ICollection<PhotoShare> PhotoShares { get; set; } = new List<PhotoShare>();
 
     public virtual ICollection<PhotoStorage> PhotoStorages { get; set; } = new List<PhotoStorage>();
+
+    public virtual ICollection<PostImage> PostImages { get; set; } = new List<PostImage>();
 }

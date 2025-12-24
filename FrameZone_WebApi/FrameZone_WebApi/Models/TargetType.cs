@@ -19,6 +19,10 @@ public partial class TargetType
 
     public virtual ICollection<CommentTarget> CommentTargets { get; set; } = new List<CommentTarget>();
 
+    public virtual ICollection<ReportTarget1> ReportTarget1s { get; set; } = new List<ReportTarget1>();
+
+    public virtual ICollection<ReportTarget2> ReportTarget2s { get; set; } = new List<ReportTarget2>();
+
     public virtual ICollection<ReportTarget> ReportTargets { get; set; } = new List<ReportTarget>();
 
     public virtual UserSystemModule System { get; set; }

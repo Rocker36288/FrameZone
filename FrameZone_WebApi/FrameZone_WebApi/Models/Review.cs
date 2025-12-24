@@ -31,6 +31,10 @@ public partial class Review
 
     public DateTime UpdatedAt { get; set; }
 
+    public virtual Booking Booking { get; set; }
+
+    public virtual OrderDetail OrderDetails { get; set; }
+
     public virtual ICollection<ReviewPhoto> ReviewPhotos { get; set; } = new List<ReviewPhoto>();
 
     public virtual User RevieweeUser { get; set; }

@@ -183,122 +183,6 @@
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[Photo]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoAIClassificationLog]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoAIClassificationSuggestion]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoAlbum]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoCategory]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoCategoryType]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoClassificationSource]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoFeatureToggle]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoGeneralSetting]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoLocation]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoMaintenanceSetting]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoMetadata]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoPhotoAlbum]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoPhotoCategory]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoPhotoTag]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoQuotaType]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoSecuritySetting]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoShare]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoStorage]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoStorageProvider]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoSubscriptionHistory]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoSubscriptionPlan]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoSubscriptionQuota]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoTag]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoThirdPartyConfig]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoThirdPartyServiceType]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoUploadLimitSetting]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoUserQuotaUsage]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[dbo].[PhotoUserSubscription]",
-         "ObjectType": 0
-      },
-      {
          "Name": "[dbo].[User]",
          "ObjectType": 0
       },
@@ -371,6 +255,46 @@
          "ObjectType": 0
       },
       {
+         "Name": "[PhotographerBooking].[AvailableSlots]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[PhotographerBooking].[Bookings]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[PhotographerBooking].[Photographers]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[PhotographerBooking].[PhotographerServices]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[PhotographerBooking].[PhotographerSpecialties]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[PhotographerBooking].[PhotographerVerificationHistory]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[PhotographerBooking].[ServiceAreas]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[PhotographerBooking].[ServiceTypes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[PhotographerBooking].[SpecialtyCategories]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[PhotographerBooking].[SpecialtyTags]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[Share].[ChatMembers]",
          "ObjectType": 0
       },
@@ -427,39 +351,115 @@
          "ObjectType": 0
       },
       {
-         "Name": "[Video].[Channels]",
+         "Name": "[Shopping].[BuyerAbnormal]",
          "ObjectType": 0
       },
       {
-         "Name": "[Video].[Following]",
+         "Name": "[Shopping].[BuyerCoupons]",
          "ObjectType": 0
       },
       {
-         "Name": "[Video].[Likes]",
+         "Name": "[Shopping].[BuyerDetails]",
          "ObjectType": 0
       },
       {
-         "Name": "[Video].[Playlists]",
+         "Name": "[Shopping].[Coupons]",
          "ObjectType": 0
       },
       {
-         "Name": "[Video].[PlaylistVideos]",
+         "Name": "[Shopping].[FrequentlyAskedQuestions]",
          "ObjectType": 0
       },
       {
-         "Name": "[Video].[ReportTarget]",
+         "Name": "[Shopping].[OrderDetails]",
          "ObjectType": 0
       },
       {
-         "Name": "[Video].[UserSavedPlaylists]",
+         "Name": "[Shopping].[Orders]",
          "ObjectType": 0
       },
       {
-         "Name": "[Video].[Videos]",
+         "Name": "[Shopping].[OrderShipping]",
          "ObjectType": 0
       },
       {
-         "Name": "[Video].[View]",
+         "Name": "[Shopping].[PayoutBatchs]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[PayoutDetails]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[PickupConvenienceStores]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[ProductAudits]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[ProductImages]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[ProductPropertyDetails]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[ProductPropertys]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[Products]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[ProductSellerCategoryMappin]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[ProductShippingOption]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[ProductSpecifications]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[ReceivingAddresses]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[ReportTarget]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[SellerAuditHistory]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[SellerCategories]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[SellerDetails]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[ShoppingCart]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[SpecOptionMapping]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[StoreBasicInformation]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Shopping].[WalletTransactions]",
          "ObjectType": 0
       },
       {
@@ -520,6 +520,42 @@
       },
       {
          "Name": "[SocialNetwork].[Stickers]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[Channels]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[Following]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[Likes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[Playlists]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[PlaylistVideos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[ReportTarget]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[UserSavedPlaylists]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[Videos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Video].[View]",
          "ObjectType": 0
       }
    ],

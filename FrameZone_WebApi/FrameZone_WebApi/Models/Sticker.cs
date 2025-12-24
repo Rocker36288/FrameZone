@@ -22,4 +22,6 @@ public partial class Sticker
     public DateTime UpdateAt { get; set; }
 
     public DateTime? DeleteAt { get; set; }
+
+    public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
 }
