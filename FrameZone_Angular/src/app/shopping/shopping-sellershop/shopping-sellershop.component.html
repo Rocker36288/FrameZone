@@ -58,10 +58,104 @@
         <div class="col-12">
           <div class="card intro-card">
             <div class="card-header">
-              <h3 class="card-title">賣場介紹</h3>
+              <h3 class="card-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  class="icon me-2 icon-tabler icons-tabler-outline icon-tabler-info-circle">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+                  <path d="M12 9h.01" />
+                  <path d="M11 12h1v4h1" />
+                </svg>
+                賣場介紹
+              </h3>
             </div>
             <div class="card-body">
-              <p class="text-secondary mb-0">{{ sellerInfo.description }}</p>
+              <div class="row g-4">
+                <div class="col-12">
+                  <div class="d-flex align-items-start">
+                    <div class="text-primary me-3 mt-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="icon">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                      </svg>
+                    </div>
+                    <div>
+                      <p class="text-secondary mb-2">{{ sellerInfo.description }}</p>
+                      <p class="text-secondary mb-0">我相信好東西就該被分享！如果你也喜歡生活中的小確幸，歡迎逛逛我的賣場，也許能找到讓你心動的寶物 💕</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="d-flex align-items-start">
+                    <div class="text-success me-3 mt-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="icon">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </div>
+                    <div>
+                      <h5 class="mb-1">品質保證</h5>
+                      <p class="text-secondary small mb-0">每件商品都是我親自挑選<br>不好的東西絕對不上架！</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="d-flex align-items-start">
+                    <div class="text-info me-3 mt-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="icon">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                      </svg>
+                    </div>
+                    <div>
+                      <h5 class="mb-1">用心包裝</h5>
+                      <p class="text-secondary small mb-0">每份包裹都用心準備<br>就像送給朋友的禮物一樣</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="d-flex align-items-start">
+                    <div class="text-warning me-3 mt-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="icon">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h5 class="mb-1">隨時線上</h5>
+                      <p class="text-secondary small mb-0">有問題隨時私訊我<br>我會盡快回覆你的 😊</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="d-flex align-items-start">
+                    <div class="text-pink me-3 mt-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="icon">
+                        <path
+                          d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                        </path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h5 class="mb-1">真心感謝</h5>
+                      <p class="text-secondary small mb-0">感謝每位支持我的朋友<br>你們的鼓勵是我最大的動力 ❤️</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -72,7 +166,16 @@
         <div class="col-12">
           <div class="card shop-image-card">
             <div class="card-header">
-              <h3 class="card-title">賣場圖片</h3>
+              <h3 class="card-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  class="icon me-2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                賣場圖片
+              </h3>
             </div>
             <img [src]="sellerInfo.shopImage" class="shop-main-image" alt="賣場代表圖片">
           </div>
@@ -84,9 +187,8 @@
         <!-- 左側分類欄 -->
         <div class="col-lg-2 col-md-3 mb-4">
           <div class="card category-card">
-            <div class="card-header">
-              <h4 class="card-title mb-0">分類</h4>
-            </div>
+            <!-- 分類標題裝飾 -->
+            <div class="category-title-bar"></div>
             <div class="list-group list-group-flush">
               <a *ngFor="let category of categories" href="javascript:void(0)"
                 class="list-group-item list-group-item-action" [class.active]="selectedCategoryId === category.id"
@@ -99,78 +201,120 @@
 
         <!-- 右側商品區 -->
         <div class="col-lg-10 col-md-9">
-          <!-- 排序按鈕 -->
+          <!-- 排序與搜尋 -->
           <div class="card mb-3">
             <div class="card-body py-2">
-              <div class="d-flex align-items-center justify-content-end gap-2">
-                <span class="text-muted small">排序：</span>
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-sm d-flex align-items-center gap-1"
-                    [ngClass]="sortBy === 'price' ? 'btn-primary' : 'btn-outline-primary'" (click)="onSort('price')">
-                    價格
-                    <span *ngIf="sortBy === 'price'">
-                      <svg *ngIf="sortOrder === 'desc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" class="icon">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M12 5v.5m0 3v1.5m0 3v6" />
-                        <path d="M16 15l-4 4" />
-                        <path d="M8 15l4 4" />
-                      </svg>
-                      <svg *ngIf="sortOrder === 'asc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" class="icon">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M12 5v6m0 3v1.5m0 3v.5" />
-                        <path d="M16 9l-4 -4" />
-                        <path d="M8 9l4 -4" />
-                      </svg>
-                    </span>
-                  </button>
-                  <button type="button" class="btn btn-sm d-flex align-items-center gap-1"
-                    [ngClass]="sortBy === 'latest' ? 'btn-primary' : 'btn-outline-primary'" (click)="onSort('latest')">
-                    最新
-                    <span *ngIf="sortBy === 'latest'">
-                      <svg *ngIf="sortOrder === 'desc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" class="icon">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M12 5v.5m0 3v1.5m0 3v6" />
-                        <path d="M16 15l-4 4" />
-                        <path d="M8 15l4 4" />
-                      </svg>
-                      <svg *ngIf="sortOrder === 'asc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" class="icon">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M12 5v6m0 3v1.5m0 3v.5" />
-                        <path d="M16 9l-4 -4" />
-                        <path d="M8 9l4 -4" />
-                      </svg>
-                    </span>
-                  </button>
-                  <button type="button" class="btn btn-sm d-flex align-items-center gap-1"
-                    [ngClass]="sortBy === 'sales' ? 'btn-primary' : 'btn-outline-primary'" (click)="onSort('sales')">
-                    熱銷
-                    <span *ngIf="sortBy === 'sales'">
-                      <svg *ngIf="sortOrder === 'desc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" class="icon">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M12 5v.5m0 3v1.5m0 3v6" />
-                        <path d="M16 15l-4 4" />
-                        <path d="M8 15l4 4" />
-                      </svg>
-                      <svg *ngIf="sortOrder === 'asc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" class="icon">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M12 5v6m0 3v1.5m0 3v.5" />
-                        <path d="M16 9l-4 -4" />
-                        <path d="M8 9l4 -4" />
-                      </svg>
-                    </span>
-                  </button>
+              <div class="row g-3 align-items-center">
+                <!-- 左側：排序按鈕 -->
+                <div class="col-md-4">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="text-muted small">排序：</span>
+                    <div class="btn-group" role="group">
+                      <button type="button" class="btn btn-sm d-flex align-items-center gap-1"
+                        [ngClass]="sortBy === 'price' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="onSort('price')">
+                        價格
+                        <span *ngIf="sortBy === 'price'">
+                          <svg *ngIf="sortOrder === 'desc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" class="icon">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M12 5v.5m0 3v1.5m0 3v6" />
+                            <path d="M16 15l-4 4" />
+                            <path d="M8 15l4 4" />
+                          </svg>
+                          <svg *ngIf="sortOrder === 'asc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" class="icon">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M12 5v6m0 3v1.5m0 3v.5" />
+                            <path d="M16 9l-4 -4" />
+                            <path d="M8 9l4 -4" />
+                          </svg>
+                        </span>
+                      </button>
+                      <button type="button" class="btn btn-sm d-flex align-items-center gap-1"
+                        [ngClass]="sortBy === 'latest' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="onSort('latest')">
+                        最新
+                        <span *ngIf="sortBy === 'latest'">
+                          <svg *ngIf="sortOrder === 'desc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" class="icon">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M12 5v.5m0 3v1.5m0 3v6" />
+                            <path d="M16 15l-4 4" />
+                            <path d="M8 15l4 4" />
+                          </svg>
+                          <svg *ngIf="sortOrder === 'asc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" class="icon">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M12 5v6m0 3v1.5m0 3v.5" />
+                            <path d="M16 9l-4 -4" />
+                            <path d="M8 9l4 -4" />
+                          </svg>
+                        </span>
+                      </button>
+                      <button type="button" class="btn btn-sm d-flex align-items-center gap-1"
+                        [ngClass]="sortBy === 'sales' ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="onSort('sales')">
+                        熱銷
+                        <span *ngIf="sortBy === 'sales'">
+                          <svg *ngIf="sortOrder === 'desc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" class="icon">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M12 5v.5m0 3v1.5m0 3v6" />
+                            <path d="M16 15l-4 4" />
+                            <path d="M8 15l4 4" />
+                          </svg>
+                          <svg *ngIf="sortOrder === 'asc'" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" class="icon">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M12 5v6m0 3v1.5m0 3v.5" />
+                            <path d="M16 9l-4 -4" />
+                            <path d="M8 9l4 -4" />
+                          </svg>
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 右側：價格區間與關鍵字搜尋 -->
+                <div class="col-md-8">
+                  <div class="row g-2 align-items-center">
+                    <!-- 價格區間 -->
+                    <div class="col-sm-5">
+                      <div class="input-group input-group-sm">
+                        <input type="number" class="form-control" placeholder="最低價格" [(ngModel)]="minPrice"
+                          (change)="onPriceFilter()">
+                        <span class="input-group-text">-</span>
+                        <input type="number" class="form-control" placeholder="最高價格" [(ngModel)]="maxPrice"
+                          (change)="onPriceFilter()">
+                      </div>
+                    </div>
+
+                    <!-- 關鍵字搜尋 -->
+                    <div class="col-sm-7">
+                      <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" placeholder="搜尋商品關鍵字..." [(ngModel)]="searchKeyword"
+                          (keyup.enter)="onSearch()">
+                        <button class="btn btn-primary d-flex align-items-center justify-content-center" type="button"
+                          (click)="onSearch()">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-search">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+                            <path d="M21 21l-6 -6" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -179,21 +323,31 @@
           <!-- 商品列表 -->
           <div class="row row-cards" *ngIf="displayProducts.length > 0">
             <div class="col-xl-2-4 col-lg-3 col-md-4 col-sm-6 mb-3" *ngFor="let product of displayProducts">
-              <div class="card d-flex flex-column h-100 product-card">
-                <a href="javascript:void(0)">
-                  <img class="card-img-top" [src]="product.image" [alt]="product.name" />
-                </a>
+              <div class="card d-flex flex-column h-100 product-card" [routerLink]="['/shopping/product', product.id]">
+                <img class="card-img-top" [src]="product.image" [alt]="product.name" />
                 <div class="card-body d-flex flex-column">
                   <h4 class="card-title">
-                    <a href="javascript:void(0)">{{ product.name }}</a>
+                    {{ product.name }}
                   </h4>
                   <div class="text-secondary small mb-3">
                     {{ product.description }}
                   </div>
-                  <div class="mt-auto">
+                  <div class="mt-auto d-flex align-items-center justify-content-between">
                     <div class="h3 text-primary mb-0">
                       NT$ {{ product.price }}
                     </div>
+                    <!-- <a href="javascript:void(0)" class="favorite-icon" [class.favorited]="isFavorite(product.id)"
+                      (click)="toggleFavorite(product, $event)">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        [attr.fill]="isFavorite(product.id) ? '#dc3545' : 'none'" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" class="icon">
+                        <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
+                      </svg>
+                    </a> -->
+                    <app-favorite-button [isFavorite]="product.isFavorite" [itemName]="product.name"
+                      (favoriteChange)="product.isFavorite = $event">
+                    </app-favorite-button>
+
                   </div>
                 </div>
               </div>
@@ -225,19 +379,30 @@
           <div class="card mt-3" *ngIf="totalPages > 1">
             <div class="card-body py-3">
               <ul class="pagination justify-content-center mb-0 flex-wrap">
-                <!-- 上一頁 -->
+                <!-- 第一頁 -->
                 <li class="page-item" [class.disabled]="currentPage === 1">
-                  <a class="page-link" href="javascript:void(0)" (click)="currentPage > 1 && goToPage(currentPage - 1)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  <a class="page-link" href="javascript:void(0)" (click)="currentPage > 1 && goToPage(1)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                       class="icon">
-                      <polyline points="15 18 9 12 15 6"></polyline>
+                      <path d="M11 7l-5 5l5 5" />
+                      <path d="M17 7l-5 5l5 5" />
                     </svg>
-                    上一頁
                   </a>
                 </li>
 
-                <!-- 第一頁 -->
+                <!-- 上一頁 -->
+                <li class="page-item" [class.disabled]="currentPage === 1">
+                  <a class="page-link" href="javascript:void(0)" (click)="currentPage > 1 && goToPage(currentPage - 1)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="icon">
+                      <path d="M15 6l-6 6l6 6" />
+                    </svg>
+                  </a>
+                </li>
+
+                <!-- 第一頁頁碼 -->
                 <li class="page-item" [class.active]="currentPage === 1">
                   <a class="page-link" href="javascript:void(0)" (click)="goToPage(1)">1</a>
                 </li>
@@ -260,7 +425,7 @@
                   <span class="page-link">...</span>
                 </li>
 
-                <!-- 最後一頁 -->
+                <!-- 最後一頁頁碼 -->
                 <li class="page-item" [class.active]="currentPage === totalPages" *ngIf="totalPages > 1">
                   <a class="page-link" href="javascript:void(0)" (click)="goToPage(totalPages)">
                     {{ totalPages }}
@@ -271,11 +436,23 @@
                 <li class="page-item" [class.disabled]="currentPage === totalPages">
                   <a class="page-link" href="javascript:void(0)"
                     (click)="currentPage < totalPages && goToPage(currentPage + 1)">
-                    下一頁
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                       class="icon">
-                      <polyline points="9 18 15 12 9 6"></polyline>
+                      <path d="M9 6l6 6l-6 6" />
+                    </svg>
+                  </a>
+                </li>
+
+                <!-- 最後一頁 -->
+                <li class="page-item" [class.disabled]="currentPage === totalPages">
+                  <a class="page-link" href="javascript:void(0)"
+                    (click)="currentPage < totalPages && goToPage(totalPages)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="icon">
+                      <path d="M7 7l5 5l-5 5" />
+                      <path d="M13 7l5 5l-5 5" />
                     </svg>
                   </a>
                 </li>
@@ -341,4 +518,21 @@
       </button>
     </div>
   </div>
+
+  <!-- Toast 提示訊息 -->
+  <!-- <div class="toast-container" *ngIf="showToast">
+    <div class="toast show">
+      <div class="toast-body">
+        {{ toastMessage }}
+      </div>
+    </div>
+  </div> -->
+</div>
+
+<div>
+  <app-toast-notification></app-toast-notification>
+</div>
+
+<div>
+  <app-footer></app-footer>
 </div>
