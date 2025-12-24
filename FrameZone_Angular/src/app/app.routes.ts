@@ -73,12 +73,28 @@ export const routes: Routes = [
         loadComponent: () => import('./shopping/shoppinghome/shoppinghome.component').then(m => m.ShoppinghomeComponent)
       },
       {
-        path: 'product/:productId',
+        path: 'products',
+        loadComponent: () => import('./shopping/shopping-products/shopping-products.component').then(m => m.ShoppingProductsComponent)
+      },
+      {
+        path: 'product-detail/:productId',
         loadComponent: () => import('./shopping/shopping-product-detail/shopping-product-detail.component').then(m => m.ShoppingProductDetailComponent)
       },
       {
         path: 'sellershop/:sellerAccount',
         loadComponent: () => import('./shopping/shopping-sellershop/shopping-sellershop.component').then(m => m.ShoppingSellershopComponent)
+      },
+      {
+        path: 'buyer-center',
+        loadComponent: () => import('./shopping/shopping-buyer-center/shopping-buyer-center.component').then(m => m.ShoppingBuyerCenterComponent)
+      },
+      {
+        path: 'reviews',
+        loadComponent: () => import('./shopping/shopping-reviews/shopping-reviews.component').then(m => m.ShoppingReviewsComponent)
+      },
+      {
+        path: 'chats',
+        loadComponent: () => import('./shopping/shopping-chats/shopping-chats.component').then(m => m.ShoppingChatsComponent)
       }
     ]
   },
@@ -89,6 +105,91 @@ export const routes: Routes = [
   {
     path: 'checkout',
     loadComponent: () => import('./shopping/shopping-checkout/shopping-checkout.component').then(m => m.ShoppingCheckoutComponent)
+  },
+  {
+    path: 'order-success',
+    loadComponent: () => import('./shopping/shopping-order-success/shopping-order-success.component').then(m => m.ShoppingOrderSuccessComponent)
+  },
+  {
+    path: 'help-center',
+    loadComponent: () => import('./shopping/shopping-help-center/shopping-help-center.component').then(m => m.ShoppingHelpCenterComponent)
+  },
+  {
+    path: 'seller',
+    loadComponent: () => import('./shopping/seller/seller-layout/seller-layout.component').then(m => m.SellerLayoutComponent),
+    children: [
+      {
+        path: '',
+        redirectTo: 'seller-management',
+        pathMatch: 'full'
+      },
+      {
+        path: 'myshop-settings',
+        loadComponent: () => import('./shopping/seller/myshop-settings/myshop-settings.component').then(m => m.MyshopSettingsComponent)
+      },
+      {
+        path: 'category-settings',
+        loadComponent: () => import('./shopping/seller/category-settings/category-settings.component').then(m => m.CategorySettingsComponent)
+      },
+      {
+        path: 'products/:status',
+        loadComponent: () => import('./shopping/seller/product-management/product-management.component').then(m => m.ProductManagementComponent)
+      },
+      {
+        path: 'products',
+        redirectTo: 'products/all',
+        pathMatch: 'full'
+      },
+      {
+        path: 'orders/:status',
+        loadComponent: () => import('./shopping/seller/order-management/order-management.component').then(m => m.OrderManagementComponent)
+      },
+      {
+        path: 'orders',
+        redirectTo: 'orders/all',
+        pathMatch: 'full'
+        // 建議保留一個不帶參數的預設路徑，避免直接輸入 /seller/orders 報錯
+      },
+      {
+        path: 'reviews',
+        loadComponent: () => import('./shopping/seller/review-management/review-management.component').then(m => m.ReviewManagementComponent)
+      },
+      {
+        path: 'wallet',
+        loadComponent: () => import('./shopping/seller/wallet-management/wallet-management.component').then(m => m.WalletManagementComponent)
+      },
+      {
+        path: 'bank-account',
+        loadComponent: () => import('./shopping/seller/bank-account-management/bank-account-management.component').then(m => m.BankAccountManagementComponent)
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('./shopping/seller/settings/settings.component').then(m => m.SettingsComponent),
+        children: [
+          {
+            path: '',
+            redirectTo: 'coupons',
+            pathMatch: 'full'
+          },
+          {
+            path: 'coupons',
+            loadComponent: () => import('./shopping/seller/settings/coupon-settings/coupon-settings.component').then(m => m.CouponSettingsComponent)
+          },
+          {
+            path: 'shipping',
+            loadComponent: () => import('./shopping/seller/settings/shipping-settings/shipping-settings.component').then(m => m.ShippingSettingsComponent)
+          },
+          {
+            path: 'payment',
+            loadComponent: () => import('./shopping/seller/settings/payment-settings/payment-settings.component').then(m => m.PaymentSettingsComponent)
+          },
+          {
+            path: 'chat',
+            loadComponent: () => import('./shopping/seller/settings/chat-settings/chat-settings.component').then(m => m.ChatSettingsComponent)
+          }
+        ]
+      }
+    ]
   },
   {
     path: '',
@@ -122,8 +223,6 @@ export const routes: Routes = [
       }
     ]
   },
-
-
   {
     path: 'videos',
     loadChildren: () => import('./videos/videos.routes').then(m => m.VIDEO_ROUTES)
