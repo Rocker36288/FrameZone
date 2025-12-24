@@ -19,6 +19,14 @@ public partial class AAContext : DbContext
 
     public virtual DbSet<BankBranch> BankBranches { get; set; }
 
+    public virtual DbSet<BellNotification> BellNotifications { get; set; }
+
+    public virtual DbSet<BellNotificationArchive> BellNotificationArchives { get; set; }
+
+    public virtual DbSet<BellNotificationPreference> BellNotificationPreferences { get; set; }
+
+    public virtual DbSet<BellNotificationRecipient> BellNotificationRecipients { get; set; }
+
     public virtual DbSet<Booking> Bookings { get; set; }
 
     public virtual DbSet<BuyerAbnormal> BuyerAbnormals { get; set; }
@@ -28,6 +36,8 @@ public partial class AAContext : DbContext
     public virtual DbSet<BuyerDetail> BuyerDetails { get; set; }
 
     public virtual DbSet<CardBrand> CardBrands { get; set; }
+
+    public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<Channel> Channels { get; set; }
 
@@ -173,6 +183,8 @@ public partial class AAContext : DbContext
 
     public virtual DbSet<PostView> PostViews { get; set; }
 
+    public virtual DbSet<Priority> Priorities { get; set; }
+
     public virtual DbSet<Product> Products { get; set; }
 
     public virtual DbSet<ProductAudit> ProductAudits { get; set; }
@@ -232,6 +244,8 @@ public partial class AAContext : DbContext
     public virtual DbSet<StoreBasicInformation> StoreBasicInformations { get; set; }
 
     public virtual DbSet<TargetType> TargetTypes { get; set; }
+
+    public virtual DbSet<Template> Templates { get; set; }
 
     public virtual DbSet<TransactionStatusLog> TransactionStatusLogs { get; set; }
 
@@ -366,6 +380,135 @@ public partial class AAContext : DbContext
                 .HasForeignKey(d => d.BankId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_BankBranch_Bank");
+        });
+
+        modelBuilder.Entity<BellNotification>(entity =>
+        {
+            entity.HasKey(e => e.NotificationId);
+
+            entity.ToTable("BellNotification", "Notification");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.CreatedBy)
+                .IsRequired()
+                .HasMaxLength(50)
+                .HasDefaultValue("System");
+            entity.Property(e => e.ExpiresAt)
+                .HasDefaultValueSql("(dateadd(day,(30),getdate()))")
+                .HasColumnType("datetime");
+            entity.Property(e => e.NotificationContent)
+                .IsRequired()
+                .HasMaxLength(500);
+            entity.Property(e => e.NotificationTitle)
+                .IsRequired()
+                .HasMaxLength(200);
+            entity.Property(e => e.RelatedObjectType).HasMaxLength(50);
+
+            entity.HasOne(d => d.Category).WithMany(p => p.BellNotifications)
+                .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_BellNotification_Category");
+
+            entity.HasOne(d => d.Priority).WithMany(p => p.BellNotifications)
+                .HasForeignKey(d => d.PriorityId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_BellNotification_Priority");
+
+            entity.HasOne(d => d.System).WithMany(p => p.BellNotifications)
+                .HasForeignKey(d => d.SystemId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_BellNotification_UserSystemModule");
+
+            entity.HasOne(d => d.Template).WithMany(p => p.BellNotifications)
+                .HasForeignKey(d => d.TemplateId)
+                .HasConstraintName("FK_BellNotification_Template");
+        });
+
+        modelBuilder.Entity<BellNotificationArchive>(entity =>
+        {
+            entity.HasKey(e => e.ArchiveId);
+
+            entity.ToTable("BellNotificationArchive", "Notification");
+
+            entity.Property(e => e.ArchiveReason)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.ArchivedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.OriginalCreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.OriginalUpdatedAt).HasColumnType("datetime");
+            entity.Property(e => e.ReadAt).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Notification).WithMany(p => p.BellNotificationArchives)
+                .HasForeignKey(d => d.NotificationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_BellNotificationArchive_Notification");
+
+            entity.HasOne(d => d.User).WithMany(p => p.BellNotificationArchives)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_BellNotificationArchive_User");
+        });
+
+        modelBuilder.Entity<BellNotificationPreference>(entity =>
+        {
+            entity.HasKey(e => e.SettingId);
+
+            entity.ToTable("BellNotificationPreference", "Notification");
+
+            entity.HasIndex(e => new { e.UserId, e.SystemId, e.CategoryId }, "UQ_BellNotificationPreference_User_Category").IsUnique();
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsEnabled).HasDefaultValue(true);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Category).WithMany(p => p.BellNotificationPreferences)
+                .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_BellNotificationPreference_Category");
+
+            entity.HasOne(d => d.System).WithMany(p => p.BellNotificationPreferences)
+                .HasForeignKey(d => d.SystemId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_BellNotificationPreference_UserSystemModule");
+
+            entity.HasOne(d => d.User).WithMany(p => p.BellNotificationPreferences)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_BellNotificationPreference_User");
+        });
+
+        modelBuilder.Entity<BellNotificationRecipient>(entity =>
+        {
+            entity.HasKey(e => e.RecipientId);
+
+            entity.ToTable("BellNotificationRecipient", "Notification");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DeletedAt).HasColumnType("datetime");
+            entity.Property(e => e.ReadAt).HasColumnType("datetime");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Notification).WithMany(p => p.BellNotificationRecipients)
+                .HasForeignKey(d => d.NotificationId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_BellNotificationRecipient_Notification");
+
+            entity.HasOne(d => d.User).WithMany(p => p.BellNotificationRecipients)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_BellNotificationRecipient_User");
         });
 
         modelBuilder.Entity<Booking>(entity =>
@@ -546,6 +689,33 @@ public partial class AAContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_CardBrand_UpdatedAt")
                 .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<Category>(entity =>
+        {
+            entity.ToTable("Category", "Notification");
+
+            entity.HasIndex(e => e.CategoryCode, "UQ_Category_Code").IsUnique();
+
+            entity.Property(e => e.CategoryCode)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.CategoryName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(200);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.System).WithMany(p => p.Categories)
+                .HasForeignKey(d => d.SystemId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Category_UserSystemModule");
         });
 
         modelBuilder.Entity<Channel>(entity =>
@@ -1430,6 +1600,16 @@ public partial class AAContext : DbContext
         {
             entity.ToTable("Photo");
 
+            entity.HasIndex(e => new { e.UserId, e.IsDeleted }, "IX_Photo_UserId_IsDeleted");
+
+            entity.HasIndex(e => new { e.UserId, e.IsDeleted, e.UploadedAt }, "IX_Photo_UserId_IsDeleted_UploadedAt").IsDescending(false, false, true);
+
+            entity.HasIndex(e => new { e.UserId, e.UploadedAt }, "IX_Photo_UserId_UploadedAt").IsDescending(false, true);
+
+            entity.HasIndex(e => new { e.UserId, e.Hash }, "UX_Photo_UserId_Hash")
+                .IsUnique()
+                .HasFilter("([IsDeleted]=(0))");
+
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_Photo_CreatedAt")
@@ -1444,8 +1624,7 @@ public partial class AAContext : DbContext
             entity.Property(e => e.Hash)
                 .IsRequired()
                 .HasMaxLength(64);
-            entity.Property(e => e.IsDeletedAt).HasAnnotation("Relational:DefaultConstraintName", "DF_Photo_IsDeletedAt");
-            entity.Property(e => e.PhotoData).IsRequired();
+            entity.Property(e => e.IsDeleted).HasAnnotation("Relational:DefaultConstraintName", "DF_Photo_IsDeletedAt");
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_Photo_UpdatedAt")
@@ -1543,6 +1722,8 @@ public partial class AAContext : DbContext
 
             entity.ToTable("PhotoCategory");
 
+            entity.HasIndex(e => e.CategoryId, "IX_PhotoCategory_CategoryId_CategoryName");
+
             entity.Property(e => e.CategoryCode).HasMaxLength(50);
             entity.Property(e => e.CategoryName)
                 .IsRequired()
@@ -1555,6 +1736,11 @@ public partial class AAContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoCategory_IsActive");
+            entity.Property(e => e.UiType)
+                .IsRequired()
+                .HasMaxLength(20)
+                .HasDefaultValue("flat")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoCategory_UiType_1");
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoCategory_UpdatedAt")
@@ -1695,6 +1881,14 @@ public partial class AAContext : DbContext
 
             entity.ToTable("PhotoLocation");
 
+            entity.HasIndex(e => new { e.City, e.District }, "IX_PhotoLocation_City_District");
+
+            entity.HasIndex(e => new { e.Country, e.City, e.District }, "IX_PhotoLocation_Country_City");
+
+            entity.HasIndex(e => e.PhotoId, "IX_PhotoLocation_PhotoId");
+
+            entity.HasIndex(e => new { e.PhotoId, e.SourceId }, "UQ_PhotoLocation_PhotoId_SourceId").IsUnique();
+
             entity.Property(e => e.Address).HasMaxLength(200);
             entity.Property(e => e.City).HasMaxLength(50);
             entity.Property(e => e.Country).HasMaxLength(50);
@@ -1743,8 +1937,15 @@ public partial class AAContext : DbContext
 
         modelBuilder.Entity<PhotoMetadatum>(entity =>
         {
-            entity.HasKey(e => e.PhotoMetadata);
+            entity.HasKey(e => e.MetadataId);
 
+            entity.HasIndex(e => e.DateTaken, "IX_PhotoMetadata_DateTaken").IsDescending();
+
+            entity.HasIndex(e => e.PhotoId, "IX_PhotoMetadata_PhotoId");
+
+            entity.HasIndex(e => new { e.PhotoId, e.DateTaken }, "IX_PhotoMetadata_PhotoId_DateTaken").IsDescending(false, true);
+
+            entity.Property(e => e.Aperture).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.CameraMake).HasMaxLength(200);
             entity.Property(e => e.CameraModel).HasMaxLength(200);
             entity.Property(e => e.CreatedAt)
@@ -1752,16 +1953,22 @@ public partial class AAContext : DbContext
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoMetadata_CreatedAt")
                 .HasColumnType("datetime");
             entity.Property(e => e.DateTaken).HasColumnType("datetime");
+            entity.Property(e => e.ExposureMode).HasMaxLength(50);
+            entity.Property(e => e.FocalLength).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.Gpslatitude)
                 .HasColumnType("decimal(10, 7)")
                 .HasColumnName("GPSLatitude");
             entity.Property(e => e.Gpslongitude)
                 .HasColumnType("decimal(10, 7)")
                 .HasColumnName("GPSLongitude");
+            entity.Property(e => e.Iso).HasColumnName("ISO");
+            entity.Property(e => e.LensModel).HasMaxLength(200);
+            entity.Property(e => e.ShutterSpeed).HasMaxLength(50);
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoMetadata_UpdatedAt")
                 .HasColumnType("datetime");
+            entity.Property(e => e.WhiteBalance).HasMaxLength(50);
 
             entity.HasOne(d => d.Photo).WithMany(p => p.PhotoMetadata)
                 .HasForeignKey(d => d.PhotoId)
@@ -1794,11 +2001,16 @@ public partial class AAContext : DbContext
 
         modelBuilder.Entity<PhotoPhotoCategory>(entity =>
         {
-            entity.HasKey(e => e.PhotoId);
+            entity.HasKey(e => new { e.PhotoId, e.CategoryId, e.SourceId });
 
             entity.ToTable("PhotoPhotoCategory");
 
-            entity.Property(e => e.PhotoId).ValueGeneratedNever();
+            entity.HasIndex(e => new { e.CategoryId, e.PhotoId }, "IX_PhotoPhotoCategory_CategoryId_PhotoId");
+
+            entity.HasIndex(e => e.PhotoId, "IX_PhotoPhotoCategory_PhotoId");
+
+            entity.HasIndex(e => new { e.PhotoId, e.SourceId }, "IX_PhotoPhotoCategory_PhotoId_SourceId");
+
             entity.Property(e => e.AssignedAt).HasColumnType("datetime");
             entity.Property(e => e.Confidence).HasColumnType("decimal(5, 2)");
             entity.Property(e => e.CreatedAt)
@@ -1815,8 +2027,8 @@ public partial class AAContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PhotoPhotoCategory_PhotoCategory");
 
-            entity.HasOne(d => d.Photo).WithOne(p => p.PhotoPhotoCategory)
-                .HasForeignKey<PhotoPhotoCategory>(d => d.PhotoId)
+            entity.HasOne(d => d.Photo).WithMany(p => p.PhotoPhotoCategories)
+                .HasForeignKey(d => d.PhotoId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PhotoPhotoCategory_Photo");
 
@@ -1828,9 +2040,15 @@ public partial class AAContext : DbContext
 
         modelBuilder.Entity<PhotoPhotoTag>(entity =>
         {
-            entity.HasKey(e => e.PhotoTagId);
+            entity.HasKey(e => new { e.PhotoId, e.TagId, e.SourceId });
 
             entity.ToTable("PhotoPhotoTag");
+
+            entity.HasIndex(e => e.PhotoId, "IX_PhotoPhotoTag_PhotoId");
+
+            entity.HasIndex(e => new { e.PhotoId, e.SourceId }, "IX_PhotoPhotoTag_PhotoId_SourceId");
+
+            entity.HasIndex(e => new { e.TagId, e.PhotoId }, "IX_PhotoPhotoTag_TagId_PhotoId");
 
             entity.Property(e => e.AddedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -1846,6 +2064,11 @@ public partial class AAContext : DbContext
                 .HasForeignKey(d => d.PhotoId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PhotoPhotoTag_Photo");
+
+            entity.HasOne(d => d.Source).WithMany(p => p.PhotoPhotoTags)
+                .HasForeignKey(d => d.SourceId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoPhotoTag_PhotoClassificationSource");
 
             entity.HasOne(d => d.Tag).WithMany(p => p.PhotoPhotoTags)
                 .HasForeignKey(d => d.TagId)
@@ -2128,11 +2351,13 @@ public partial class AAContext : DbContext
 
             entity.ToTable("PhotoTag");
 
-            entity.Property(e => e.TagId).ValueGeneratedNever();
+            entity.HasIndex(e => e.TagId, "IX_PhotoTag_TagId_TagName");
+
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoTag_CreatedAt")
                 .HasColumnType("datetime");
+            entity.Property(e => e.DisplayOrder).HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoTag_DisplayOrder");
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoTag_IsActive");
@@ -2147,9 +2372,14 @@ public partial class AAContext : DbContext
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoTag_UpdatedAt")
                 .HasColumnType("datetime");
 
-            entity.HasOne(d => d.User).WithMany(p => p.PhotoTags)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK_PhotoTag_User");
+            entity.HasOne(d => d.Category).WithMany(p => p.PhotoTags)
+                .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoTag_PhotoCategory");
+
+            entity.HasOne(d => d.ParentTag).WithMany(p => p.InverseParentTag)
+                .HasForeignKey(d => d.ParentTagId)
+                .HasConstraintName("FK_PhotoTag_PhotoTag");
         });
 
         modelBuilder.Entity<PhotoThirdPartyConfig>(entity =>
@@ -2667,6 +2897,28 @@ public partial class AAContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PostViews_User");
+        });
+
+        modelBuilder.Entity<Priority>(entity =>
+        {
+            entity.ToTable("Priority", "Notification");
+
+            entity.HasIndex(e => e.PriorityCode, "UQ_Priority_Code").IsUnique();
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(200);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.PriorityCode)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.PriorityName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
         });
 
         modelBuilder.Entity<Product>(entity =>
@@ -3435,6 +3687,46 @@ public partial class AAContext : DbContext
                 .HasForeignKey(d => d.SystemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Targets_UserSystemModule");
+        });
+
+        modelBuilder.Entity<Template>(entity =>
+        {
+            entity.ToTable("Template", "Notification");
+
+            entity.HasIndex(e => e.TemplateCode, "UQ_Template_Code").IsUnique();
+
+            entity.Property(e => e.ContentTemplate).IsRequired();
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__Template__Create__5B6E70FD")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__Template__IsActi__5A7A4CC4");
+            entity.Property(e => e.Subject).HasMaxLength(200);
+            entity.Property(e => e.TemplateCode)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.TemplateName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.TemplateType)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF__Template__Update__5C629536")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Category).WithMany(p => p.Templates)
+                .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Template_Category");
+
+            entity.HasOne(d => d.System).WithMany(p => p.Templates)
+                .HasForeignKey(d => d.SystemId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Template_UserSystemModule");
         });
 
         modelBuilder.Entity<TransactionStatusLog>(entity =>

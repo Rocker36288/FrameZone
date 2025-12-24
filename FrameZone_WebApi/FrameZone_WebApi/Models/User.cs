@@ -31,6 +31,12 @@ public partial class User
 
     public DateTime UpdatedAt { get; set; }
 
+    public virtual ICollection<BellNotificationArchive> BellNotificationArchives { get; set; } = new List<BellNotificationArchive>();
+
+    public virtual ICollection<BellNotificationPreference> BellNotificationPreferences { get; set; } = new List<BellNotificationPreference>();
+
+    public virtual ICollection<BellNotificationRecipient> BellNotificationRecipients { get; set; } = new List<BellNotificationRecipient>();
+
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
     public virtual ICollection<BuyerAbnormal> BuyerAbnormals { get; set; } = new List<BuyerAbnormal>();
@@ -80,8 +86,6 @@ public partial class User
     public virtual ICollection<PhotoShare> PhotoShares { get; set; } = new List<PhotoShare>();
 
     public virtual ICollection<PhotoSubscriptionHistory> PhotoSubscriptionHistories { get; set; } = new List<PhotoSubscriptionHistory>();
-
-    public virtual ICollection<PhotoTag> PhotoTags { get; set; } = new List<PhotoTag>();
 
     public virtual ICollection<PhotoUserQuotaUsage> PhotoUserQuotaUsages { get; set; } = new List<PhotoUserQuotaUsage>();
 

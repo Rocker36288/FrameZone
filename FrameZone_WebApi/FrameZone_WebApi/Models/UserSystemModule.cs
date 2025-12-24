@@ -21,6 +21,12 @@ public partial class UserSystemModule
 
     public DateTime UpdatedAt { get; set; }
 
+    public virtual ICollection<BellNotificationPreference> BellNotificationPreferences { get; set; } = new List<BellNotificationPreference>();
+
+    public virtual ICollection<BellNotification> BellNotifications { get; set; } = new List<BellNotification>();
+
+    public virtual ICollection<Category> Categories { get; set; } = new List<Category>();
+
     public virtual ICollection<FrequentlyAskedQuestion> FrequentlyAskedQuestions { get; set; } = new List<FrequentlyAskedQuestion>();
 
     public virtual ICollection<PhotoQuotaType> PhotoQuotaTypes { get; set; } = new List<PhotoQuotaType>();
@@ -28,6 +34,8 @@ public partial class UserSystemModule
     public virtual ICollection<PhotoSubscriptionPlan> PhotoSubscriptionPlans { get; set; } = new List<PhotoSubscriptionPlan>();
 
     public virtual ICollection<TargetType> TargetTypes { get; set; } = new List<TargetType>();
+
+    public virtual ICollection<Template> Templates { get; set; } = new List<Template>();
 
     public virtual ICollection<UserPermission> UserPermissions { get; set; } = new List<UserPermission>();
 

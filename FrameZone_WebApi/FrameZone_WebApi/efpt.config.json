@@ -255,6 +255,34 @@
          "ObjectType": 0
       },
       {
+         "Name": "[Notification].[BellNotification]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Notification].[BellNotificationArchive]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Notification].[BellNotificationPreference]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Notification].[BellNotificationRecipient]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Notification].[Category]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Notification].[Priority]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Notification].[Template]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[PhotographerBooking].[AvailableSlots]",
          "ObjectType": 0
       },
