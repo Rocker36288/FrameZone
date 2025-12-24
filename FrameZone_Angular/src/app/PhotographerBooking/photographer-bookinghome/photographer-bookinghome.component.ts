@@ -1,4 +1,3 @@
-import { PhotographerTagstylesComponent } from './../../photographer-tagstyles/photographer-tagstyles.component';
 import { PhotographerBookingheroComponent } from './../photographer-bookinghero/photographer-bookinghero.component';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
@@ -6,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { PhotographerbookingSearchComponent } from '../photographerbooking-search/photographerbooking-search.component';
 import { PhotographerbookingCardComponent } from '../photographerbooking-card/photographerbooking-card.component';
 import { PhotographerbookingHeaderComponent } from '../photographerbooking-header/photographerbooking-header.component';
-import { PhotographerServicetypeComponent } from '../../photographer-servicetype/photographer-servicetype.component';
 
 @Component({
   selector: 'app-photographer-bookinghome',
