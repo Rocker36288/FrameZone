@@ -1,0 +1,96 @@
+/* 品牌藍紫色 */
+.text-purple,
+.text-primary {
+  color: #6c5ce7 !important;
+}
+
+.btn-primary {
+  background-color: #6c5ce7;
+  border-color: #6c5ce7;
+}
+
+.btn-outline-primary {
+  color: #6c5ce7;
+  border-color: #6c5ce7;
+}
+
+/* 模態框層級 */
+.modal-backdrop {
+  z-index: 1040;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal {
+  z-index: 1050;
+}
+
+/* 收藏卡片優化樣式 */
+.fav-card {
+  transition: all 0.3s ease;
+  border-radius: 8px;
+}
+
+.fav-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(108, 92, 231, 0.1) !important;
+  border-color: #6c5ce7 !important;
+}
+
+.fav-badge-overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+}
+
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 2.8em;
+  line-height: 1.4;
+}
+
+/* 側邊欄啟動樣式 */
+.list-group-item.active {
+  background-color: #f3f0ff;
+  color: #6c5ce7;
+  border-right: 4px solid #6c5ce7;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* 讓圖片固定比例不變形 */
+.object-cover {
+  object-fit: cover;
+}
+
+.bg-purple {
+  background-color: #6c5ce7 !important;
+}
+
+.card-header-tabs .nav-link.active {
+  border-bottom-color: #6c5ce7 !important;
+  color: #6c5ce7 !important;
+}
+
+/* 針對模態框內部的卡片優化 */
+.modal .card {
+  border-radius: 12px;
+}
+
+/* 7-11 與 全家的 Badge 顏色 */
+.bg-7-11 {
+  background-color: #eb2f06 !important;
+}
+
+.bg-family {
+  background-color: #1e3799 !important;
+}
+
+.container-xl {
+  margin-top: 150px;
+}

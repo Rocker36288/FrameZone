@@ -1,0 +1,262 @@
+<div class="container-xl py-4">
+  <div class="row g-4">
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-3 text-center">
+          <span class="avatar avatar-xl rounded-circle mb-3"
+            [style.background-image]="'url(' + userProfile.avatar + ')'"></span>
+          <div class="fw-bold fs-3">{{ userProfile.username }}</div>
+          <hr class="my-3">
+          <div class="list-group list-group-transparent text-start">
+            <a *ngFor="let item of sidebarItems" (click)="activeMenu = item.id"
+              class="list-group-item list-group-item-action d-flex align-items-center mb-1 cursor-pointer"
+              [class.active]="activeMenu === item.id">
+              <span class="nav-link-icon me-2"><i [className]="item.icon"></i></span>{{ item.label }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-9">
+
+      <div *ngIf="activeMenu === 'profile'" class="card shadow-sm">
+        <div class="card-header">
+          <h3 class="card-title">基本資料</h3>
+        </div>
+        <div class="card-body">
+          <div class="datagrid">
+            <div class="datagrid-item">
+              <div class="datagrid-title">姓名</div>
+              <div class="datagrid-content">{{ userProfile.name }}</div>
+            </div>
+            <div class="datagrid-item">
+              <div class="datagrid-title">性別</div>
+              <div class="datagrid-content">{{ userProfile.gender }}</div>
+            </div>
+            <div class="datagrid-item">
+              <div class="datagrid-title">生日</div>
+              <div class="datagrid-content">{{ userProfile.birthday }}</div>
+            </div>
+            <div class="datagrid-item">
+              <div class="datagrid-title">電子信箱</div>
+              <div class="datagrid-content">{{ userProfile.email }}</div>
+            </div>
+            <div class="datagrid-item">
+              <div class="datagrid-title">聯絡電話</div>
+              <div class="datagrid-content">{{ userProfile.phone }}</div>
+            </div>
+            <div class="datagrid-item">
+              <div class="datagrid-title">密碼</div>
+              <div class="datagrid-content">********</div>
+            </div>
+          </div>
+          <button class="btn btn-outline-primary mt-4 px-4" (click)="openEditModal()">編輯基本資料</button>
+        </div>
+      </div>
+
+      <div *ngIf="activeMenu === 'orders'" class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <ul class="nav nav-tabs card-header-tabs">
+            <li class="nav-item"><a (click)="filterOrders('all')" class="nav-link"
+                [class.active]="currentOrderTab === 'all'">全部</a></li>
+            <li class="nav-item"><a (click)="filterOrders('pay')" class="nav-link"
+                [class.active]="currentOrderTab === 'pay'">待付款</a></li>
+            <li class="nav-item"><a (click)="filterOrders('ship')" class="nav-link"
+                [class.active]="currentOrderTab === 'ship'">待出貨</a></li>
+            <li class="nav-item"><a (click)="filterOrders('done')" class="nav-link"
+                [class.active]="currentOrderTab === 'done'">已完成</a></li>
+          </ul>
+          <div class="input-group w-50">
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="searchText" (keyup.enter)="onSearch()"
+              placeholder="搜尋店名或商品...">
+            <button class="btn btn-primary btn-sm px-3" (click)="onSearch()"><i class="ti ti-search"></i></button>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div *ngFor="let order of displayOrders" class="p-4 border-bottom">
+            <div class="d-flex justify-content-between mb-3">
+              <div class="fw-bold"><i class="ti ti-store me-1"></i>{{ order.shopName }}</div>
+              <div class="text-primary">{{ order.statusText }}</div>
+            </div>
+            <div *ngFor="let p of order.products" class="d-flex"><img [src]="p.imageUrl" class="rounded border me-3"
+                width="60">
+              <div>{{ p.name }}<br><small class="text-muted">{{ p.spec }}</small></div>
+              <div class="ms-auto fw-bold">${{ p.price }}</div>
+            </div>
+            <div class="text-end border-top pt-2 mt-2">總金額：<span class="fs-2 fw-bold text-primary">${{ order.totalAmount
+                }}</span></div>
+          </div>
+          <div *ngIf="displayOrders.length === 0" class="p-5 text-center text-muted">查無相關訂單</div>
+        </div>
+      </div>
+
+      <div *ngIf="activeMenu === 'address'" class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h3 class="card-title">預設收件地址</h3><button class="btn btn-primary btn-sm">+ 新增地址</button>
+        </div>
+        <div class="card-body">
+          <div class="border rounded p-3 d-flex justify-content-between align-items-center">
+            <div><strong>{{ userProfile.name }}</strong> | {{ userProfile.phone }}<div class="text-secondary small">
+                台北市萬華區...</div>
+            </div><span class="badge bg-purple-lt">預設</span>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="activeMenu === 'store'" class="card shadow-sm">
+        <div class="card-header">
+          <h3 class="card-title">預設取貨門市</h3>
+        </div>
+        <div class="card-body">
+          <div class="mb-3 p-3 border-7-11 rounded d-flex justify-content-between align-items-center">
+            <div><span class="badge bg-7-11 me-2 text-white">7-11</span><strong>萬華門市 (123456)</strong>
+              <div class="small text-muted mt-1">台北市萬華區...</div>
+            </div>
+            <button class="btn btn-ghost-secondary btn-sm">修改</button>
+          </div>
+          <div class="p-3 border-family rounded d-flex justify-content-between align-items-center">
+            <div><span class="badge bg-family me-2 text-white">全家</span><strong>新莊運昌店 (987654)</strong>
+              <div class="small text-muted mt-1">新北市新莊區...</div>
+            </div>
+            <button class="btn btn-ghost-secondary btn-sm">修改</button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="activeMenu === 'bank'" class="card shadow-sm">
+        <div class="card-header">
+          <h3 class="card-title">銀行帳號設定</h3>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="p-4 border rounded-3 bg-faint bank-card position-relative">
+                <div class="d-flex align-items-center mb-3"><i
+                    class="ti ti-building-bank fs-1 text-purple me-2"></i><strong>國泰世華銀行 (013)</strong></div>
+                <div class="text-secondary mb-1 small">戶名：{{ userProfile.name }}</div>
+                <div class="fs-2 fw-bold">**** **** **** 6789</div>
+                <button class="btn btn-icon btn-ghost-danger position-absolute top-0 end-0 m-2"><i
+                    class="ti ti-trash"></i></button>
+              </div>
+            </div>
+            <div class="col-md-6"><button
+                class="btn btn-outline-dashed w-100 h-100 py-4 d-flex flex-column align-items-center"><i
+                  class="ti ti-plus fs-1"></i>新增帳號</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="activeMenu === 'favorite'" class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h3 class="card-title">我的收藏</h3>
+          <div class="input-group w-50">
+            <input type="text" class="form-control form-control-sm" [(ngModel)]="searchText" (keyup.enter)="onSearch()"
+              placeholder="搜尋收藏商品...">
+            <button class="btn btn-primary btn-sm px-3" (click)="onSearch()"><i class="ti ti-search"></i></button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div *ngFor="let fav of displayFavorites" class="col-md-4">
+              <div class="card fav-card h-100 shadow-none border">
+                <div class="position-relative overflow-hidden">
+                  <img class="card-img-top object-cover" style="height: 180px;" [src]="fav.imageUrl">
+                  <div class="fav-badge-overlay">
+                    <button class="btn btn-icon btn-white rounded-circle text-danger shadow-sm"
+                      (click)="toggleFavorite(fav)">
+                      <i class="ti ti-heart-filled"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body d-flex flex-column p-3">
+                  <h4 class="card-title mb-1 text-truncate-2">{{ fav.name }}</h4>
+                  <div class="text-muted small mb-3">收藏於 {{ fav.date }}</div>
+                  <div class="mt-auto d-flex align-items-center justify-content-between">
+                    <span class="fw-bold text-primary fs-2">${{ fav.price }}</span>
+                    <button class="btn btn-primary btn-icon rounded-circle shadow-sm" (click)="addToCart(fav)">
+                      <i class="ti ti-shopping-cart"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="displayFavorites.length === 0" class="col-12 text-center py-5 text-muted">找不到相符的商品</div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="activeMenu === 'coupons'" class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h3 class="card-title">我的優惠券</h3>
+          <div class="d-flex"><input type="text" class="form-control form-control-sm me-2"
+              [(ngModel)]="couponCodeInput"><button class="btn btn-primary btn-sm" (click)="redeemCoupon()">領取</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div *ngFor="let cp of coupons" class="coupon-item border-dashed p-3 mb-2 rounded"
+            [class.opacity-50]="cp.used">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="fw-bold text-purple">{{ cp.title }}</div>
+              <div class="badge bg-white text-purple border-purple">代碼: {{ cp.code }}</div>
+            </div>
+            <div class="small text-muted">{{ cp.desc }} | 期限: {{ cp.expiry }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="activeMenu === 'notifications'" class="card shadow-sm">
+        <div class="card-header">
+          <h3 class="card-title">通知總覽</h3>
+        </div>
+        <div class="list-group list-group-flush">
+          <div class="list-group-item p-3"><strong>訂單出貨通知</strong>
+            <div class="text-muted small">您的訂單 ORD001 已經安排出貨！</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop fade show" *ngIf="showModal"></div>
+<div class="modal fade show d-block" *ngIf="showModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="card shadow-lg border-0 w-100">
+      <div class="card-header bg-purple text-white">
+        <h3 class="card-title">編輯基本資料</h3>
+      </div>
+      <div class="card-body">
+        <div class="text-center mb-3">
+          <span class="avatar avatar-xl rounded-circle mb-2"
+            [style.background-image]="'url(' + tempProfile.avatar + ')'"></span>
+          <input type="file" class="form-control form-control-sm" (change)="onAvatarChange($event)">
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6"><label class="form-label">姓名</label><input type="text" class="form-control"
+              [(ngModel)]="tempProfile.name"></div>
+          <div class="col-md-6"><label class="form-label">性別</label><select class="form-select"
+              [(ngModel)]="tempProfile.gender">
+              <option value="男">男</option>
+              <option value="女">女</option>
+            </select></div>
+          <div class="col-md-6"><label class="form-label">生日</label><input type="date" class="form-control"
+              [(ngModel)]="tempProfile.birthday"></div>
+          <div class="col-md-6"><label class="form-label">密碼</label><input type="password" class="form-control"
+              [(ngModel)]="tempProfile.password"></div>
+          <div class="col-12"><label class="form-label">電子信箱</label><input type="email" class="form-control"
+              [(ngModel)]="tempProfile.email"></div>
+          <div class="col-12"><label class="form-label">聯絡電話</label><input type="text" class="form-control"
+              [(ngModel)]="tempProfile.phone"></div>
+        </div>
+      </div>
+      <div class="card-footer text-end"><button class="btn btn-link link-secondary"
+          (click)="cancelEdit()">取消</button><button class="btn btn-primary" (click)="saveProfile()">確認修改</button></div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <app-footer></app-footer>
+</div>
