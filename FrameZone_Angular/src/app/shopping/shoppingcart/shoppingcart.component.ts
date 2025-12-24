@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, effect, ElementRef, inject, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HeaderComponent } from "../../shared/components/header/header.component";
 import { CartItem, Coupon } from '../interfaces/cart';
 import { RouterLink } from '@angular/router';
+import { CartService } from '../shared/services/cart.service';
 
 // interface CartItem {
 //   id: number;
@@ -34,25 +35,51 @@ import { RouterLink } from '@angular/router';
 
 export class ShoppingcartComponent {
 
+  // 注入服務，設為 public 讓 HTML 可以直接使用 cartService.items() 等
+  public cartService = inject(CartService);
+
   @ViewChild('couponModalElement') couponModalElement!: ElementRef;
 
+  currentStep: number = 1;
 
-  // 2. 屬性 (Property): 模擬購物車資料
-  cartItems: CartItem[] = [
-    { id: 1, name: '相機 A', price: 2500, quantity: 1, selected: false },
-    { id: 2, name: '相機 B', price: 3500, quantity: 1, selected: false },
-    { id: 3, name: '相機 C', price: 4500, quantity: 1, selected: false },
-    { id: 4, name: '相機 D', price: 5500, quantity: 1, selected: false },
-    { id: 5, name: '相機 E', price: 6500, quantity: 1, selected: false },
-    { id: 6, name: '相機 F', price: 7500, quantity: 1, selected: false },
+  // 2. 屬性(Property): 模擬購物車資料已移轉到 Service
+  // 組件端透過 getter 或是直接在 HTML 使用 cartService.items()
+  get cartItems(): CartItem[] {
+    return this.cartService.items();
+  }
 
-    // 這裡的資料會從 API 服務中獲取，但目前先以硬編碼模擬
-  ];
+  constructor() {
+    effect(() => {
+      const appliedCoupon = this.cartService.selectedCoupon();
 
-  constructor() { }
+      if (!appliedCoupon) {
+        // 沒使用優惠券
+        this.availableCoupons.forEach(c => c.isSelected = false);
+        this.finalAppliedDiscount = 0;
+        return;
+      }
+
+      // 有使用優惠券 → 對齊 UI
+      this.availableCoupons.forEach(coupon => {
+        coupon.isSelected = coupon.id === appliedCoupon.id;
+      });
+
+      this.finalAppliedDiscount = appliedCoupon.discount;
+    });
+  }
 
   ngOnInit(): void {
     // 可以在這裡執行元件初始化時的邏輯，例如從服務中載入資料
+
+    // 從 CartService 讀取「已套用的優惠券」
+    const appliedCoupon = this.cartService.selectedCoupon();
+
+    if (!appliedCoupon) {
+      // 沒有使用優惠券 → 全部取消勾選
+      this.availableCoupons.forEach(c => c.isSelected = false);
+      this.finalAppliedDiscount = 0;
+      return;
+    }
   }
 
   // 3. 方法 (Method): 實現「賣家點擊 -> 所有商品連動」邏輯
@@ -61,9 +88,7 @@ export class ShoppingcartComponent {
    * @param isChecked 賣家勾選框的狀態 (true/false)
    */
   toggleAllItems(isChecked: boolean): void {
-    this.cartItems.forEach(item => {
-      item.selected = isChecked;
-    });
+    this.cartService.toggleAll(isChecked);
   }
 
   // 4. 方法 (Method): 實現「商品點擊 -> 賣家勾勾連動」邏輯
@@ -73,7 +98,6 @@ export class ShoppingcartComponent {
    */
   updateMasterCheckbox(): void {
     // 檢查邏輯實際上在 areAllItemsChecked() 內執行，這裡無需重複計算。
-    // 呼叫此方法是為了讓 Angular 知道資料可能已變動，進而更新 HTML 模板。
     console.log('商品狀態已變動，觸發檢查主勾選框狀態。');
   }
 
@@ -83,34 +107,21 @@ export class ShoppingcartComponent {
    * * @returns boolean
    */
   areAllItemsChecked(): boolean {
-    // 使用 Array.prototype.every() 檢查陣列中是否所有元素的 selected 屬性都是 true
-    return this.cartItems.every(item => item.selected);
+    return this.cartItems.length > 0 && this.cartItems.every(item => item.selected);
   }
 
   getTotalQuantity(): number {
-    return this.cartItems.reduce((total, item) => {
-      // 只有在商品被選取時才加入計算
-      if (item.selected) {
-        return total + item.quantity;
-      }
-      return total;
-    }, 0);
+    return this.cartService.selectedTotalQuantity();
   }
 
   getTotalAmount(): number {
-    return this.cartItems.reduce((total, item) => {
-      // 只有在商品被選取時才加入計算 (價格 * 數量)
-      if (item.selected) {
-        return total + (item.price * item.quantity);
-      }
-      return total;
-    }, 0);
+    return this.cartService.totalAmount();
   }
 
   couponCodeInput: string = ''; // 用於綁定輸入框
   selectedDiscount: number = 0; // 儲存最終選定的折扣金額
   private tempFinalAppliedDiscount: number = 0;// 新增一個屬性來儲存 Modal 開啟前的 finalAppliedDiscount
-  finalAppliedDiscount: number = 0;  // 儲存最終套用的折扣金額，這個值才真正影響購物車小計
+  finalAppliedDiscount: number = 0;   // 儲存最終套用的折扣金額，這個值才真正影響購物車小計
 
   availableCoupons: Coupon[] = [
     { id: 1, name: '運費抵用券', discount: 60, code: 'FREESHIP', expiryDate: new Date('2025/12/31'), isSelected: false },
@@ -160,24 +171,24 @@ export class ShoppingcartComponent {
     // 確保最終金額不為負數
     return Math.max(0, totalAmount - discount);
   }
+
   // 更新小計區域的優惠券金額
   getDiscountDisplay(): string {
     const discount = this.finalAppliedDiscount;
     return discount > 0 ? `-$${discount}` : '選擇/輸入折扣碼';
   }
 
-
   calculateFinalTotal(): void {
-    // 呼叫 getAppliedDiscount() 取得使用者目前在 Modal 中選定的折扣金額
-    const currentDiscount = this.getAppliedDiscount();
+    const selectedCoupon =
+      this.availableCoupons.find(c => c.isSelected) || null;
 
-    // 將計算出的折扣金額存入 finalAppliedDiscount
-    this.finalAppliedDiscount = currentDiscount;
+    // ⭐ 關鍵：寫回 CartService
+    this.cartService.applyCoupon(selectedCoupon);
 
-    // 備註：您不需要在這裡呼叫 getFinalTotal()。
-    // Angular 的變動偵測會自動偵測到 this.finalAppliedDiscount 變了，
-    // 進而重新執行所有綁定到它的函式（包括 getFinalTotal()），並更新畫面。
+    // 本地只做顯示用（可留可不留）
+    this.finalAppliedDiscount = selectedCoupon ? selectedCoupon.discount : 0;
   }
+
   private tempCouponState: Coupon[] = [];
 
   /** * 在 Modal 開啟前呼叫，儲存當前的優惠券選取狀態。*/
@@ -196,10 +207,22 @@ export class ShoppingcartComponent {
 
     // *** 還原最終套用的折扣金額 ***
     this.finalAppliedDiscount = this.tempFinalAppliedDiscount;
-
-    // 由於狀態改變了，也需要手動觸發一次最終總計的計算，
-    // 確保小計區塊立刻更新回取消前的狀態 (即原本的 finalAppliedDiscount)。
-    // 如果 finalAppliedDiscount 是唯一參考，則不需要，但為了安全起見，建議呼叫。
-    // 更好的做法是確保 getAppliedDiscount() 保持使用最新的 this.availableCoupons 狀態
   }
+
+  /** 檢查是否有任何優惠券被選中 (供 HTML 按鈕判斷用) */
+  anyCouponSelected(): boolean {
+    return this.availableCoupons.some(coupon => coupon.isSelected);
+  }
+
+  // 清空優惠券
+  clearCouponSelection(): void {
+    this.availableCoupons.forEach(c => c.isSelected = false);
+  }
+
+  // 範例頭像 URL，請替換為實際的會員服務獲取邏輯
+  memberAvatarUrl: string = 'https://i.pravatar.cc/30?img=68';
+
+  // 範例會員名稱
+  memberName: string = 'Angular用戶001';
+
 }
