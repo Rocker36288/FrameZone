@@ -15,8 +15,6 @@ using SixLabors.ImageSharp.Processing;
 using System.Diagnostics;
 
 
-
-
 namespace FrameZone_WebApi.Services
 {
     /// <summary>
@@ -33,6 +31,7 @@ namespace FrameZone_WebApi.Services
         private readonly IMemoryCache _cache;
         private readonly ILogger<PhotoService> _logger;
         private readonly IBackgroundGeocodingService _backgroundGeocodingService;
+        private readonly IBlobStorageService _blobStorageService;
 
 
         public PhotoService(
@@ -41,7 +40,8 @@ namespace FrameZone_WebApi.Services
             IPhotoRepository photoRepository,
             IMemoryCache cache,
             ILogger<PhotoService> logger,
-            IBackgroundGeocodingService backgroundGeocodingService)
+            IBackgroundGeocodingService backgroundGeocodingService,
+            IBlobStorageService blobStorageService)
         {
             _exifService = exifService;
             _geocodingService = geocodingService;
@@ -49,6 +49,7 @@ namespace FrameZone_WebApi.Services
             _cache = cache;
             _logger = logger;
             _backgroundGeocodingService = backgroundGeocodingService;
+            _blobStorageService = blobStorageService;
         }
 
         #endregion
@@ -222,8 +223,8 @@ namespace FrameZone_WebApi.Services
                     FileName = Path.GetFileNameWithoutExtension(file.FileName),
                     FileExtension = Path.GetExtension(file.FileName).TrimStart('.').ToLower(),
                     FileSize = file.Length,
-                    PhotoData = fileBytes,
-                    ThumbnailData = thumbnailData,
+                    PhotoData = null,
+                    ThumbnailData = null,
                     Hash = fileHash,
                     UploadedAt = DateTime.UtcNow,
                     IsDeleted = false,
@@ -265,6 +266,114 @@ namespace FrameZone_WebApi.Services
 
                 _logger.LogInformation("照片上傳成功，PhotoId: {PhotoId}", uploadedPhoto.PhotoId);
 
+                try
+                {
+                    _logger.LogInformation("📤 開始上傳到 Blob Storage，PhotoId: {PhotoId}", uploadedPhoto.PhotoId);
+
+                    // 1️⃣ 上傳原圖到 Blob Storage
+                    string originalBlobUrl;
+                    using (var originalStream = new MemoryStream(fileBytes))
+                    {
+                        originalBlobUrl = await _blobStorageService.UploadPhotoAsync(
+                            originalStream,
+                            file.FileName,
+                            userId,
+                            uploadedPhoto.PhotoId,
+                            uploadedPhoto.UploadedAt,
+                            $"image/{uploadedPhoto.FileExtension}");
+                    }
+
+                    _logger.LogInformation("✅ 原圖上傳成功，URL: {BlobUrl}", originalBlobUrl);
+
+                    // 2️⃣ 上傳縮圖到 Blob Storage
+                    string thumbnailBlobUrl;
+                    using (var thumbnailStream = new MemoryStream(thumbnailData))
+                    {
+                        thumbnailBlobUrl = await _blobStorageService.UploadThumbnailAsync(
+                            thumbnailStream,
+                            file.FileName,
+                            userId,
+                            uploadedPhoto.PhotoId,
+                            uploadedPhoto.UploadedAt,
+                            $"image/{uploadedPhoto.FileExtension}");
+                    }
+
+                    _logger.LogInformation("✅ 縮圖上傳成功，URL: {ThumbnailUrl}", thumbnailBlobUrl);
+
+                    // 3️⃣ 記錄原圖的 PhotoStorage（主要儲存）
+                    var photoStorage = new PhotoStorage
+                    {
+                        PhotoId = uploadedPhoto.PhotoId,
+                        ProviderId = 1, // Azure Blob Storage（需要在 PhotoStorageProvider 表中有這筆資料）
+                        StoragePath = _blobStorageService.GeneratePhotoBlobPath(
+                            userId,
+                            uploadedPhoto.PhotoId,
+                            uploadedPhoto.UploadedAt,
+                            uploadedPhoto.FileExtension),
+                        BucketName = null, // 可選
+                        Region = null,     // 可選
+                        AccessUrl = originalBlobUrl,
+                        IsPrimary = true,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    await _photoRepository.AddPhotoStorageAsync(photoStorage);
+
+                    _logger.LogInformation("✅ PhotoStorage 記錄新增成功，StorageId: {StorageId}", photoStorage.StorageId);
+
+                    // 4️⃣ 記錄縮圖的 PhotoStorage（次要儲存）
+                    var thumbnailStorage = new PhotoStorage
+                    {
+                        PhotoId = uploadedPhoto.PhotoId,
+                        ProviderId = 1, // Azure Blob Storage
+                        StoragePath = _blobStorageService.GenerateThumbnailBlobPath(
+                            userId,
+                            uploadedPhoto.PhotoId,
+                            uploadedPhoto.UploadedAt,
+                            uploadedPhoto.FileExtension),
+                        BucketName = null,
+                        Region = null,
+                        AccessUrl = thumbnailBlobUrl,
+                        IsPrimary = false, // 縮圖不是主要儲存
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    await _photoRepository.AddPhotoStorageAsync(thumbnailStorage);
+
+                    _logger.LogInformation("✅ 縮圖 PhotoStorage 記錄新增成功");
+
+                    // 5️⃣ 生成前端可用的 SAS Token URL
+                    var photoUrlWithSas = await _blobStorageService.GetPhotoUrlAsync(photoStorage.StoragePath, useSasToken: true);
+                    var thumbnailUrlWithSas = await _blobStorageService.GetThumbnailUrlAsync(thumbnailStorage.StoragePath, useSasToken: true);
+
+                    _logger.LogInformation("✅ Blob Storage 上傳完成");
+
+                    // ⚠️ 注意：將 BlobUrl 和 ThumbnailUrl 存到變數中，稍後返回給前端
+                    // 暫存這兩個 URL，稍後在返回 DTO 時使用
+                    metadata.BlobUrl = photoUrlWithSas;      // 需要在 PhotoMetadataDTO 新增這個屬性
+                    metadata.ThumbnailUrl = thumbnailUrlWithSas;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "❌ Blob Storage 上傳失敗，PhotoId: {PhotoId}", uploadedPhoto.PhotoId);
+
+                    // ⚠️ 重要決策：如果 Blob 上傳失敗，是否要回滾資料庫？
+                    // 選項 A：回滾（刪除已建立的 Photo 記錄）
+                    // 選項 B：繼續（資料庫有記錄但沒有 Blob，之後可以重試上傳）
+                    // 這裡建議選項 A：回滾
+
+                    await _photoRepository.SoftDeletePhotoAsync(uploadedPhoto.PhotoId);
+
+                    return new PhotoUploadResponseDTO
+                    {
+                        Success = false,
+                        Message = "照片上傳到儲存服務失敗，請稍後再試"
+                    };
+                }
+
+
                 // 🚀 觸發背景地理編碼任務（Fire and Forget）
                 if (metadata.GPSLatitude.HasValue && metadata.GPSLongitude.HasValue)
                 {
@@ -303,8 +412,8 @@ namespace FrameZone_WebApi.Services
                         FileSize = metadata.FileSize,
                         Metadata = metadata,
                         AutoTags = metadata.AutoTags,
-                        BlobUrl = null,
-                        ThumbnailUrl = $"/api/photos/{uploadedPhoto.PhotoId}/thumbnail"
+                        BlobUrl = metadata.BlobUrl,
+                        ThumbnailUrl = metadata.ThumbnailUrl
                     }
                 };
             }

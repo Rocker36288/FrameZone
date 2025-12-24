@@ -107,6 +107,12 @@ builder.Services.AddMemoryCache(options =>
     options.CompactionPercentage = 0.25;
 });
 
+// 註冊 Azure Blob Storage 設定
+builder.Services.Configure<AzureBlobStorageSettings>(
+    builder.Configuration.GetSection(AzureBlobStorageSettings.SectionName));
+
+
+
 // ========== 註冊依賴注入服務 (DI注入) ==========
 
 builder.Services.AddScoped<IPhotoRepository, PhotoRepository>();
@@ -119,6 +125,7 @@ builder.Services.AddScoped<IExifService, ExifService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<ITagCategorizationService, TagCategorizationService>();
 builder.Services.AddScoped<IBackgroundGeocodingService, BackgroundGeocodingService>();
+builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 
 
 builder.Services.AddHttpClient<IGeocodingService, GeocodingService>();
@@ -165,6 +172,13 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+// 確保 Blob 容器存在
+using (var scope = app.Services.CreateScope())
+{
+    var blobService = scope.ServiceProvider.GetRequiredService<IBlobStorageService>();
+    await blobService.EnsureContainersExistAsync();
 }
 
 

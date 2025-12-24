@@ -337,6 +337,63 @@ namespace FrameZone_WebApi.Repositories
 
         #endregion
 
+        #region PhotoStorage 表操作
+
+        /// <summary>
+        /// 新增照片儲存記錄
+        /// 記錄照片在 Blob Storage 的儲存位置
+        /// </summary>
+        /// <param name="storage">照片儲存物件</param>
+        /// <returns>新增後的儲存記錄</returns>
+        Task<PhotoStorage> AddPhotoStorageAsync(PhotoStorage storage);
+
+        /// <summary>
+        /// 根據 PhotoId 查詢主要儲存位置
+        /// </summary>
+        /// <param name="photoId">照片 ID</param>
+        /// <returns>主要儲存記錄（IsPrimary = true），不存在則返回 null</returns>
+        Task<PhotoStorage> GetPrimaryStorageByPhotoIdAsync(long photoId);
+
+        /// <summary>
+        /// 根據 PhotoId 查詢所有儲存位置
+        /// 支援多個儲存位置（例如：主要儲存 + 備份）
+        /// </summary>
+        /// <param name="photoId">照片 ID</param>
+        /// <returns>儲存記錄列表</returns>
+        Task<List<PhotoStorage>> GetAllStoragesByPhotoIdAsync(long photoId);
+
+        /// <summary>
+        /// 更新照片儲存記錄
+        /// 例如：變更存取層級、更新 AccessURL
+        /// </summary>
+        /// <param name="storage">照片儲存物件</param>
+        /// <returns>是否更新成功</returns>
+        Task<bool> UpdatePhotoStorageAsync(PhotoStorage storage);
+
+        /// <summary>
+        /// 刪除照片儲存記錄
+        /// 實體刪除，用於清理儲存記錄
+        /// </summary>
+        /// <param name="storageId">儲存記錄 ID</param>
+        /// <returns>是否刪除成功</returns>
+        Task<bool> DeletePhotoStorageAsync(long storageId);
+
+        /// <summary>
+        /// 根據 StorageId 查詢儲存記錄
+        /// </summary>
+        /// <param name="storageId">儲存記錄 ID</param>
+        /// <returns>儲存記錄，不存在則返回 null</returns>
+        Task<PhotoStorage> GetStorageByIdAsync(long storageId);
+
+        /// <summary>
+        /// 檢查照片是否有儲存記錄
+        /// </summary>
+        /// <param name="photoId">照片 ID</param>
+        /// <returns>是否存在儲存記錄</returns>
+        Task<bool> HasStorageRecordAsync(long photoId);
+
+        #endregion
+
         /// <summary>
         /// 根據標籤 ID 查詢標籤
         /// </summary>

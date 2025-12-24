@@ -43,6 +43,12 @@ namespace FrameZone_WebApi.DTOs
 
         // Hash (用於去重)
         public string Hash { get; set; }
+
+        // Blob Storage URL
+        public string BlobUrl { get; set; }
+
+        // 縮圖 URL
+        public string ThumbnailUrl { get; set; }
     }
 
     /// <summary>

@@ -320,6 +320,12 @@ namespace FrameZone_WebApi.DTOs
         /// </summary>
         public string PreviewUrl { get; set; }
 
+        /// <summary>
+        /// 原圖 URL（帶 SAS Token，從 Blob Storage 取得）
+        /// 前端可直接使用此 URL 顯示原圖
+        /// </summary>
+        public string PhotoUrl { get; set; }
+
         #endregion
 
         #region 時間資訊

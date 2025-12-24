@@ -23,15 +23,18 @@ namespace FrameZone_WebApi.Controllers
         private readonly IPhotoService _photoService;
         private readonly IPhotoRepository _photoRepository;
         private readonly ILogger<PhotosController> _logger;
+        private readonly IBlobStorageService _blobStorageService;
 
         public PhotosController(
             IPhotoService photoService,
             IPhotoRepository photoRepository,
-            ILogger<PhotosController> logger)
+            ILogger<PhotosController> logger,
+            IBlobStorageService blobStorageService)
         {
             _photoService = photoService;
             _photoRepository = photoRepository;
             _logger = logger;
+            _blobStorageService = blobStorageService;
         }
 
 
@@ -470,87 +473,104 @@ namespace FrameZone_WebApi.Controllers
         /// 取得照片縮圖
         /// </summary>
         [HttpGet("{photoId}/thumbnail")]
-        [Authorize]
-        [ResponseCache(Duration = 86400)] // 快取 24 小時
-        public async Task<IActionResult> GetThumbnail(
-            long photoId,
-            [FromQuery] int width = 300,
-            [FromQuery] int height = 200,
-            [FromQuery] string token = null)
+        public async Task<IActionResult> GetThumbnail(long photoId)
         {
             try
             {
-                var userId = GetCurrentUserId();
+                var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                _logger.LogInformation("使用者 {UserId} 請求照片 {PhotoId} 的縮圖", userId, photoId);
 
-                // 驗證尺寸參數
-                if (width < 50 || width > 1000) width = 200;
-                if (height < 50 || height > 1000) height = 150;
-
-                _logger.LogInformation(
-                    "使用者 {UserId} 請求照片 {PhotoId} 的縮圖",
-                    userId, photoId);
-
-                // 取得照片
-                var thumbnailData = await _photoRepository.GetThumbnailDataAsync(photoId);
-
-                if (thumbnailData == null)
+                // 取得照片基本資訊
+                var photo = await _photoRepository.GetPhotoByIdAsync(photoId);
+                if (photo == null)
                 {
                     _logger.LogWarning("照片不存在，PhotoId: {PhotoId}", photoId);
-                    return NotFound();
+                    return NotFound(new { message = "照片不存在" });
                 }
 
                 // 檢查權限
-                if (thumbnailData.UserId != userId)
+                if (photo.UserId != userId)
                 {
                     _logger.LogWarning("無權限存取照片，PhotoId: {PhotoId}, UserId: {UserId}", photoId, userId);
                     return Forbid();
                 }
 
-                // 優先使用預生成的縮圖
-                if (thumbnailData.ThumbnailData != null && thumbnailData.ThumbnailData.Length > 0)
+                // 從 PhotoStorage 取得縮圖路徑
+                var storages = await _photoRepository.GetAllStoragesByPhotoIdAsync(photoId);
+                var thumbnailStorage = storages.FirstOrDefault(s => !s.IsPrimary); // 縮圖的 IsPrimary = false
+
+                if (thumbnailStorage == null)
                 {
-                    _logger.LogDebug("使用預生成的縮圖，PhotoId: {PhotoId}", photoId);
-                    return File(thumbnailData.ThumbnailData, "image/jpeg");
+                    _logger.LogWarning("找不到縮圖儲存記錄，PhotoId: {PhotoId}", photoId);
+                    return NotFound(new { message = "縮圖不存在" });
                 }
 
-                // 縮圖不存在：即時生成
-                _logger.LogWarning("縮圖不存在，即時生成，PhotoId: {PhotoId}", photoId);
+                // 生成 SAS Token URL（帶時效性）
+                var thumbnailUrl = await _blobStorageService.GetThumbnailUrlAsync(
+                    thumbnailStorage.StoragePath,
+                    useSasToken: true);
 
-                // 只在需要時才載入原圖
-                var photoData = await _photoRepository.GetPhotoDataAsync(photoId);
+                _logger.LogInformation("✅ 縮圖 URL 生成成功，PhotoId: {PhotoId}", photoId);
 
-                if (photoData == null || photoData.PhotoData == null || photoData.PhotoData.Length == 0)
-                {
-                    _logger.LogError("原圖資料不存在，PhotoId: {PhotoId}", photoId);
-                    return NotFound();
-                }
-
-                // 生成縮圖
-                var thumbnail = await _photoService.GenerateThumbnailAsync(
-                    photoData.PhotoData, width, height);
-
-                // 將生成的縮圖存回資料庫，避免下次再生成
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        await _photoRepository.UpdateThumbnailAsync(photoId, thumbnail);
-                        _logger.LogInformation("縮圖已補存，PhotoId: {PhotoId}", photoId);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "補存縮圖時發生錯誤，PhotoId: {PhotoId}", photoId);
-                    }
-                });
-
-                // 回傳圖片
-                var contentType = GetContentType(thumbnailData.FileExtension);
-                return File(thumbnail, contentType);
+                // 重定向到 Blob Storage URL
+                return Redirect(thumbnailUrl);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "取得縮圖時發生錯誤，PhotoId: {PhotoId}", photoId);
-                return StatusCode(500);
+                return StatusCode(500, new { message = "取得縮圖失敗" });
+            }
+        }
+
+        /// <summary>
+        /// 取得照片原圖（從 Blob Storage）
+        /// </summary>
+        [HttpGet("{photoId}/photo")]
+        public async Task<IActionResult> GetPhoto(long photoId)
+        {
+            try
+            {
+                var userId = long.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                _logger.LogInformation("使用者 {UserId} 請求照片 {PhotoId} 的原圖", userId, photoId);
+
+                // 1️⃣ 檢查照片是否存在並驗證權限
+                var ownerUserId = await _photoRepository.GetPhotoOwnerUserIdAsync(photoId);
+
+                if (ownerUserId == null)
+                {
+                    _logger.LogWarning("照片不存在，PhotoId: {PhotoId}", photoId);
+                    return NotFound(new { message = "照片不存在" });
+                }
+
+                if (ownerUserId != userId)
+                {
+                    _logger.LogWarning("無權限存取照片，PhotoId: {PhotoId}, UserId: {UserId}", photoId, userId);
+                    return Forbid();
+                }
+
+                // 2️⃣ 從 PhotoStorage 取得原圖路徑
+                var primaryStorage = await _photoRepository.GetPrimaryStorageByPhotoIdAsync(photoId);
+
+                if (primaryStorage == null)
+                {
+                    _logger.LogWarning("找不到原圖儲存記錄，PhotoId: {PhotoId}", photoId);
+                    return NotFound(new { message = "原圖不存在" });
+                }
+
+                // 3️⃣ 生成 SAS Token URL（帶時效性，60分鐘有效）
+                var photoUrl = await _blobStorageService.GetPhotoUrlAsync(
+                    primaryStorage.StoragePath,
+                    useSasToken: true);
+
+                _logger.LogInformation("✅ 原圖 URL 生成成功，PhotoId: {PhotoId}", photoId);
+
+                // 4️⃣ 重定向到 Blob Storage URL
+                return Redirect(photoUrl);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ 取得原圖時發生錯誤，PhotoId: {PhotoId}", photoId);
+                return StatusCode(500, new { message = "取得原圖失敗" });
             }
         }
 
@@ -670,5 +690,121 @@ namespace FrameZone_WebApi.Controllers
         }
 
         #endregion
+
+        /// <summary>
+        /// 測試 Azure Blob Storage 連線
+        /// </summary>
+        [AllowAnonymous]
+        [HttpGet("test-blob-connection")]
+        public async Task<IActionResult> TestBlobConnection()
+        {
+            try
+            {
+                _logger.LogInformation("🧪 開始測試 Blob Storage 連線...");
+
+                // 測試容器是否存在
+                var result = await _blobStorageService.EnsureContainersExistAsync();
+
+                if (result)
+                {
+                    _logger.LogInformation("✅ Blob Storage 連線測試成功");
+                    return Ok(new
+                    {
+                        success = true,
+                        message = "Azure Blob Storage 連線成功",
+                        timestamp = DateTime.UtcNow
+                    });
+                }
+                else
+                {
+                    _logger.LogError("❌ Blob Storage 連線測試失敗");
+                    return StatusCode(500, new
+                    {
+                        success = false,
+                        message = "容器初始化失敗"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Blob Storage 連線測試發生錯誤");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"連線測試失敗: {ex.Message}",
+                    detail = ex.ToString()
+                });
+            }
+        }
+
+        /// <summary>
+        /// 測試 Blob Storage 上傳功能（使用測試檔案）
+        /// </summary>
+        [AllowAnonymous]
+        [HttpPost("test-blob-upload")]
+        public async Task<IActionResult> TestBlobUpload()
+        {
+            try
+            {
+                _logger.LogInformation("🧪 開始測試 Blob 上傳功能...");
+
+                // 建立一個測試用的小圖片（1x1 透明 PNG）
+                byte[] testImageBytes = Convert.FromBase64String(
+                    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==");
+
+                var testFileName = $"test_{DateTime.UtcNow:yyyyMMddHHmmss}.png";
+                var testUserId = 9999; // 測試用的 UserId
+                var testPhotoId = DateTime.UtcNow.Ticks; // 使用時間戳作為測試 PhotoId
+
+                // 上傳到 Blob Storage
+                string blobUrl;
+                using (var stream = new MemoryStream(testImageBytes))
+                {
+                    blobUrl = await _blobStorageService.UploadPhotoAsync(
+                        stream,
+                        testFileName,
+                        testUserId,
+                        testPhotoId,
+                        DateTime.UtcNow,
+                        "image/png");
+                }
+
+                _logger.LogInformation("✅ 測試檔案上傳成功: {BlobUrl}", blobUrl);
+
+                // 生成 SAS Token URL
+                var blobPath = _blobStorageService.GeneratePhotoBlobPath(
+                    testUserId,
+                    testPhotoId,
+                    DateTime.UtcNow,
+                    "png");
+
+                var sasUrl = await _blobStorageService.GetPhotoUrlAsync(blobPath, useSasToken: true);
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Blob 上傳測試成功",
+                    blobUrl = blobUrl,
+                    sasUrl = sasUrl,
+                    blobPath = blobPath,
+                    testInfo = new
+                    {
+                        userId = testUserId,
+                        photoId = testPhotoId,
+                        fileName = testFileName
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Blob 上傳測試失敗");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"上傳測試失敗: {ex.Message}",
+                    detail = ex.ToString()
+                });
+            }
+        }
     }
 }

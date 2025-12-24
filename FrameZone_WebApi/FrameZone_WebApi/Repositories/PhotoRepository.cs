@@ -1812,5 +1812,247 @@ namespace FrameZone_WebApi.Repositories
         }
 
         #endregion
+
+        #region PhotoStorage 表操作
+
+        /// <summary>
+        /// 新增照片儲存記錄
+        /// 記錄照片在 Blob Storage 的儲存位置
+        /// </summary>
+        public async Task<PhotoStorage> AddPhotoStorageAsync(PhotoStorage storage)
+        {
+            try
+            {
+                _logger.LogInformation(
+                    "💾 開始新增儲存記錄，PhotoId: {PhotoId}, ProviderId: {ProviderId}",
+                    storage.PhotoId, storage.ProviderId);
+
+                storage.CreatedAt = DateTime.UtcNow;
+                storage.UpdatedAt = DateTime.UtcNow;
+
+                await _context.PhotoStorages.AddAsync(storage);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation(
+                    "✅ 儲存記錄新增成功，StorageId: {StorageId}, 路徑: {StoragePath}",
+                    storage.StorageId, storage.StoragePath);
+
+                return storage;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "❌ 新增儲存記錄失敗，PhotoId: {PhotoId}",
+                    storage.PhotoId);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 根據 PhotoId 查詢主要儲存位置
+        /// </summary>
+        public async Task<PhotoStorage> GetPrimaryStorageByPhotoIdAsync(long photoId)
+        {
+            try
+            {
+                _logger.LogDebug("🔍 查詢主要儲存位置，PhotoId: {PhotoId}", photoId);
+
+                var storage = await _context.PhotoStorages
+                    .AsNoTracking()
+                    .Where(s => s.PhotoId == photoId && s.IsPrimary)
+                    .FirstOrDefaultAsync();
+
+                if (storage == null)
+                {
+                    _logger.LogWarning("⚠️ 找不到主要儲存位置，PhotoId: {PhotoId}", photoId);
+                }
+                else
+                {
+                    _logger.LogDebug(
+                        "✅ 找到主要儲存位置，StorageId: {StorageId}, 路徑: {StoragePath}",
+                        storage.StorageId, storage.StoragePath);
+                }
+
+                return storage;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ 查詢主要儲存位置失敗，PhotoId: {PhotoId}", photoId);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 根據 PhotoId 查詢所有儲存位置
+        /// 支援多個儲存位置（例如：主要儲存 + 備份）
+        /// </summary>
+        public async Task<List<PhotoStorage>> GetAllStoragesByPhotoIdAsync(long photoId)
+        {
+            try
+            {
+                _logger.LogDebug("🔍 查詢所有儲存位置，PhotoId: {PhotoId}", photoId);
+
+                var storages = await _context.PhotoStorages
+                    .AsNoTracking()
+                    .Where(s => s.PhotoId == photoId)
+                    .OrderByDescending(s => s.IsPrimary) // 主要儲存排在最前面
+                    .ThenBy(s => s.CreatedAt)
+                    .ToListAsync();
+
+                _logger.LogDebug(
+                    "✅ 找到 {Count} 個儲存位置，PhotoId: {PhotoId}",
+                    storages.Count, photoId);
+
+                return storages;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ 查詢所有儲存位置失敗，PhotoId: {PhotoId}", photoId);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 更新照片儲存記錄
+        /// 例如：變更存取層級、更新 AccessURL
+        /// </summary>
+        public async Task<bool> UpdatePhotoStorageAsync(PhotoStorage storage)
+        {
+            try
+            {
+                _logger.LogInformation(
+                    "🔄 開始更新儲存記錄，StorageId: {StorageId}",
+                    storage.StorageId);
+
+                storage.UpdatedAt = DateTime.UtcNow;
+
+                _context.PhotoStorages.Update(storage);
+                var rowsAffected = await _context.SaveChangesAsync();
+
+                if (rowsAffected > 0)
+                {
+                    _logger.LogInformation(
+                        "✅ 儲存記錄更新成功，StorageId: {StorageId}",
+                        storage.StorageId);
+                    return true;
+                }
+                else
+                {
+                    _logger.LogWarning(
+                        "⚠️ 儲存記錄更新失敗（無資料變更），StorageId: {StorageId}",
+                        storage.StorageId);
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "❌ 更新儲存記錄失敗，StorageId: {StorageId}",
+                    storage.StorageId);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 刪除照片儲存記錄
+        /// 實體刪除，用於清理儲存記錄
+        /// </summary>
+        public async Task<bool> DeletePhotoStorageAsync(long storageId)
+        {
+            try
+            {
+                _logger.LogInformation("🗑️ 開始刪除儲存記錄，StorageId: {StorageId}", storageId);
+
+                var storage = await _context.PhotoStorages
+                    .Where(s => s.StorageId == storageId)
+                    .FirstOrDefaultAsync();
+
+                if (storage == null)
+                {
+                    _logger.LogWarning("⚠️ 儲存記錄不存在，StorageId: {StorageId}", storageId);
+                    return false;
+                }
+
+                _context.PhotoStorages.Remove(storage);
+                var rowsAffected = await _context.SaveChangesAsync();
+
+                if (rowsAffected > 0)
+                {
+                    _logger.LogInformation(
+                        "✅ 儲存記錄刪除成功，StorageId: {StorageId}, 路徑: {StoragePath}",
+                        storageId, storage.StoragePath);
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ 刪除儲存記錄失敗，StorageId: {StorageId}", storageId);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 根據 StorageId 查詢儲存記錄
+        /// </summary>
+        public async Task<PhotoStorage> GetStorageByIdAsync(long storageId)
+        {
+            try
+            {
+                _logger.LogDebug("🔍 查詢儲存記錄，StorageId: {StorageId}", storageId);
+
+                var storage = await _context.PhotoStorages
+                    .AsNoTracking()
+                    .Where(s => s.StorageId == storageId)
+                    .FirstOrDefaultAsync();
+
+                if (storage == null)
+                {
+                    _logger.LogWarning("⚠️ 儲存記錄不存在，StorageId: {StorageId}", storageId);
+                }
+                else
+                {
+                    _logger.LogDebug(
+                        "✅ 找到儲存記錄，PhotoId: {PhotoId}, 路徑: {StoragePath}",
+                        storage.PhotoId, storage.StoragePath);
+                }
+
+                return storage;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ 查詢儲存記錄失敗，StorageId: {StorageId}", storageId);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 檢查照片是否有儲存記錄
+        /// </summary>
+        public async Task<bool> HasStorageRecordAsync(long photoId)
+        {
+            try
+            {
+                _logger.LogDebug("🔍 檢查儲存記錄是否存在，PhotoId: {PhotoId}", photoId);
+
+                var exists = await _context.PhotoStorages
+                    .AsNoTracking()
+                    .AnyAsync(s => s.PhotoId == photoId);
+
+                _logger.LogDebug(
+                    "✅ 儲存記錄檢查完成，PhotoId: {PhotoId}, 存在: {Exists}",
+                    photoId, exists);
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ 檢查儲存記錄時發生錯誤，PhotoId: {PhotoId}", photoId);
+                throw;
+            }
+        }
+
+        #endregion
     }
 }

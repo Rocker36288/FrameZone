@@ -140,7 +140,6 @@ public partial class AAContext : DbContext
                 .IsRequired()
                 .HasMaxLength(64);
             entity.Property(e => e.IsDeleted).HasAnnotation("Relational:DefaultConstraintName", "DF_Photo_IsDeletedAt");
-            entity.Property(e => e.PhotoData).IsRequired();
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_Photo_UpdatedAt")
