@@ -1,0 +1,81 @@
+<div class="page-header">
+  <div class="top-navbar">
+    <div class="top-nav-container d-flex justify-content-between align-items-center">
+      <div class="d-flex top-nav-left">
+        <a routerLink="/shopping/home" class="logo-link me-4">
+          <img src="favicon5.png" alt="FrameZone Logo" class="brand-logo">
+        </a>
+      </div>
+      <div class="d-flex top-nav-right">
+        <a routerLink="/home" class="member-profile-link">
+          <img [src]="memberAvatarUrl" alt="會員頭像" class="member-avatar">
+          <span class="member-name">{{ memberName }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+  <div class="container">
+    <div class="text-center mb-5">
+      <p class="fw-bold">幫助中心</p>
+    </div>
+
+    <div class="row mb-6 justify-content-center">
+      <div class="col-md-8">
+        <div class="input-group custom-search-group shadow-sm">
+          <span class="input-group-text bg-white border-end-0">
+            <i class="ti ti-search text-muted"></i>
+          </span>
+          <input type="text" class="form-control border-start-0 ps-0" placeholder="輸入關鍵字搜尋問題..."
+            (keyup.enter)="onSearch(searchInput.value)" #searchInput>
+          <button class="btn btn-primary custom-search-btn" type="button" (click)="onSearch(searchInput.value)">
+            搜尋
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      @for (item of categories; track item.title; let i = $index) {
+      <div class="col-md-6 col-lg-3">
+        <div class="help-box">
+          <div [class]="'icon-wrapper color-' + (i + 1)">
+            <i [class]="'ti ' + item.icon"></i>
+          </div>
+          <h3 class="help-box-title">{{ item.title }}</h3>
+          <p class="help-box-text">{{ item.description }}</p>
+        </div>
+      </div>
+      }
+    </div>
+
+    <div class="row mt-6">
+      <div class="col-12">
+        <h2 class="mb-4">常見問題 (FAQ)</h2>
+        <div class="accordion" id="faq-accordion">
+          @for (faq of faqs; track faq.id) {
+          <div class="accordion-item mb-2 border-0 shadow-sm">
+            <h2 class="accordion-header" [id]="'heading-' + faq.id">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                [attr.data-bs-target]="'#collapse-' + faq.id">
+                {{ faq.question }}
+              </button>
+            </h2>
+            <div [id]="'collapse-' + faq.id" class="accordion-collapse collapse" data-bs-parent="#faq-accordion">
+              <div class="accordion-body text-secondary">
+                {{ faq.answer }}
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <app-footer></app-footer>
+</div>
