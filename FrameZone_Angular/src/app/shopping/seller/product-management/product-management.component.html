@@ -1,0 +1,107 @@
+<div class="product-management-container">
+  <div class="page-header">
+    <h1>商品管理</h1>
+  </div>
+
+  <div class="tabs-card card mb-3">
+    <div class="nav nav-tabs nav-fill">
+      <a *ngFor="let tab of tabs" [routerLink]="['/seller/products', tab.key]" class="nav-link py-3"
+        [class.active]="currentFilter === tab.key">
+        {{ tab.label }}
+      </a>
+    </div>
+  </div>
+
+  <div class="card mb-3 border-0 shadow-sm">
+    <div class="card-body d-flex gap-2 p-3">
+      <div class="input-icon flex-grow-1">
+        <span class="input-icon-addon"><i class="ti ti-search"></i></span>
+        <input type="text" class="form-control" placeholder="搜尋商品名稱或貨號..." [(ngModel)]="searchQuery"
+          (input)="onSearchChange()">
+      </div>
+      <select class="form-select w-auto" [(ngModel)]="sortOrder">
+        <option value="newest">最新更新</option>
+        <option value="price_high">價格：高到低</option>
+      </select>
+      <button class="btn btn-primary bg-indigo-purple border-0">
+        <i class="ti ti-plus me-1"></i>新增商品
+      </button>
+    </div>
+  </div>
+
+  <div class="mb-3 text-muted fs-4 px-1">
+    共 <strong>{{ filteredProducts.length }}</strong> 件商品
+  </div>
+
+  <div class="row row-cards g-3">
+    <div class="col-five" *ngFor="let product of paginatedProducts">
+      <div class="card product-card h-100">
+        <div class="img-container">
+          <img [src]="product.image" class="card-img-top">
+        </div>
+        <div class="card-body p-2 d-flex flex-column">
+          <h3 class="product-title mb-1">{{ product.name }}</h3>
+          <div class="product-price mb-2">NT$ {{ product.price.toLocaleString() }}</div>
+
+          <div class="mt-auto d-flex align-items-center justify-content-between">
+            <div class="d-flex gap-2 text-muted fs-6">
+              <span><i class="ti ti-package"></i> {{ product.stock }}</span>
+              <span><i class="ti ti-shopping-cart"></i> {{ product.sales }}</span>
+            </div>
+            <span class="badge" [ngClass]="'status-' + product.status">
+              {{ getStatusText(product.status) }}
+            </span>
+          </div>
+        </div>
+        <div class="card-footer p-0 d-flex border-top-0">
+          <button class="btn btn-ghost-primary flex-fill rounded-0 py-2 border-end">編輯</button>
+          <button class="btn btn-ghost-danger flex-fill rounded-0 py-2">刪除</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pagination-container">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" (click)="setPage(1)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 7l-5 5l5 5" />
+            <path d="M17 7l-5 5l5 5" />
+          </svg>
+        </a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" (click)="setPage(currentPage - 1)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 6l-6 6l6 6" />
+          </svg>
+        </a>
+      </li>
+
+      <li class="page-item" *ngFor="let page of pageNumbers" [class.active]="currentPage === page">
+        <a class="page-link" (click)="setPage(page)">{{ page }}</a>
+      </li>
+
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a class="page-link" (click)="setPage(currentPage + 1)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 6l6 6l-6 6" />
+          </svg>
+        </a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a class="page-link" (click)="setPage(totalPages)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 7l5 5l-5 5" />
+            <path d="M13 7l5 5l-5 5" />
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>

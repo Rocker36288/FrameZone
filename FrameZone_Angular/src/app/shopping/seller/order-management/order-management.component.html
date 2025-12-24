@@ -1,0 +1,138 @@
+<div class="order-management-container">
+  <div class="page-header">
+    <h1>訂單管理</h1>
+  </div>
+
+  <div class="tabs-nav">
+    <button *ngFor="let tab of tabs" [class.active]="currentFilter === tab.key"
+      [routerLink]="['/seller/orders', tab.key]">
+      {{ tab.label }}
+    </button>
+  </div>
+
+  <div class="search-section">
+    <div class="search-wrapper">
+      <div class="input-group">
+        <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="applyFilters(true)" placeholder="搜尋訂單編號或買家名稱">
+      </div>
+      <button class="btn-search" (click)="applyFilters(true)">
+        <i class="ti ti-search"></i> 搜尋訂單
+      </button>
+    </div>
+  </div>
+
+  <div class="order-list">
+    <div class="order-card" *ngFor="let order of paginatedOrders">
+      <div class="card-header">
+        <div class="header-left">
+          <div class="buyer-info">
+            <i class="ti ti-user-circle"></i>
+            <span class="buyer-name">{{ order.customer }}</span>
+            <button class="btn-chat"><i class="ti ti-message-circle"></i> 聊聊</button>
+          </div>
+          <div class="order-id-label">訂單編號: {{ order.orderNumber }}</div>
+        </div>
+        <div class="order-status" [ngClass]="order.status">{{ getStatusText(order.status) }}</div>
+      </div>
+
+      <div class="card-body">
+        <div class="product-row" *ngFor="let item of order.items">
+          <div class="product-left">
+            <img [src]="item.image" class="product-img">
+            <div class="product-info-block">
+              <h4 class="product-name">{{ item.name }}</h4>
+              <p class="product-spec">規格：{{ item.spec }}</p>
+              <span class="product-qty">x{{ item.quantity }}</span>
+            </div>
+          </div>
+          <div class="product-right">
+            <div class="item-price">NT${{ item.price.toLocaleString() }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <div class="order-total-info">
+          <span class="total-label">訂單總金額:</span>
+          <span class="total-amount-red">NT${{ order.totalAmount.toLocaleString() }}</span>
+        </div>
+        <div class="action-btns">
+          <button class="btn-secondary">查看詳情</button>
+          <button class="btn-primary" *ngIf="order.status === 'pending'" (click)="openShipModal(order)">安排出貨</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pagination-container">
+    <ul class="pagination">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" (click)="setPage(1)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 7l-5 5l5 5" />
+            <path d="M17 7l-5 5l5 5" />
+          </svg>
+        </a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" (click)="setPage(currentPage - 1)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 6l-6 6l6 6" />
+          </svg>
+        </a>
+      </li>
+
+      <li class="page-item" *ngFor="let page of pageNumbers" [class.active]="currentPage === page">
+        <a class="page-link" (click)="setPage(page)">{{ page }}</a>
+      </li>
+
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a class="page-link" (click)="setPage(currentPage + 1)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 6l6 6l-6 6" />
+          </svg>
+        </a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a class="page-link" (click)="setPage(totalPages)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 7l5 5l-5 5" />
+            <path d="M13 7l5 5l-5 5" />
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="showShipModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>安排出貨</h3>
+        <button class="close-btn-svg" (click)="closeShipModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6l-12 12M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-summary">
+          <p>訂單編號：<strong>{{ selectedOrderForShip?.orderNumber }}</strong></p>
+          <p>買家：{{ selectedOrderForShip?.customer }}</p>
+        </div>
+        <div class="form-group">
+          <label>物流單號</label>
+          <input type="text" class="form-control" [(ngModel)]="shippingNumber" placeholder="請輸入單號">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeShipModal()">取消</button>
+        <button class="btn-primary" (click)="confirmShip()">確認出貨</button>
+      </div>
+    </div>
+  </div>
+</div>

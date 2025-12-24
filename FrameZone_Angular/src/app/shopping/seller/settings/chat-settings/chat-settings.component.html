@@ -1,0 +1,365 @@
+<div class="settings-container">
+  <div class="settings-header">
+    <div>
+      <h1 class="settings-title">聊聊設定</h1>
+      <p class="settings-subtitle">管理您的即時客服與聊天室設定</p>
+    </div>
+    <button class="btn-save" (click)="saveSettings()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" />
+        <path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+        <path d="M14 4l0 4l-6 0l0 -4" />
+      </svg>
+      儲存設定
+    </button>
+  </div>
+
+  <!-- 自動回覆設定 -->
+  <div class="settings-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 4m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" />
+          <path d="M18 14l3 3l-3 3" />
+          <path d="M6 14l-3 3l3 3" />
+        </svg>
+        自動回覆
+      </h2>
+      <label class="toggle-switch">
+        <input type="checkbox" [(ngModel)]="settings.autoReply">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="section-content" *ngIf="settings.autoReply">
+      <div class="form-group">
+        <label>自動回覆訊息</label>
+        <textarea [(ngModel)]="settings.autoReplyMessage" rows="3" placeholder="輸入當客戶傳送訊息時的自動回覆內容"></textarea>
+        <p class="form-hint">當客服不在線或工作時間外,系統將自動回覆此訊息</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 工作時間設定 -->
+  <div class="settings-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+          <path d="M12 7l0 5l3 3" />
+        </svg>
+        工作時間
+      </h2>
+      <label class="toggle-switch">
+        <input type="checkbox" [(ngModel)]="settings.workingHours.enabled">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="section-content" *ngIf="settings.workingHours.enabled">
+      <div class="form-row">
+        <div class="form-group">
+          <label>開始時間</label>
+          <input type="time" [(ngModel)]="settings.workingHours.start">
+        </div>
+        <div class="form-group">
+          <label>結束時間</label>
+          <input type="time" [(ngModel)]="settings.workingHours.end">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>工作日</label>
+        <div class="day-selector">
+          <button *ngFor="let day of weekDays" class="day-btn" [class.active]="isDaySelected(day)"
+            (click)="toggleDay(day)">
+            {{ day }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 快速回覆 -->
+  <div class="settings-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 10l5 -6l5 6" />
+          <path d="M21 10l-2 8a2 2.5 0 0 1 -2 2h-10a2 2.5 0 0 1 -2 -2l-2 -8z" />
+          <path d="M12 4l0 6" />
+        </svg>
+        快速回覆
+      </h2>
+      <button class="btn-add-small" (click)="openQuickReplyModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5l0 14" />
+          <path d="M5 12l14 0" />
+        </svg>
+        新增
+      </button>
+    </div>
+
+    <div class="section-content">
+      <div class="quick-reply-grid">
+        <div *ngFor="let reply of settings.quickReplies" class="quick-reply-card">
+          <div class="reply-header">
+            <h3 class="reply-title">{{ reply.title }}</h3>
+            <span class="reply-category">{{ reply.category }}</span>
+          </div>
+          <p class="reply-message">{{ reply.message }}</p>
+          <div class="reply-actions">
+            <button class="btn-icon-small" (click)="openQuickReplyModal(reply)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
+                <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
+                <path d="M16 5l3 3" />
+              </svg>
+              編輯
+            </button>
+            <button class="btn-icon-small delete" (click)="deleteQuickReply(reply.id)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 7l16 0" />
+                <path d="M10 11l0 6" />
+                <path d="M14 11l0 6" />
+                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+              </svg>
+              刪除
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 通知設定 -->
+  <div class="settings-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
+          <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
+        </svg>
+        通知設定
+      </h2>
+    </div>
+
+    <div class="section-content">
+      <div class="notification-options">
+        <label class="checkbox-item">
+          <input type="checkbox" [(ngModel)]="settings.notifications.email">
+          <div class="checkbox-content">
+            <span class="checkbox-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" />
+                <path d="M3 7l9 6l9 -6" />
+              </svg>
+            </span>
+            <div>
+              <div class="checkbox-label">Email 通知</div>
+              <div class="checkbox-description">收到新訊息時發送 Email 通知</div>
+            </div>
+          </div>
+        </label>
+
+        <label class="checkbox-item">
+          <input type="checkbox" [(ngModel)]="settings.notifications.browser">
+          <div class="checkbox-content">
+            <span class="checkbox-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+                <path d="M3.6 9h16.8" />
+                <path d="M3.6 15h16.8" />
+                <path d="M11.5 3a17 17 0 0 0 0 18" />
+                <path d="M12.5 3a17 17 0 0 1 0 18" />
+              </svg>
+            </span>
+            <div>
+              <div class="checkbox-label">瀏覽器通知</div>
+              <div class="checkbox-description">顯示桌面推播通知</div>
+            </div>
+          </div>
+        </label>
+
+        <label class="checkbox-item">
+          <input type="checkbox" [(ngModel)]="settings.notifications.sound">
+          <div class="checkbox-content">
+            <span class="checkbox-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 8a5 5 0 0 1 0 8" />
+                <path d="M17.7 5a9 9 0 0 1 0 14" />
+                <path
+                  d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5" />
+              </svg>
+            </span>
+            <div>
+              <div class="checkbox-label">音效提示</div>
+              <div class="checkbox-description">收到訊息時播放提示音</div>
+            </div>
+          </div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 封鎖字詞 -->
+  <div class="settings-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+          <path d="M5 5l14 14" />
+        </svg>
+        封鎖字詞
+      </h2>
+      <button class="btn-add-small" (click)="openBlockWordModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5l0 14" />
+          <path d="M5 12l14 0" />
+        </svg>
+        新增
+      </button>
+    </div>
+
+    <div class="section-content">
+      <div class="blocked-words">
+        <span *ngFor="let word of settings.blockedWords" class="word-tag">
+          {{ word }}
+          <button class="word-remove" (click)="removeBlockWord(word)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6l-12 12" />
+              <path d="M6 6l12 12" />
+            </svg>
+          </button>
+        </span>
+        <span *ngIf="settings.blockedWords.length === 0" class="empty-message">
+          尚未設定封鎖字詞
+        </span>
+      </div>
+      <p class="form-hint">包含這些字詞的訊息將被自動過濾</p>
+    </div>
+  </div>
+
+  <!-- AI 聊天機器人 -->
+  <div class="settings-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 4m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" />
+          <path d="M9 16l0 2" />
+          <path d="M15 16l0 2" />
+          <path d="M9 18l6 0" />
+          <path d="M10 8l0 .01" />
+          <path d="M14 8l0 .01" />
+          <path d="M9.5 11c.667 1 1.833 1.5 2.5 1.5s1.833 -.5 2.5 -1.5" />
+        </svg>
+        AI 聊天機器人
+      </h2>
+      <label class="toggle-switch">
+        <input type="checkbox" [(ngModel)]="settings.chatbotEnabled">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="section-content" *ngIf="settings.chatbotEnabled">
+      <div class="info-box">
+        <span class="info-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+            <path d="M12 8l.01 0" />
+            <path d="M11 12l1 0l0 4l1 0" />
+          </svg>
+        </span>
+        <div>
+          <div class="info-title">AI 自動回覆功能</div>
+          <div class="info-text">啟用後,AI 將協助回答常見問題,提升客服效率。您可以在後續設定中訓練 AI 的回答內容。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 快速回覆 Modal -->
+<div class="modal-overlay" *ngIf="showQuickReplyModal" (click)="closeQuickReplyModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ currentQuickReply ? '編輯' : '新增' }}快速回覆</h2>
+      <button class="btn-close" (click)="closeQuickReplyModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6l-12 12" />
+          <path d="M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label>標題 *</label>
+        <input type="text" [(ngModel)]="modalQuickReply.title" placeholder="例如: 歡迎訊息">
+      </div>
+
+      <div class="form-group">
+        <label>分類</label>
+        <select [(ngModel)]="modalQuickReply.category">
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>回覆內容 *</label>
+        <textarea [(ngModel)]="modalQuickReply.message" rows="4" placeholder="輸入快速回覆的內容"></textarea>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeQuickReplyModal()">取消</button>
+      <button class="btn-primary" (click)="saveQuickReply()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 封鎖字詞 Modal -->
+<div class="modal-overlay" *ngIf="showBlockWordModal" (click)="closeBlockWordModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>新增封鎖字詞</h2>
+      <button class="btn-close" (click)="closeBlockWordModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6l-12 12" />
+          <path d="M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label>字詞 *</label>
+        <input type="text" [(ngModel)]="newBlockWord" placeholder="輸入要封鎖的字詞" (keyup.enter)="addBlockWord()">
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeBlockWordModal()">取消</button>
+      <button class="btn-primary" (click)="addBlockWord()">新增</button>
+    </div>
+  </div>
+</div>

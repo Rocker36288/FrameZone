@@ -1,0 +1,61 @@
+<div class="coupon-settings">
+  <div class="settings-header">
+    <h1>優惠券設定</h1>
+    <button class="btn-primary" (click)="addCoupon()">
+      <i class="ti ti-plus"></i>
+      新增優惠券
+    </button>
+  </div>
+
+  <div class="coupons-grid">
+    <div *ngFor="let coupon of coupons" class="coupon-card" [class.inactive]="!coupon.active">
+      <div class="coupon-header">
+        <div class="coupon-code">{{ coupon.code }}</div>
+        <div class="coupon-status">
+          <span class="status-badge" [class.active]="coupon.active">
+            {{ coupon.active ? '啟用中' : '已停用' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="coupon-body">
+        <div class="coupon-discount">
+          <span class="discount-value">
+            {{ coupon.type === 'percentage' ? coupon.discount + '%' : 'NT$ ' + coupon.discount }}
+          </span>
+          <span class="discount-label">折扣</span>
+        </div>
+
+        <div class="coupon-details">
+          <div class="detail-item">
+            <i class="ti ti-shopping-cart"></i>
+            <span>最低消費: NT$ {{ coupon.minAmount }}</span>
+          </div>
+          <div class="detail-item">
+            <i class="ti ti-users"></i>
+            <span>已使用: {{ coupon.usedCount }} / {{ coupon.usageLimit }}</span>
+          </div>
+          <div class="detail-item">
+            <i class="ti ti-calendar"></i>
+            <span>{{ coupon.startDate | date:'yyyy/MM/dd' }} ~ {{ coupon.endDate | date:'yyyy/MM/dd' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="coupon-actions">
+        <button class="btn-action" (click)="editCoupon(coupon)">
+          <i class="ti ti-edit"></i>
+          編輯
+        </button>
+        <button class="btn-action" (click)="toggleCoupon(coupon)">
+          <i class="ti" [class.ti-toggle-right]="coupon.active" [class.ti-toggle-left]="!coupon.active"></i>
+          {{ coupon.active ? '停用' : '啟用' }}
+        </button>
+        <button class="btn-action delete" (click)="deleteCoupon(coupon)">
+          <i class="ti ti-trash"></i>
+          刪除
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

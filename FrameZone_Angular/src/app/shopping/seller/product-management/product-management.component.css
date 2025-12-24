@@ -1,0 +1,168 @@
+/* Container 同步訂單管理版寬 */
+.product-management-container {
+  padding: 20px;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 狀態欄文字完美置中 */
+.nav-fill .nav-link {
+  flex: 1 1 auto;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 確保水平置中 */
+  color: #64748b;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  padding: 1rem 0;
+  /* 垂直間距 */
+}
+
+.nav-fill .nav-link.active {
+  color: #5c67f2;
+  background: #f5f6ff;
+  border-bottom: 3px solid #5c67f2;
+  font-weight: bold;
+}
+
+/* 實作 5 欄網格 (每欄 20%) */
+.col-five {
+  flex: 0 0 auto;
+  width: 20%;
+  padding: 0 8px;
+  /* 調整卡片間距 */
+}
+
+@media (max-width: 1024px) {
+  .col-five {
+    width: 33.33%;
+  }
+}
+
+@media (max-width: 768px) {
+  .col-five {
+    width: 50%;
+  }
+}
+
+/* 商品卡片尺寸微調 */
+.product-card {
+  border: 1px solid #f1f5f9;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+}
+
+.img-container {
+  aspect-ratio: 1 / 1;
+  background: #f8fafc;
+}
+
+.img-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.4;
+  height: 2.4rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.product-price {
+  color: #667eea;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* 狀態標籤 */
+.badge {
+  padding: 0.3em 0.6em;
+  font-size: 0.7rem;
+  border-radius: 4px;
+}
+
+.status-active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-violation {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-inactive {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* 藍紫色漸層按鈕 */
+.bg-indigo-purple {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+/* 分頁樣式 (藍紫色 + 置中) */
+.pagination-container {
+  display: flex !important;
+  justify-content: center !important;
+  /* 確保水平置中 */
+  margin: 40px 0 60px !important;
+  width: 100% !important;
+}
+
+.pagination {
+  display: flex !important;
+  list-style: none !important;
+  padding: 0 !important;
+  gap: 8px !important;
+}
+
+.page-link {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 38px !important;
+  height: 38px !important;
+  color: #5c67f2 !important;
+  background-color: #ffffff !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 6px !important;
+  text-decoration: none !important;
+  font-size: 14px !important;
+}
+
+/* 當前頁面狀態：強制深藍紫底白字 */
+.page-item.active .page-link {
+  background-color: #5c67f2 !important;
+  border-color: #5c67f2 !important;
+  color: #ffffff !important;
+  font-weight: bold !important;
+}
+
+.page-link:hover {
+  background-color: #f0f2ff !important;
+  border-color: #5c67f2 !important;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+  padding-bottom: 30px;
+}
