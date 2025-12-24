@@ -31,14 +31,15 @@
     <a [href]="'/videos/watch/' + video.videoUri" target="_blank" class="text-decoration-none">
       <div class="card video-card mb-3" style="width: 18rem;">
         <div class="position-relative video-thumb-container video-thumb-big">
-          <img [src]="'https://localhost:7213/api/Videos/video-thumbnail/' + video.videoUri" alt="影片縮圖">
+          <img [src]="'https://localhost:7213/api/Videos/video-thumbnail/' + video.videoUri" alt="影片縮圖"
+            (error)="onthumbnailError($event)">
           <span class="duration-tag">{{ video.duration! | videoDuration }}</span>
         </div>
         <div class="card-body p-2">
           <h6 class="card-title text-truncate">{{ video.title }}</h6>
           <p class="card-text text-muted small text-truncate mb-2">{{ video.description }}</p>
           <div class="d-flex align-items-center">
-            <img src={{video.avatar}} class="rounded-circle me-2" alt="創作者頭像">
+            <img src={{video.avatar}} class="rounded-circle me-2" alt="創作者頭像" (error)="onAvatarError($event)">
             <div class="small text-truncate">
               <div class="fw-semibold">{{video.channelName}}</div>
               <div class="text-muted">

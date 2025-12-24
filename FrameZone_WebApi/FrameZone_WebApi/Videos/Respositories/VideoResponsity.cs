@@ -328,9 +328,56 @@ namespace FrameZone_WebApi.Videos.Repositories
         /* =====================================================
         * 搜尋
         * ===================================================== */
-        //public async Task<List<VideoCardDto>> VideoSearchAsync()
-        //{
+        // 推薦影片
+        public async Task<List<VideoCardDto>> VideoSearchAsync(
+         string? keyword = null,
+         int? channelId = null,
+         int? categoryId = null,
+         string sortBy = "date",
+         string sortOrder = "desc",
+         int take = 10)
+        {
+            // 1️ 基礎 Query
+            IQueryable<Video> query = _context.Videos
+                .AsNoTracking()
+                .Include(v => v.Channel)
+                    .ThenInclude(c => c.UserProfile)
+                .Where(v => v.ProcessStatus == "published");
 
-        //}
+            // 2️ 搜尋條件
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                query = query.Where(v =>
+                    v.Title.Contains(keyword) ||
+                    v.Description.Contains(keyword));
+            }
+
+            if (channelId.HasValue)
+            {
+                query = query.Where(v => v.ChannelId == channelId.Value);
+            }
+
+
+            // 3️ 排序條件
+            query = (sortBy.ToLower(), sortOrder.ToLower()) switch
+            {
+                //("views", "asc") => query.OrderBy(v => v.ViewCount),
+                //("views", "desc") => query.OrderByDescending(v => v.ViewCount),
+
+                //("likes", "asc") => query.OrderBy(v => v.LikeCount),
+                //("likes", "desc") => query.OrderByDescending(v => v.LikeCount),
+
+                ("date", "asc") => query.OrderBy(v => v.CreatedAt),
+                _ => query.OrderByDescending(v => v.CreatedAt) // default
+            };
+
+            // 4️ 限制筆數
+            var videos = await query
+                .Take(take)
+                .ToListAsync();
+
+            // 5️⃣ 映射 DTO
+            return await MapVideosToDtoAsync(videos);
+        }
     }
 }

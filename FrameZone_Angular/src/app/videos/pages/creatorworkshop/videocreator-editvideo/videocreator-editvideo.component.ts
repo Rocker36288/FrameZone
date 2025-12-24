@@ -10,6 +10,9 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './videocreator-editvideo.component.css'
 })
 export class VideocreatorEditvideoComponent {
+  editThumbnail() {
+    throw new Error('Method not implemented.');
+  }
   // ====== 假資料 ======
   video = {
     videoId: 1,

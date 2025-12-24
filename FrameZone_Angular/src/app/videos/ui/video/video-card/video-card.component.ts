@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
   styleUrl: './video-card.component.css'
 })
 export class VideoCardComponent {
+
   @Input() video!: VideoCardData;
   @Input() variant:
     'small'
@@ -34,6 +35,15 @@ export class VideoCardComponent {
     this.router.navigate(['/watch', this.video.videoUri]);
   }
 
+  onAvatarError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = 'favicon2.png';
+  }
+
+  onthumbnailError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = 'favicon2.png';
+  }
 
 
 }

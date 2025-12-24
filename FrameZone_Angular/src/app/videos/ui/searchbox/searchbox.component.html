@@ -1,26 +1,35 @@
-<!-- 🔍 Search Component -->
 <div class="container my-4">
-  <div class="search-box p-4">
+  <div class="search-box card shadow-sm border-0">
+    <div class="card-body p-4">
 
-    <form class="row g-2 align-items-center">
-      <div class="col">
-        <input type="search" class="form-control form-control-lg" placeholder="搜尋影片、創作者或關鍵字" />
+      <!-- 搜尋輸入 -->
+      <form class="row g-2 align-items-center mb-3" (ngSubmit)="onSearch()">
+        <div class="col-12 col-md input-icon">
+          <span class="input-icon-addon">
+            <i class="ti ti-search"></i>
+          </span>
+          <input type="search" class="form-control form-control-lg" placeholder="搜尋影片、創作者或關鍵字" [(ngModel)]="keyword"
+            name="keyword" />
+        </div>
+
+        <div class="col-12 col-md-auto">
+          <button class="btn btn-primary btn-lg w-100" type="submit">搜尋</button>
+        </div>
+      </form>
+
+      <!-- 篩選 / 排序按鈕群 -->
+      <div class="d-flex flex-wrap gap-2 align-items-center">
+
+        <!-- 排序下拉 -->
+        <div class="ms-auto">
+          <select class="form-select" [(ngModel)]="sortBy" name="sortBy" (change)="onSearch()">
+            <option value="date">最新</option>
+            <option value="views">觀看數</option>
+            <option value="likes">喜歡數</option>
+          </select>
+        </div>
       </div>
 
-      <div class="col-auto">
-        <button class="btn btn-primary btn-lg px-4">
-          <i class="ti ti-search"></i> 搜尋
-        </button>
-      </div>
-    </form>
-
-    <!-- 可選：熱門關鍵字 -->
-    <div class="mt-3 text-muted small">
-      熱門搜尋：
-      <a href="#" class="text-decoration-none me-2">動畫</a>
-      <a href="#" class="text-decoration-none me-2">遊戲</a>
-      <a href="#" class="text-decoration-none">音樂</a>
     </div>
-
   </div>
 </div>

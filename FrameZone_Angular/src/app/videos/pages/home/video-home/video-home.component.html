@@ -1,31 +1,88 @@
-<div class="container my-5">
-  <app-searchbox></app-searchbox>
-</div>
-
-<div class="container my-5">
-
-  <!-- 熱門創作者 -->
-  <app-video-creatorspotlight [channel]="channel" [Videos]="videos"></app-video-creatorspotlight>
-
-  <!-- Popular -->
-  <h2 class="my-4 fw-bold">Popular</h2>
-
-  <div class="row g-4">
-
-    <!-- 卡片 -->
-    <div class="position-relative my-4">
-      <app-videos-list [variant]="'gridshow-scroll'" [videos]="recommendVideos!"></app-videos-list>
+<!-- 搜尋區塊 -->
+<div class="search-hero">
+  <div class="container py-5">
+    <div class="search-wrapper">
+      <app-searchbox></app-searchbox>
     </div>
   </div>
+</div>
 
-  <!-- Recommend -->
-  <h2 class="my-4 fw-bold">推薦影片</h2>
+<div class="container content-container">
 
-  <div class="video-grid">
-    @for (video of recommendVideos; track $index) {
-    <app-video-card [video]="video" [variant]="'large'">
-    </app-video-card>
-    }
-  </div>
+  <!-- 熱門創作者區塊 -->
+  <section class="creator-spotlight-section">
+    <div class="section-header mb-4">
+      <div class="header-content">
+        <div class="header-icon">
+          <i class="ti ti-star-filled"></i>
+        </div>
+        <h2 class="section-title">熱門創作者</h2>
+      </div>
+      <div class="header-decoration"></div>
+    </div>
+
+    <div class="spotlight-container">
+      <app-video-creatorspotlight [channel]="channel" [Videos]="videos"></app-video-creatorspotlight>
+    </div>
+  </section>
+
+  <!-- Popular 區塊 -->
+  <section class="popular-section mt-5">
+    <div class="section-header mb-4">
+      <div class="header-content">
+        <div class="header-icon popular-icon">
+          <i class="ti ti-flame"></i>
+        </div>
+        <h2 class="section-title">Popular</h2>
+        <span class="trending-badge">
+          <i class="ti ti-trending-up"></i>
+          熱門中
+        </span>
+      </div>
+      <a href="/popular" class="view-all-link">
+        查看全部
+        <i class="ti ti-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="popular-carousel-wrapper">
+      <app-videos-list [variant]="'gridshow-scroll'" [videos]="recommendVideos!"></app-videos-list>
+    </div>
+  </section>
+
+  <!-- 推薦影片區塊 -->
+  <section class="recommend-section mt-5 mb-5">
+    <div class="section-header mb-4">
+      <div class="header-content">
+        <div class="header-icon recommend-icon">
+          <i class="ti ti-sparkles"></i>
+        </div>
+        <h2 class="section-title">為你推薦</h2>
+        <span class="recommend-subtitle">根據你的觀看記錄精選</span>
+      </div>
+      <div class="filter-chips">
+        <button class="chip active">全部</button>
+        <button class="chip">音樂</button>
+        <button class="chip">遊戲</button>
+        <button class="chip">教學</button>
+      </div>
+    </div>
+
+    <div class="video-grid">
+      @for (video of recommendVideos; track $index) {
+      <div class="video-grid-item" [style.animation-delay.ms]="$index * 50">
+        <app-video-card [video]="video" [variant]="'large'"></app-video-card>
+      </div>
+      }
+    </div>
+
+    <!-- 載入更多按鈕 -->
+    <div class="load-more-container">
+      <button class="load-more-btn">
+        <i class="ti ti-refresh"></i>
+        載入更多影片
+      </button>
+    </div>
+  </section>
 
 </div>

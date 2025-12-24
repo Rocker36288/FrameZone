@@ -1,20 +1,13 @@
 import { MockChannelService } from './../service/mock-channel.service';
 import { Component } from '@angular/core';
-import { HeaderComponent } from "../../shared/components/header/header.component";
 import { VideosSidebarComponent } from "../ui/videos-sidebar/videos-sidebar.component";
 import { VideoHomeComponent } from "./home/video-home/video-home.component";
-import { VideolistCardComponent } from "../ui/video/videolist-card/videolist-card.component";
-import { ChannelComponent } from "./channel/channel-home/channel-home.component";
-import { ChannelLayoutComponent } from "./channel/channel-layout/channel-layout.component";
 import { ChannelCard, VideoCardData } from '../models/video-model';
-import { VideocreatorUploadComponent } from "./creatorworkshop/videocreator-upload/videocreator-upload.component";
-import { VideocreatorVideomanageComponent } from "./creatorworkshop/videocreator-videomanage/videocreator-videomanage.component";
-import { SearchboxComponent } from "../ui/searchbox/searchbox.component";
 import { VideoSearchComponent } from "./search/video-search/video-search.component";
 
 @Component({
   selector: 'app-videos-shell',
-  imports: [HeaderComponent, VideosSidebarComponent, VideoHomeComponent, VideolistCardComponent, ChannelComponent, ChannelLayoutComponent, VideocreatorVideomanageComponent, SearchboxComponent, VideoSearchComponent],
+  imports: [VideosSidebarComponent, VideoHomeComponent, VideoSearchComponent],
   templateUrl: './videos-shell.component.html',
   styleUrl: './videos-shell.component.css'
 })
