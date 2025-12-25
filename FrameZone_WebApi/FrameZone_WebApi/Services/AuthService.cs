@@ -333,7 +333,9 @@ namespace FrameZone_WebApi.Services
                 string userAgent = httpContext?.Request.Headers["User-Agent"].ToString() ?? "Unknown";
 
                 // 計算過期時間
-                int expirationMinutes = rememberMe ? 7 : 1;
+                int expirationDays = rememberMe
+                    ? AuthConstants.JWT_EXPIRY_DAYS_REMEMBER
+                    : AuthConstants.JWT_EXPIRY_DAYS_DEFAULT;
 
                 var userSession = new UserSession
                 {
@@ -341,7 +343,7 @@ namespace FrameZone_WebApi.Services
                     UserAgent = userAgent,                                          // 活耀中  
                     IsActive = true,                                                // 最後活動時間
                     LastActivityAt = DateTime.UtcNow,                               // 過期時間
-                    ExpiresAt = DateTime.UtcNow.AddMinutes(expirationMinutes),
+                    ExpiresAt = DateTime.UtcNow.AddDays(expirationDays),
                     CreatedAt = DateTime.UtcNow,
                 };
 

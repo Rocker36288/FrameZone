@@ -1,11 +1,11 @@
 import { AuthService } from './../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, AfterViewInit } from '@angular/core';
 import { RouterLink, Router, ActivatedRoute } from "@angular/router";
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { LoginRequestDto } from '../../core/models/auth.models';
+import { LoginRequestDto, GoogleLoginRequestDto } from '../../core/models/auth.models';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +14,7 @@ import { LoginRequestDto } from '../../core/models/auth.models';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent implements OnInit, OnDestroy {
+export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   // 表單
   loginForm!: FormGroup;
 
@@ -29,6 +29,9 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   // Title 名稱
   titleName: string = "登入帳號";
+
+  // Google 登入按鈕是否已準備好
+  googleButtonReady: boolean = false;
 
   // 用於取消訂閱
   private destroy$ = new Subject<void>();
@@ -52,6 +55,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  /**
+   * 組件初始化完成後載入 Google Sign-In
+   */
+  ngAfterViewInit(): void {
+    this.loadGoogleSignIn();
+  }
 
   /**
    * 初始化表單
@@ -234,6 +243,131 @@ export class LoginComponent implements OnInit, OnDestroy {
    */
   dismissErrorMessage(): void {
     this.errorMessage = '';
+  }
+
+  /**
+   * 載入 Google Sign-In SDK
+   */
+  private loadGoogleSignIn(): void {
+    if (typeof (window as any).google !== 'undefined') {
+      this.initializeGoogleSignIn();
+    } else {
+      setTimeout(() => this.loadGoogleSignIn(), 100);
+    }
+  }
+
+  private initializeGoogleSignIn(): void {
+    const google = (window as any).google;
+
+    if (!google || !google.accounts) {
+      console.error('Google Identity Services 未載入');
+      return;
+    }
+
+    // 初始化 Google Sign-In
+    google.accounts.id.initialize({
+      client_id: '836883046870-hl4oqsr1vatlgre0pfs7fn32ncpa6tkg.apps.googleusercontent.com',
+      callback: (response: any) => {
+        this.handleGoogleSignIn(response)
+      },
+      auto_select: false,
+      cancel_on_tap_outside: true
+    });
+
+    // 渲染按鈕
+    const buttonDiv = document.getElementById('googleSignInButton');
+    if (buttonDiv) {
+      google.accounts.id.renderButton(
+        buttonDiv,
+        {
+          theme: 'outline',
+          size: 'large',
+          width: 400,
+          text: 'signin_with',
+          shape: 'rectangular',
+          logo_alignment: 'left'
+        }
+      );
+      console.log('Google 按鈕已渲染'); // 調試用
+    } else {
+      console.error('找不到 googleSignInButton 元素');
+    }
+
+    this.googleButtonReady = true;
+  }
+
+  /**
+ * 處理 Google Sign-In 回應
+ */
+  private handleGoogleSignIn(response: any): void {
+    if (!response.credential) {
+      this.errorMessage = 'Google 登入失敗，請重試';
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.errorMessage = '';
+
+    const googleLoginData: GoogleLoginRequestDto = {
+      idToken: response.credential,
+      rememberMe: this.loginForm.get('rememberMe')?.value || false
+    };
+
+    this.authService.googleLogin(googleLoginData)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (res) => {
+        console.log('後端回應:', res);
+        this.handleGoogleLoginSuccess(res);
+      },
+      error: (error) => {
+        console.error('後端錯誤:', error);
+        this.handleGoogleLoginError(error);
+      }
+    });
+  }
+
+  /**
+ * 處理 Google 登入成功
+ */
+  private handleGoogleLoginSuccess(response: any): void {
+    this.isSubmitting = false;
+
+    if (response.success) {
+      // 顯示歡迎訊息（如果是新使用者）
+      if (response.isNewUser) {
+        this.successMessage = '歡迎加入 FrameZone！';
+      }
+
+      // 導向原本要去的頁面或首頁
+      const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+      this.router.navigate([returnUrl]);
+    } else {
+      this.errorMessage = response.message || 'Google 登入失敗';
+    }
+  }
+
+  /**
+ * 處理 Google 登入錯誤
+ */
+  private handleGoogleLoginError(error: any): void {
+    this.isSubmitting = false;
+
+    if (error.error?.message) {
+      this.errorMessage = error.error.message;
+    } else {
+      this.errorMessage = 'Google 登入時發生錯誤，請稍後再試';
+    }
+  }
+
+  /**
+   * 使用傳統方式觸發 Google 登入（點擊按鈕時）
+   */
+  onGoogleLogin(): void {
+    const google = (window as any).google;
+    if (google && google.accounts) {
+      google.accounts.id.prompt();
+    }
   }
 }
 

@@ -247,6 +247,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "[dbo].[UserThirdPartyAuth]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[UserVerification]",
          "ObjectType": 0
       },

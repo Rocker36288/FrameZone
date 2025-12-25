@@ -287,6 +287,8 @@ public partial class AAContext : DbContext
 
     public virtual DbSet<UserSystemModule> UserSystemModules { get; set; }
 
+    public virtual DbSet<UserThirdPartyAuth> UserThirdPartyAuths { get; set; }
+
     public virtual DbSet<UserVerification> UserVerifications { get; set; }
 
     public virtual DbSet<UserVerificationType> UserVerificationTypes { get; set; }
@@ -299,6 +301,8 @@ public partial class AAContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.UseCollation("Chinese_Taiwan_Stroke_CI_AS");
+
         modelBuilder.Entity<AvailableSlot>(entity =>
         {
             entity.HasKey(e => e.AvailableSlotId).HasName("PK_AvailableSlot");
@@ -4319,6 +4323,55 @@ public partial class AAContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_SystemModule_UpdatedAt")
                 .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<UserThirdPartyAuth>(entity =>
+        {
+            entity.HasKey(e => e.AuthId);
+
+            entity.ToTable("UserThirdPartyAuth", tb => tb.HasComment("使用者第三方登入認證資料表"));
+
+            entity.HasIndex(e => new { e.Provider, e.ProviderId }, "IX_UserThirdPartyAuth_Provider_ProviderId");
+
+            entity.HasIndex(e => e.UserId, "IX_UserThirdPartyAuth_UserId");
+
+            entity.HasIndex(e => new { e.Provider, e.ProviderId }, "UQ_UserThirdPartyAuth_Provider_ProviderId").IsUnique();
+
+            entity.HasIndex(e => new { e.UserId, e.Provider }, "UQ_UserThirdPartyAuth_UserId_Provider").IsUnique();
+
+            entity.Property(e => e.AuthId).HasComment("第三方登入認證ID");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_UserThirdPartyAuth_CreatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_UserThirdPartyAuth_IsActive");
+            entity.Property(e => e.IsPrimary).HasAnnotation("Relational:DefaultConstraintName", "DF_UserThirdPartyAuth_IsPrimary");
+            entity.Property(e => e.LastUsedAt).HasColumnType("datetime");
+            entity.Property(e => e.Provider)
+                .IsRequired()
+                .HasMaxLength(50)
+                .HasComment("第三方提供者 (Google, Facebook, GitHub, Line)");
+            entity.Property(e => e.ProviderAvatar).HasMaxLength(500);
+            entity.Property(e => e.ProviderEmail).HasMaxLength(255);
+            entity.Property(e => e.ProviderId)
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasComment("第三方平台的使用者唯一識別碼");
+            entity.Property(e => e.ProviderName).HasMaxLength(100);
+            entity.Property(e => e.Scope).HasMaxLength(500);
+            entity.Property(e => e.TokenExpiresAt).HasColumnType("datetime");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasAnnotation("Relational:DefaultConstraintName", "DF_UserThirdPartyAuth_UpdatedAt")
+                .HasColumnType("datetime");
+            entity.Property(e => e.UserId).HasComment("使用者ID");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserThirdPartyAuths)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_UserThirdPartyAuth_User");
         });
 
         modelBuilder.Entity<UserVerification>(entity =>

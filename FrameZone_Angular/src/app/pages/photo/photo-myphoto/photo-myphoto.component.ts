@@ -6,6 +6,7 @@ import { PhotoService } from '../../../core/services/photo.service';
 import { ToastrService } from 'ngx-toastr';
 import { firstValueFrom } from 'rxjs';
 import { PhotoSidebarComponent } from "../../../shared/components/photo-sidebar/photo-sidebar.component";
+import { PhotoConstants } from '../../../shared/constants/photo.constants';
 
 @Component({
   selector: 'app-photo-myphoto',
@@ -20,7 +21,7 @@ export class PhotoMyphotoComponent implements OnInit {
   photos = signal<PhotoListItem[]>([]);
   isLoading = signal(false);
   currentPage = signal(1);
-  pageSize = signal(20);
+  pageSize = signal(PhotoConstants.DEFAULT_PAGE_SIZE);
   totalCount = signal(0);
   viewMode = signal<'grid' | 'list'>('grid');
 

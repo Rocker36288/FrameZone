@@ -4,6 +4,7 @@ import { PhotoService } from '../../../core/services/photo.service';
 import { UploadFileItem, PhotoMetadata } from '../../../core/models/photo.models';
 import { firstValueFrom } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
+import { PhotoConstants } from '../../../shared/constants/photo.constants';
 
 @Component({
   selector: 'app-photo-classify',
@@ -26,7 +27,7 @@ export class PhotoClassifyComponent {
   );
 
   // 建議留 buffer：後端 batch-upload 上限 200MB，你用 180MB 比較安全
-  private readonly MAX_BATCH_BYTES = 180 * 1024 * 1024;
+  private readonly MAX_BATCH_BYTES = PhotoConstants.MAX_BATCH_TOTAL_SIZE_BYTES * 0.9;
 
   private buildBatches(items: UploadFileItem[]): UploadFileItem[][] {
     const batches: UploadFileItem[][] = [];
@@ -54,6 +55,15 @@ export class PhotoClassifyComponent {
 
     if (current.length > 0) batches.push(current);
     return batches;
+  }
+
+  // 取得上傳限制資訊（用於 HTML 顯示）
+  get uploadLimits() {
+    return {
+      maxFileSize: PhotoConstants.MAX_FILE_SIZE_MB,
+      maxBatchCount: PhotoConstants.MAX_BATCH_UPLOAD_COUNT,
+      allowedExtensions: PhotoConstants.ALLOWED_IMAGE_EXTENSIONS.join(', ')
+    };
   }
 
 
@@ -111,6 +121,14 @@ export class PhotoClassifyComponent {
    */
   async handleFiles(files: File[]) {
     console.log('📄 開始處理檔案，數量:', files.length);
+
+    if (!PhotoConstants.isBatchCountValid(files.length)) {
+      this.toastr.error(
+        PhotoConstants.getBatchCountExceededMessage(),
+        '批次上傳限制'
+      );
+      return;
+    }
 
     const currentFiles = this.uploadFiles();
 

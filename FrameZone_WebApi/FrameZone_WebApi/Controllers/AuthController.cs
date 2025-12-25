@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Security.Claims;
+using static FrameZone_WebApi.DTOs.GoogleAuthDtos;
 
 
 namespace FrameZone_WebApi.Controllers
@@ -16,13 +17,16 @@ namespace FrameZone_WebApi.Controllers
     {
         private readonly AuthService _authService;
         private readonly IPasswordService _passwordService;
+        private readonly IGoogleAuthService _googleAuthService;
         private readonly ILogger<AuthController> _logger;
 
-        public AuthController(AuthService authService, IPasswordService passwordService, ILogger<AuthController> logger)
+        public AuthController(AuthService authService, IPasswordService passwordService, ILogger<AuthController> logger, IGoogleAuthService googleAuthService)
         {
             _authService = authService;
             _passwordService = passwordService;
             _logger = logger;
+            _googleAuthService = googleAuthService;
+
         }
 
         // =========== 登入相關 API ===========
@@ -368,6 +372,211 @@ namespace FrameZone_WebApi.Controllers
                 加密後密碼 = hashedPassword,
                 說明 = "請將加密後的密碼更新到資料庫的 Password 欄位"
             });
+        }
+
+        // =========== Google 登入相關 API ===========
+
+        /// <summary>
+        /// 使用 Google 登入
+        /// </summary>
+        /// <param name="request">Google 登入請求</param>
+        /// <returns>登入結果</returns>
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequestDto request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    var firstError = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .FirstOrDefault()?.ErrorMessage ?? "輸入資料不正確";
+
+                    return BadRequest(new GoogleLoginResponseDto
+                    {
+                        Success = false,
+                        Message = firstError
+                    });
+                }
+
+                // 呼叫 GoogleAuthService 處理登入邏輯
+                var response = await _googleAuthService.GoogleLoginAsync(request);
+
+                if (response.Success)
+                {
+                    _logger.LogInformation($"使用者透過 Google 登入成功: {response.Email}");
+                    return Ok(response);
+                }
+                else
+                {
+                    _logger.LogWarning($"Google 登入失敗: {response.Message}");
+                    return Unauthorized(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Google 登入時發生錯誤");
+                return StatusCode(500, new GoogleLoginResponseDto
+                {
+                    Success = false,
+                    Message = "系統錯誤，請稍後再試"
+                });
+            }
+        }
+
+        /// <summary>
+        /// 綁定 Google 帳號 (需先登入)
+        /// </summary>
+        /// <param name="request">綁定請求</param>
+        /// <returns>處理結果</returns>
+        [HttpPost("link-google")]
+        public async Task<IActionResult> LinkGoogleAccount([FromBody] LinkGoogleAccountRequestDto request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    var firstError = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .FirstOrDefault()?.ErrorMessage ?? "輸入資料不正確";
+
+                    return BadRequest(new ApiResponseDto
+                    {
+                        Success = false,
+                        Message = firstError
+                    });
+                }
+
+                // 從 JWT Token 取得使用者 ID
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim) || !long.TryParse(userIdClaim, out var userId))
+                {
+                    return Unauthorized(new ApiResponseDto
+                    {
+                        Success = false,
+                        Message = "未授權的請求"
+                    });
+                }
+
+                var response = await _googleAuthService.LinkGoogleAccountAsync(userId, request);
+
+                if (response.Success)
+                {
+                    _logger.LogInformation($"使用者成功綁定 Google 帳號: UserId={userId}");
+                    return Ok(response);
+                }
+                else
+                {
+                    _logger.LogWarning($"綁定 Google 帳號失敗: UserId={userId}, Message={response.Message}");
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "綁定 Google 帳號時發生錯誤");
+                return StatusCode(500, new ApiResponseDto
+                {
+                    Success = false,
+                    Message = "系統錯誤，請稍後再試"
+                });
+            }
+        }
+
+        /// <summary>
+        /// 解除 Google 帳號綁定 (需先登入)
+        /// </summary>
+        /// <param name="request">解除綁定請求</param>
+        /// <returns>處理結果</returns>
+        [HttpPost("unlink-google")]
+        public async Task<IActionResult> UnlinkGoogleAccount([FromBody] UnlinkGoogleAccountRequestDto request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    var firstError = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .FirstOrDefault()?.ErrorMessage ?? "輸入資料不正確";
+
+                    return BadRequest(new ApiResponseDto
+                    {
+                        Success = false,
+                        Message = firstError
+                    });
+                }
+
+                // 從 JWT Token 取得使用者 ID
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim) || !long.TryParse(userIdClaim, out var userId))
+                {
+                    return Unauthorized(new ApiResponseDto
+                    {
+                        Success = false,
+                        Message = "未授權的請求"
+                    });
+                }
+
+                var response = await _googleAuthService.UnlinkGoogleAccountAsync(userId, request);
+
+                if (response.Success)
+                {
+                    _logger.LogInformation($"使用者成功解除 Google 帳號綁定: UserId={userId}");
+                    return Ok(response);
+                }
+                else
+                {
+                    _logger.LogWarning($"解除 Google 帳號綁定失敗: UserId={userId}, Message={response.Message}");
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "解除 Google 帳號綁定時發生錯誤");
+                return StatusCode(500, new ApiResponseDto
+                {
+                    Success = false,
+                    Message = "系統錯誤，請稍後再試"
+                });
+            }
+        }
+
+        /// <summary>
+        /// 檢查是否已綁定 Google 帳號 (需先登入)
+        /// </summary>
+        /// <returns>是否已綁定</returns>
+        [HttpGet("google-linked")]
+        public async Task<IActionResult> IsGoogleLinked()
+        {
+            try
+            {
+                // 從 JWT Token 取得使用者 ID
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim) || !long.TryParse(userIdClaim, out var userId))
+                {
+                    return Unauthorized(new ApiResponseDto
+                    {
+                        Success = false,
+                        Message = "未授權的請求"
+                    });
+                }
+
+                var isLinked = await _googleAuthService.IsGoogleAccountLinkedAsync(userId);
+
+                return Ok(new
+                {
+                    success = true,
+                    isLinked = isLinked
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "檢查 Google 綁定狀態時發生錯誤");
+                return StatusCode(500, new ApiResponseDto
+                {
+                    Success = false,
+                    Message = "系統錯誤，請稍後再試"
+                });
+            }
         }
     }
 }

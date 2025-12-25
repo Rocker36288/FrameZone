@@ -159,6 +159,8 @@ public partial class User
 
     public virtual ICollection<UserSession> UserSessions { get; set; } = new List<UserSession>();
 
+    public virtual ICollection<UserThirdPartyAuth> UserThirdPartyAuths { get; set; } = new List<UserThirdPartyAuth>();
+
     public virtual ICollection<UserVerification> UserVerifications { get; set; } = new List<UserVerification>();
 
     public virtual ICollection<WalletTransaction> WalletTransactions { get; set; } = new List<WalletTransaction>();

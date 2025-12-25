@@ -14,7 +14,12 @@ import {
   ResetPasswordResponseDto,
   ChangePasswordRequestDto,
   ChangePasswordResponseDto,
-  UserInfo
+  UserInfo,
+  LinkGoogleAccountRequestDto,
+  GoogleLoginRequestDto,
+  GoogleLoginResponseDto,
+  UnlinkGoogleAccountRequestDto,
+  GoogleLinkedStatusResponseDto
 } from '../models/auth.models';
 
 @Injectable({
@@ -187,6 +192,49 @@ export class AuthService {
    */
   testApi(): Observable<any> {
     return this.http.get(`${this.apiUrl}/test`);
+  }
+
+
+  /**
+   * 使用 Google 登入
+   * @param googleLoginData Google 登入資料
+   * @returns 登入結果
+   */
+  googleLogin(googleLoginData: GoogleLoginRequestDto): Observable<GoogleLoginResponseDto> {
+    return this.http.post<GoogleLoginResponseDto>(`${this.apiUrl}/google-login`, googleLoginData)
+      .pipe(
+        tap(response => {
+          if (response.success && response.token) {
+            this.handleLoginSuccess(response, googleLoginData.rememberMe);
+          }
+        })
+      );
+  }
+
+  /**
+   * 綁定 Google 帳號
+   * @param request 綁定請求資料
+   * @returns 處理結果
+   */
+  linkGoogleAccount(request: LinkGoogleAccountRequestDto): Observable<any> {
+    return this.http.post(`${this.apiUrl}/link-google`, request);
+  }
+
+  /**
+   * 解除 Google 帳號綁定
+   * @param request 解除綁定請求資料
+   * @returns 處理結果
+   */
+  unlinkGoogleAccount(request: UnlinkGoogleAccountRequestDto): Observable<any> {
+    return this.http.post(`${this.apiUrl}/unlink-google`, request);
+  }
+
+  /**
+   * 檢查是否已綁定 Google 帳號
+   * @returns 綁定狀態
+   */
+  isGoogleLinked(): Observable<GoogleLinkedStatusResponseDto> {
+    return this.http.get<GoogleLinkedStatusResponseDto>(`${this.apiUrl}/google-linked`);
   }
 
 }
