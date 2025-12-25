@@ -1,23 +1,87 @@
-<!-- 左側欄（功能選單） -->
-<div class="card shadow-sm">
+<div class="card shadow-sm menu-card">
   <div class="card-body">
-    <h3 class="mb-3">選單</h3>
-    <div class="input-group mb-3">
-      <span class="input-group-text bg-white border-end-0">
-        <i class="bi bi-search text-muted"></i>
-      </span>
-      <input type="text" class="form-control border-start-0 ps-0" placeholder="搜尋內容..." aria-label="Search">
-    </div>
-    <div class="btn-group-vertical w-100" role="group">
-      <a class="nav-link btn btn-custom" routerLink="index">
-        <i class="bi bi-house"></i> 首頁
+    <h3 class="menu-title mb-3">選單</h3>
+
+    <div class="menu-list">
+      <a class="nav-link menu-item-btn" routerLink="index">
+        <div class="icon-circle">
+          <i class="bi bi-house-door-fill"></i>
+        </div>
+        <span class="menu-item-name">首頁</span>
       </a>
-      <a class="nav-link btn btn-custom" routerLink="profile">
-        <i class="bi bi-people"></i> 我的貼文
+
+      <a class="nav-link menu-item-btn" routerLink="profile">
+        <div class="icon-circle">
+          <i class="bi bi-collection-play-fill"></i>
+        </div>
+        <span class="menu-item-name">我的貼文</span>
       </a>
-      <a class="nav-link btn btn-custom" routerLink="friends">
-        <i class="bi bi-people"></i> 朋友
+
+      <a class="nav-link menu-item-btn" routerLink="friends">
+        <div class="icon-circle">
+          <i class="bi bi-newspaper"></i>
+        </div>
+        <span class="menu-item-name">朋友貼文</span>
       </a>
+
+      <a class="nav-link menu-item-btn" routerLink="friends">
+        <div class="icon-circle">
+          <i class="bi bi-clock-history"></i>
+        </div>
+        <span class="menu-item-name">最近觀看</span>
+      </a>
+
+      <a class="nav-link menu-item-btn" routerLink="friends">
+        <div class="icon-circle">
+          <i class="bi bi-heart-fill text-danger"></i>
+        </div>
+        <span class="menu-item-name">已按讚的貼文</span>
+      </a>
+
+      <a class="nav-link menu-item-btn" routerLink="friends">
+        <div class="icon-circle">
+          <i class="bi bi-chat-dots-fill"></i>
+        </div>
+        <span class="menu-item-name">留言過的貼文</span>
+      </a>
+
+      <a class="nav-link menu-item-btn" routerLink="friends">
+        <div class="icon-circle">
+          <i class="bi bi-share-fill"></i>
+        </div>
+        <span class="menu-item-name">分享過的貼文</span>
+      </a>
+
+      <hr class="my-3">
+
+      <a class="nav-link menu-item-btn" routerLink="friends">
+        <div class="icon-circle">
+          <i class="bi bi-person-lines-fill"></i>
+        </div>
+        <span class="menu-item-name">好友清單</span>
+      </a>
+
+      <a class="nav-link menu-item-btn" routerLink="friends">
+        <div class="icon-circle">
+          <i class="bi bi-three-dots"></i>
+        </div>
+        <span class="menu-item-name">社團</span>
+      </a>
+
+      <a class="nav-link menu-item-btn" routerLink="friends">
+        <div class="icon-circle">
+          <i class="bi bi-calendar-event-fill"></i>
+        </div>
+        <span class="menu-item-name">活動</span>
+      </a>
+
+      <a class="nav-link menu-item-btn" routerLink="friends">
+        <div class="icon-circle">
+          <i class="bi bi-gear-fill"></i>
+        </div>
+        <span class="menu-item-name">設定</span>
+      </a>
+
     </div>
   </div>
 </div>

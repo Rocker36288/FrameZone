@@ -1,0 +1,121 @@
+/* --- 1. 卡片外殼與佈局 --- */
+.menu-card {
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* 防止卡片本身長出滾動條 */
+}
+
+.menu-card .card-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.menu-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding-left: 0.25rem;
+}
+
+/* --- 2. 搜尋框樣式 --- */
+.custom-search {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.search-icon-box {
+  background-color: #007bff !important;
+  border-color: #007bff !important;
+  padding-left: 15px;
+  padding-right: 12px;
+}
+
+.search-icon-box i {
+  color: white !important;
+  font-size: 0.9rem;
+}
+
+.custom-search .form-control {
+  background-color: #ffffff !important;
+  border: 1px solid #dee2e6 !important;
+  border-left: none !important;
+  /* 移除與藍色區塊相接的線 */
+  font-size: 0.95rem;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.custom-search .form-control:focus {
+  border-color: #dee2e6 !important;
+  box-shadow: none !important;
+  background-color: #f8f9fa !important;
+}
+
+.custom-search:focus-within {
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+/* --- 3. 選單列表與滾動條 --- */
+.menu-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+  /* 為滾動條預留空間 */
+}
+
+.menu-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.menu-list::-webkit-scrollbar-thumb {
+  background: #e0e0e0;
+  border-radius: 10px;
+}
+
+/* --- 4. 選單按鈕項目 --- */
+.menu-item-btn {
+  background-color: transparent;
+  border: none !important;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  text-decoration: none !important;
+  color: #333 !important;
+}
+
+.menu-item-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: translateX(4px);
+}
+
+.menu-item-btn:active {
+  background-color: rgba(0, 0, 0, 0.1);
+  transform: scale(0.97);
+}
+
+.icon-circle {
+  width: 35px;
+  height: 35px;
+  background-color: #f0f2f5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  /* 建議加上這個，防止文字過長時擠壓到圓圈 */
+}
+
+.menu-item-name {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
