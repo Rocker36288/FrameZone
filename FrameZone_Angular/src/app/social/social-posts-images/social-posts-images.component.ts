@@ -15,6 +15,9 @@ export class SocialPostsImagesComponent {
     { id: 4, imageUrl: 'https://picsum.photos/500/500?random=4' },
     { id: 5, imageUrl: 'https://picsum.photos/500/500?random=5' },
     { id: 6, imageUrl: 'https://picsum.photos/500/500?random=6' },
+    { id: 7, imageUrl: 'https://picsum.photos/500/500?random=7' },
+    { id: 8, imageUrl: 'https://picsum.photos/500/500?random=8' },
+    { id: 9, imageUrl: 'https://picsum.photos/500/500?random=9' },
   ];
 
   viewPost(postId: number) {
