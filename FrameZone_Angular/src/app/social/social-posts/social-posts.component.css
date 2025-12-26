@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. 貼文框架與選單 (Post Structure & Dropdown)
+   0. 貼文框架與選單 (Post Structure & Dropdown)
    ========================================================================== */
 
 /* 防止選單被卡片邊緣切掉 */
@@ -36,6 +36,31 @@
 }
 
 /* ==========================================================================
+   1. 頭像樣式 (Avatar Style) - 確保邊框完整顯示
+   ========================================================================== */
+.avatar-wrapper {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 1.5px solid #5473f3;
+  padding: 2px;
+  /* 留白讓頭像更有層次 */
+  background-color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.avatar-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* ==========================================================================
    2. 按讚/留言/分享 按鈕 (Action Buttons - Ghost Style)
    ========================================================================== */
 
@@ -44,16 +69,30 @@
   background: transparent;
   color: #65676b;
   font-weight: 600;
-  transition: all 0.2s ease;
+  border-radius: 8px;
+  /* 增加圓角感 */
+  transition: all 0.3s ease;
 }
 
+/* 懸停：背景變淺紫，圖示變深藍 */
 .btn-ghost-dark:hover {
-  background-color: rgba(0, 0, 0, 0.05) !important;
-  color: #050505;
+  background-color: #f0f2ff !important;
+  color: #5473f3 !important;
+}
+
+/* 按讚激活狀態：使用主色調 */
+.btn-ghost-dark.text-primary {
+  color: #738fee !important;
 }
 
 .btn-ghost-dark i {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
+  transition: transform 0.2s ease;
+}
+
+/* 懸停時圖示微動效 */
+.btn-ghost-dark:hover i {
+  transform: scale(1.1);
 }
 
 /* ==========================================================================
