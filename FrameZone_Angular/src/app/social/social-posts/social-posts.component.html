@@ -39,51 +39,58 @@
       @if(post.postContent.length<=10){ {{post.postContent}} } @else{ {{ isFullContent ? post.postContent :
         (post.postContent | slice:0:10) + '...' }}<button class="btn btn-link btn-sm p-0 ms-1"
         (click)="toggleContent()">
-        {{ isFullContent ? '收起' : '顯示全部' }}
+        {{ isFullContent ? '' : '顯示全部' }}
         </button>
         }
     </h2>
-    }
 
-    <!-- 編輯區 -->
-    @if(isEditing){
-    <div>
-      <textarea class="form-control" [(ngModel)]="editContent"></textarea>
-      <button class="btn btn-success btn-sm mt-2" (click)="saveEdit()">保存</button>
-      <button class="btn btn-secondary btn-sm mt-2" (click)="cancelEdit()">取消</button>
-    </div>
-    }
     <br>
-    <div>
-      👍 按讚數
-      💬 留言數
-    </div>
     <hr class="my-2">
 
     <div class="row text-center">
       <div class="col-4">
-        <button class="btn btn-ghost-dark w-100 py-2 d-flex align-items-center justify-content-center">
-          <i class="bi bi-hand-thumbs-up me-2"></i>讚
+        <button class="btn btn-ghost-dark w-100 py-2 d-flex align-items-center justify-content-center"
+          (click)="toggleLikes()" [class.text-primary]="isLiked"> <i class="bi me-2"
+            [class.bi-hand-thumbs-up]="!isLiked" [class.bi-hand-thumbs-up-fill]="isLiked"></i>
+          {{likeCount}} 讚
+        </button>
+      </div>
+      <div class="col-4">
+        <button class="btn btn-ghost-dark w-100 py-2 d-flex align-items-center justify-content-center"
+          (click)="toggleComments()">
+          <i class="bi bi-chat-square me-2"></i>10 則留言
         </button>
       </div>
       <div class="col-4">
         <button class="btn btn-ghost-dark w-100 py-2 d-flex align-items-center justify-content-center">
-          <i class="bi bi-chat-square me-2"></i>留言
-        </button>
-      </div>
-      <div class="col-4">
-        <button class="btn btn-ghost-dark w-100 py-2 d-flex align-items-center justify-content-center">
-          <i class="bi bi-share me-2"></i>分享
+          <i class="bi bi-share me-2"></i>5 次分享
         </button>
       </div>
     </div>
 
-    <hr class="my-2">
+    }
 
+    <!-- 編輯區 -->
+    @if(isEditing){
+    <div class="edit-container mt-2">
+      <textarea class="form-control mb-2 edit-textarea" rows="5" [(ngModel)]="editContent"></textarea>
+
+      <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-success px-4" (click)="saveEdit()">保存</button>
+        <button class="btn btn-secondary px-4" (click)="cancelEdit()">取消</button>
+      </div>
+    </div>
+    }
+
+
+
+    @if(isCommentShowed){
+    <hr class="my-2">
     <!-- 顯示留言區 -->
     <div class="comment-section">
       <app-social-comments [comments]="post.comments"></app-social-comments>
     </div>
+
 
     <!-- 發布留言區 -->
     <div class="mt-3">
@@ -109,7 +116,7 @@
         </div>
       </div>
     </div>
-
+    }
   </div>
 </div>
 }

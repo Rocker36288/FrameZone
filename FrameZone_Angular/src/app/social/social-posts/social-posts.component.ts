@@ -15,10 +15,14 @@ export class SocialPostsComponent {
   @Input() post!: PostDto;
   @Output() postDeleted = new EventEmitter<number>();
 
-  isEditing = false;
+  isEditing = false;  //是否正在編輯
   editContent = "";
   isMenuOpen = false; // 控制選單開關
   isFullContent = false; // 控制是否顯示全部內容
+  isCommentShowed = false; // 控制是否顯示留言
+
+  isLiked = false;  //是否按過讚
+  likeCount = 132;  //按讚假資料
 
   constructor(private postService: PostService, private eRef: ElementRef) { }
 
@@ -67,6 +71,20 @@ export class SocialPostsComponent {
 
   toggleContent() {
     this.isFullContent = !this.isFullContent;
+  }
+
+  toggleLikes() {
+    this.isLiked = !this.isLiked; //先換狀態再加次數
+    if (this.isLiked == true) {
+      this.likeCount++;
+    }
+    else {
+      this.likeCount--;
+    }
+  }
+
+  toggleComments() {
+    this.isCommentShowed = !this.isCommentShowed;
   }
 
   startEdit() {
