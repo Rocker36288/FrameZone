@@ -13,10 +13,15 @@ import { TargetTypeEnum } from '../../../models/video.enum';
 import { VideoService } from '../../../service/video.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { VideosSidebarComponent } from "../../../ui/videos-sidebar/videos-sidebar.component";
+import { DatePipe } from '@angular/common';
+import { VideoSearchComponent } from "../../search/video-search/video-search.component";
+import { SearchboxComponent } from "../../../ui/searchbox/searchbox.component";
+import { MockChannelService } from '../../../service/mock-channel.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-video-main',
-  imports: [FormsModule, VideoPlayerComponent, VideoTimeagoPipe, VideoActionsBarComponent, ChannelCardComponent, NgIf, VideoCommentListComponent, VideosListComponent, VideosSidebarComponent],
+  imports: [CommonModule, DatePipe, FormsModule, VideoPlayerComponent, VideoTimeagoPipe, VideoActionsBarComponent, ChannelCardComponent, NgIf, VideoCommentListComponent, VideosListComponent, VideosSidebarComponent, VideoSearchComponent, SearchboxComponent],
   templateUrl: './video-main.component.html',
   styleUrl: './video-main.component.css'
 })
@@ -95,7 +100,8 @@ export class VideoMainComponent {
 
   constructor(
     private route: ActivatedRoute,
-    private videoService: VideoService, private cdr: ChangeDetectorRef
+    private videoService: VideoService, private cdr: ChangeDetectorRef,
+    private mockChannelService: MockChannelService
   ) { }
 
 
@@ -130,6 +136,14 @@ export class VideoMainComponent {
         this.commentList = comments; // 這裡才是陣列
       },
       error: (err) => console.error(err)
+    });
+
+    //讀取推薦影片
+    this.videoService.getVideoRecommend().subscribe(apiVideos => {
+      this.videosRecommand = [
+        ...this.mockChannelService.videos,
+        ...this.mockChannelService.Videos3
+      ];
     });
 
     /* 4️⃣ 模擬影片載入完成（UI 動畫用） */

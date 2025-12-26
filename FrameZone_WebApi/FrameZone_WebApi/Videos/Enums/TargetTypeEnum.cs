@@ -4,9 +4,9 @@
     {
         None = 0,
         Photo = 1,
-        Social = 2,
-        Shopping = 3,
-        Stuido = 4,
-        Video = 5,
+        Video = 2,
+        Social = 3,
+        Shopping = 4,
+        Stuido = 5
     }
 }

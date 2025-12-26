@@ -1,11 +1,6 @@
 <!-- 搜尋區塊 -->
-<div class="search-hero">
-  <div class="container py-5">
-    <div class="search-wrapper">
-      <app-searchbox></app-searchbox>
-    </div>
-  </div>
-</div>
+<app-searchbox></app-searchbox>
+
 
 <div class="container content-container">
 
@@ -46,7 +41,7 @@
     </div>
 
     <div class="popular-carousel-wrapper">
-      <app-videos-list [variant]="'gridshow-scroll'" [videos]="recommendVideos!"></app-videos-list>
+      <app-videos-list [variant]="'gridshow-scroll'" [videos]="popularVideos!"></app-videos-list>
     </div>
   </section>
 
@@ -59,12 +54,6 @@
         </div>
         <h2 class="section-title">為你推薦</h2>
         <span class="recommend-subtitle">根據你的觀看記錄精選</span>
-      </div>
-      <div class="filter-chips">
-        <button class="chip active">全部</button>
-        <button class="chip">音樂</button>
-        <button class="chip">遊戲</button>
-        <button class="chip">教學</button>
       </div>
     </div>
 

@@ -99,6 +99,25 @@ namespace FrameZone_WebApi.Videos.Services
 
         public async Task<Comment> PostVideoComment(VideoCommentRequest req)
         {
+            // 1️⃣ 嘗試取得既有 TargetTypeId
+            var targetTypeId = await _videoRepo
+                .GetTargetTypeIdBySystemIdAsync((int)TargetTypeEnum.Video);
+
+            if (targetTypeId == 0)
+            {
+                // 2️⃣ 不存在 → 建立新 TargetType
+                var newTargetType = new TargetType
+                {
+                    SystemId = (int)TargetTypeEnum.Video,
+                    TargetType1 = "VideoCommentTarget",
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                targetTypeId = await _videoRepo.CreateAsync(newTargetType);
+            }
+
+            
+
             // 1️⃣ 取得或建立 CommentTarget
             var commentTarget = await _videoRepo.GetCommentTargetAsync(req.Videoid);
 
@@ -107,7 +126,7 @@ namespace FrameZone_WebApi.Videos.Services
                 commentTarget = await _videoRepo.CreateCommentTargetAsync(new CommentTarget
                 {
                     VideoId = req.Videoid,
-                    TargetTypeId = (int)TargetTypeEnum.Video // 建議用 enum
+                    TargetTypeId = targetTypeId // 建議用 enum
                 });
             }
 

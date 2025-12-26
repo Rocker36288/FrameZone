@@ -30,6 +30,18 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
   showControls: boolean = false;
   hideCursor: boolean = false; // 新增
 
+  // Color Mode================
+  colorModes = [
+    { key: 'normal', label: '標準' },
+    { key: 'grayscale', label: '黑白' },
+    { key: 'high-contrast', label: '高對比' },
+    { key: 'low-saturation', label: '低飽和' }
+  ];
+
+  currentColorMode: string = 'normal';
+  showColorMenu: boolean = false;
+
+
   ngAfterViewInit(): void {
     const video = this.videoRef.nativeElement;
 
@@ -254,4 +266,15 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
       this.hls.destroy();
     }
   }
+
+  // 特色切換
+  toggleColorMenu() {
+    this.showColorMenu = !this.showColorMenu;
+  }
+
+  changeColorMode(mode: string) {
+    this.currentColorMode = mode;
+    this.showColorMenu = false;
+  }
+
 }

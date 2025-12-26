@@ -6,7 +6,7 @@
       <!-- 頭像 -->
       <div class="d-flex align-items-center pointer me-3" (click)="FollowerBtn()">
         <img src="{{channel.avatar}}" alt="頻道頭像" class="rounded-circle"
-          style="width:64px; height:64px; object-fit:cover;" />
+          style="width:64px; height:64px; object-fit:cover;" (error)="onthumbnailError($event)" />
       </div>
 
       <!-- 中間資訊 -->
@@ -28,7 +28,8 @@
   <ng-container *ngSwitchCase="'middle'">
     <div class="channel-card channel-card-middle" (click)="goToChannelHome()">
       <div class="d-flex justify-content-center pointer my-3" (click)="FollowerBtn()">
-        <img src="{{channel.avatar}}" alt="頻道頭像" class="rounded-circle" style="width:9rem; height:9rem;" />
+        <img src="{{channel.avatar}}" alt="頻道頭像" class="rounded-circle" style="width:9rem; height:9rem;"
+          (error)="onthumbnailError($event)" />
       </div>
 
       <div class="d-flex justify-content-center flex-grow-1">

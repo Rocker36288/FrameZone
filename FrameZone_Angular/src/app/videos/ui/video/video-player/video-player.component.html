@@ -1,5 +1,5 @@
 <div #videoContainer class="video-container" [ngClass]="{'hide-cursor': hideCursor}" (mouseenter)="onMouseEnter()"
-  (mousemove)="onMouseMove()" (mouseleave)="onMouseLeave()">
+  (mousemove)="onMouseMove()" (mouseleave)="onMouseLeave()" [ngClass]="currentColorMode">
 
   <!-- 影片元素 -->
   <video #videoRef class="video-player" playsinline></video>
@@ -101,6 +101,34 @@
               [class.active]="currentQuality === quality.index" (click)="changeQuality(quality.index)">
               <span>{{ quality.name }}</span>
               <svg *ngIf="currentQuality === quality.index" xmlns="http://www.w3.org/2000/svg"
+                class="icon icon-tabler icon-tabler-check ms-auto" width="24" height="24" viewBox="0 0 24 24"
+                stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <polyline points="5 12 9 16 19 6" />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- 色彩模式按鈕 -->
+        <div class="color-mode-control">
+          <button class="btn btn-icon" (click)="toggleColorMenu()" type="button" [class.active]="showColorMenu">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+              stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 3a9 9 0 0 0 0 18" />
+            </svg>
+          </button>
+
+          <!-- 色彩模式選單 -->
+          <div class="dropdown-menu dropdown-menu-forcolor-end show" *ngIf="showColorMenu">
+            <h6 class="dropdown-header">色彩模式</h6>
+
+            <a *ngFor="let mode of colorModes" href="javascript:void(0)" class="dropdown-item"
+              [class.active]="currentColorMode === mode.key" (click)="changeColorMode(mode.key)">
+              <span>{{ mode.label }}</span>
+              <svg *ngIf="currentColorMode === mode.key" xmlns="http://www.w3.org/2000/svg"
                 class="icon icon-tabler icon-tabler-check ms-auto" width="24" height="24" viewBox="0 0 24 24"
                 stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />

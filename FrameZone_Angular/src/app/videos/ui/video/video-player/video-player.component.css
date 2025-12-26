@@ -299,3 +299,25 @@
     display: none;
   }
 }
+
+/* 顏色模式 */
+.video-container.normal {
+  filter: none;
+}
+
+.video-container.grayscale {
+  filter: grayscale(100%);
+}
+
+.video-container.high-contrast {
+  filter: contrast(130%) brightness(110%);
+}
+
+.video-container.low-saturation {
+  filter: saturate(70%);
+}
+
+.dropdown-menu-forcolor-end {
+  transform: translateX(-2rem);
+  transform: translateY(2rem);
+}

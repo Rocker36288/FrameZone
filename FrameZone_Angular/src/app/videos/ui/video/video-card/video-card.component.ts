@@ -5,10 +5,11 @@ import { VideoDurationPipe } from "../../../pipes/video-duration.pipe";
 import { NgSwitch, NgSwitchCase } from '@angular/common';
 import { VideoCardData } from '../../../models/video-model';
 import { Router } from '@angular/router';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-video-card',
-  imports: [VideoTimeagoPipe, VideoDurationPipe, NgSwitch, NgSwitchCase],
+  imports: [DatePipe, VideoTimeagoPipe, VideoDurationPipe, NgSwitch, NgSwitchCase],
   templateUrl: './video-card.component.html',
   styleUrl: './video-card.component.css'
 })
@@ -24,6 +25,8 @@ export class VideoCardComponent {
     = 'small';
   @Input() showChannel: boolean = true;
   @Input() showDescription: boolean = true;
+
+  videothumbnail: string = ''
 
   @Output() videoClick = new EventEmitter<string>();
 

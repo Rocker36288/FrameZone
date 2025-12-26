@@ -11,11 +11,6 @@ import { VideoService } from '../../service/video.service';
 })
 export class SearchboxComponent {
   keyword: string = '';
-  categories = [
-    { id: 1, name: '音樂' },
-    { id: 2, name: '遊戲' },
-    { id: 3, name: '教育' }
-  ];
   selectedCategory: number | null = null;
 
   sortBy: string = 'date';

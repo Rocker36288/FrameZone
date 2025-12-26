@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
   styleUrl: './channel-card.component.css'
 })
 export class ChannelCardComponent {
+
   @Input() channel!: ChannelCard
   @Input() variant: 'small' | 'middle' | 'large' = 'small';
 
@@ -24,5 +25,10 @@ export class ChannelCardComponent {
 
   FollowerBtn() {
 
+  }
+
+  onthumbnailError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = 'favicon2.png';
   }
 }

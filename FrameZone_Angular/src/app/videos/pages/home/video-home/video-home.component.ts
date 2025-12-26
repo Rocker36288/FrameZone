@@ -1,3 +1,4 @@
+import { MockChannelService } from './../../../service/mock-channel.service';
 import { VideoService } from './../../../service/video.service';
 import { Component, ElementRef, Input, input, ViewChild, OnInit } from '@angular/core';
 import { VideoCreatorspotlightComponent } from "../video-creatorspotlight/video-creatorspotlight.component";
@@ -18,12 +19,26 @@ export class VideoHomeComponent {
 
   recommendVideos: VideoCardData[] | undefined
 
-  constructor(private videoService: VideoService) {
+  popularVideos: VideoCardData[] | undefined
+
+  constructor(private videoService: VideoService, private mockChannelService: MockChannelService) {
 
   }
 
-  ngOnInit() {
-    this.videoService.getVideoRecommend().subscribe(data => { this.recommendVideos = data; })
+  ngOnInit(): void {
+    this.videoService.getVideoRecommend().subscribe(apiVideos => {
+      this.popularVideos = [
+        ...apiVideos,
+        ...this.mockChannelService.Videos2
+      ];
+    });
+    this.videoService.getVideoRecommend().subscribe(apiVideos => {
+      this.recommendVideos = [
+        ...apiVideos,
+        ...this.mockChannelService.videos,
+        ...this.mockChannelService.Videos3
+      ];
+    });
   }
 
 }

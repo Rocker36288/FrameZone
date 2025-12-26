@@ -329,3 +329,27 @@
     padding-left: 0;
   }
 }
+
+.sidebar-avatar-wrapper {
+  display: flex;
+  margin-top: 1.5rem;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+  /* 平滑過渡 */
+  margin-bottom: 2rem;
+}
+
+.sidebar-avatar-wrapper app-user-avatar img {
+  width: 80px;
+  /* 展開時尺寸 */
+  height: 80px;
+  transition: all 0.3s ease;
+  /* 平滑縮放 */
+}
+
+.sidebar-avatar-wrapper.collapsed app-user-avatar img {
+  width: 40px;
+  /* 收縮時尺寸 */
+  height: 40px;
+}

@@ -148,6 +148,29 @@ namespace FrameZone_WebApi.Videos.Repositories
             return comment;
         }
 
+        /// <summary>
+        /// 1️⃣ 檢測是否存在指定 SystemId
+        /// </summary>
+        public async Task<int> GetTargetTypeIdBySystemIdAsync(int systemId)
+        {
+            return await _context.TargetTypes
+                .AsNoTracking()
+                .Where(t => t.SystemId == systemId)
+                .Select(t => t.TargetTypeId)
+                .FirstOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// 2️⃣ 建立 TargetType
+        /// </summary>
+        public async Task<int> CreateAsync(TargetType targetType)
+        {
+            _context.TargetTypes.Add(targetType);
+            await _context.SaveChangesAsync();
+            return targetType.TargetTypeId;
+        }
+
+
         /* =====================================================
          * 📺 Channel
          * ===================================================== */
@@ -225,6 +248,7 @@ namespace FrameZone_WebApi.Videos.Repositories
         {
             var videos = await _context.Videos
                 .AsNoTracking()
+                .Where(v=> v.IsDeleted == false)
                 .Include(v => v.Channel)
                     .ThenInclude(c => c.UserProfile)
                 .OrderByDescending(v => v.CreatedAt)

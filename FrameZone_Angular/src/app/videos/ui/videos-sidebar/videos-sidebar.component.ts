@@ -3,10 +3,11 @@ import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs';
 import { NgSwitchCase, NgClass, NgSwitch, NgForOf } from "@angular/common";
 import { UserMenuComponent } from "../../../shared/components/user-menu/user-menu.component";
+import { UserAvatarComponent } from "../user-avatar/user-avatar.component";
 
 @Component({
   selector: 'app-videos-sidebar',
-  imports: [NgSwitchCase, RouterLink, NgClass, NgSwitch, NgForOf, UserMenuComponent],
+  imports: [NgSwitchCase, RouterLink, NgClass, NgSwitch, NgForOf, UserMenuComponent, UserAvatarComponent],
   templateUrl: './videos-sidebar.component.html',
   styleUrl: './videos-sidebar.component.css'
 })
@@ -19,11 +20,6 @@ export class VideosSidebarComponent {
       title: '影片首頁',
       route: '/videos',
       icon: 'home'
-    },
-    {
-      title: '假頻道',
-      route: '/videos/channel/1',
-      icon: 'barrier-block'
     },
     {
       title: '創作者工作室',
