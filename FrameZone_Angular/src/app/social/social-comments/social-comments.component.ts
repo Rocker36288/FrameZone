@@ -1,23 +1,19 @@
-import { DatePipe } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { CommentDto } from '../models/PostDto'; // 確保路徑正確
 
 @Component({
   selector: 'app-social-comments',
-  imports: [DatePipe],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './social-comments.component.html',
   styleUrl: './social-comments.component.css'
 })
 export class SocialCommentsComponent {
-  // 接收父組件傳進來的留言資料
-  @Input() data: any;
+  // 接收從 SocialPostsComponent 傳進來的留言陣列
+  @Input() comments: CommentDto[] = [];
 
-  // 判斷是否為目前登入者，以便顯示刪除按鈕 (範例)
-  @Input() isOwner: boolean = false;
+  constructor() { }
 
-  // 傳遞刪除事件給父組件
-  @Output() delete = new EventEmitter<number>();
-
-  onDeleteClick() {
-    this.delete.emit(this.data.id);
-  }
+  // 未來可以在這裡加入「按讚留言」或「刪除留言」的邏輯
 }

@@ -1,21 +1,46 @@
-<div class="d-flex mb-3 align-items-start comment-item">
-  <img src="~/img/social/default-avatar.png" class="rounded-circle me-2" style="width:35px; height:35px" />
+<div class="comments-wrapper mt-3">
+  @for (comment of comments; track comment.commentId) {
+  <div class="d-flex mb-3">
+    <img src="images/social/AmongUs.png" class="rounded-circle me-2"
+      style="width:32px; height:32px; object-fit: cover;" />
 
-  <div class="flex-grow-1">
-    <div class="bg-light p-2 rounded">
-      <div class="d-flex justify-content-between">
-        <strong style="font-size: 0.85rem;">UserId: {{data.userId}}</strong>
-        <span class="text-muted" style="font-size: 0.75rem;">{{data.createdAt | date:'MM-dd HH:mm'}}</span>
+    <div class="flex-grow-1">
+      <div class="bg-light p-2 px-3 rounded-3 d-inline-block shadow-sm">
+        <div class="fw-bold text-dark" style="font-size: 0.85rem;">
+          User ID: {{comment.userId}}
+        </div>
+        <div class="text-secondary" style="font-size: 0.9rem; line-height: 1.4;">
+          {{comment.content}}
+        </div>
       </div>
-      <div style="font-size: 0.9rem; white-space: pre-wrap;">{{data.content}}</div>
-    </div>
 
-    <div class="mt-1 ms-1">
-      <button class="btn btn-link btn-sm p-0 text-decoration-none text-muted" style="font-size: 0.75rem;">回覆</button>
-      @if(isOwner) {
-      <button class="btn btn-link btn-sm p-0 text-decoration-none text-danger ms-2" style="font-size: 0.75rem;"
-        (click)="onDeleteClick()">刪除</button>
+      <div class="ms-2 mt-1" style="font-size: 0.75rem; color: #65676b;">
+        <span class="fw-bold cursor-pointer hover-underline">讚</span> ·
+        <span class="fw-bold cursor-pointer hover-underline">回覆</span> ·
+        <span>{{comment.updatedAt | date:'shortTime'}}</span>
+      </div>
+
+      @if (comment.replies && comment.replies.length > 0) {
+      <div class="ms-1 mt-2 ps-3 border-start" style="border-width: 2px !important; border-color: #dee2e6 !important;">
+        @for (reply of comment.replies; track reply.commentId) {
+        <div class="d-flex mb-2">
+          <img src="images/social/AmongUs.png" class="rounded-circle me-2"
+            style="width:24px; height:24px; object-fit: cover;" />
+          <div class="flex-grow-1">
+            <div class="bg-light p-2 px-3 rounded-3 d-inline-block">
+              <div class="fw-bold" style="font-size: 0.8rem;">User ID: {{reply.userId}}</div>
+              <div class="text-secondary" style="font-size: 0.85rem;">{{reply.content}}</div>
+            </div>
+            <div class="ms-2 mt-1" style="font-size: 0.7rem; color: #65676b;">
+              <span class="fw-bold cursor-pointer hover-underline">讚</span> ·
+              <span>{{reply.updatedAt | date:'shortTime'}}</span>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
       }
     </div>
   </div>
+  }
 </div>

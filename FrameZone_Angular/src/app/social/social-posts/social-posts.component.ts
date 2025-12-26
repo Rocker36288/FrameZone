@@ -22,6 +22,37 @@ export class SocialPostsComponent {
 
   constructor(private postService: PostService, private eRef: ElementRef) { }
 
+  ngOnInit() {
+    // 如果後端還沒實作留言功能（post.comments 為 undefined 或空）
+    // 我們在這裡手動塞入假資料
+    if (!this.post.comments || this.post.comments.length === 0) {
+      this.post.comments = [
+        {
+          commentId: 101,
+          userId: 55,
+          content: '這則貼文的內容很有趣！',
+          updatedAt: new Date().toISOString(),
+          replies: [
+            {
+              commentId: 1011,
+              userId: 1,
+              content: '感謝支持，歡迎多加利用。',
+              updatedAt: new Date().toISOString()
+            }
+          ]
+        },
+        {
+          commentId: 102,
+          userId: 66,
+          content: '這段程式碼的邏輯還有優化空間喔。',
+          updatedAt: new Date().toISOString(),
+          replies: []
+        }
+      ];
+    }
+  }
+
+
   // 點擊選單以外的地方時，自動關閉選單
   @HostListener('document:click', ['$event'])
   clickout(event: any) {
