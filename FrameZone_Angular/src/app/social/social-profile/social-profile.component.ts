@@ -1,11 +1,12 @@
 import { Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SocialPostsListComponent } from '../social-posts-list/social-posts-list.component';
+import { SocialPostsImagesComponent } from '../social-posts-images/social-posts-images.component';
 
 @Component({
   selector: 'app-social-profile',
   standalone: true,
-  imports: [RouterLink, SocialPostsListComponent], // 在 Angular 19 中，內建控制流不需要 CommonModule
+  imports: [RouterLink, SocialPostsListComponent, SocialPostsImagesComponent], // 在 Angular 19 中，內建控制流不需要 CommonModule
   templateUrl: './social-profile.component.html',
   styleUrl: './social-profile.component.css'
 })

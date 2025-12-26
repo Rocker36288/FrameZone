@@ -1,0 +1,47 @@
+.post-container {
+  display: grid;
+  /* 關鍵：分成三列，每列等寬 */
+  grid-template-columns: repeat(3, 1fr);
+  /* 圖片之間的間隙，1px 是 IG 風格，也可以加大 */
+  gap: 3px;
+  width: 100%;
+  max-width: 935px;
+  /* 模擬常見的社群媒體寬度 */
+  margin: 0 auto;
+}
+
+.post-item {
+  position: relative;
+  width: 100%;
+  /* 強制 1:1 正方形 */
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.post-item img {
+  width: 100%;
+  height: 100%;
+  /* 確保圖片填滿格子且不變形 */
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+/* 滑鼠移上去縮放效果 */
+.post-item:hover img {
+  transform: scale(1.05);
+}
+
+/* 點擊時的反饋 */
+.post-item:active {
+  opacity: 0.8;
+}
+
+/* 手機版微調 (選用) */
+@media (max-width: 768px) {
+  .post-container {
+    gap: 1px;
+    /* 手機上間隙通常更小 */
+  }
+}
