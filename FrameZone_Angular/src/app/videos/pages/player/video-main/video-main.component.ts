@@ -21,7 +21,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-video-main',
-  imports: [CommonModule, DatePipe, FormsModule, VideoPlayerComponent, VideoTimeagoPipe, VideoActionsBarComponent, ChannelCardComponent, NgIf, VideoCommentListComponent, VideosListComponent, VideosSidebarComponent, VideoSearchComponent, SearchboxComponent],
+  imports: [CommonModule, DatePipe, FormsModule, VideoPlayerComponent, VideoActionsBarComponent, ChannelCardComponent, NgIf, VideoCommentListComponent, VideosListComponent, VideosSidebarComponent, VideoSearchComponent, SearchboxComponent],
   templateUrl: './video-main.component.html',
   styleUrl: './video-main.component.css'
 })

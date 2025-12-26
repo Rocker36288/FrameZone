@@ -35,11 +35,21 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
     { key: 'normal', label: '標準' },
     { key: 'grayscale', label: '黑白' },
     { key: 'high-contrast', label: '高對比' },
-    { key: 'low-saturation', label: '低飽和' }
+    { key: 'low-saturation', label: '低飽和' },
+    { key: 'exposure', label: '曝光輔助' }
   ];
+  currentColorMode = 'normal';
+  showColorMenu = false;
 
-  currentColorMode: string = 'normal';
-  showColorMenu: boolean = false;
+  //Canvas
+  @ViewChild('analysisCanvas') canvasRef?: ElementRef<HTMLCanvasElement>;
+
+  animationFrameId?: number;
+
+  // 倍速設定========================
+  playbackRates = [0.5, 0.75, 1, 1.25, 1.5, 2]; // 可擴充
+  currentPlaybackRate: number = 1;
+  showRateMenu: boolean = false;
 
 
   ngAfterViewInit(): void {
@@ -272,9 +282,78 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
     this.showColorMenu = !this.showColorMenu;
   }
 
-  changeColorMode(mode: string) {
-    this.currentColorMode = mode;
+  changeColorMode(modeKey: string) {
+    this.currentColorMode = modeKey;
     this.showColorMenu = false;
+
+    if (modeKey === 'exposure') {
+      // 使用 setTimeout 讓 Angular 渲染 Canvas 後再啟動
+      setTimeout(() => this.startExposureMode(), 0);
+    } else {
+      this.stopExposureMode();
+    }
+  }
+
+  drawExposureFrame() {
+    if (!this.videoRef || !this.canvasRef) return;
+
+    const video = this.videoRef.nativeElement;
+    const canvas = this.canvasRef.nativeElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // 將影片畫面畫到 Canvas
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // 取像素資料
+    const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = frame.data;
+
+    // 曝光輔助簡單示例：高亮過曝區域
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+
+      // 計算亮度
+      const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+      // 高亮過曝區域 (亮度超過 220)
+      if (luminance > 220) {
+        data[i] = 255;     // R
+        data[i + 1] = 0;   // G
+        data[i + 2] = 0;   // B
+      }
+    }
+
+    ctx.putImageData(frame, 0, 0);
+
+    // 下一幀更新
+    this.animationFrameId = requestAnimationFrame(() => this.drawExposureFrame());
+  }
+
+
+  startExposureMode() {
+    if (this.currentColorMode === 'exposure') {
+      this.drawExposureFrame();
+    }
+  }
+
+  stopExposureMode() {
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = undefined;
+    }
+  }
+
+  toggleRateMenu() {
+    this.showRateMenu = !this.showRateMenu;
+  }
+
+  changePlaybackRate(rate: number) {
+    this.currentPlaybackRate = rate;
+    this.videoRef.nativeElement.playbackRate = rate; // 套用到 video 元素
+    this.showRateMenu = false;
   }
 
 }

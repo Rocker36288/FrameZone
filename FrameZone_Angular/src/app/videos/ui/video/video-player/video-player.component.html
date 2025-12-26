@@ -4,6 +4,11 @@
   <!-- 影片元素 -->
   <video #videoRef class="video-player" playsinline></video>
 
+  <!-- Canvas 曝光分析層 -->
+  <canvas *ngIf="currentColorMode === 'exposure'" #analysisCanvas width="1280" height="720"
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+  </canvas>
+
   <!-- 自訂控制列 -->
   <div class="custom-controls" [ngClass]="{'show': showControls}">
 
@@ -67,6 +72,33 @@
 
       <!-- 右側控制 -->
       <div class="controls-right">
+        <!-- 倍速播放按鈕 -->
+        <div class="playback-rate-control">
+          <button class="btn btn-icon" (click)="toggleRateMenu()" type="button" [class.active]="showRateMenu">
+            <span>{{ currentPlaybackRate }}x</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+              stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+
+          <!-- 倍速選單 -->
+          <div class="dropdown-menu dropdown-menu-end show" *ngIf="showRateMenu">
+            <h6 class="dropdown-header">播放速度</h6>
+
+            <a *ngFor="let rate of playbackRates" href="javascript:void(0)" class="dropdown-item"
+              [class.active]="currentPlaybackRate === rate" (click)="changePlaybackRate(rate)">
+              {{ rate }}x
+              <svg *ngIf="currentPlaybackRate === rate" xmlns="http://www.w3.org/2000/svg"
+                class="icon icon-tabler icon-tabler-check ms-auto" width="24" height="24" viewBox="0 0 24 24"
+                stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <polyline points="5 12 9 16 19 6" />
+              </svg>
+            </a>
+          </div>
+        </div>
 
         <!-- 畫質設定按鈕 -->
         <div class="quality-control" *ngIf="qualityLevels.length > 0">
@@ -109,6 +141,8 @@
             </a>
           </div>
         </div>
+
+
 
         <!-- 色彩模式按鈕 -->
         <div class="color-mode-control">

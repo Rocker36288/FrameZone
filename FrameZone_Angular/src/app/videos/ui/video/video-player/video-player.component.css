@@ -321,3 +321,24 @@
   transform: translateX(-2rem);
   transform: translateY(2rem);
 }
+
+.video-container {
+  position: relative;
+  width: 100%;
+  height: auto;
+
+  video,
+  canvas {
+    display: block;
+  }
+}
+
+.playback-rate-control {
+  position: relative;
+
+
+}
+
+.btn-icon span {
+  margin-right: 4px;
+}
