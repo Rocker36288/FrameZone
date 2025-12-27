@@ -31,7 +31,7 @@ export class MockChannelService {
       '本影片將教你如何運用自然光與人造光源，' +
       '拍出更有層次與情緒的照片，適合所有攝影新手。',
     videoUri: '',
-    ChannelId: 1,
+    channelId: 1,
     likes: 1342
   };
 
@@ -48,7 +48,7 @@ export class MockChannelService {
       publishDate: new Date('2024-09-10'),
       description: '從三分法到引導線，讓照片瞬間升級。',
       videoUri: '',
-      ChannelId: 1,
+      channelId: 1,
       likes: 856
     },
     {
@@ -62,7 +62,7 @@ export class MockChannelService {
       publishDate: new Date('2024-09-28'),
       description: '教你在室內與戶外拍出自然好看的人像。',
       videoUri: '',
-      ChannelId: 1,
+      channelId: 1,
       likes: 1043
     },
     {
@@ -76,7 +76,7 @@ export class MockChannelService {
       publishDate: new Date('2024-10-12'),
       description: '從構圖、曝光到後製一次講清楚。',
       videoUri: '',
-      ChannelId: 1,
+      channelId: 1,
       likes: 732
     },
     {
@@ -90,7 +90,7 @@ export class MockChannelService {
       publishDate: new Date('2024-11-03'),
       description: '定焦 vs 變焦鏡，一次幫你分析清楚。',
       videoUri: '',
-      ChannelId: 1,
+      channelId: 1,
       likes: 1620
     },
     {
@@ -104,7 +104,7 @@ export class MockChannelService {
       publishDate: new Date('2024-12-01'),
       description: '從原圖到成品的完整修圖示範。',
       videoUri: '',
-      ChannelId: 1,
+      channelId: 1,
       likes: 1893
     }
   ];
@@ -121,7 +121,7 @@ export class MockChannelService {
       publishDate: new Date('2025-01-10'),
       description: '從拍照、錄影到夜拍，完整實測比較。',
       videoUri: '',
-      ChannelId: 2,
+      channelId: 2,
       likes: 2314
     },
     {
@@ -135,7 +135,7 @@ export class MockChannelService {
       publishDate: new Date('2025-01-18'),
       description: '一次搞懂感光元件尺寸的差異。',
       videoUri: '',
-      ChannelId: 2,
+      channelId: 2,
       likes: 1783
     },
     {
@@ -149,7 +149,7 @@ export class MockChannelService {
       publishDate: new Date('2024-11-22'),
       description: '走訪澀谷、原宿，捕捉最真實的街頭瞬間。',
       videoUri: '',
-      ChannelId: 3,
+      channelId: 3,
       likes: 2105
     },
     {
@@ -163,7 +163,7 @@ export class MockChannelService {
       publishDate: new Date('2024-12-08'),
       description: '輕裝出門也能拍出高質感照片。',
       videoUri: '',
-      ChannelId: 3,
+      channelId: 3,
       likes: 1294
     }, {
       id: 301,
@@ -176,7 +176,7 @@ export class MockChannelService {
       publishDate: new Date('2024-10-30'),
       description: '教你調出電影感色調的關鍵技巧。',
       videoUri: '',
-      ChannelId: 4,
+      channelId: 4,
       likes: 2450
     },
     {
@@ -190,7 +190,7 @@ export class MockChannelService {
       publishDate: new Date('2024-11-18'),
       description: '從 RAW 檔到成品的完整流程示範。',
       videoUri: '',
-      ChannelId: 4,
+      channelId: 4,
       likes: 2890
     }
   ];
@@ -206,7 +206,7 @@ export class MockChannelService {
     publishDate: new Date('2024-10-05'),
     description: '教你如何在不干擾動物的情況下拍出自然畫面。',
     videoUri: '',
-    ChannelId: 5,
+    channelId: 5,
     likes: 1834
   },
   {
@@ -220,7 +220,7 @@ export class MockChannelService {
     publishDate: new Date('2024-10-22'),
     description: '高速快門與追焦設定一次搞懂。',
     videoUri: '',
-    ChannelId: 5,
+    channelId: 5,
     likes: 2011
   },
   {
@@ -234,7 +234,7 @@ export class MockChannelService {
     publishDate: new Date('2024-11-14'),
     description: '不同焦段實拍比較，選鏡不再迷惘。',
     videoUri: '',
-    ChannelId: 5,
+    channelId: 5,
     likes: 1657
   }, {
     id: 501,
@@ -247,7 +247,7 @@ export class MockChannelService {
     publishDate: new Date('2024-09-18'),
     description: '掌握角度與光線，拍出最療癒的瞬間。',
     videoUri: '',
-    ChannelId: 6,
+    channelId: 6,
     likes: 2741
   },
   {
@@ -261,7 +261,7 @@ export class MockChannelService {
     publishDate: new Date('2024-10-06'),
     description: '貓咪拍攝時機與構圖技巧分享。',
     videoUri: '',
-    ChannelId: 6,
+    channelId: 6,
     likes: 3120
   },
   {
@@ -275,7 +275,7 @@ export class MockChannelService {
     publishDate: new Date('2024-11-20'),
     description: '從打光到引導寵物動作的完整流程。',
     videoUri: '',
-    ChannelId: 6,
+    channelId: 6,
     likes: 1987
   }]
 

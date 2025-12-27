@@ -21,6 +21,9 @@ export class VideoHomeComponent {
 
   popularVideos: VideoCardData[] | undefined
 
+  spotlightVideos: VideoCardData[] | undefined
+  spotlightChannel: ChannelCard | undefined
+
   constructor(private videoService: VideoService, private mockChannelService: MockChannelService) {
 
   }
@@ -39,6 +42,9 @@ export class VideoHomeComponent {
         ...this.mockChannelService.Videos3
       ];
     });
+
+    this.spotlightVideos = this.mockChannelService.videos
+    this.spotlightChannel = this.mockChannelService.channel
   }
 
 }

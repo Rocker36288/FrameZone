@@ -110,81 +110,100 @@ export class VideoMainComponent {
    * 🚀 Lifecycle
    * ===================================================== */
 
+
   ngOnInit(): void {
 
-    /* 1️⃣ 取得路由中的影片 GUID */
-    this.guid = this.route.snapshot.paramMap.get('guid');
-    if (!this.guid) return;
+    /* 1️⃣ 取得路由 GUID */
+    const guid = this.route.snapshot.paramMap.get('guid');
+    if (!guid) return;
+    this.guid = guid;
 
-    /* 2️⃣ 取得影片資料 */
-    this.loadVideoData(this.guid);
+    /* 2️⃣ 載入影片（所有後續行為從這裡開始） */
+    this.loadVideoData(guid);
 
-    /* 3️⃣ 設定播放器來源 */
-    this.setVideoSource(this.guid);
+    /* 3️⃣ 載入推薦影片（與影片本身無依賴） */
+    this.loadRecommendVideos();
 
-    //讀取頻道
-    this.videoService.getChannelCard(1).subscribe({
-      next: (channel: ChannelCard) => {
-        this.channel = channel;
-        console.log(this.channel)
-      },
-      error: (err) => console.error(err)
-    });
-
-    //讀取留言
-    this.videoService.getVideoComments(this.guid).subscribe({
-      next: (comments: VideoCommentCard[]) => {
-        this.commentList = comments; // 這裡才是陣列
-      },
-      error: (err) => console.error(err)
-    });
-
-    //讀取推薦影片
-    this.videoService.getVideoRecommend().subscribe(apiVideos => {
-      this.videosRecommand = [
-        ...this.mockChannelService.videos,
-        ...this.mockChannelService.Videos3
-      ];
-    });
-
-    /* 4️⃣ 模擬影片載入完成（UI 動畫用） */
+    /* 4️⃣ UI 動畫 */
     setTimeout(() => {
       this.isVideoLoaded = true;
-      this.cdr.detectChanges(); // 強制檢查變更，避免錯誤
+      this.cdr.detectChanges();
     }, 300);
   }
 
+  /* ===============================
+   📌 API 呼叫區
+   =============================== */
 
-  /* =====================================================
-   * 🎥 影片相關方法
-   * ===================================================== */
-
-  /**
-   * 取得影片詳細資料
-   */
+  /** 載入影片資料 */
   private loadVideoData(guid: string): void {
     this.videoService.getVideo(guid).subscribe({
-      next: (data) => {
-        this.video = data;
+      next: (video) => {
+        this.video = video;
         console.log('影片資料:', this.video);
 
-        // 檢查描述是否需要「展開」
-        if (this.video?.description &&
-          this.video.description.length > this.MAX_DESCRIPTION_LENGTH) {
+        /* 1️⃣ 描述是否顯示「展開」按鈕 */
+        if (
+          this.video.description &&
+          this.video.description.length > this.MAX_DESCRIPTION_LENGTH
+        ) {
           this.showExpandButton = true;
+        } else {
+          this.showExpandButton = false;
         }
+
+        /* 2️⃣ 影片一到，就該做的事（不依賴 description） */
+
+        this.setVideoSource(guid);
+        this.loadChannel(video.channelId);
+        this.loadComments(guid);
       },
-      error: (err) => {
-        console.error('取得影片資料失敗', err);
-      }
+      error: err => console.error('取得影片失敗', err)
     });
   }
+
+  /** 載入頻道卡片 */
+  private loadChannel(channelId: number): void {
+    this.videoService.getChannelCard(channelId).subscribe({
+      next: (channel: ChannelCard) => {
+        this.channel = channel;
+        console.log('頻道資料', channel);
+      },
+      error: err => console.error('取得頻道失敗', err)
+    });
+  }
+
+  /** 載入留言 */
+  private loadComments(guid: string): void {
+    this.videoService.getVideoComments(guid).subscribe({
+      next: (comments: VideoCommentCard[]) => {
+        this.commentList = comments;
+      },
+      error: err => console.error('取得留言失敗', err)
+    });
+  }
+
+  /** 載入推薦影片 */
+  private loadRecommendVideos(): void {
+    this.videoService.getVideoRecommend().subscribe({
+      next: () => {
+        this.videosRecommand = [
+          ...this.mockChannelService.videos,
+          ...this.mockChannelService.Videos3
+        ];
+      },
+      error: err => console.error('取得推薦影片失敗', err)
+    });
+  }
+
 
   /**
    * 設定播放器影片來源
    */
   private setVideoSource(guid: string): void {
+
     this.videoUrl = `https://localhost:7213/api/videoplayer/${guid}`;
+    console.log(this.videoUrl)
   }
 
 

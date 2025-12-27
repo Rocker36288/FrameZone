@@ -10,41 +10,49 @@ import { VideocreatorVideomanageComponent } from './pages/creatorworkshop/videoc
 import { VideocreatorUploadComponent } from './pages/creatorworkshop/videocreator-upload/videocreator-upload.component';
 import { VideocreatorLayoutComponent } from './pages/creatorworkshop/videocreator-layout/videocreator-layout.component';
 import { videoGuard } from './guard/video.guard';
+import { VideoHomeComponent } from './pages/home/video-home/video-home.component';
 
 export const VIDEO_ROUTES: Routes = [
   {
-    path: 'home',
+    path: '',
+    // 建議將 VideosShellComponent 作為頂層 Layout，包含導覽列與側邊欄
     component: VideosShellComponent,
-  },
-  {
-    path: 'watch/:guid',
-    component: VideoMainComponent,
-  },
-  {
-    path: 'channel/:id',
-    component: ChannelLayoutComponent,
     children: [
+      // 預設首頁
       { path: '', redirectTo: 'home', pathMatch: 'full' },
-      { path: 'home', component: ChannelComponent },
-      { path: 'videos', component: ChannelVideosComponent },
-      { path: 'playlists', component: ChannelPlaylistsComponent }
+      { path: 'home', component: VideoHomeComponent }, // 註：如果 Shell 本身就是 Home，這裡可調整
+
+      // 影片播放頁
+      { path: 'watch/:guid', component: VideoMainComponent },
+
+      // 頻道頁面（巢狀路由）
+      {
+        path: 'channel/:id',
+        component: ChannelLayoutComponent,
+        children: [
+          { path: '', redirectTo: 'home', pathMatch: 'full' },
+          { path: 'home', component: ChannelComponent },
+          { path: 'videos', component: ChannelVideosComponent },
+          { path: 'playlists', component: ChannelPlaylistsComponent }
+        ]
+      },
+
+      // 創作者工作台（包含您之前的 Guard 邏輯）
+      {
+        path: 'videocreator',
+        component: VideocreatorLayoutComponent,
+        canActivate: [videoGuard],
+        canActivateChild: [videoGuard],
+        children: [
+          { path: '', redirectTo: 'home', pathMatch: 'full' },
+          { path: 'home', component: VideocreatorHomeComponent },
+          { path: 'videos', component: VideocreatorVideomanageComponent },
+          { path: 'upload', component: VideocreatorUploadComponent }
+        ]
+      }
     ]
   },
-  {
-    path: 'videocreator',
-    component: VideocreatorLayoutComponent,
-    canActivate: [videoGuard],
-    canActivateChild: [videoGuard],
-    children: [
-      { path: '', redirectTo: 'home', pathMatch: 'full' },
-      { path: 'home', component: VideocreatorHomeComponent },
-      { path: 'videos', component: VideocreatorVideomanageComponent },
-      { path: 'upload', component: VideocreatorUploadComponent }
-    ]
-  },
-  {
-    path: '**',             // 匹配所有未定義的路徑
-    redirectTo: 'home',     // 強制跳轉到 home
-    pathMatch: 'full'
-  }
-]
+
+  // 萬用字元：處理所有找不到的路徑，跳轉回首頁
+  { path: '**', redirectTo: 'home' }
+];

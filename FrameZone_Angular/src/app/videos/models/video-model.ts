@@ -17,7 +17,7 @@ export class VideoCardData {
   description: string = '';
   likes: number = 0;
 
-  ChannelId: number = 0;
+  channelId: number = 0;
   channelName: string = '';
   avatar: string = '';
 
