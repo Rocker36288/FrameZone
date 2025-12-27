@@ -18,10 +18,11 @@ import { VideoSearchComponent } from "../../search/video-search/video-search.com
 import { SearchboxComponent } from "../../../ui/searchbox/searchbox.component";
 import { MockChannelService } from '../../../service/mock-channel.service';
 import { CommonModule } from '@angular/common';
+import { VideosSharedModalComponent } from "../../../ui/videos-shared-modal/videos-shared-modal.component";
 
 @Component({
   selector: 'app-video-main',
-  imports: [CommonModule, DatePipe, FormsModule, VideoPlayerComponent, VideoActionsBarComponent, ChannelCardComponent, NgIf, VideoCommentListComponent, VideosListComponent, VideosSidebarComponent, VideoSearchComponent, SearchboxComponent],
+  imports: [CommonModule, DatePipe, FormsModule, VideoPlayerComponent, VideoActionsBarComponent, ChannelCardComponent, NgIf, VideoCommentListComponent, VideosListComponent, VideosSidebarComponent, VideoSearchComponent, SearchboxComponent, VideosSharedModalComponent],
   templateUrl: './video-main.component.html',
   styleUrl: './video-main.component.css'
 })
@@ -233,7 +234,7 @@ export class VideoMainComponent {
     this.isSubmitting = true;
 
     const req: VideoCommentRequest = {
-      UserId: this.currentUserId,
+      //UserId: this.currentUserId,
       VideoId: Number(this.video?.videoId),
       TargetTypeId: TargetTypeEnum.Video,
       CommentContent: this.newComment,
@@ -256,7 +257,7 @@ export class VideoMainComponent {
 
   submitReply(event: { parentId: number; message: string }) {
     const req: VideoCommentRequest = {
-      UserId: this.currentUserId,
+      //UserId: this.currentUserId,
       VideoId: Number(this.video?.videoId),
       TargetTypeId: TargetTypeEnum.Video,
       CommentContent: event.message,
@@ -299,5 +300,13 @@ export class VideoMainComponent {
       },
       error: (err) => console.error('按讚失敗', err)
     });
+  }
+
+  //=======分享
+  showShare = false;
+
+  openShare() {
+    console.log('🔥 openShare called');
+    this.showShare = true;
   }
 }

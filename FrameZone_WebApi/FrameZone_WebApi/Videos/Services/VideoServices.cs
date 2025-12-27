@@ -97,7 +97,7 @@ namespace FrameZone_WebApi.Videos.Services
         }
 
 
-        public async Task<Comment> PostVideoComment(VideoCommentRequest req)
+        public async Task<Comment> PostVideoComment(VideoCommentRequest req, int userId)
         {
             // 1️⃣ 嘗試取得既有 TargetTypeId
             var targetTypeId = await _videoRepo
@@ -135,7 +135,7 @@ namespace FrameZone_WebApi.Videos.Services
             {
                 CommentContent = req.CommentContent,
                 CommentTargetId = commentTarget.CommentTargetId,
-                UserId = req.UserId,
+                UserId = userId,
                 ParentCommentId = req.ParentCommentId,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,

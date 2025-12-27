@@ -1,5 +1,5 @@
-<app-videos-sidebar></app-videos-sidebar>
 <app-searchbox></app-searchbox>
+<app-videos-shared-modal *ngIf="showShare" [shareUrl]="videoUrl" (closed)="showShare = false"></app-videos-shared-modal>
 <div class="spotlight-wrapper container-xl py-4">
   <div class="row g-4">
 
@@ -100,11 +100,10 @@
             </div>
 
             <div class="ms-auto">
-              <app-video-actions-bar [likes]="video?.likes" [isLiked]="isLiked"
-                (likeChanged)="onLikeChanged($event)">></app-video-actions-bar>
+              <app-video-actions-bar [likes]="video?.likes" [isLiked]="isLiked" (likeChanged)="onLikeChanged($event)"
+                (share)="openShare()"></app-video-actions-bar>
             </div>
           </div>
-
           <div class="divider-glow my-3"></div>
 
           <!-- 頻道資訊 -->

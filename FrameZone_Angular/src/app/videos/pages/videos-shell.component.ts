@@ -4,10 +4,11 @@ import { VideosSidebarComponent } from "../ui/videos-sidebar/videos-sidebar.comp
 import { VideoHomeComponent } from "./home/video-home/video-home.component";
 import { ChannelCard, VideoCardData } from '../models/video-model';
 import { VideoSearchComponent } from "./search/video-search/video-search.component";
+import { RouterOutlet } from "@angular/router";
 
 @Component({
   selector: 'app-videos-shell',
-  imports: [VideosSidebarComponent, VideoHomeComponent, VideoSearchComponent],
+  imports: [VideosSidebarComponent, VideoHomeComponent, VideoSearchComponent, RouterOutlet],
   templateUrl: './videos-shell.component.html',
   styleUrl: './videos-shell.component.css'
 })

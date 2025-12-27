@@ -118,6 +118,7 @@ namespace FrameZone_WebApi.Videos.Controllers
         //===============================留言發布========================================
 
         [HttpPost("comment/publish")]
+        [Authorize]
         public async Task<IActionResult> CommentPublish([FromBody] VideoCommentRequest req)
         {
             if (req == null)
@@ -126,20 +127,25 @@ namespace FrameZone_WebApi.Videos.Controllers
             if (req.Videoid <= 0)
                 return BadRequest("Invalid video id");
 
-            if (req.UserId <= 0)
-                return BadRequest("Invalid user id");
-
             if (string.IsNullOrWhiteSpace(req.CommentContent))
                 return BadRequest("Comment content is required");
 
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId) || userId <= 0)
+                return Unauthorized("Invalid user");
+
             try
             {
-                var result = await _videoServices.PostVideoComment(req);
+                var result = await _videoServices.PostVideoComment(req, userId);
                 return Ok(result);
             }
             catch (InvalidOperationException ex)
             {
                 return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
             }
         }
 

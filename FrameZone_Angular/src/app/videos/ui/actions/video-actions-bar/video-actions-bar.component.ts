@@ -20,4 +20,12 @@ export class VideoActionsBarComponent {
     // 再發射事件到 VideoMainComponent
     this.likeChanged.emit(liked);
   }
+
+  @Output() share = new EventEmitter<void>();
+
+  onShare() {
+    console.log('➡ ActionBar emit share');
+    this.share.emit();
+  }
+
 }

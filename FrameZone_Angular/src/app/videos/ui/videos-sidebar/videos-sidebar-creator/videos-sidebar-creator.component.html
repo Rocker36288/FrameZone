@@ -1,0 +1,47 @@
+<div class="navbar-collapse">
+  <ul class="navbar-nav pt-lg-3">
+    <li class="nav-item" *ngFor="let item of menuItems">
+      <a class="nav-link" [routerLink]="[item.route]" [class.active]="isActive(item.route)"
+        [class.collapsed]="isCollapsed" [attr.title]="isCollapsed ? item.title : null">
+        <span class="nav-link-icon d-md-none d-lg-inline-block">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="icon icon-tabler">
+            <ng-container [ngSwitch]="item.icon">
+              <!-- Home Icon -->
+              <ng-container *ngSwitchCase="'home'">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
+                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+                <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+              </ng-container>
+              <!-- Video Icon -->
+              <ng-container *ngSwitchCase="'video'">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M15 10l4.553 -2.276a1 1 0 0 1 1.447 .894v6.764a1 1 0 0 1 -1.447 .894l-4.553 -2.276v-4z" />
+                <path d="M3 6m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" />
+              </ng-container>
+              <!-- Barrier Block Icon -->
+              <ng-container *ngSwitchCase="'barrier-block'">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M4 7m0 1a1 1 0 0 1 1 -1h14a1 1 0 0 1 1 1v7a1 1 0 0 1 -1 1h-14a1 1 0 0 1 -1 -1z" />
+                <path d="M7 16v4" />
+                <path d="M7.5 16l9 -9" />
+                <path d="M13.5 16l6.5 -6.5" />
+                <path d="M4 13.5l6.5 -6.5" />
+                <path d="M17 16v4" />
+                <path d="M5 20h4" />
+                <path d="M15 20h4" />
+                <path d="M17 7v-2" />
+                <path d="M7 7v-2" />
+              </ng-container>
+            </ng-container>
+          </svg>
+        </span>
+        <span class="nav-link-title" [class.d-none]="isCollapsed">
+          {{ item.title }}
+        </span>
+      </a>
+    </li>
+  </ul>
+</div>

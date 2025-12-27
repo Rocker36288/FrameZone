@@ -17,7 +17,7 @@ namespace FrameZone_WebApi.Videos.Services
 {
     public interface IVideoUploadService
     {
-        Task<VideoUploadResult> UploadAsync(IFormFile file);
+        Task<VideoUploadResult> UploadAsync(IFormFile file,int userId);
         // 新增：生成 Base64 縮圖
         Task<List<string>> GenerateThumbnailsInMemoryAsync(string videoPath);
 
@@ -39,7 +39,7 @@ namespace FrameZone_WebApi.Videos.Services
             _videoTranscodeServices = transcodeService;
             _aaContextFactoryHelper = AaContextFactoryHelper;
         }
-        public async Task<VideoUploadResult> UploadAsync(IFormFile file)
+        public async Task<VideoUploadResult> UploadAsync(IFormFile file,int userId)
         {
             // 5.1 後端檔案驗證
             ValidateFile(file);
@@ -62,7 +62,7 @@ namespace FrameZone_WebApi.Videos.Services
             var video = new Video
             {
                 Title = file.FileName,
-                ChannelId = 1,
+                ChannelId = userId,
                 VideoUrl = guid,
                 PrivacyStatus = "DRAFT",
                 ProcessStatus = "UPLOADED",

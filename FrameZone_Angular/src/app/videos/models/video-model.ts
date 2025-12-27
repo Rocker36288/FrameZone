@@ -89,7 +89,7 @@ export class ChannelHome {
 }
 
 export interface VideoCommentRequest {
-  UserId: number;          // long → number
+  //UserId: number;          // long → number
   VideoId: number;         // int → number（注意命名）
   TargetTypeId: TargetTypeEnum.Video;    // enum / int
   CommentContent: string;
