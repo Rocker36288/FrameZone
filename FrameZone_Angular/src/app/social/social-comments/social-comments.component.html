@@ -1,13 +1,13 @@
 <div class="comments-wrapper mt-3">
   @for (comment of comments; track comment.commentId) {
   <div class="d-flex mb-3">
-    <img src="images/social/AmongUs.png" class="rounded-circle me-2"
+    <img src="https://i.pravatar.cc/150?img=37" class="rounded-circle me-2"
       style="width:32px; height:32px; object-fit: cover;" />
 
     <div class="flex-grow-1">
       <div class="bg-light p-2 px-3 rounded-3 d-inline-block shadow-sm">
         <div class="fw-bold text-dark" style="font-size: 0.85rem;">
-          User ID: {{comment.userId}}
+          {{comment.userName}}
         </div>
         <div class="text-secondary" style="font-size: 0.9rem; line-height: 1.4;">
           {{comment.content}}
@@ -24,11 +24,11 @@
       <div class="ms-1 mt-2 ps-3 border-start" style="border-width: 2px !important; border-color: #dee2e6 !important;">
         @for (reply of comment.replies; track reply.commentId) {
         <div class="d-flex mb-2">
-          <img src="images/social/AmongUs.png" class="rounded-circle me-2"
+          <img src="https://api.dicebear.com/7.x/micah/svg?seed=NightHaze" class="rounded-circle me-2"
             style="width:24px; height:24px; object-fit: cover;" />
           <div class="flex-grow-1">
             <div class="bg-light p-2 px-3 rounded-3 d-inline-block">
-              <div class="fw-bold" style="font-size: 0.8rem;">User ID: {{reply.userId}}</div>
+              <div class="fw-bold" style="font-size: 0.8rem;">{{reply.userName}}</div>
               <div class="text-secondary" style="font-size: 0.85rem;">{{reply.content}}</div>
             </div>
             <div class="ms-2 mt-1" style="font-size: 0.7rem; color: #65676b;">

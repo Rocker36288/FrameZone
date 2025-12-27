@@ -38,9 +38,6 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  border: 2px solid #5473f3;
-  padding: 3px;
-  /* 這裡的間距會露出背景色 */
   background: #ffffff;
   /* 留白的顏色 */
   box-sizing: border-box;

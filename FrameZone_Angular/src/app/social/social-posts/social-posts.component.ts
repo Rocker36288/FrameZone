@@ -22,7 +22,7 @@ export class SocialPostsComponent {
   isCommentShowed = false; // 控制是否顯示留言
 
   isLiked = false;  //是否按過讚
-  likeCount = 132;  //按讚假資料
+  likeCount = 4;  //按讚假資料
 
   constructor(private postService: PostService, private eRef: ElementRef) { }
 
@@ -30,26 +30,31 @@ export class SocialPostsComponent {
     // 如果後端還沒實作留言功能（post.comments 為 undefined 或空）
     // 我們在這裡手動塞入假資料
     if (!this.post.comments || this.post.comments.length === 0) {
+      this.post.userName = '派大星';
+
       this.post.comments = [
         {
           commentId: 101,
           userId: 55,
-          content: '這則貼文的內容很有趣！',
-          updatedAt: new Date().toISOString(),
+          userName: '李詩涵',
+          content: 'Canon EOS R50這台目前我也有在用，拍起來效果還不錯',
+          updatedAt: new Date('2025-12-27T19:00:00').toISOString(),
           replies: [
             {
               commentId: 1011,
-              userId: 1,
-              content: '感謝支持，歡迎多加利用。',
-              updatedAt: new Date().toISOString()
+              userId: 33,
+              userName: '夜羽',
+              content: '真的，超讚!!',
+              updatedAt: new Date('2025-12-27T19:05:00').toISOString()
             }
           ]
         },
         {
           commentId: 102,
-          userId: 66,
-          content: '這段程式碼的邏輯還有優化空間喔。',
-          updatedAt: new Date().toISOString(),
+          userId: 55,
+          userName: '李詩涵',
+          content: 'Sony Rx100M6這台也可以，價格可以壓到3萬內',
+          updatedAt: new Date('2025-12-27T19:01:00').toISOString(),
           replies: []
         }
       ];

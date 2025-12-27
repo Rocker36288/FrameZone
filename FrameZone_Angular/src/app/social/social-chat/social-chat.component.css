@@ -6,7 +6,7 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: #007bff;
+  background: linear-gradient(135deg, #738fee 0%, #806afc 100%);
   color: #fff;
   border: none;
   font-size: 20px;
@@ -17,7 +17,7 @@
 }
 
 .mini-btn:hover {
-  background: #0056b3;
+  filter: brightness(0.9);
 }
 
 .mini-btn.active {
@@ -55,7 +55,7 @@
 
 /* Header */
 .chat-header {
-  background: #007bff;
+  background: linear-gradient(135deg, #738fee 0%, #806afc 100%);
   color: white;
   padding: 12px;
   font-size: 18px;
@@ -106,7 +106,7 @@
 
 /* 送出按鈕（可選） */
 .send-btn {
-  background: #007bff;
+  background: linear-gradient(135deg, #738fee 0%, #806afc 100%);
   color: white;
   border: none;
   width: 40px;
