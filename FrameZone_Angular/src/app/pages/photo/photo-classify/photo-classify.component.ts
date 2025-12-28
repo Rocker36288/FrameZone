@@ -22,9 +22,21 @@ export class PhotoClassifyComponent {
   successCount = signal(0);
   failedCount = signal(0);
 
+  // 篩選狀態
+  filterStatus = signal<'all' | 'pending' | 'success' | 'error'>('all');
+
   pendingFilesCount = computed(() =>
     this.uploadFiles().filter(f => f.status === 'pending').length
   );
+
+  // 根據篩選狀態過濾檔案
+  filteredFiles = computed(() => {
+    const status = this.filterStatus();
+    if (status === 'all') {
+      return this.uploadFiles();
+    }
+    return this.uploadFiles().filter(f => f.status === status);
+  });
 
   // 建議留 buffer：後端 batch-upload 上限 200MB，你用 180MB 比較安全
   private readonly MAX_BATCH_BYTES = PhotoConstants.MAX_BATCH_TOTAL_SIZE_BYTES * 0.9;
@@ -299,36 +311,128 @@ export class PhotoClassifyComponent {
     this.totalFiles.set(validFiles.length);
 
     try {
-      const batches = this.buildBatches(validFiles);
+      // 逐張上傳，即時顯示進度
+      for (const fileItem of validFiles) {
+        console.log(`\n📤 開始上傳: ${fileItem.fileName}`);
 
-      for (const batch of batches) {
-        batch.forEach(f => (f.status = 'uploading'));
+        // 標記為上傳中
+        fileItem.status = 'uploading';
+        fileItem.progress = 0;
         this.uploadFiles.set([...files]);
 
-        const filesToUpload = batch.map(f => f.file);
-        const response = await firstValueFrom(this.photoService.batchUpload(filesToUpload));
+        try {
+          // 單張上傳
+          const response = await firstValueFrom(
+            this.photoService.batchUpload([fileItem.file])
+          );
 
-        if (response) {
-          this.handleBatchUploadResponse(response);
+          console.log(`📊 上傳回應:`, response);
+
+          // 處理單張結果
+          if (response && response.results && response.results.length > 0) {
+            const result = response.results[0];
+
+            if (result.success) {
+              fileItem.status = 'success';
+              fileItem.photoId = result.photoId;
+              fileItem.progress = 100;
+              this.successCount.set(this.successCount() + 1);
+              console.log(`✅ ${fileItem.fileName} 上傳成功`);
+            } else {
+              fileItem.status = 'error';
+
+              // 判斷是否為重複錯誤
+              const errorMsg = result.error || '上傳失敗';
+              const isDuplicate =
+                errorMsg.includes('已經上傳過') ||
+                errorMsg.includes('重複') ||
+                errorMsg.includes('duplicate') ||
+                errorMsg.includes('already uploaded');
+
+              if (isDuplicate) {
+                fileItem.error = '此照片已存在於相簿中';
+                console.log(`⚠️ ${fileItem.fileName} 重複上傳`);
+              } else {
+                fileItem.error = errorMsg;
+                console.log(`❌ ${fileItem.fileName} 上傳失敗: ${errorMsg}`);
+              }
+
+              this.failedCount.set(this.failedCount() + 1);
+            }
+          } else {
+            // 無有效回應
+            fileItem.status = 'error';
+            fileItem.error = '伺服器無回應';
+            this.failedCount.set(this.failedCount() + 1);
+          }
+
+        } catch (error: unknown) {
+          console.error(`❌ ${fileItem.fileName} 上傳錯誤:`, error);
+          fileItem.status = 'error';
+
+          const errorMessage = error instanceof Error
+            ? error.message
+            : (error as any)?.error?.message || '網路錯誤';
+
+          fileItem.error = errorMessage;
+          this.failedCount.set(this.failedCount() + 1);
         }
+
+        // 即時更新 UI
+        this.uploadFiles.set([...files]);
+
+        // 短暫延遲，避免請求過快
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
+
+      // 顯示總結
+      const successCount = this.successCount();
+      const failedCount = this.failedCount();
+      const duplicateCount = validFiles.filter(
+        f => f.error?.includes('已存在於相簿中')
+      ).length;
+      const otherErrorCount = failedCount - duplicateCount;
+
+      console.log('\n📊 上傳結果統計:');
+      console.log('  成功:', successCount);
+      console.log('  重複:', duplicateCount);
+      console.log('  其他錯誤:', otherErrorCount);
+
+      if (successCount > 0) {
+        this.toastr.success(
+          `成功上傳 ${successCount} 張照片`,
+          '✔ 上傳完成'
+        );
+      }
+
+      if (duplicateCount > 0) {
+        this.toastr.warning(
+          `${duplicateCount} 張照片已存在相簿中，已自動略過`,
+          '⚠ 重複照片'
+        );
+      }
+
+      if (otherErrorCount > 0) {
+        this.toastr.error(
+          `${otherErrorCount} 張照片上傳失敗`,
+          '✗ 上傳錯誤'
+        );
+      }
+
     } catch (error: unknown) {
       console.error('❌ 批次上傳錯誤:', error);
       const errorMessage = error instanceof Error
         ? error.message
         : (error as any)?.error?.message || '未知錯誤';
       this.toastr.error(`上傳失敗: ${errorMessage}`, '錯誤');
-
-      // 將所有上傳中的檔案標記為錯誤
-      files.forEach(f => {
-        if (f.status === 'uploading') {
-          f.status = 'error';
-          f.error = '上傳失敗';
-        }
-      });
-      this.uploadFiles.set([...files]);
     } finally {
       this.isUploading.set(false);
+
+      // 清除檔案選擇器
+      const fileInputs = document.querySelectorAll('input[type="file"]');
+      fileInputs.forEach((input: any) => {
+        input.value = '';
+      });
     }
   }
 
@@ -357,17 +461,23 @@ export class PhotoClassifyComponent {
           console.log(`✅ ${result.fileName} 上傳成功`);
         } else {
           fileItem.status = 'error';
-          fileItem.error = result.error || '上傳失敗';
 
-          // 統計重複照片數量
-          if (result.error?.includes('已經上傳過') ||
-            result.error?.includes('重複') ||
-            result.error?.includes('already uploaded')) {
+          // 判斷是否為重複錯誤
+          const errorMsg = result.error || '上傳失敗';
+          const isDuplicate =
+            errorMsg.includes('已經上傳過') ||
+            errorMsg.includes('重複') ||
+            errorMsg.includes('duplicate') ||
+            errorMsg.includes('already uploaded');
+
+          if (isDuplicate) {
             duplicateCount++;
+            fileItem.error = '此照片已存在於相簿中';
             console.log(`⚠️ ${result.fileName} 重複上傳`);
           } else {
             otherErrorCount++;
-            console.log(`❌ ${result.fileName} 上傳失敗: ${result.error}`);
+            fileItem.error = errorMsg;
+            console.log(`❌ ${result.fileName} 上傳失敗: ${errorMsg}`);
           }
         }
       }
@@ -390,7 +500,7 @@ export class PhotoClassifyComponent {
 
     if (duplicateCount > 0) {
       this.toastr.warning(
-        `${duplicateCount} 張照片已存在資料庫，已自動略過`,
+        `${duplicateCount} 張照片已存在相簿中，已自動略過`,
         '⚠ 重複照片'
       );
     }
@@ -465,6 +575,84 @@ export class PhotoClassifyComponent {
       case 'success': return 'status-success';
       case 'error': return 'status-error';
       default: return '';
+    }
+  }
+
+  /**
+   * 設定篩選狀態
+   */
+  setFilterStatus(status: 'all' | 'pending' | 'success' | 'error') {
+    this.filterStatus.set(status);
+  }
+
+  /**
+   * 重試失敗的檔案
+   */
+  async retryFailedFiles() {
+    const failedFiles = this.uploadFiles().filter(f => f.status === 'error');
+
+    if (failedFiles.length === 0) {
+      this.toastr.info('沒有需要重試的檔案', '提示');
+      return;
+    }
+
+    // 重置失敗檔案的狀態
+    this.uploadFiles().forEach(f => {
+      if (f.status === 'error') {
+        f.status = 'pending';
+        f.error = undefined;
+      }
+    });
+    this.uploadFiles.set([...this.uploadFiles()]);
+
+    this.toastr.info(`已重置 ${failedFiles.length} 個失敗項目，請點擊「開始批次上傳」`, '重試準備');
+  }
+
+  /**
+   * 取得檔案類型圖示
+   */
+  getFileTypeIcon(fileName: string): string {
+    const ext = fileName.split('.').pop()?.toLowerCase() || '';
+
+    switch (ext) {
+      case 'jpg':
+      case 'jpeg':
+        return 'ti ti-file-type-jpg';
+      case 'png':
+        return 'ti ti-file-type-png';
+      case 'heic':
+      case 'heif':
+        return 'ti ti-device-mobile';
+      case 'gif':
+        return 'ti ti-gif';
+      case 'bmp':
+        return 'ti ti-photo';
+      case 'webp':
+        return 'ti ti-brand-chrome';
+      default:
+        return 'ti ti-photo';
+    }
+  }
+
+  /**
+   * 取得檔案類型標籤 class
+   */
+  getFileTypeBadgeClass(fileName: string): string {
+    const ext = fileName.split('.').pop()?.toLowerCase() || '';
+
+    switch (ext) {
+      case 'jpg':
+      case 'jpeg':
+        return 'badge-jpg';
+      case 'png':
+        return 'badge-png';
+      case 'heic':
+      case 'heif':
+        return 'badge-heic';
+      case 'gif':
+        return 'badge-gif';
+      default:
+        return '';
     }
   }
 }

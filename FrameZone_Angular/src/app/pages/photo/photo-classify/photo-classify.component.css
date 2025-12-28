@@ -1,55 +1,259 @@
-/* ==========================================
-   統計卡片樣式
-   ========================================== */
-.card-sm {
-  transition: all 0.3s ease;
+/* 統計卡片樣式 - 漸層版本 */
+.stats-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  position: relative;
 }
 
-.card-sm:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--tblr-box-shadow-lg);
+.stats-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-/* ==========================================
-   上傳區域樣式
-   ========================================== */
+.stats-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.stats-card:hover::before {
+  opacity: 1;
+}
+
+/* 漸層背景 */
+.stats-card-gradient-blue {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.stats-card-gradient-success {
+  background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+  color: white;
+}
+
+.stats-card-gradient-danger {
+  background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+  color: white;
+}
+
+.stats-card-gradient-secondary {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+}
+
+/* 統計圖示 */
+.stats-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 統計文字 */
+.stats-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: white;
+  margin-bottom: 0.25rem;
+  opacity: 0.95;
+}
+
+.stats-sublabel {
+  font-size: 0.75rem;
+  color: white;
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stats-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 上傳區域樣式優化 */
 .upload-card {
-  height: 100%;
-  min-height: 500px;
+  height: 600px;
+  max-height: 600px;
+  transition: all 0.3s ease;
 }
 
 .upload-zone {
-  border: 2px dashed var(--tblr-border-color);
-  border-radius: var(--tblr-border-radius);
+  border: 3px dashed var(--tblr-border-color);
+  border-radius: 16px;
   padding: 4rem 2rem;
-  transition: all 0.3s ease;
-  background-color: var(--tblr-bg-surface);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg,
+    rgba(32, 107, 196, 0.02) 0%,
+    rgba(32, 107, 196, 0.05) 100%);
   cursor: pointer;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-zone::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(32, 107, 196, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
 
 .upload-zone:hover {
-  border-color: var(--tblr-primary);
-  background-color: var(--tblr-bg-surface-secondary);
+  border-color: #206bc4;
+  background: linear-gradient(135deg,
+    rgba(32, 107, 196, 0.05) 0%,
+    rgba(32, 107, 196, 0.1) 100%);
+  transform: scale(1.01);
+}
+
+.upload-zone:hover::before {
+  opacity: 1;
 }
 
 .upload-zone.dragging {
-  border-color: var(--tblr-primary);
-  background-color: rgba(var(--tblr-primary-rgb), 0.1);
+  border-color: #206bc4;
   border-style: solid;
+  background: linear-gradient(135deg,
+    rgba(32, 107, 196, 0.15) 0%,
+    rgba(32, 107, 196, 0.25) 100%);
+  box-shadow: 0 0 0 4px rgba(32, 107, 196, 0.1);
+  animation: pulse-drag 1s ease-in-out infinite;
 }
 
-/* ==========================================
-   右側上傳清單樣式
-   ========================================== */
+@keyframes pulse-drag {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* 上傳圖示動畫 */
+.upload-icon-wrapper {
+  position: relative;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-icon-primary {
+  font-size: 5rem;
+  color: #206bc4;
+  animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 4px 8px rgba(32, 107, 196, 0.3));
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.upload-zone.dragging .upload-icon-primary {
+  animation: bounce 0.6s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+/* 上傳資訊 */
+.upload-info {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.upload-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(32, 107, 196, 0.05);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--tblr-secondary);
+  transition: all 0.3s ease;
+}
+
+.upload-info-item:hover {
+  background: rgba(32, 107, 196, 0.1);
+  transform: translateY(-2px);
+}
+
+.upload-info-item i {
+  font-size: 1.25rem;
+  color: #206bc4;
+}
+
+/* 上傳按鈕優化 */
+.btn-upload {
+  padding: 0.75rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(32, 107, 196, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-upload:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(32, 107, 196, 0.4);
+}
+
+.btn-upload:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(32, 107, 196, 0.3);
+}
+
+.btn-pulse:not(:disabled) {
+  animation: pulse-button 2s ease-in-out infinite;
+}
+
+@keyframes pulse-button {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(32, 107, 196, 0.7); }
+  50% { box-shadow: 0 0 0 10px rgba(32, 107, 196, 0); }
+}
+
+/* 右側上傳清單樣式優化 */
 .upload-list-card {
-  height: 100%;
-  min-height: 500px;
+  height: 600px;
+  max-height: 600px;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.upload-list-card .card-header {
+  flex-shrink: 0;
+  background: linear-gradient(to right,
+    rgba(32, 107, 196, 0.05) 0%,
+    rgba(32, 107, 196, 0.02) 100%);
+  border-bottom: 2px solid rgba(32, 107, 196, 0.1);
 }
 
 .upload-list-card .card-body {
@@ -57,43 +261,107 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  padding: 0;
 }
 
+/* 整體進度條 */
+.overall-progress {
+  background: linear-gradient(to right,
+    rgba(32, 107, 196, 0.05) 0%,
+    rgba(32, 107, 196, 0.02) 100%);
+  border-bottom: 1px solid var(--tblr-border-color);
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.overall-progress > div {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* 進度條 - 對稱的左右間距 */
+.overall-progress-bar {
+  margin-left: 0.75rem;
+  margin-right: 0.75rem;
+}
+
+.progress-bar.bg-gradient-primary {
+  background: linear-gradient(90deg,
+    #206bc4 0%,
+    rgba(32, 107, 196, 0.8) 100%);
+}
+
+/* 篩選按鈕 */
+.list-filters {
+  background: var(--tblr-bg-surface-secondary);
+  border-bottom: 1px solid var(--tblr-border-color);
+}
+
+.list-filters .btn-group {
+  width: 100%;
+}
+
+.list-filters .btn,
+.list-filters .btn-group .btn {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0.625rem 0.75rem !important;
+  min-height: 2.75rem !important;
+  line-height: 1.2 !important;
+}
+
+/* 上傳清單 */
 .upload-list {
+  flex: 1;
   overflow-y: auto;
-  max-height: 100%;
   padding: 0.75rem;
 }
 
-/* 自訂捲軸樣式 */
 .upload-list::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 .upload-list::-webkit-scrollbar-track {
-  background: var(--tblr-bg-surface-secondary);
-  border-radius: 4px;
+  background: transparent;
 }
 
 .upload-list::-webkit-scrollbar-thumb {
   background: var(--tblr-border-color);
-  border-radius: 4px;
+  border-radius: 3px;
+  transition: background 0.3s ease;
 }
 
 .upload-list::-webkit-scrollbar-thumb:hover {
-  background: var(--tblr-primary);
+  background: #206bc4;
 }
 
-/* ==========================================
-   上傳清單項目樣式
-   ========================================== */
+/* 上傳清單項目樣式優化 */
 .upload-list-item {
-  padding: 0.75rem;
+  padding: 0.875rem;
   border: 1px solid var(--tblr-border-color);
-  border-radius: var(--tblr-border-radius);
+  border-radius: 12px;
   margin-bottom: 0.75rem;
   background-color: var(--tblr-bg-surface);
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-list-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--tblr-secondary);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .upload-list-item:last-child {
@@ -102,17 +370,70 @@
 
 .upload-list-item:hover {
   background-color: var(--tblr-bg-surface-secondary);
-  box-shadow: var(--tblr-box-shadow-sm);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateX(4px);
 }
 
-/* 縮圖 */
+.upload-list-item:hover::before {
+  opacity: 1;
+}
+
+/* 成功狀態 */
+.upload-list-item.upload-success {
+  border-color: var(--tblr-success);
+  background: linear-gradient(to right,
+    rgba(45, 170, 80, 0.05) 0%,
+    transparent 100%);
+  animation: successSlide 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.upload-list-item.upload-success::before {
+  background: var(--tblr-success);
+  opacity: 1;
+}
+
+@keyframes successSlide {
+  0% {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* 錯誤狀態 */
+.upload-list-item.upload-error {
+  border-color: var(--tblr-danger);
+  background: linear-gradient(to right,
+    rgba(214, 57, 57, 0.05) 0%,
+    transparent 100%);
+}
+
+.upload-list-item.upload-error::before {
+  background: var(--tblr-danger);
+  opacity: 1;
+}
+
+/* 縮圖優化 */
 .upload-list-thumbnail {
-  width: 60px;
-  height: 60px;
-  border-radius: var(--tblr-border-radius);
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
   overflow: hidden;
   flex-shrink: 0;
-  background-color: var(--tblr-bg-surface-secondary);
+  background: var(--tblr-bg-surface-secondary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.upload-list-item:hover .upload-list-thumbnail {
+  transform: scale(1.05);
 }
 
 .upload-list-thumbnail img {
@@ -127,24 +448,54 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 2rem;
   color: var(--tblr-secondary);
+  background: linear-gradient(135deg,
+    rgba(32, 107, 196, 0.1) 0%,
+    rgba(32, 107, 196, 0.05) 100%);
 }
+
+/* 檔案類型標籤 */
+.file-type-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  backdrop-filter: blur(4px);
+}
+
+.file-type-badge.badge-jpg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.file-type-badge.badge-png { background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); }
+.file-type-badge.badge-heic { background: linear-gradient(135deg, #c94b4b 0%, #4b134f 100%); }
+.file-type-badge.badge-gif { background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%); }
 
 /* 檔案資訊 */
 .upload-list-filename {
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.875rem;
   color: var(--tblr-body-color);
   margin-bottom: 0.25rem;
-  word-break: break-all;
   line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .upload-list-filesize {
   font-size: 0.75rem;
   color: var(--tblr-secondary);
   margin-bottom: 0.25rem;
+  font-weight: 500;
 }
 
 .upload-list-status {
@@ -152,6 +503,7 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  font-weight: 600;
 }
 
 .upload-list-status i {
@@ -162,29 +514,37 @@
   font-size: 0.75rem;
   color: var(--tblr-danger);
   margin-top: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(214, 57, 57, 0.1);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+/* 操作按鈕 */
+.upload-list-actions .btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.upload-list-actions .btn-icon:hover {
+  transform: scale(1.1);
 }
 
 /* 狀態文字顏色 */
-.status-pending {
-  color: var(--tblr-secondary);
-}
+.status-pending { color: var(--tblr-secondary); }
+.status-uploading { color: #206bc4; }
+.status-success { color: var(--tblr-success); }
+.status-error { color: var(--tblr-danger); }
 
-.status-uploading {
-  color: var(--tblr-primary);
-}
-
-.status-success {
-  color: var(--tblr-success);
-}
-
-.status-error {
-  color: var(--tblr-danger);
-}
-
-/* ==========================================
-   空狀態樣式
-   ========================================== */
-.empty-list {
+/* 空狀態樣式優化 */
+.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -192,58 +552,135 @@
   padding: 4rem 2rem;
   text-align: center;
   height: 100%;
+  min-height: 400px;
+}
+
+.empty-state-icon {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state-icon i {
+  font-size: 4rem;
+  color: #206bc4;
+  animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 4px 8px rgba(32, 107, 196, 0.3));
+}
+
+.empty-state h4 {
+  font-weight: 600;
+  color: var(--tblr-body-color);
+}
+
+.empty-state p {
+  font-size: 0.875rem;
+  max-width: 300px;
+}
+
+/* 功能特點 */
+.empty-state-features {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: rgba(32, 107, 196, 0.05);
+  min-width: 100px;
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+  background: rgba(32, 107, 196, 0.1);
+  transform: translateY(-4px);
+}
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg,
+    #206bc4 0%,
+    rgba(32, 107, 196, 0.8) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 12px rgba(32, 107, 196, 0.3);
+}
+
+.feature-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--tblr-secondary);
+}
+
+/* 空列表 */
+.empty-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+  height: 100%;
 }
 
 .empty-list i {
   font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
 }
 
-.empty-list p {
-  font-size: 0.875rem;
-}
-
-/* ==========================================
-   動畫效果
-   ========================================== */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.ti-loader-2 {
-  animation: spin 1s linear infinite;
-}
-
-/* ==========================================
-   響應式設計
-   ========================================== */
+/* 響應式設計 */
 @media (max-width: 992px) {
   .upload-card {
-    min-height: 400px;
+    height: 500px;
+    max-height: 500px;
   }
 
   .upload-list-card {
-    min-height: 400px;
+    height: 500px;
+    max-height: 500px;
     margin-top: 1rem;
   }
 
   .upload-zone {
     padding: 3rem 1.5rem;
   }
+
+  .upload-icon-primary {
+    font-size: 4rem;
+  }
+
+  .empty-state-features {
+    gap: 1rem;
+  }
 }
 
 @media (max-width: 768px) {
   .upload-card {
-    min-height: 350px;
+    height: 450px;
+    max-height: 450px;
   }
 
   .upload-list-card {
-    min-height: 350px;
+    height: 450px;
+    max-height: 450px;
   }
 
   .upload-zone {
@@ -254,30 +691,51 @@
     font-size: 1.25rem;
   }
 
-  .upload-list-thumbnail {
-    width: 50px;
-    height: 50px;
+  .upload-icon-primary {
+    font-size: 3.5rem;
   }
 
-  .card-sm .display-6 {
-    font-size: 1.5rem;
+  .upload-list-thumbnail {
+    width: 56px;
+    height: 56px;
+  }
+
+  .stats-value {
+    font-size: 1.75rem;
+  }
+
+  .upload-info {
+    gap: 1rem;
+  }
+
+  .empty-state-features {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .feature-item {
+    flex-direction: row;
+    min-width: auto;
+    width: 100%;
   }
 }
 
 @media (max-width: 576px) {
   .upload-card {
-    min-height: 300px;
+    height: 400px;
+    max-height: 400px;
   }
 
   .upload-list-card {
-    min-height: 300px;
+    height: 400px;
+    max-height: 400px;
   }
 
   .upload-zone {
     padding: 1.5rem 1rem;
   }
 
-  .upload-zone .display-1 {
+  .upload-icon-primary {
     font-size: 3rem;
   }
 
@@ -286,15 +744,73 @@
   }
 
   .upload-list-item {
-    padding: 0.5rem;
+    padding: 0.625rem;
   }
 
   .upload-list-thumbnail {
-    width: 45px;
-    height: 45px;
+    width: 48px;
+    height: 48px;
   }
 
   .upload-list-filename {
     font-size: 0.8125rem;
   }
+
+  .stats-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+
+  .stats-value {
+    font-size: 1.5rem;
+  }
+
+  .btn-upload {
+    padding: 0.625rem 1.5rem;
+  }
+
+  .upload-info {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .upload-info-item {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* 動畫效果 */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.ti-loader-2 {
+  animation: spin 1s linear infinite;
+}
+
+/* 進度條動畫 */
+.progress-bar-striped {
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.15) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.15) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 1rem 1rem;
+}
+
+.progress-bar-animated {
+  animation: progress-bar-stripes 1s linear infinite;
+}
+
+@keyframes progress-bar-stripes {
+  0% { background-position: 1rem 0; }
+  100% { background-position: 0 0; }
 }

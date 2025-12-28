@@ -80,10 +80,44 @@
 }
 
 /* Logo 樣式 */
+.navbar-brand .logo-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: transform 0.2s ease;
+}
+
+.navbar-brand .logo-link:hover {
+  text-decoration: none;
+  transform: scale(1.05);
+}
+
+.navbar-brand .logo-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.navbar-brand .logo-image img {
+  display: block;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
 .navbar-brand h2 {
-  color: var(--text-primary);
+  color: #0054a6;
   font-weight: 700;
   margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: -0.5px;
+  transition: color 0.2s ease;
+}
+
+.navbar-brand .logo-link:hover h2 {
+  color: #003d7a;
 }
 
 .navbar-brand svg {
@@ -148,8 +182,6 @@
     padding: 0 1rem;
   }
 }
-
-/* ...你原本的 CSS 保留... */
 
 .navbar .container {
   position: relative;
