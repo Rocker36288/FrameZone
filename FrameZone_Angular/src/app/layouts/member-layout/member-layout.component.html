@@ -1,0 +1,50 @@
+<!-- 會員中心主容器 -->
+<div class="member-layout">
+  <!-- 側邊欄遮罩層（手機版） -->
+  <div class="sidebar-overlay" [class.active]="isSidebarOpen" (click)="closeSidebar()"></div>
+
+  <!-- 側邊欄 -->
+  <aside class="sidebar" [class.open]="isSidebarOpen">
+    <!-- Logo 區域 -->
+    <div class="sidebar-header">
+      <a href="/home" class="logo-link">
+        <div class="logo-image">
+          <img src="favicon2.png" alt="FrameZone Logo" width="32" height="32">
+        </div>
+        <h2>FrameZone</h2>
+      </a>
+    </div>
+
+    <!-- 導航選單 -->
+    <nav class="sidebar-nav">
+      <ul class="nav-list">
+        @for (item of menuItems; track item.path) {
+        <li class="nav-item">
+          <a [routerLink]="item.path" routerLinkActive="active" class="nav-link" (click)="closeSidebar()">
+            <span class="nav-icon" [innerHTML]="item.icon"></span>
+            <span class="nav-label">{{ item.label }}</span>
+          </a>
+        </li>
+        }
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- 主內容區域 -->
+  <main class="main-content">
+    <!-- 頂部工具列（手機版顯示漢堡選單） -->
+    <div class="mobile-header">
+      <button class="hamburger-btn" (click)="toggleSidebar()" [class.active]="isSidebarOpen">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+      <h1 class="mobile-title">會員中心</h1>
+    </div>
+
+    <!-- 內容區域 -->
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

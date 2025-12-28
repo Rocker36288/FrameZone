@@ -1,0 +1,163 @@
+/* ==================== 容器 ==================== */
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ==================== 頁面標題 ==================== */
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.page-subtitle {
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ==================== 區塊 ==================== */
+.section {
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+/* ==================== 系統卡片網格 ==================== */
+.systems-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.system-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #0054a6;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.system-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: currentColor;
+}
+
+.system-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.system-content {
+  flex: 1;
+}
+
+.system-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
+}
+
+.system-description {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.system-arrow {
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.system-card:hover .system-arrow {
+  color: #475569;
+  transform: translateX(4px);
+}
+
+/* ==================== 活動卡片 ==================== */
+.activity-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 2rem;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state {
+  text-align: center;
+  color: #94a3b8;
+}
+
+.empty-state svg {
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ==================== 響應式設計 ==================== */
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .systems-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .system-card {
+    padding: 1.25rem;
+  }
+
+  .system-icon {
+    font-size: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .page-title {
+    font-size: 1.25rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.9rem;
+  }
+}

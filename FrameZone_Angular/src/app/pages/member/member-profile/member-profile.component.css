@@ -1,0 +1,775 @@
+/* ============================================================================
+   會員個人資料組件樣式 - 優化版本
+   修正：按鈕可讀性、移除位移動畫、增強色彩、移除浮動效果
+   ============================================================================ */
+
+/* ==================== 全域變數 ==================== */
+:root {
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --card-bg: #ffffff;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.24);
+}
+
+/* ==================== 載入中容器 ==================== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 20px;
+  padding: 3rem;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.spinner-border-lg {
+  width: 4rem;
+  height: 4rem;
+  border-width: 0.3rem;
+  animation: spin 1s linear infinite, pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+/* ==================== 頁面容器 ==================== */
+.member-profile-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* ==================== 頁面標題 ==================== */
+.page-header {
+  margin-bottom: 2.5rem;
+  text-align: center;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.page-header h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
+}
+
+.page-header p {
+  font-size: 1.1rem;
+  color: #64748b;
+  margin-bottom: 0;
+}
+
+/* ==================== 卡片樣式（優化版） ==================== */
+.card {
+  background: var(--card-bg);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* 移除上下浮動效果，改為加強陰影和邊框 */
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(102, 126, 234, 0.4);
+}
+
+.card-header {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+  border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+  padding: 1.5rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-header h5 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-header h5::before {
+  content: '';
+  width: 4px;
+  height: 24px;
+  background: var(--primary-gradient);
+  border-radius: 2px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.card-body {
+  padding: 2rem;
+  background: #fafbfc;
+}
+
+/* ==================== 封面圖片區塊 ==================== */
+.cover-image-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.cover-image-preview {
+  width: 100%;
+  height: 300px;
+  border: 2px dashed rgba(102, 126, 234, 0.4);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  position: relative;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 移除閃爍動畫，改為簡單的邊框和陰影變化 */
+.cover-image-preview:hover {
+  border-color: rgba(102, 126, 234, 0.6);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.cover-image-preview.has-image {
+  border-style: solid;
+  border-color: rgba(102, 126, 234, 0.5);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.cover-image-preview.has-image:hover {
+  border-color: rgba(102, 126, 234, 0.7);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.25);
+}
+
+.cover-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.cover-image-preview:hover img {
+  transform: scale(1.03);
+}
+
+.cover-image-preview .placeholder {
+  text-align: center;
+  color: #64748b;
+  padding: 2rem;
+}
+
+.cover-image-preview .placeholder i {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  display: block;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.cover-image-preview .placeholder p {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.cover-image-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* ==================== 頭像區塊 ==================== */
+.avatar-section {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.avatar-preview {
+  width: 150px;
+  height: 150px;
+  min-width: 150px;
+  border: 4px solid transparent;
+  background: linear-gradient(white, white) padding-box,
+              var(--primary-gradient) border-box;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+}
+
+/* 移除旋轉動畫，改為簡單的縮放和陰影 */
+.avatar-preview:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+}
+
+.avatar-preview.has-image {
+  border-color: rgba(102, 126, 234, 0.8);
+}
+
+.avatar-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.avatar-preview:hover img {
+  transform: scale(1.08);
+}
+
+.avatar-preview .placeholder {
+  text-align: center;
+  color: #64748b;
+}
+
+.avatar-preview .placeholder i {
+  font-size: 4rem;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.avatar-actions {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.avatar-actions > div {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ==================== 表單控制項 ==================== */
+.form-label {
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-label::before {
+  content: '';
+  width: 3px;
+  height: 16px;
+  background: var(--primary-gradient);
+  border-radius: 2px;
+}
+
+.form-control,
+.form-select {
+  border: 2px solid rgba(102, 126, 234, 0.25);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  background: #ffffff;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.form-control:hover,
+.form-select:hover {
+  border-color: rgba(102, 126, 234, 0.5);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+  outline: none;
+  background: white;
+}
+
+.form-control[readonly] {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  cursor: not-allowed;
+  border-color: #cbd5e1;
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* ==================== 表單操作按鈕 ==================== */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 2px solid rgba(102, 126, 234, 0.1);
+}
+
+.form-actions .btn {
+  min-width: 140px;
+}
+
+/* ==================== 按鈕樣式（優化可讀性） ==================== */
+.btn {
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 移除波紋效果，使用簡單的縮放 */
+.btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.btn-outline-primary {
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+}
+
+.btn-outline-primary:hover:not(:disabled) {
+  background: #667eea;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-outline-secondary {
+  background: white;
+  color: #64748b;
+  border: 2px solid #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.btn-outline-secondary:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #94a3b8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.btn-outline-danger {
+  background: white;
+  color: #ef4444;
+  border: 2px solid #ef4444;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
+}
+
+.btn-outline-danger:hover:not(:disabled) {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ==================== Alert 樣式 ==================== */
+.alert {
+  border-radius: 12px;
+  padding: 1.25rem 1.75rem;
+  margin-bottom: 2rem;
+  border: none;
+  box-shadow: var(--shadow-md);
+  animation: fadeIn 0.3s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.alert::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+}
+
+.alert pre {
+  font-family: inherit;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+}
+
+.alert-success {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+
+.alert-success::before {
+  background: linear-gradient(to bottom, #10b981, #059669);
+}
+
+.alert-danger {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+.alert-danger::before {
+  background: linear-gradient(to bottom, #ef4444, #dc2626);
+}
+
+.btn-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-close:hover {
+  opacity: 1;
+}
+
+/* ==================== 小文字提示 ==================== */
+small.text-muted {
+  font-size: 0.875rem;
+  color: #64748b !important;
+  display: block;
+  margin-top: 0.5rem;
+}
+
+/* ==================== 動畫定義 ==================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 移除所有位移動畫 */
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ==================== 載入動畫 ==================== */
+.spinner-border {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  vertical-align: text-bottom;
+  border: 0.2em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.15em;
+}
+
+/* ==================== 響應式設計 ==================== */
+
+/* 平板 (≤1024px) */
+@media (max-width: 1024px) {
+  .member-profile-container {
+    padding: 1.5rem;
+  }
+
+  .page-header h2 {
+    font-size: 2rem;
+  }
+}
+
+/* 手機 (≤768px) */
+@media (max-width: 768px) {
+  .member-profile-container {
+    padding: 1rem;
+  }
+
+  .page-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .page-header h2 {
+    font-size: 1.75rem;
+  }
+
+  .cover-image-preview {
+    height: 200px;
+  }
+
+  .avatar-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .avatar-preview {
+    width: 120px;
+    height: 120px;
+    min-width: 120px;
+  }
+
+  .avatar-actions {
+    width: 100%;
+  }
+
+  .avatar-actions > div {
+    flex-direction: column;
+  }
+
+  .avatar-actions button {
+    width: 100%;
+  }
+
+  .cover-image-actions {
+    flex-direction: column;
+  }
+
+  .cover-image-actions button {
+    width: 100%;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  .card-header {
+    padding: 1.25rem 1.5rem;
+  }
+}
+
+/* 小手機 (≤480px) */
+@media (max-width: 480px) {
+  .member-profile-container {
+    padding: 0.75rem;
+  }
+
+  .page-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .page-header p {
+    font-size: 0.95rem;
+  }
+
+  .cover-image-preview {
+    height: 180px;
+  }
+
+  .avatar-preview {
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
+  }
+
+  .card {
+    margin-bottom: 1rem;
+    border-radius: 12px;
+  }
+
+  .card-header h5 {
+    font-size: 1.1rem;
+  }
+
+  .card-body {
+    padding: 1.25rem;
+  }
+}
+
+/* ==================== 輔助類別 ==================== */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.text-muted {
+  color: #64748b;
+}
+
+.ms-2 { margin-left: 0.5rem; }
+.ms-3 { margin-left: 1rem; }
+.me-1 { margin-right: 0.25rem; }
+.me-2 { margin-right: 0.5rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 1rem; }
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-4 { margin-bottom: 1.5rem; }
+
+.d-block { display: block; }
+.d-flex { display: flex; }
+
+/* ==================== 深色模式支援（可選） ==================== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --card-bg: #1e293b;
+  }
+
+  .card-header h5 {
+    color: #f1f5f9;
+  }
+
+  .form-label {
+    color: #e2e8f0;
+  }
+
+  .form-control,
+  .form-select {
+    background: rgba(15, 23, 42, 0.6);
+    color: #f1f5f9;
+    border-color: rgba(102, 126, 234, 0.3);
+  }
+
+  .form-control::placeholder {
+    color: #94a3b8;
+  }
+
+  .card-body {
+    background: #0f172a;
+  }
+}
+
+/* ==================== HEIC 佔位符樣式 ==================== */
+.heic-placeholder {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px;
+  border: 2px dashed rgba(102, 126, 234, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+}
+
+.heic-placeholder i {
+  display: block;
+  margin-bottom: 1rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+.heic-placeholder p {
+  margin: 0.25rem 0;
+  line-height: 1.5;
+}
+
+.heic-placeholder strong {
+  color: #334155;
+  font-weight: 600;
+}
+
+.heic-placeholder .text-muted {
+  color: #94a3b8 !important;
+  font-size: 0.9rem;
+}
+
+/* 頭像區塊的 HEIC 佔位符 */
+.avatar-preview .heic-placeholder {
+  min-height: auto;
+  padding: 1.5rem;
+  width: 100%;
+  height: 100%;
+}
+
+.avatar-preview .heic-placeholder i {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+/* 浮動動畫 */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}

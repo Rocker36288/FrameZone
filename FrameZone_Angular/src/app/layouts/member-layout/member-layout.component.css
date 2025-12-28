@@ -1,0 +1,301 @@
+/* ==================== 主容器 ==================== */
+.member-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+/* ==================== 側邊欄 ==================== */
+.sidebar {
+  width: 260px;
+  background-color: #ffffff;
+  border-right: 1px solid #e6e7e9;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+}
+
+/* Logo 區域 */
+.sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e6e7e9;
+  background-color: #ffffff;
+}
+
+.logo-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: transform 0.2s ease;
+}
+
+.logo-link:hover {
+  text-decoration: none;
+  transform: scale(1.05);
+}
+
+.logo-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-image img {
+  display: block;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.logo-link h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0054a6;
+  margin: 0;
+  letter-spacing: -0.5px;
+  transition: color 0.2s ease;
+}
+
+.logo-link:hover h2 {
+  color: #003d7a;
+}
+
+/* 導航選單 */
+.sidebar-nav {
+  flex: 1;
+  padding: 1rem 0;
+}
+
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  margin-bottom: 0.25rem;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  color: #667085;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+}
+
+.nav-link:hover {
+  background-color: #f8f9fa;
+  color: #0054a6;
+  border-left-color: #0054a6;
+}
+
+.nav-link.active {
+  background-color: #e8f3ff;
+  color: #0054a6;
+  border-left-color: #0054a6;
+}
+
+.nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.nav-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.nav-label {
+  flex: 1;
+}
+
+/* ==================== 主內容區域 ==================== */
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content-wrapper {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ==================== 手機版頂部工具列 ==================== */
+.mobile-header {
+  display: none;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e6e7e9;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.mobile-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+/* ==================== 自訂漢堡選單按鈕 ==================== */
+.hamburger-btn {
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.hamburger-btn:hover {
+  background-color: #f1f5f9;
+  border-radius: 6px;
+}
+
+.hamburger-line {
+  width: 24px;
+  height: 2px;
+  background-color: #475569;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+/* 漢堡選單展開時的動畫 */
+.hamburger-btn.active .hamburger-line:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger-btn.active .hamburger-line:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamburger-btn.active .hamburger-line:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+/* ==================== 側邊欄遮罩層（手機版） ==================== */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ==================== 響應式設計 ==================== */
+
+/* 平板版（768px ~ 1024px） */
+@media (max-width: 1024px) {
+  .content-wrapper {
+    padding: 1.5rem;
+  }
+}
+
+/* 手機版（< 768px） */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-overlay {
+    display: block;
+  }
+
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .mobile-header {
+    display: flex;
+  }
+
+  .content-wrapper {
+    padding: 1rem;
+  }
+}
+
+/* 小手機版（< 480px） */
+@media (max-width: 480px) {
+  .sidebar {
+    width: 80%;
+    max-width: 280px;
+  }
+
+  .content-wrapper {
+    padding: 0.75rem;
+  }
+
+  .mobile-title {
+    font-size: 1.1rem;
+  }
+}
+
+/* ==================== 滾動條美化 ==================== */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
