@@ -63,33 +63,48 @@
   flex: 0 0 auto;
 }
 
-.brand-logo a {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  text-decoration: none;
-  transition: transform 0.3s ease;
+.brand-logo .logo-link {
+  text-decoration: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.625rem !important;
+  transition: transform 0.2s ease !important;
 }
 
-.brand-logo a:hover {
-  transform: scale(1.03);
+.brand-logo .logo-link:hover {
+  text-decoration: none !important;
+  transform: scale(1.05) !important;
 }
 
-.brand-logo .logo-icon {
-  stroke: #667eea;
-  flex-shrink: 0;
+.brand-logo .logo-image {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.brand-logo .logo-image img {
+  display: block !important;
+  width: 32px !important;
+  height: 32px !important;
+  object-fit: contain !important;
 }
 
 .brand-logo h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1e293b;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  white-space: nowrap;
+  margin: 0 !important;
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  white-space: nowrap !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.brand-logo .logo-link:hover h2 {
+  opacity: 0.85 !important;
 }
 
 /* ===== 主導航 ===== */
