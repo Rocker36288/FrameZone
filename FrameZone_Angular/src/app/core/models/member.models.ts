@@ -222,7 +222,7 @@ export interface BatchUpdatePrivacySettingsDto {
 }
 
 // ============================================================================
-// Activity Log Models
+// Activity Log Models（更新版）
 // ============================================================================
 
 /**
@@ -230,18 +230,23 @@ export interface BatchUpdatePrivacySettingsDto {
  */
 export interface UserLogDto {
   logId: number;
-  userId: number;
+  userId: number | null;
   status: string;
   actionType: string;
   actionCategory: string;
   actionDescription: string;
   targetType: string | null;
   targetId: number | null;
+  oldValue: string | null;
+  newValue: string | null;
   ipAddress: string | null;
   userAgent: string | null;
   deviceType: string | null;
   systemName: string;
   severity: string;
+  errorMessage: string | null;
+  executionTime: number | null;
+  performedBy: string | null;
   createdAt: string;
 }
 
@@ -256,6 +261,20 @@ export interface UserLogQueryDto {
   startDate?: string;
   endDate?: string;
   status?: string;
+  severity?: string;
+}
+
+/**
+ * 分頁資料包裝
+ */
+export interface PagedData<T> {
+  items: T[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
 }
 
 /**
@@ -264,13 +283,29 @@ export interface UserLogQueryDto {
 export interface UserLogPagedResponseDto {
   success: boolean;
   message: string;
-  data: {
-    items: UserLogDto[];
-    totalCount: number;
-    pageNumber: number;
-    pageSize: number;
-    totalPages: number;
-  };
+  data: PagedData<UserLogDto> | null;
+}
+
+/**
+ * 活動記錄統計 DTO
+ */
+export interface UserLogStatsDto {
+  totalLogs: number;
+  successCount: number;
+  failureCount: number;
+  lastLoginAt: string | null;
+  lastActivityAt: string | null;
+  actionTypeStats: { [key: string]: number };
+  actionCategoryStats: { [key: string]: number };
+}
+
+/**
+ * 活動記錄統計回應 DTO
+ */
+export interface UserLogStatsResponseDto {
+  success: boolean;
+  message: string;
+  data: UserLogStatsDto | null;
 }
 
 // ============================================================================

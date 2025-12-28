@@ -222,6 +222,7 @@ builder.Services.AddScoped<IBackgroundGeocodingService, BackgroundGeocodingServi
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<IMemberProfileService, MemberProfileService>();
+builder.Services.AddScoped<IUserLogService, UserLogService>();
 
 
 builder.Services.AddHttpClient<IGeocodingService, GeocodingService>();

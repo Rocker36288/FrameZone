@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   GetProfileResponseDto,
@@ -14,6 +14,7 @@ import {
   BatchUpdatePrivacySettingsDto,
   UserLogQueryDto,
   UserLogPagedResponseDto,
+  UserLogStatsResponseDto,
   ThirdPartyAuthListResponseDto,
   BindThirdPartyDto,
   UnbindThirdPartyDto,
@@ -160,22 +161,47 @@ export class MemberService {
   }
 
   // ============================================================================
-  // Activity Logs
+  // Activity Logs（更新版）
   // ============================================================================
 
   /**
-   * 查詢活動記錄
+   * 分頁查詢活動記錄
    */
   getUserLogs(params: UserLogQueryDto): Observable<UserLogPagedResponseDto> {
-    return this.http.get<UserLogPagedResponseDto>(`${this.apiUrl}/logs`, { params: params as any });
+    // 清理空值參數
+    const cleanParams = this.cleanParams(params);
+    return this.http.get<UserLogPagedResponseDto>(`${this.apiUrl}/logs`, { params: cleanParams });
   }
 
   /**
-   * 匯出活動記錄
+   * 取得活動記錄統計資料
+   */
+  getUserLogStats(): Observable<UserLogStatsResponseDto> {
+    return this.http.get<UserLogStatsResponseDto>(`${this.apiUrl}/logs/stats`);
+  }
+
+  /**
+   * 取得單筆活動記錄詳細資料
+   */
+  getUserLogById(logId: number): Observable<UserLogPagedResponseDto> {
+    return this.http.get<UserLogPagedResponseDto>(`${this.apiUrl}/logs/${logId}`);
+  }
+
+  /**
+   * 取得最近登入記錄
+   */
+  getRecentLoginLogs(count: number = 5): Observable<UserLogPagedResponseDto> {
+    const params = new HttpParams().set('count', count.toString());
+    return this.http.get<UserLogPagedResponseDto>(`${this.apiUrl}/logs/recent-logins`, { params });
+  }
+
+  /**
+   * 匯出活動記錄為 CSV
    */
   exportUserLogs(params: UserLogQueryDto): Observable<Blob> {
+    const cleanParams = this.cleanParams(params);
     return this.http.get(`${this.apiUrl}/logs/export`, {
-      params: params as any,
+      params: cleanParams,
       responseType: 'blob'
     });
   }
@@ -214,5 +240,25 @@ export class MemberService {
    */
   getDashboard(): Observable<MemberDashboardResponseDto> {
     return this.http.get<MemberDashboardResponseDto>(`${this.apiUrl}/dashboard`);
+  }
+
+  // ============================================================================
+  // Helper Methods
+  // ============================================================================
+
+  /**
+   * 清理空值參數（避免傳送 undefined 或 null 到後端）
+   */
+  private cleanParams(params: any): HttpParams {
+    let httpParams = new HttpParams();
+    
+    Object.keys(params).forEach(key => {
+      const value = params[key];
+      if (value !== null && value !== undefined && value !== '') {
+        httpParams = httpParams.set(key, value.toString());
+      }
+    });
+    
+    return httpParams;
   }
 }
