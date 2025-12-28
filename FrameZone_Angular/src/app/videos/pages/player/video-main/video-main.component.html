@@ -1,5 +1,6 @@
 <app-searchbox></app-searchbox>
 <app-videos-shared-modal *ngIf="showShare" [shareUrl]="videoUrl" (closed)="showShare = false"></app-videos-shared-modal>
+<app-videos-notloginyet-modal *ngIf="showLoginModal" (close)="showLoginModal = false"></app-videos-notloginyet-modal>
 <div class="spotlight-wrapper container-xl py-4">
   <div class="row g-4">
 
@@ -22,7 +23,9 @@
 
             <!-- 播放器容器 -->
             <div class="ratio ratio-16x9 bg-dark rounded overflow-hidden">
-              <app-video-player [src]="videoUrl!"></app-video-player>
+              <div *ngIf="video">
+                <app-video-player [src]="videoUrl!"></app-video-player>
+              </div>
             </div>
 
             <!-- 播放器角落裝飾 -->

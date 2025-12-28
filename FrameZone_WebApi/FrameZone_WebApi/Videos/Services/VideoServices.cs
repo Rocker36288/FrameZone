@@ -158,5 +158,17 @@ namespace FrameZone_WebApi.Videos.Services
         {
             return await _videoRepo.VideosLikeToggleAsync(userId, guid);
         }
+
+        //==============================頻道追隨================================
+        //#確認是否按讚
+        public async Task<bool> CheckChannelFollow(int userId, int channelId)
+        {
+            return await _videoRepo.CheckFollowingAsync(userId, channelId);
+        }
+
+        public async Task<bool> ChannelFollowToggle(int userId, int channelId)
+        {
+            return await _videoRepo.FollowingToggleAsync(userId, channelId);
+        }
     }
 }

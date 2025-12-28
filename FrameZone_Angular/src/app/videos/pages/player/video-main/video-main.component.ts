@@ -1,7 +1,7 @@
+import { AuthService } from './../../../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { Component, Input } from '@angular/core';
 import { VideoPlayerComponent } from '../../../ui/video/video-player/video-player.component';
-import { VideoTimeagoPipe } from "../../../pipes/video-timeago.pipe";
 import { VideoActionsBarComponent } from "../../../ui/actions/video-actions-bar/video-actions-bar.component";
 import { ChannelCardComponent } from "../../../ui/channel/channel-card/channel-card.component";
 import { NgIf } from '@angular/common';
@@ -19,10 +19,11 @@ import { SearchboxComponent } from "../../../ui/searchbox/searchbox.component";
 import { MockChannelService } from '../../../service/mock-channel.service';
 import { CommonModule } from '@angular/common';
 import { VideosSharedModalComponent } from "../../../ui/videos-shared-modal/videos-shared-modal.component";
+import { VideosNotloginyetModalComponent } from "../../../ui/videos-notloginyet-modal/videos-notloginyet-modal.component";
 
 @Component({
   selector: 'app-video-main',
-  imports: [CommonModule, DatePipe, FormsModule, VideoPlayerComponent, VideoActionsBarComponent, ChannelCardComponent, NgIf, VideoCommentListComponent, VideosListComponent, VideosSidebarComponent, VideoSearchComponent, SearchboxComponent, VideosSharedModalComponent],
+  imports: [CommonModule, DatePipe, FormsModule, VideoPlayerComponent, VideoActionsBarComponent, ChannelCardComponent, NgIf, VideoCommentListComponent, VideosListComponent, VideosSidebarComponent, VideoSearchComponent, SearchboxComponent, VideosSharedModalComponent, VideosNotloginyetModalComponent],
   templateUrl: './video-main.component.html',
   styleUrl: './video-main.component.css'
 })
@@ -94,6 +95,11 @@ export class VideoMainComponent {
   /** 使用者頭像字母（之後可從登入資訊取得） */
   currentUserInitial = 'I';
 
+  //===============
+  showLoginModal = false; // 控制 Modal 顯示
+
+  userLoggedIn = false; // 假設是否登入
+
 
   /* =====================================================
    * 🔧 DI
@@ -103,6 +109,7 @@ export class VideoMainComponent {
     private route: ActivatedRoute,
     private videoService: VideoService, private cdr: ChangeDetectorRef,
     private mockChannelService: MockChannelService
+    , private authService: AuthService
   ) { }
 
 
@@ -124,6 +131,11 @@ export class VideoMainComponent {
     /* 3️⃣ 載入推薦影片（與影片本身無依賴） */
     this.loadRecommendVideos();
 
+    // 檢測是否有登入
+    if (this.authService.currentUser$) {
+      this.checkLikeStatus()
+    }
+
     /* 4️⃣ UI 動畫 */
     setTimeout(() => {
       this.isVideoLoaded = true;
@@ -141,6 +153,7 @@ export class VideoMainComponent {
       next: (video) => {
         this.video = video;
         console.log('影片資料:', this.video);
+        this.setVideoSource(guid);
 
         /* 1️⃣ 描述是否顯示「展開」按鈕 */
         if (
@@ -153,8 +166,6 @@ export class VideoMainComponent {
         }
 
         /* 2️⃣ 影片一到，就該做的事（不依賴 description） */
-
-        this.setVideoSource(guid);
         this.loadChannel(video.channelId);
         this.loadComments(guid);
       },
@@ -306,6 +317,9 @@ export class VideoMainComponent {
   }
 
   onLikeChanged(liked: boolean) {
+    if (!this.CheckLogin()) return; // 未登入直接 return
+
+    // ✅ 已登入才更新
     this.isLiked = liked;
 
     const req: VideoLikesRequest = {
@@ -316,16 +330,26 @@ export class VideoMainComponent {
     this.videoService.ToggleVideoLikes(this.guid!, req).subscribe({
       next: (res: VideoLikesDto) => {
         this.isLiked = res.isLikes;
+        this.video!.likes += this.isLiked ? 1 : -1;
       },
       error: (err) => console.error('按讚失敗', err)
     });
   }
 
-  //=======分享
+  //=======分享===============
   showShare = false;
 
   openShare() {
     console.log('🔥 openShare called');
     this.showShare = true;
+  }
+  // ======登入檢測
+  CheckLogin() {
+    if (this.authService.getCurrentUser()) {
+      return true
+    } else {
+      this.showLoginModal = true
+      return false
+    }
   }
 }

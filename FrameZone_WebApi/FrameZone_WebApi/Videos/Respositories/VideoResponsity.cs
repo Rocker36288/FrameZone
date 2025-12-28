@@ -316,8 +316,10 @@ namespace FrameZone_WebApi.Videos.Repositories
         public async Task<VideoLikesDto> VideosLikeToggleAsync(int userId, string guid)
         {
             var video = await _context.Videos
-                .AsNoTracking()
-                .FirstOrDefaultAsync(v => v.VideoUrl == guid);
+      .AsNoTracking()
+      .Where(v => v.VideoUrl == guid)
+      .Select(v => new { v.VideoId })
+      .FirstOrDefaultAsync();
 
             if (video == null)
                 throw new KeyNotFoundException("Video not found.");
@@ -327,26 +329,57 @@ namespace FrameZone_WebApi.Videos.Repositories
 
             if (like == null)
             {
-                // 不追蹤實體，EF 只生成 INSERT
-                var newLike = new Like
+                _context.Likes.Add(new Like
                 {
                     UserId = userId,
                     VideoId = video.VideoId,
                     CreatedAt = DateTime.UtcNow
-                };
-
-                _context.Likes.Attach(newLike); // 告訴 EF 這個實體存在
-                _context.Entry(newLike).State = EntityState.Added; // 明確指定新增
+                });
 
                 await _context.SaveChangesAsync();
                 return new VideoLikesDto { IsLikes = true };
             }
-            else
+
+            _context.Likes.Remove(like);
+            await _context.SaveChangesAsync();
+            return new VideoLikesDto { IsLikes = false };
+        }
+
+        /* =====================================================
+        * Comment Likes
+        * ===================================================== */
+
+        /* =====================================================
+        * Channel Folow
+        * ===================================================== */
+        public async Task<bool> CheckFollowingAsync(int userId, int channelId)
+        {
+            return await _context.Followings
+                .AsNoTracking()
+                .AnyAsync(f => f.UserId == userId && f.ChannelId == channelId);
+        }
+
+        public async Task<bool> FollowingToggleAsync(int userId, int channelId)
+        {
+            var follow = await _context.Followings
+                .FirstOrDefaultAsync(f => f.UserId == userId && f.ChannelId == channelId);
+
+            if (follow == null)
             {
-                _context.Likes.Remove(like);
+                _context.Followings.Add(new Following
+                {
+                    UserId = userId,
+                    ChannelId = channelId,
+                    CreatedAt = DateTime.UtcNow
+                });
+
                 await _context.SaveChangesAsync();
-                return new VideoLikesDto { IsLikes = false };
+                return true; // 已 Follow
             }
+
+            _context.Followings.Remove(follow);
+            await _context.SaveChangesAsync();
+            return false; // 已 Unfollow
         }
 
         /* =====================================================

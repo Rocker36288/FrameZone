@@ -40,7 +40,7 @@ export class VideosSidebarComponent {
           this.displayUserName = `你好! ${user.displayName || user.account || '使用者'}`;
         } else {
           this.isLoggedIn = false;
-          this.displayUserName = '未知登入';
+          this.displayUserName = '未登入';
         }
       });
 

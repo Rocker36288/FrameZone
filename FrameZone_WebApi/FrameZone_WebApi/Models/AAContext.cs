@@ -1037,20 +1037,20 @@ public partial class AAContext : DbContext
 
         modelBuilder.Entity<Following>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("Following", "Video");
+            entity.HasKey(e => new { e.UserId, e.ChannelId });
+
+            entity.ToTable("Following", "Video");
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
 
-            entity.HasOne(d => d.Channel).WithMany()
+            entity.HasOne(d => d.Channel).WithMany(p => p.Followings)
                 .HasForeignKey(d => d.ChannelId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Following_Channels");
 
-            entity.HasOne(d => d.User).WithMany()
+            entity.HasOne(d => d.User).WithMany(p => p.Followings)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Following_User");
@@ -1231,20 +1231,20 @@ public partial class AAContext : DbContext
 
         modelBuilder.Entity<Like>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("Likes", "Video");
+            entity.HasKey(e => new { e.UserId, e.VideoId });
+
+            entity.ToTable("Likes", "Video");
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
 
-            entity.HasOne(d => d.User).WithMany()
+            entity.HasOne(d => d.User).WithMany(p => p.Likes)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Likes_User");
 
-            entity.HasOne(d => d.Video).WithMany()
+            entity.HasOne(d => d.Video).WithMany(p => p.Likes)
                 .HasForeignKey(d => d.VideoId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Likes_Videos");

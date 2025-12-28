@@ -1,0 +1,106 @@
+/* Backdrop */
+.auth-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px) saturate(180%);
+  z-index: 1040;
+  animation: fadeIn 0.3s ease;
+  cursor: pointer;
+}
+
+/* Modal */
+.auth-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 420px;
+  max-width: calc(100% - 2rem);
+  transform: translate(-50%, -50%);
+  z-index: 1050;
+  border-radius: 20px;
+  border: none;
+  background: white;
+  animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+/* Header */
+.auth-modal .card-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem 1.75rem;
+  border: none;
+}
+
+.auth-modal .card-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+}
+
+.auth-modal .card-title i {
+  font-size: 1.5rem;
+  animation: pulse 2s infinite;
+}
+
+/* Body */
+.auth-modal .card-body {
+  padding: 2rem 1.75rem;
+}
+
+/* Icon */
+.auth-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 24px rgba(102, 126, 234, 0.4);
+}
+
+.auth-icon i {
+  font-size: 2.25rem;
+  color: white;
+}
+
+/* Text */
+.auth-title {
+  font-weight: 700;
+  margin-top: 1rem;
+}
+
+.auth-desc {
+  color: #6c757d;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+}
+
+/* Actions */
+.auth-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.auth-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.auth-btn i {
+  font-size: 1.1rem;
+}
+
+.auth-btn:hover {
+  transform: translateY(-3px);
+}

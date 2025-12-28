@@ -115,39 +115,7 @@ namespace FrameZone_WebApi.Videos.Controllers
             return Ok(dto);
         }
 
-        //===============================留言發布========================================
-
-        [HttpPost("comment/publish")]
-        [Authorize]
-        public async Task<IActionResult> CommentPublish([FromBody] VideoCommentRequest req)
-        {
-            if (req == null)
-                return BadRequest("Request body is required");
-
-            if (req.Videoid <= 0)
-                return BadRequest("Invalid video id");
-
-            if (string.IsNullOrWhiteSpace(req.CommentContent))
-                return BadRequest("Comment content is required");
-
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId) || userId <= 0)
-                return Unauthorized("Invalid user");
-
-            try
-            {
-                var result = await _videoServices.PostVideoComment(req, userId);
-                return Ok(result);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Internal server error");
-            }
-        }
+       
 
 
         //==============================獲取影片列表===========================
@@ -166,44 +134,94 @@ namespace FrameZone_WebApi.Videos.Controllers
             return Ok(dto);
         }
 
+        //===============================留言發布========================================
+
+        [HttpPost("comment/publish")]
+        [Authorize]
+        public async Task<IActionResult> CommentPublish([FromBody] VideoCommentRequest req)
+        {
+            if (req == null)
+                return BadRequest("Request body is required");
+
+            if (req.Videoid <= 0)
+                return BadRequest("Invalid video id");
+
+            if (string.IsNullOrWhiteSpace(req.CommentContent))
+                return BadRequest("Comment content is required");
+
+            var userId = GetUserId();
+
+            try
+            {
+                var result = await _videoServices.PostVideoComment(req, userId);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
         //==============================Likes相關===========================
-        //[Authorize]
+        [Authorize]
         [HttpGet("{guid}/likecheck")]
         public async Task<ActionResult<VideoLikesDto>> GetVideoLikes(string guid)
         {
 
-            var identity = new ClaimsIdentity(new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, "1")
-            }, "TestAuth");
-
-            HttpContext.User = new ClaimsPrincipal(identity);
-
-            var userId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
-            );
+            var userId = GetUserId();
 
             var dto = await _videoServices.CheckVideoLike(userId, guid);
             return Ok(dto);
         }
 
         [HttpPost("{guid}/liketoggle")]
+        [Authorize]
         public async Task<ActionResult<VideoLikesDto>> ToggleVideoLikes(string guid)
         {
 
-            var identity = new ClaimsIdentity(new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, "1")
-            }, "TestAuth");
-
-            HttpContext.User = new ClaimsPrincipal(identity);
-
-            var userId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
-            );
+            var userId = GetUserId();
 
             var dto = await _videoServices.VideosLikeToggle(userId, guid);
             return Ok(dto);
+        }
+
+        // ============================== Channel Follow ==============================
+
+        [Authorize]
+        [HttpGet("channels/{channelId}/followcheck")]
+        public async Task<ActionResult<bool>> CheckChannelFollow(int channelId)
+        {
+            var userId = GetUserId();
+            var isFollowing = await _videoServices.CheckChannelFollow(userId, channelId);
+            return Ok(isFollowing);
+        }
+
+        [Authorize]
+        [HttpPost("channels/{channelId}/followtoggle")]
+        public async Task<ActionResult<bool>> ToggleChannelFollow(int channelId)
+        {
+            var userId = GetUserId();
+            var isFollowing = await _videoServices.ChannelFollowToggle(userId, channelId);
+            return Ok(isFollowing);
+        }
+
+
+        //=============獲取userid=======================================
+        private int GetUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null
+                || !int.TryParse(userIdClaim.Value, out var userId)
+                || userId <= 0)
+            {
+                throw new UnauthorizedAccessException("Invalid user.");
+            }
+
+            return userId;
         }
     }
 }
