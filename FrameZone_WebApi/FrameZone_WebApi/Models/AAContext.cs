@@ -4088,9 +4088,7 @@ public partial class AAContext : DbContext
             entity.ToTable("UserProfile");
 
             entity.Property(e => e.UserId).ValueGeneratedNever();
-            entity.Property(e => e.Avatar).HasMaxLength(500);
             entity.Property(e => e.Bio).HasMaxLength(500);
-            entity.Property(e => e.CoverImage).HasMaxLength(500);
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_UserProfile_CreatedAt")

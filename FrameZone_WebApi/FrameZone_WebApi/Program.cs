@@ -4,7 +4,9 @@ using FrameZone_WebApi.Helpers;
 using FrameZone_WebApi.Middlewares;
 using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Repositories;
+using FrameZone_WebApi.Repositories.Member;
 using FrameZone_WebApi.Services;
+using FrameZone_WebApi.Services.Member;
 using FrameZone_WebApi.Socials.Repositories;
 using FrameZone_WebApi.Socials.Services;
 using FrameZone_WebApi.Videos.Helpers;
@@ -206,6 +208,8 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<IPhotoRepository, PhotoRepository>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<PostRepository>();
+builder.Services.AddScoped<IMemberProfileRepository, MemberProfileRepository>();
+builder.Services.AddScoped<IUserLogRepository, UserLogRepository>();
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -217,6 +221,8 @@ builder.Services.AddScoped<ITagCategorizationService, TagCategorizationService>(
 builder.Services.AddScoped<IBackgroundGeocodingService, BackgroundGeocodingService>();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+builder.Services.AddScoped<IMemberProfileService, MemberProfileService>();
+
 
 builder.Services.AddHttpClient<IGeocodingService, GeocodingService>();
 builder.Services.AddScoped<IGeocodingService, GeocodingService>();
