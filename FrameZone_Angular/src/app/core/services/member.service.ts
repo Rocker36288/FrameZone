@@ -19,10 +19,11 @@ import {
   BindThirdPartyDto,
   UnbindThirdPartyDto,
   MemberDashboardResponseDto,
-  TwoFactorAuthDto,
-  EnableTwoFactorDto,
-  VerifyTwoFactorDto,
-  ApiResponse
+  ApiResponse,
+  GetUserSessionsResponseDto,
+  LogoutSessionResponseDto,
+  GetAccountLockStatusResponseDto,
+  GetSecurityOverviewResponseDto
 } from '../models/member.models';
 
 /**
@@ -97,31 +98,38 @@ export class MemberService {
   }
 
   /**
-   * 取得雙因素驗證狀態
+   * 取得所有登入裝置
    */
-  getTwoFactorAuthStatus(): Observable<ApiResponse<TwoFactorAuthDto>> {
-    return this.http.get<ApiResponse<TwoFactorAuthDto>>(`${this.apiUrl}/security/two-factor`);
+  getUserSessions(): Observable<GetUserSessionsResponseDto> {
+    return this.http.get<GetUserSessionsResponseDto>(`${this.apiUrl}/security/sessions`);
   }
 
   /**
-   * 啟用雙因素驗證
+   * 登出特定裝置
    */
-  enableTwoFactorAuth(dto: EnableTwoFactorDto): Observable<ApiResponse<TwoFactorAuthDto>> {
-    return this.http.post<ApiResponse<TwoFactorAuthDto>>(`${this.apiUrl}/security/two-factor/enable`, dto);
+  logoutSession(sessionId: number): Observable<LogoutSessionResponseDto> {
+    return this.http.delete<LogoutSessionResponseDto>(`${this.apiUrl}/security/sessions/${sessionId}`);
   }
 
   /**
-   * 停用雙因素驗證
+   * 登出所有其他裝置
    */
-  disableTwoFactorAuth(): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(`${this.apiUrl}/security/two-factor/disable`, {});
+  logoutOtherSessions(): Observable<LogoutSessionResponseDto> {
+    return this.http.delete<LogoutSessionResponseDto>(`${this.apiUrl}/security/sessions/others`);
   }
 
   /**
-   * 驗證雙因素驗證碼
+   * 取得帳號鎖定狀態
    */
-  verifyTwoFactorAuth(dto: VerifyTwoFactorDto): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(`${this.apiUrl}/security/two-factor/verify`, dto);
+  getAccountLockStatus(): Observable<GetAccountLockStatusResponseDto> {
+    return this.http.get<GetAccountLockStatusResponseDto>(`${this.apiUrl}/security/lock-status`);
+  }
+
+  /**
+   * 取得安全性概覽
+   */
+  getSecurityOverview(): Observable<GetSecurityOverviewResponseDto> {
+    return this.http.get<GetSecurityOverviewResponseDto>(`${this.apiUrl}/security/overview`);
   }
 
   // ============================================================================
@@ -161,7 +169,7 @@ export class MemberService {
   }
 
   // ============================================================================
-  // Activity Logs（更新版）
+  // Activity Logs
   // ============================================================================
 
   /**
@@ -251,14 +259,14 @@ export class MemberService {
    */
   private cleanParams(params: any): HttpParams {
     let httpParams = new HttpParams();
-    
+
     Object.keys(params).forEach(key => {
       const value = params[key];
       if (value !== null && value !== undefined && value !== '') {
         httpParams = httpParams.set(key, value.toString());
       }
     });
-    
+
     return httpParams;
   }
 }

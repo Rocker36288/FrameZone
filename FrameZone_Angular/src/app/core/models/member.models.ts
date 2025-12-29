@@ -92,7 +92,7 @@ export interface GenderOption {
 }
 
 /**
- * 下拉選項（通用）
+ * 下拉選項(通用)
  */
 export interface SelectOption {
   value: string;
@@ -121,25 +121,84 @@ export interface ChangePasswordResponseDto {
 }
 
 /**
- * 雙因素驗證設定 DTO
+ * 使用者登入裝置 (Session) DTO
  */
-export interface TwoFactorAuthDto {
-  otpEnabled: boolean;
-  otpSecret?: string;
+export interface UserSessionDto {
+  sessionId: number;
+  userId: number;
+  userAgent: string | null;
+  isActive: boolean;
+  lastActivityAt: string;
+  expiresAt: string;
+  createdAt: string;
+  isCurrentSession: boolean;
+  deviceType: string;
+  browserName: string;
+  operatingSystem: string;
+  ipAddress: string | null;
 }
 
 /**
- * 啟用雙因素驗證 DTO
+ * 取得所有登入裝置回應 DTO
  */
-export interface EnableTwoFactorDto {
-  verificationCode: string;
+export interface GetUserSessionsResponseDto {
+  success: boolean;
+  message: string;
+  data: UserSessionDto[] | null;
 }
 
 /**
- * 驗證雙因素驗證碼 DTO
+ * 登出裝置回應 DTO
  */
-export interface VerifyTwoFactorDto {
-  verificationCode: string;
+export interface LogoutSessionResponseDto {
+  success: boolean;
+  message: string;
+}
+
+/**
+ * 帳號鎖定狀態 DTO
+ */
+export interface AccountLockStatusDto {
+  userId: number;
+  isLocked: boolean;
+  failedLoginAttempts: number;
+  lastFailedLoginAt: string | null;
+  lockedAt: string | null;
+  lockedUntil: string | null;
+  lockedReason: string | null;
+  lockedBy: string | null;
+  unlockedAt: string | null;
+  remainingLockMinutes: number | null;
+}
+
+/**
+ * 取得帳號鎖定狀態回應 DTO
+ */
+export interface GetAccountLockStatusResponseDto {
+  success: boolean;
+  message: string;
+  data: AccountLockStatusDto | null;
+}
+
+/**
+ * 安全性概覽 DTO
+ */
+export interface SecurityOverviewDto {
+  lockStatus: AccountLockStatusDto | null;
+  activeSessionCount: number;
+  lastPasswordChangeAt: string | null;
+  lastLoginAt: string | null;
+  lastLoginIp: string | null;
+  shouldChangePassword: boolean;
+}
+
+/**
+ * 取得安全性概覽回應 DTO
+ */
+export interface GetSecurityOverviewResponseDto {
+  success: boolean;
+  message: string;
+  data: SecurityOverviewDto | null;
 }
 
 // ============================================================================
@@ -159,6 +218,8 @@ export interface NotificationPreferenceDto {
   orderUpdate: boolean;
   promotionAlert: boolean;
   systemAnnouncement: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 /**
@@ -222,7 +283,7 @@ export interface BatchUpdatePrivacySettingsDto {
 }
 
 // ============================================================================
-// Activity Log Models（更新版）
+// Activity Log Models
 // ============================================================================
 
 /**
