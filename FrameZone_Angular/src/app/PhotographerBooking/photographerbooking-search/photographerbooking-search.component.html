@@ -1,45 +1,34 @@
-<div class="search-wrap">
-  <div class="container">
-    <div class="search">
-      <input
-        placeholder="搜尋攝影師、工作室、風格關鍵字"
-        [ngModel]="keyword"
-        (ngModelChange)="keywordChange.emit($event)"
-      />
-
-      <select
-        [ngModel]="filterLocation"
-        (ngModelChange)="filterLocationChange.emit($event)"
-      >
-        <option value="">地區</option>
-        <option>台北</option>
-        <option>新北</option>
-        <option>台中</option>
-        <option>高雄</option>
-      </select>
-
-      <select
-        [ngModel]="filterService"
-        (ngModelChange)="filterServiceChange.emit($event)"
-      >
-        <option value="">服務</option>
-        <option>婚紗</option>
-        <option>人像</option>
-        <option>商業</option>
-        <option>活動</option>
-        <option>形象照</option>
-      </select>
-
-      <select
-        [ngModel]="filterPrice"
-        (ngModelChange)="filterPriceChange.emit($event)"
-      >
-        <option value="">價格</option>
-        <option value="2k-5k">NT$2,000-5,000</option>
-        <option value="5k+">NT$5,000+</option>
-      </select>
-
-      <button (click)="clear()">清空</button>
-    </div>
+<!-- components/photographerbooking-search/photographerbooking-search.component.html -->
+<header class="search-bar">
+  <div class="search-field" style="flex: 1.2">
+    <i class="ti ti-calendar"></i>
+    <input
+      type="text"
+      placeholder="拍攝日期或範圍"
+      [(ngModel)]="dateRange"
+      (change)="onDateChange($event)"
+    />
   </div>
-</div>
+
+  <div class="search-field" style="flex: 1.2">
+    <i class="ti ti-camera"></i>
+    <select [(ngModel)]="selectedServiceType" (change)="onServiceTypeChange()">
+      <option value="">所有服務類型</option>
+      <option *ngFor="let type of serviceTypes" [value]="type">
+        {{ type }}
+      </option>
+    </select>
+  </div>
+
+  <div class="search-field" style="flex: 2">
+    <i class="ti ti-search"></i>
+    <input
+      type="text"
+      placeholder="搜尋姓名、器材或細分風格..."
+      [(ngModel)]="searchKeyword"
+      (input)="onKeywordChange()"
+    />
+  </div>
+
+  <button class="search-btn" (click)="onSearch()">搜尋</button>
+</header>

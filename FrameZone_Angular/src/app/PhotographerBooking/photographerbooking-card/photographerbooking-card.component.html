@@ -1,24 +1,29 @@
-<a class="card">
-  <img [src]="photographer.img" />
+<!-- components/photographerbooking-card/photographerbooking-card.component.html -->
+<article class="card">
+  <img [src]="photographer.img" [alt]="photographer.name" />
   <div class="card-body">
-    <div class="row">
-      <div class="title">{{ photographer.name }}</div>
-      <div class="rating">⭐ {{ photographer.rating }}</div>
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="fw-bold h4 mb-0">{{ photographer.name }}</div>
+      <div class="text-warning fw-bold">★ {{ photographer.rating }}</div>
     </div>
-
-    <div class="meta">
-      {{ photographer.location }}｜{{ photographer.services.join("・") }}
+    <div class="text-muted small mb-3">
+      {{ photographer.loc }} · {{ photographer.reviews }} 則評價
     </div>
-
-    <div class="row">
-      <div class="price">NT${{ photographer.price }} / 時</div>
-      <div class="meta">可預約：{{ photographer.availability }}</div>
-    </div>
-
-    <div class="tags">
-      <span class="tag" *ngFor="let tag of photographer.tags">
+    <div class="card-tags">
+      <span class="tag-small badge-service">
+        <i class="ti ti-camera"></i> {{ photographer.type }}
+      </span>
+      <span *ngFor="let tag of photographer.tags" class="tag-small">
         {{ tag }}
       </span>
     </div>
+    <div
+      class="d-flex justify-content-between align-items-center mt-3 border-top pt-3"
+    >
+      <div class="price-text">{{ formattedPrice }}</div>
+      <button class="btn btn-sm btn-ghost-primary" (click)="onViewDetails()">
+        查看詳情
+      </button>
+    </div>
   </div>
-</a>
+</article>

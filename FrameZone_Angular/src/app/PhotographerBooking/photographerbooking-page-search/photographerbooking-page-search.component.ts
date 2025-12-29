@@ -3,9 +3,15 @@ import { PhotographerbookingSearchComponent } from './../photographerbooking-sea
 import { PhotographerbookingHeaderComponent } from './../photographerbooking-header/photographerbooking-header.component';
 import { CommonModule } from '@angular/common';
 
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { FooterComponent } from "../../shared/components/footer/footer.component";
+import { Subject, takeUntil } from 'rxjs';
+import { PhotographerBookingService } from '../services/photographer-booking.service';
+import { PhotographerbookingSidebarSearchComponent } from '../photographerbooking-sidebar-search/photographerbooking-sidebar-search.component';
+import {
+  Photographer,
+  SearchFilters,
+} from '../models/photographer-booking.models';
 
 @Component({
   selector: 'app-photographerbooking-page-search',
@@ -15,132 +21,49 @@ import { FooterComponent } from "../../shared/components/footer/footer.component
     PhotographerbookingHeaderComponent,
     PhotographerbookingSearchComponent,
     PhotographerbookingCardComponent,
-  
-],
+    PhotographerbookingSidebarSearchComponent,
+  ],
   templateUrl: './photographerbooking-page-search.component.html',
   styleUrl: './photographerbooking-page-search.component.css',
 })
-export class PhotographerbookingPageSearchComponent {
-  // Search 狀態
-  keyword = '';
-  filterLocation = '';
-  filterService = '';
-  filterPrice = '';
+export class PhotographerbookingPageSearchComponent
+  implements OnInit, OnDestroy
+{
+  photographers: Photographer[] = [];
+  sortOrder: 'default' | 'priceAsc' | 'priceDesc' | 'ratingDesc' = 'default';
 
-  // 原始資料
-  photographers = [
-    {
-      name: 'Alex Studio',
-      rating: 4.9,
-      location: '台北',
-      services: ['人像', '商業'],
-      price: 3500,
-      availability: '本週末',
-      tags: ['自然光', '清新'],
-      img: '/images/Photographer/photographercard001.png',
-    },
-    {
-      name: 'Mia Photo',
-      rating: 4.8,
-      location: '新北',
-      services: ['婚紗'],
-      price: 6000,
-      availability: '下週',
-      tags: ['唯美', '棚拍'],
-      img: '/images/Photographer/photographercard001.png',
-    },
-    {
-      name: 'Leo Works',
-      rating: 4.7,
-      location: '台中',
-      services: ['活動'],
-      price: 2800,
-      availability: '今日',
-      tags: ['紀實', '快速交件'],
-      img: '/images/Photographer/photographercard001.png',
-    },
-    {
-      name: 'Nina Studio',
-      rating: 5.0,
-      location: '高雄',
-      services: ['形象照'],
-      price: 4200,
-      availability: '本月',
-      tags: ['專業修圖', '商務'],
-      img: '/images/Photographer/photographercard001.png',
-    },
-    {
-      name: 'Alex Studio',
-      rating: 4.9,
-      location: '台北',
-      services: ['人像', '商業'],
-      price: 3500,
-      availability: '本週末',
-      tags: ['自然光', '清新'],
-      img: '/images/Photographer/photographercard001.png',
-    },
-    {
-      name: 'Mia Photo',
-      rating: 4.8,
-      location: '新北',
-      services: ['婚紗'],
-      price: 6000,
-      availability: '下週',
-      tags: ['唯美', '棚拍'],
-      img: '/images/Photographer/photographercard001.png',
-    },
-    {
-      name: 'Leo Works',
-      rating: 4.7,
-      location: '台中',
-      services: ['活動'],
-      price: 2800,
-      availability: '今日',
-      tags: ['紀實', '快速交件'],
-      img: '/images/Photographer/photographercard001.png',
-    },
-    {
-      name: 'Nina Studio',
-      rating: 5.0,
-      location: '高雄',
-      services: ['形象照'],
-      price: 4200,
-      availability: '本月',
-      tags: ['專業修圖', '商務'],
-      img: '/images/Photographer/photographercard001.png',
-    },
-  ];
+  private destroy$ = new Subject<void>();
 
-  // 濾後結果filter 邏輯
-  get filteredPhotographers() {
-    return this.photographers.filter((p) => {
-      // 關鍵字搜尋（名稱 / 服務 / 標籤）
-      const keywordMatch = this.keyword
-        ? p.name.includes(this.keyword) ||
-          p.services.some((s) => s.includes(this.keyword)) ||
-          p.tags.some((t) => t.includes(this.keyword))
-        : true;
+  constructor(private bookingService: PhotographerBookingService) {}
 
-      // 地區
-      const locationMatch = this.filterLocation
-        ? p.location === this.filterLocation
-        : true;
+  ngOnInit(): void {
+    // 訂閱篩選條件變更
+    this.bookingService.filters$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((filters) => {
+        this.performSearch(filters);
+      });
 
-      // 服務
-      const serviceMatch = this.filterService
-        ? p.services.includes(this.filterService)
-        : true;
+    // 初始搜尋
+    this.performSearch(this.bookingService.getCurrentFilters());
+  }
 
-      // 價格
-      let priceMatch = true;
-      if (this.filterPrice === '2k-5k') {
-        priceMatch = p.price >= 2000 && p.price <= 5000;
-      }
-      if (this.filterPrice === '5k+') {
-        priceMatch = p.price > 5000;
-      }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
-      return keywordMatch && locationMatch && serviceMatch && priceMatch;
-    });
+  performSearch(filters: SearchFilters): void {
+    const updatedFilters = { ...filters, sortOrder: this.sortOrder };
+    this.photographers =
+      this.bookingService.searchPhotographers(updatedFilters);
+  }
+
+  onSortChange(): void {
+    this.bookingService.updateFilters({ sortOrder: this.sortOrder });
+  }
+
+  get resultsCount(): number {
+    return this.photographers.length;
   }
 }
