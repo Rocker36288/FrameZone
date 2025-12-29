@@ -35,6 +35,43 @@
                 <path d="M17 7v-2" />
                 <path d="M7 7v-2" />
               </ng-container>
+              <!-- Dashboard Icon -->
+              <ng-container *ngSwitchCase="'dashboard'">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M4 4h6v6h-6z" />
+                <path d="M14 4h6v10h-6z" />
+                <path d="M4 14h6v6h-6z" />
+                <path d="M14 18h6" />
+              </ng-container>
+              <!-- Film Icon -->
+              <ng-container *ngSwitchCase="'film'">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="M7 5v14" />
+                <path d="M17 5v14" />
+                <path d="M3 9h18" />
+                <path d="M3 15h18" />
+              </ng-container>
+              <!-- Upload Icon -->
+              <ng-container *ngSwitchCase="'upload'">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+                <path d="M7 9l5 -5l5 5" />
+                <path d="M12 4v12" />
+              </ng-container>
+              <!-- Settings Icon -->
+              <ng-container *ngSwitchCase="'settings'">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0" />
+                <path d="M6.318 6.318c-1.756 .426 -1.756 2.924 0 3.35" />
+                <path d="M4.317 10.325c-1.756 .426 -1.756 2.924 0 3.35" />
+                <path d="M6.318 14.332c.426 1.756 2.924 1.756 3.35 0" />
+                <path d="M10.325 16.683c.426 1.756 2.924 1.756 3.35 0" />
+                <path d="M14.332 14.332c1.756 -.426 1.756 -2.924 0 -3.35" />
+                <path d="M16.683 10.325c1.756 -.426 1.756 -2.924 0 -3.35" />
+                <path d="M14.332 6.318c-.426 -1.756 -2.924 -1.756 -3.35 0" />
+                <circle cx="12" cy="12" r="3" />
+              </ng-container>
             </ng-container>
           </svg>
         </span>

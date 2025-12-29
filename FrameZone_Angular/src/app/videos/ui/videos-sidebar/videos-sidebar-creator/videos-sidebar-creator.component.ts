@@ -11,10 +11,10 @@ import { NgForOf, NgSwitchCase, NgSwitch } from "@angular/common";
 export class VideosSidebarCreatorComponent {
   @Input() menuItems = [
     { title: '回到影片首頁', route: '/videos/home', icon: 'home' },
-    { title: '創作者管理首頁', route: '/videos/videocreator/home', icon: 'home' },
-    { title: '影片上傳', route: '/videos/videocreator/upload', icon: 'video' },
-    { title: '影片管理', route: '/videos/videocreator/', icon: 'video' },
-    { title: '數據顯示', route: '/videos/videocreator/', icon: 'video' }
+    { title: '創作者管理首頁', route: '/videos/videocreator/home', icon: 'dashboard' },
+    { title: '影片上傳', route: '/videos/videocreator/upload', icon: 'upload' },
+    { title: '影片管理', route: '/videos/videocreator/videos', icon: 'film' },
+    { title: '數據顯示', route: '/videos/videocreator/stats', icon: 'dashboard' }
   ];
 
   @Input() isCollapsed: boolean = true;

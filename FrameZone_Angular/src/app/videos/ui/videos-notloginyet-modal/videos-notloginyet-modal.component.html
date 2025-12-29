@@ -1,8 +1,8 @@
 <!-- Backdrop -->
-<div class="auth-backdrop" (click)="close.emit()" [@fadeIn]></div>
+<div class="auth-backdrop" @backdropFade (click)="onBackdropClick()"></div>
 
 <!-- Modal -->
-<div class="auth-modal card shadow-lg" [@slideUp]>
+<div class="auth-modal card shadow-lg" @modalSlide (click)="$event.stopPropagation()">
   <!-- Header -->
   <div class="card-header d-flex justify-content-between align-items-center">
     <h3 class="card-title mb-0">

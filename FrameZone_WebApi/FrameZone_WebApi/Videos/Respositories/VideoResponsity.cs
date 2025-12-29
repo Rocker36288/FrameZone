@@ -8,11 +8,11 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FrameZone_WebApi.Videos.Repositories
 {
-    public class VideoRespository
+    public class VideoRepository
     {
         private readonly AAContext _context;
 
-        public VideoRespository(AAContext context)
+        public VideoRepository(AAContext context)
         {
             _context = context;
         }
@@ -141,11 +141,30 @@ namespace FrameZone_WebApi.Videos.Repositories
             return target;
         }
 
-        public async Task<Comment> CreateCommentAsync(Comment comment)
+        public async Task<VideoCommentDto> CreateCommentAsync(Comment comment)
         {
             _context.Comments.Add(comment);
             await _context.SaveChangesAsync();
-            return comment;
+
+            var c = await _context.Comments
+      .Include(x => x.User)
+          .ThenInclude(u => u.Channel)
+      .Include(x => x.User)
+          .ThenInclude(u => u.UserProfile)
+      .SingleAsync(x => x.CommentId == comment.CommentId);
+
+            var returnComment = new VideoCommentDto
+            {
+                Id = c.CommentId,
+                UserName = c.User?.Channel?.ChannelName ?? "Unknown",
+                Avatar = c.User?.UserProfile?.Avatar ?? "",
+                Message = c.CommentContent,
+                CreatedAt = c.CreatedAt,
+                Likes = 0,
+                Replies = new List<VideoCommentDto>()
+            };
+
+            return returnComment;
         }
 
         /// <summary>
@@ -380,6 +399,40 @@ namespace FrameZone_WebApi.Videos.Repositories
             _context.Followings.Remove(follow);
             await _context.SaveChangesAsync();
             return false; // 已 Unfollow
+        }
+
+        /* =====================================================
+        * Watch History
+        * ===================================================== */
+        public async Task WatchVideoUpdateAsync(int userId, int videoId, int lastPosition)
+        {
+            // 嘗試取得既有紀錄
+            var watchRecord = await _context.Views
+                .FirstOrDefaultAsync(v => v.UserId == userId && v.VideoId == videoId);
+
+            if (watchRecord != null)
+            {
+                // 更新最後觀看位置與時間
+                watchRecord.LastPosition = lastPosition;
+                watchRecord.UpdateAt = DateTime.UtcNow;
+                _context.Views.Update(watchRecord);
+            }
+            else
+            {
+                // 新增紀錄
+                var newRecord = new View
+                {
+                    UserId = userId,
+                    VideoId = videoId,
+                    LastPosition = lastPosition,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdateAt = DateTime.UtcNow
+                };
+                await _context.Views.AddAsync(newRecord);
+            }
+
+            // 儲存變更
+            await _context.SaveChangesAsync();
         }
 
         /* =====================================================

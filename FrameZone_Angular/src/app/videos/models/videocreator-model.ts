@@ -10,8 +10,6 @@ export interface VideoUploadResponse {
 
 }
 
-
-
 export interface VideoPublishRequest {
   videoGuid: string;
   title: string;
@@ -32,7 +30,7 @@ export class VideoDetailData {
 
   // ─── 時間相關 ─────────────────
   duration: number = 0; // 秒
-  uploadDate: Date = new Date();
+  publishDate: Date = new Date();
 
   // ─── 成效數據 ─────────────────
   viewsCount: number = 0;

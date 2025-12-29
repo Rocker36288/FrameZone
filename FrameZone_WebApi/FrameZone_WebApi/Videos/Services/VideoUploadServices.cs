@@ -371,6 +371,7 @@ namespace FrameZone_WebApi.Videos.Services
 
             video.Title = req.Title;
             video.Description = req.Description;
+            video.PrivacyStatus = req.PrivacyStatus;
 
             var result = await _repository.VideoPublishedAsync(video);
 

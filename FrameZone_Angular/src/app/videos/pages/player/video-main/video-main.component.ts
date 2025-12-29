@@ -20,6 +20,7 @@ import { MockChannelService } from '../../../service/mock-channel.service';
 import { CommonModule } from '@angular/common';
 import { VideosSharedModalComponent } from "../../../ui/videos-shared-modal/videos-shared-modal.component";
 import { VideosNotloginyetModalComponent } from "../../../ui/videos-notloginyet-modal/videos-notloginyet-modal.component";
+import { LoginResponseDto } from '../../../../core/models/auth.models';
 
 @Component({
   selector: 'app-video-main',
@@ -84,6 +85,8 @@ export class VideoMainComponent {
    * 💬 留言相關狀態
    * ===================================================== */
 
+  user: LoginResponseDto | null = null;
+
   //使用者id
   currentUserId: number = 1; // 模擬登入用
   /** 使用者正在輸入的留言 */
@@ -93,7 +96,7 @@ export class VideoMainComponent {
   isSubmitting = false;
 
   /** 使用者頭像字母（之後可從登入資訊取得） */
-  currentUserInitial = 'I';
+  currentUserInitial = '?';
 
   //===============
   showLoginModal = false; // 控制 Modal 顯示
@@ -132,8 +135,10 @@ export class VideoMainComponent {
     this.loadRecommendVideos();
 
     // 檢測是否有登入
-    if (this.authService.currentUser$) {
+    if (this.authService.getCurrentUser()) {
       this.checkLikeStatus()
+      this.user = this.authService.getCurrentUser()
+      this.currentUserInitial = this.user?.avatar!
     }
 
     /* 4️⃣ UI 動畫 */
@@ -214,7 +219,6 @@ export class VideoMainComponent {
   private setVideoSource(guid: string): void {
 
     this.videoUrl = `https://localhost:7213/api/videoplayer/${guid}`;
-    console.log(this.videoUrl)
   }
 
 
@@ -259,12 +263,12 @@ export class VideoMainComponent {
    * 之後可接後端 API
    */
   submitComment(parentId?: number): void {
+    if (!this.CheckLogin()) return; // 未登入直接 return
     if (!this.newComment.trim()) return;
 
     this.isSubmitting = true;
 
     const req: VideoCommentRequest = {
-      //UserId: this.currentUserId,
       VideoId: Number(this.video?.videoId),
       TargetTypeId: TargetTypeEnum.Video,
       CommentContent: this.newComment,
@@ -273,36 +277,42 @@ export class VideoMainComponent {
 
     this.videoService.postVideoComment(req).subscribe({
       next: (res) => {
-        this.commentList.unshift(res); // 置頂新留言
+        // ✅ 用 API 回傳的完整物件更新列表
+        this.commentList = [res, ...this.commentList];
         this.newComment = '';
         this.isSubmitting = false;
       },
-      error: () => {
-        console.error('留言失敗');
+      error: (err) => {
+        console.error('留言失敗', err);
+        alert('留言失敗，請稍後再試');
         this.isSubmitting = false;
       }
     });
-
   }
 
   submitReply(event: { parentId: number; message: string }) {
+
+    if (!this.CheckLogin()) return; // 未登入直接 return
+
     const req: VideoCommentRequest = {
-      //UserId: this.currentUserId,
       VideoId: Number(this.video?.videoId),
       TargetTypeId: TargetTypeEnum.Video,
       CommentContent: event.message,
-      ParentCommentId: event.parentId // ✅ 父留言 ID
+      ParentCommentId: event.parentId
     };
 
     this.videoService.postVideoComment(req).subscribe({
       next: (res) => {
         const parent = this.commentList.find(c => c.id === event.parentId);
-        if (parent) {
-          parent.replies = parent.replies || [];
-          parent.replies.unshift(res);
-        }
+        if (!parent) return;
+
+        parent.replies = parent.replies || [];
+        parent.replies.unshift(res); // ✅ 直接用 API 回傳的完整物件
       },
-      error: () => console.error('回覆留言失敗')
+      error: (err) => {
+        console.error('回覆留言失敗', err);
+        alert('回覆留言失敗，請稍後再試');
+      }
     });
   }
 

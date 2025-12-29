@@ -8,9 +8,9 @@ namespace FrameZone_WebApi.Videos.Services
 
     public class VideoServices
     {
-        private readonly VideoRespository _videoRepo;
+        private readonly VideoRepository _videoRepo;
 
-        public VideoServices(VideoRespository videoRepo)
+        public VideoServices(VideoRepository videoRepo)
         {
             _videoRepo = videoRepo;
         }
@@ -97,7 +97,7 @@ namespace FrameZone_WebApi.Videos.Services
         }
 
 
-        public async Task<Comment> PostVideoComment(VideoCommentRequest req, int userId)
+        public async Task<VideoCommentDto> PostVideoComment(VideoCommentRequest req, int userId)
         {
             // 1️⃣ 嘗試取得既有 TargetTypeId
             var targetTypeId = await _videoRepo

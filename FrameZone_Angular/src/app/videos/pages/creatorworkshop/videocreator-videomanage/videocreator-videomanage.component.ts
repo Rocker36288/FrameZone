@@ -18,7 +18,7 @@ export class VideocreatorVideomanageComponent {
     description: '',
     thumbnail: '',
     duration: 0,
-    uploadDate: new Date(),
+    publishDate: new Date(),
     viewsCount: 0,
     likesCount: 0,
     commentCount: 0,

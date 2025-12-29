@@ -1,29 +1,29 @@
-using FrameZone_WebApi.Middlewares;
-using System.Text;
 using FrameZone_WebApi.Configuration;
 using FrameZone_WebApi.Helpers;
+using FrameZone_WebApi.Middlewares;
 using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Repositories;
 using FrameZone_WebApi.Services;
+using FrameZone_WebApi.Socials.Repositories;
+using FrameZone_WebApi.Socials.Services;
 using FrameZone_WebApi.Videos.Helpers;
 using FrameZone_WebApi.Videos.Repositories;
+using FrameZone_WebApi.Videos.Respositories;
 using FrameZone_WebApi.Videos.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.StaticFiles;
-
 using Microsoft.OpenApi;
 using SixLabors.ImageSharp;
+using System.Text;
 using System.Text;
 using Xabe.FFmpeg;
 using Xabe.FFmpeg.Downloader;
 using static FrameZone_WebApi.Videos.Helpers.AaContextFactoryHelper;
-using FrameZone_WebApi.Socials.Repositories;
-using FrameZone_WebApi.Socials.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -199,11 +199,13 @@ builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<AaContextFactoryHelper>();
 builder.Services.AddHttpClient(); // 註冊 HttpClient 工廠
 builder.Services.AddHostedService<ChannelEnsureHostedService>();
-builder.Services.AddScoped<VideoRespository>(); // 註冊 Repository
+builder.Services.AddScoped<VideoCreatorRepository>(); // 註冊 Repository
 builder.Services.AddScoped<VideoUploadRepository>();// 註冊 Repository
+builder.Services.AddScoped<VideoRepository>();// 註冊 Repository
 builder.Services.AddScoped<VideoTranscodeServices>();
 builder.Services.AddScoped<IVideoUploadService, VideoUploadService>();
 builder.Services.AddScoped<VideoServices>();
+builder.Services.AddScoped<VideoCreatorService>();
 builder.Services.AddScoped<VideoPlayerService>();
 
 

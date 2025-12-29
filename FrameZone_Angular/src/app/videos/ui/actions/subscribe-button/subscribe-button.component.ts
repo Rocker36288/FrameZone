@@ -16,7 +16,7 @@ export class SubscribeButtonComponent {
 
   toggleFollow() {
     // 切換內部狀態
-    this.isFollowing = !this.isFollowing;
+    //this.isFollowing = !this.isFollowing;
 
     // 發送事件給父元件，傳回最新狀態
     this.followToggle.emit(this.isFollowing);

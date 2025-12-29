@@ -111,7 +111,7 @@
 
           <!-- 頻道資訊 -->
           <div class="channel-section mb-3" *ngIf="channel">
-            <app-channel-card [channel]="channel"></app-channel-card>
+            <app-channel-card [channel]="channel" (loginRequired)="CheckLogin()"></app-channel-card>
           </div>
 
           <!-- 影片描述 - 霓虹邊框效果 -->

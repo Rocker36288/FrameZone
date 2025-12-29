@@ -11,6 +11,7 @@ import { VideocreatorUploadComponent } from './pages/creatorworkshop/videocreato
 import { VideocreatorLayoutComponent } from './pages/creatorworkshop/videocreator-layout/videocreator-layout.component';
 import { videoGuard } from './guard/video.guard';
 import { VideoHomeComponent } from './pages/home/video-home/video-home.component';
+import { VideocreatorEditvideoComponent } from './pages/creatorworkshop/videocreator-editvideo/videocreator-editvideo.component';
 
 export const VIDEO_ROUTES: Routes = [
   {
@@ -47,7 +48,9 @@ export const VIDEO_ROUTES: Routes = [
           { path: '', redirectTo: 'home', pathMatch: 'full' },
           { path: 'home', component: VideocreatorHomeComponent },
           { path: 'videos', component: VideocreatorVideomanageComponent },
-          { path: 'upload', component: VideocreatorUploadComponent }
+          { path: 'videoedit/:guid', component: VideocreatorEditvideoComponent },
+          { path: 'upload', component: VideocreatorUploadComponent },
+          { path: 'stats', component: VideocreatorUploadComponent }
         ]
       }
     ]

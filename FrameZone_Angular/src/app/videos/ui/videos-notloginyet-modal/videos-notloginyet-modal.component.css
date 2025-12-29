@@ -5,8 +5,8 @@
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px) saturate(180%);
   z-index: 1040;
-  animation: fadeIn 0.3s ease;
   cursor: pointer;
+  /* 移除 animation: fadeIn */
 }
 
 /* Modal */
@@ -21,7 +21,6 @@
   border-radius: 20px;
   border: none;
   background: white;
-  animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   overflow: hidden;
 }
 

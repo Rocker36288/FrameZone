@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { RouterLink } from "@angular/router";
 import { VideoTimeagoPipe } from "../../../pipes/video-timeago.pipe";
 import { VideoDurationPipe } from "../../../pipes/video-duration.pipe";
@@ -26,11 +26,16 @@ export class VideoCardComponent {
   @Input() showChannel: boolean = true;
   @Input() showDescription: boolean = true;
 
-  videothumbnail: string = ''
-
   @Output() videoClick = new EventEmitter<string>();
 
   constructor(private router: Router) { }
+
+  ngOnInit(): void {
+    if (!this.video.thumbnail) {
+      this.video.thumbnail =
+        'https://localhost:7213/api/Videos/video-thumbnail/' + this.video.videoUri;
+    }
+  }
 
   onVideoClick() {
     if (!this.video || !this.video.videoUri) return;

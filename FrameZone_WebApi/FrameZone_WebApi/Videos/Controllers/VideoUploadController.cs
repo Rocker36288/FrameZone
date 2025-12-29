@@ -152,7 +152,6 @@ namespace FrameZone_WebApi.Videos.Controllers
             try
             {
                 var result = await _videoUploadService.PublishedVideo(req);
-
                 return Ok(result);
             }
             catch (InvalidOperationException ex)
