@@ -1,46 +1,93 @@
-<div class="comments-wrapper mt-3">
-  @for (comment of comments; track comment.commentId) {
-  <div class="d-flex mb-3">
-    <img src="https://i.pravatar.cc/150?img=37" class="rounded-circle me-2"
-      style="width:32px; height:32px; object-fit: cover;" />
+@for (comment of comments; track comment.commentId) {
+<div class="comment-wrapper mt-3">
+  <div class="d-flex align-items-start">
+    <img [src]="comment.avatar || 'images/social/default-avatar.png'" class="rounded-circle me-2"
+      style="width:32px; height:32px; object-fit: cover;">
 
-    <div class="flex-grow-1">
-      <div class="bg-light p-2 px-3 rounded-3 d-inline-block shadow-sm">
-        <div class="fw-bold text-dark" style="font-size: 0.85rem;">
-          {{comment.userName}}
+    <div class="bg-light rounded p-2 flex-grow-1 shadow-sm position-relative">
+      <div class="d-flex justify-content-between align-items-start mb-1">
+
+        <!-- 左側：名稱 + 時間（同一行） -->
+        <div class="d-flex align-items-center">
+          <span class="fw-bold small me-2">
+            {{ comment.displayName }}
+          </span>
+
+          <span class="text-muted" style="font-size: 0.7rem; white-space: nowrap;">
+            {{ comment.updatedAt || comment.createdAt | date:'yyyy-MM-dd HH:mm' }}
+          </span>
         </div>
-        <div class="text-secondary" style="font-size: 0.9rem; line-height: 1.4;">
-          {{comment.content}}
+
+        <!-- 右側：功能選單 -->
+        <div class="position-absolute top-0 end-0 me-2 mt-2">
+          <button class="btn btn-sm btn-light" (click)="toggleMenu(comment.commentId, $event)">
+            ...
+          </button>
+
+          @if (activeMenuId === comment.commentId) {
+          <ul class="dropdown-menu dropdown-menu-end show">
+            <li>
+              <button class="dropdown-item" (click)="startEdit(comment); closeMenu()">
+                編輯
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item text-danger" (click)="deleteComment(comment.commentId); closeMenu()">
+                刪除
+              </button>
+            </li>
+          </ul>
+          }
         </div>
+
       </div>
 
-      <div class="ms-2 mt-1" style="font-size: 0.75rem; color: #65676b;">
-        <span class="fw-bold cursor-pointer hover-underline">讚</span> ·
-        <span class="fw-bold cursor-pointer hover-underline">回覆</span> ·
-        <span>{{comment.updatedAt | date:'shortTime'}}</span>
-      </div>
 
-      @if (comment.replies && comment.replies.length > 0) {
-      <div class="ms-1 mt-2 ps-3 border-start" style="border-width: 2px !important; border-color: #dee2e6 !important;">
-        @for (reply of comment.replies; track reply.commentId) {
-        <div class="d-flex mb-2">
-          <img src="https://api.dicebear.com/7.x/micah/svg?seed=NightHaze" class="rounded-circle me-2"
-            style="width:24px; height:24px; object-fit: cover;" />
-          <div class="flex-grow-1">
-            <div class="bg-light p-2 px-3 rounded-3 d-inline-block">
-              <div class="fw-bold" style="font-size: 0.8rem;">{{reply.userName}}</div>
-              <div class="text-secondary" style="font-size: 0.85rem;">{{reply.content}}</div>
-            </div>
-            <div class="ms-2 mt-1" style="font-size: 0.7rem; color: #65676b;">
-              <span class="fw-bold cursor-pointer hover-underline">讚</span> ·
-              <span>{{reply.updatedAt | date:'shortTime'}}</span>
-            </div>
-          </div>
-        </div>
-        }
-      </div>
+      @if (editingCommentId === comment.commentId) {
+      <input type="text" [(ngModel)]="editContent" class="form-control form-control-sm"
+        (keyup.enter)="submitEdit(comment.commentId)" (blur)="cancelEdit()">
+      } @else {
+      <p class="mb-1 small">{{ comment.commentContent }}</p>
       }
+
+    </div>
+  </div>
+
+  <div class="ms-5 mt-1">
+    <button class="btn btn-sm btn-link text-decoration-none p-0 me-3 small"
+      (click)="toggleReply(comment.commentId); $event.stopPropagation()">
+      回覆
+    </button>
+
+  </div>
+
+  @if (activeReplyId === comment.commentId) {
+  <div class="ms-5 mt-2 d-flex align-items-center" (click)="$event.stopPropagation()">
+    <div class="position-relative flex-grow-1">
+      <input type="text" [(ngModel)]="replyContent" (keyup.enter)="submitReply(comment.commentId)"
+        class="form-control form-control-sm rounded-pill bg-light border-0 pe-5" placeholder="撰寫回覆...">
+
+      <button type="button" class="btn position-absolute end-0 top-50 translate-middle-y p-0 me-3 btn-send-comment"
+        (click)="submitReply(comment.commentId)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          class="icon icon-tabler icons-tabler-outline icon-tabler-send-2">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path
+            d="M4.698 4.034l16.302 7.966l-16.302 7.966a.503 .503 0 0 1 -.546 -.124a.555 .555 0 0 1 -.12 -.568l2.468 -7.274l-2.468 -7.274a.555 .555 0 0 1 .12 -.568a.503 .503 0 0 1 .546 -.124z" />
+          <path d="M6.5 12h14.5" />
+        </svg>
+      </button>
     </div>
   </div>
   }
+
+
+  @if (comment.replies && comment.replies.length > 0) {
+  <div class="ms-4 ps-2 border-start">
+    <app-social-comments [comments]="comment.replies" [postId]="postId" (refresh)="onChildRefresh()">
+    </app-social-comments>
+  </div>
+  }
 </div>
+}

@@ -4,139 +4,174 @@ using FrameZone_WebApi.Socials.Repositories;
 
 namespace FrameZone_WebApi.Socials.Services
 {
+    /// <summary>
+    /// Comment Service
+    /// 負責處理留言相關的「商業邏輯」
+    /// 
+    /// 包含：
+    /// - 建立留言
+    /// - 取得貼文留言（樹狀結構）
+    /// - 更新留言（權限檢查）
+    /// - 刪除留言（軟刪除 + 權限檢查）
+    /// 
+    /// 不直接處理 HTTP / Request / Response
+    /// </summary>
     public class CommentService
     {
         private readonly CommentRepository _repository;
 
+        /// <summary>
+        /// 透過 DI 注入 CommentRepository
+        /// </summary>
         public CommentService(CommentRepository repository)
         {
             _repository = repository;
         }
 
-        //新增留言
-        public async Task<CommentReadDto> CreateCommentAsync(long userId, CommentCreateDto dto)
+        /// <summary>
+        /// 新增一筆留言
+        /// </summary>
+        /// <param name="userId">目前登入的使用者 ID</param>
+        /// <param name="dto">建立留言所需資料</param>
+        /// <returns>建立完成後的留言資料（Read DTO）</returns>
+        public async Task<CommentReadDto> CreateAsync(long userId, CommentCreateDto dto)
         {
-            // 1. 取得對應的 CommentTargetId
-            int targetId = await _repository.GetOrCreateTargetIdByPostIdAsync(dto.PostId);
+            // 取得（或建立）該貼文對應的 CommentTargetId
+            int targetId = await _repository.GetOrCreateTargetIdAsync(dto.PostId);
 
-            // 2. 建立 Comment 實體
+            // 建立 Comment 實體
             var comment = new Comment
             {
                 UserId = userId,
                 CommentTargetId = targetId,
                 ParentCommentId = dto.ParentCommentId,
-                CommentContent = dto.CommentContent,
-                CreatedAt = DateTime.Now
+                CommentContent = dto.CommentContent
             };
 
-            // 3. 儲存
-            var result = await _repository.CreateAsync(comment);
+            // 寫入資料庫
+            var created = await _repository.CreateAsync(comment);
 
-            // 4. 回傳扁平化 DTO
-            return new CommentReadDto
-            {
-                CommentId = result.CommentId,
-                UserId = result.UserId,
-                DisplayName = result.User?.UserProfile?.DisplayName ?? "新使用者",
-                Avatar = result.User?.UserProfile?.Avatar,
-                CommentTargetId = result.CommentTargetId,
-                ParentCommentId = result.ParentCommentId,
-                CommentContent = result.CommentContent,
-                CreatedAt = result.CreatedAt
-            };
+            // 轉換成回傳用的 DTO
+            return MapToReadDto(created);
         }
 
-        //取得留言
-        public async Task<List<CommentReadDto>> GetPostCommentsAsync(int postId)
+        /// <summary>
+        /// 取得指定貼文底下的所有留言（樹狀結構）
+        /// </summary>
+        /// <param name="postId">貼文 ID</param>
+        /// <returns>樹狀留言清單</returns>
+        public async Task<List<CommentReadDto>> GetByPostIdAsync(int postId)
         {
-            // 1. 取得所有留言
-            var allComments = await _repository.GetCommentsByPostIdAsync(postId);
+            // 1. 取得資料庫中的所有留言（扁平結構）
+            var comments = await _repository.GetByPostIdAsync(postId);
 
-            // 2. 轉換成扁平的 DTO 清單
-            var allDtos = allComments.Select(c => new CommentReadDto
-            {
-                CommentId = c.CommentId,
-                UserId = c.UserId,
-                DisplayName = c.DeletedAt == null ? (c.User?.UserProfile?.DisplayName) : null,
-                Avatar = c.DeletedAt == null ? (c.User?.UserProfile?.Avatar) : null,
-                ParentCommentId = c.ParentCommentId,
-                // 關鍵：如果已刪除，隱藏內容
-                CommentContent = c.DeletedAt == null ? c.CommentContent : "此留言已刪除",
-                CreatedAt = c.CreatedAt,
-            }).ToList();
+            // 2. 先轉換成扁平的 DTO 清單
+            var flatDtos = comments
+                .Select(MapToReadDto)
+                .ToList();
 
-            // 3. 呼叫遞迴函數，找出所有「頂層留言」(ParentCommentId 為 null)
-            var tree = allDtos
+            // 3. 建立樹狀結構（只從頂層留言開始）
+            return flatDtos
                 .Where(c => c.ParentCommentId == null)
-                .Select(c => MapReplies(c, allDtos)) // 為每個頂層留言找子留言
+                .Select(c => BuildReplyTree(c, flatDtos))
                 .OrderByDescending(c => c.CreatedAt)
                 .ToList();
-
-            return tree;
         }
 
-        // 遞迴助手函數
-        private CommentReadDto MapReplies(CommentReadDto parent, List<CommentReadDto> allDtos)
+        /// <summary>
+        /// 更新留言內容
+        /// 僅允許留言作者本人操作
+        /// </summary>
+        public async Task<CommentReadDto> UpdateAsync(
+            long userId,
+            int commentId,
+            CommentUpdateDto dto)
         {
-            // 在所有資料中，找到「父 ID 等於目前 ID」的資料
-            parent.Replies = allDtos
-                .Where(c => c.ParentCommentId == parent.CommentId)
-                .Select(c => MapReplies(c, allDtos)) // 關鍵：繼續往下找子留言的子留言
-                .OrderBy(c => c.CreatedAt)
-                .ToList();
-
-            return parent;
-        }
-
-        public async Task<bool> DeleteCommentAsync(long userId, int commentId)
-        {
+            // 1. 取得留言
             var comment = await _repository.GetByIdAsync(commentId);
 
+            // 2. 基本狀態檢查
             if (comment == null || comment.DeletedAt != null)
-                return false;
+                throw new KeyNotFoundException("找不到留言");
 
-            // 權限檢查：只能刪除自己的留言
+            // 3. 權限檢查（只能修改自己的留言）
             if (comment.UserId != userId)
-                throw new UnauthorizedAccessException("你沒有權限刪除此留言");
+                throw new UnauthorizedAccessException("沒有權限修改此留言");
 
-            // 執行軟刪除
-            comment.DeletedAt = DateTime.Now;
-            await _repository.UpdateAsync(comment);
-
-            return true;
-        }
-
-        public async Task<CommentReadDto> UpdateCommentAsync(long userId, int commentId, CommentUpdateDto dto)
-        {
-            var comment = await _repository.GetByIdAsync(commentId);
-
-            // 1. 基本檢查
-            if (comment == null || comment.DeletedAt != null)
-                throw new KeyNotFoundException("找不到留言或留言已被刪除");
-
-            // 2. 權限檢查：只能修改自己的留言
-            if (comment.UserId != userId)
-                throw new UnauthorizedAccessException("你沒有權限修改此留言");
-
-            // 3. 更新內容與時間
+            // 4. 更新內容
             comment.CommentContent = dto.CommentContent;
-            comment.UpdatedAt = DateTime.Now;
 
             await _repository.UpdateAsync(comment);
 
-            // 4. 回傳更新後的結果（扁平化 DTO）
-            // 這裡建議重新讀取 UserProfile 資訊以確保回傳完整
+            // 5. 回傳更新後結果
+            return MapToReadDto(comment);
+        }
+
+        /// <summary>
+        /// 刪除留言（軟刪除）
+        /// 僅允許留言作者本人操作
+        /// </summary>
+        public async Task DeleteAsync(long userId, int commentId)
+        {
+            // 1. 取得留言
+            var comment = await _repository.GetByIdAsync(commentId);
+
+            // 2. 基本狀態檢查
+            if (comment == null || comment.DeletedAt != null)
+                throw new KeyNotFoundException("找不到留言");
+
+            // 3. 權限檢查
+            if (comment.UserId != userId)
+                throw new UnauthorizedAccessException("沒有權限刪除此留言");
+
+            // 4. 執行軟刪除
+            await _repository.SoftDeleteAsync(comment);
+        }
+
+        // ================= Private Helpers =================
+
+        /// <summary>
+        /// 將 Comment Entity 轉換成 CommentReadDto
+        /// 若留言已被刪除，會隱藏使用者資訊與內容
+        /// </summary>
+        private CommentReadDto MapToReadDto(Comment comment)
+        {
+            bool isDeleted = comment.DeletedAt != null;
+
             return new CommentReadDto
             {
                 CommentId = comment.CommentId,
                 UserId = comment.UserId,
-                DisplayName = comment.User?.UserProfile?.DisplayName ?? "新使用者",
-                Avatar = comment.User?.UserProfile?.Avatar,
+                DisplayName = isDeleted
+                    ? null
+                    : comment.User?.UserProfile?.DisplayName ?? "新使用者",
+                Avatar = isDeleted
+                    ? null
+                    : comment.User?.UserProfile?.Avatar,
                 CommentTargetId = comment.CommentTargetId,
                 ParentCommentId = comment.ParentCommentId,
-                CommentContent = comment.CommentContent,
-                UpdatedAt = comment.UpdatedAt,
+                CommentContent = isDeleted
+                    ? "此留言已刪除"
+                    : comment.CommentContent,
+                CreatedAt = comment.CreatedAt,
+                UpdatedAt = comment.UpdatedAt
             };
+        }
+
+        /// <summary>
+        /// 遞迴建立留言的回覆樹狀結構
+        /// </summary>
+        private CommentReadDto BuildReplyTree(
+            CommentReadDto parent,
+            List<CommentReadDto> all)
+        {
+            parent.Replies = all
+                .Where(c => c.ParentCommentId == parent.CommentId)
+                .Select(c => BuildReplyTree(c, all))
+                .OrderBy(c => c.CreatedAt)
+                .ToList();
+
+            return parent;
         }
     }
 }

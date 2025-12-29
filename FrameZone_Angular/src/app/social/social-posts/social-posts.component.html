@@ -90,7 +90,8 @@
     <hr class="my-2">
     <!-- 顯示留言區 -->
     <div class="comment-section">
-      <app-social-comments [comments]="post.comments"></app-social-comments>
+      <app-social-comments [comments]="comments()" [postId]="post.postId" (refresh)="refreshComments()">
+      </app-social-comments>
     </div>
 
 
@@ -101,11 +102,12 @@
           style="width:35px; height:35px; object-fit: cover;" />
 
         <div class="position-relative flex-grow-1">
-          <input type="text"
+          <input type="text" [(ngModel)]="newCommentContent" (keyup.enter)="sendComment()"
             class="form-control form-control-sm rounded-pill bg-light border-0 pe-5 comment-input-custom"
             placeholder="發佈留言...">
 
-          <button class="btn position-absolute end-0 top-50 translate-middle-y p-0 me-3 btn-send-comment" type="button">
+          <button (click)="sendComment()"
+            class="btn position-absolute end-0 top-50 translate-middle-y p-0 me-3 btn-send-comment" type="button">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
               class="icon icon-tabler icons-tabler-outline icon-tabler-send-2">
