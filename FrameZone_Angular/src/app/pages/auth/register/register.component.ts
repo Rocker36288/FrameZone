@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { catchError, throwError, timeout } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -62,6 +63,7 @@ export class RegisterComponent {
         Validators.required
       ]],
       phone: ['', [
+        Validators.required,
         Validators.pattern(/^09\d{8}$/)
       ]],
     }, {
@@ -120,7 +122,8 @@ export class RegisterComponent {
         'account': '帳號',
         'email': 'Email',
         'password': '密碼',
-        'confirmPassword': '確認密碼'
+        'confirmPassword': '確認密碼',
+        'phone': '手機號碼'
       };
       return `請輸入${fieldNames[fieldName] || fieldName}`;
     }
@@ -176,6 +179,11 @@ export class RegisterComponent {
       return;
     }
 
+    // 防止重複提交
+    if (this.isSubmitting) {
+      return;
+    }
+
     // 開始提交
     this.isSubmitting = true;
     this.errorMessage = '';
@@ -188,32 +196,97 @@ export class RegisterComponent {
       phone: this.registerForm.value.phone
     }
 
-    this.authService.register(registerData).subscribe({
-      next: (response) => {
-        if (response.success) {
-          // 導向登入頁面，並傳遞成功訊息
-          this.router.navigate(['/login'], {
-            state: { message: '註冊成功！請登入您的帳號' }
-          });
-        } else {
-          // 後端回傳失敗訊息
-          this.errorMessage = response.message;
-        }
-      },
-      error: (error) => {
-        console.error('註冊錯誤：', error);
-
-        // 顯示錯誤訊息
-        if (error.error?.message) {
-          this.errorMessage = error.error.message;
-        } else {
-          this.errorMessage = '註冊失敗，請稍後再試';
-        }
-      },
-
-      complete: () => {
-        this.isSubmitting = false;
-      }
+    console.log('開始註冊，資料：', {
+      account: registerData.account,
+      email: registerData.email,
+      phone: registerData.phone
     });
+
+    this.authService.register(registerData)
+      .pipe(
+        timeout(30000), // 30秒超時
+        catchError(error => {
+          console.error('註冊請求錯誤:', error);
+          return throwError(() => error);
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          console.log('註冊回應:', response);
+
+          if (response.success) {
+            // 導向登入頁面，並傳遞成功訊息
+            this.router.navigate(['/login'], {
+              state: { message: '註冊成功！請登入您的帳號' }
+            });
+          } else {
+            // 後端回傳失敗訊息
+            this.errorMessage = response.message || '註冊失敗';
+            this.isSubmitting = false;  // 重要：重設狀態
+          }
+        },
+        error: (error) => {
+          console.error('註冊錯誤:', error);
+          console.log('錯誤類型:', error.name);
+          console.log('錯誤狀態:', error.status);
+          console.log('完整錯誤物件:', JSON.stringify(error, null, 2));
+
+          // 處理超時錯誤
+          if (error.name === 'TimeoutError') {
+            this.errorMessage = '請求超時，請檢查網路連線或稍後再試';
+            this.isSubmitting = false;
+            return;
+          }
+
+          // 處理不同類型的錯誤訊息
+          if (error.status === 400) {
+            // 處理驗證錯誤
+            if (error.error?.errors) {
+              // ASP.NET Core 的 ModelState 驗證錯誤格式
+              const validationErrors: string[] = [];
+
+              Object.keys(error.error.errors).forEach(key => {
+                const errors = error.error.errors[key];
+                if (Array.isArray(errors)) {
+                  validationErrors.push(...errors);
+                } else {
+                  validationErrors.push(errors);
+                }
+              });
+
+              this.errorMessage = validationErrors.join('、');
+            } else if (error.error?.message) {
+              // 自訂錯誤訊息
+              this.errorMessage = error.error.message;
+            } else if (error.error?.title) {
+              // 標準錯誤格式
+              this.errorMessage = error.error.title;
+            } else {
+              this.errorMessage = '註冊失敗，請檢查輸入的資料';
+            }
+          } else if (error.status === 0) {
+            // 網路連線錯誤
+            this.errorMessage = '無法連線到伺服器，請檢查後端服務是否正在運行';
+          } else if (error.status === 500) {
+            // 伺服器錯誤
+            this.errorMessage = '伺服器錯誤，請稍後再試';
+          } else if (error.error?.message) {
+            // 其他錯誤
+            this.errorMessage = error.error.message;
+          } else {
+            this.errorMessage = '註冊失敗，請稍後再試';
+          }
+
+          // 重要：確保在所有錯誤情況下都重設狀態
+          this.isSubmitting = false;
+        },
+        complete: () => {
+          console.log('註冊請求完成');
+          // 防禦性程式設計：確保狀態被重設
+          if (this.isSubmitting) {
+            this.isSubmitting = false;
+          }
+        }
+      });
   }
 }
