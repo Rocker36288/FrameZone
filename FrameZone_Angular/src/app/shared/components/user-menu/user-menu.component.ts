@@ -113,9 +113,12 @@ export class UserMenuComponent implements OnInit, OnDestroy {
    * 取得使用者頭像 URL
    */
   getUserAvatar(): string {
-    if (this.currentUser?.avatar) {
-      return this.currentUser.avatar;
+    const avatarUrl = this.currentUser?.avatar;
+
+    if (avatarUrl) {
+      return avatarUrl;
     }
+
     return this.getDefaultAvatar();
   }
 

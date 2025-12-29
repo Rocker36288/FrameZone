@@ -259,10 +259,32 @@ namespace FrameZone_WebApi.Services.Member
                         description: "更新個人資料成功"
                     );
 
+                    // 重新查詢使用者資料以取得更新後的結果（包含 Blob URL）
+                    var updatedUser = await _repository.GetUserWithProfileAsync(userId);
+
+                    // 轉換為 DTO 並生成 SAS URL
+                    var profileDto = UserProfileDto.FromEntity(
+                        updatedUser,
+                        updatedUser.UserProfile,
+                        updatedUser.UserPrivateInfo
+                    );
+
+                    // 為頭像和封面圖片生成 SAS URL
+                    if (!string.IsNullOrWhiteSpace(profileDto.Avatar))
+                    {
+                        profileDto.Avatar = await GenerateSasUrlForImage(profileDto.Avatar, "avatars");
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(profileDto.CoverImage))
+                    {
+                        profileDto.CoverImage = await GenerateSasUrlForImage(profileDto.CoverImage, "covers");
+                    }
+
                     return new UpdateProfileResponseDto
                     {
                         Success = true,
-                        Message = "個人資料更新成功"
+                        Message = "個人資料更新成功",
+                        Data = profileDto  // ← 回傳更新後的資料
                     };
                 }
                 catch (Exception innerEx)

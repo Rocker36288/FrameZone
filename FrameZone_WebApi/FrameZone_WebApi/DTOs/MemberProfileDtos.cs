@@ -186,6 +186,11 @@ namespace FrameZone_WebApi.DTOs.Member
         public string Message { get; set; } = string.Empty;
 
         /// <summary>
+        /// 更新後的個人資料（包含 SAS URL 的圖片連結）
+        /// </summary>
+        public UserProfileDto? Data { get; set; }
+
+        /// <summary>
         /// 驗證錯誤列表（如果有）
         /// </summary>
         public List<string>? Errors { get; set; }

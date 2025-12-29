@@ -1,3 +1,4 @@
+import { AuthService } from './../../../core/services/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -89,8 +90,9 @@ export class MemberProfileComponent implements OnInit {
 
   constructor(
     private memberService: MemberService,
+    private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadProfile();
@@ -381,15 +383,15 @@ export class MemberProfileComponent implements OnInit {
 
     // 1. 網站 URL 格式（明顯錯誤）
     if (this.formData.website &&
-        this.formData.website.trim() !== '' &&
-        !isValidUrl(this.formData.website)) {
+      this.formData.website.trim() !== '' &&
+      !isValidUrl(this.formData.website)) {
       errors.push('網站格式不正確（需以 http:// 或 https:// 開頭）');
     }
 
     // 2. 電話格式（明顯錯誤：包含非數字、空格、+、-、()以外的字符）
     if (this.formData.phone &&
-        this.formData.phone.trim() !== '' &&
-        !isValidPhone(this.formData.phone)) {
+      this.formData.phone.trim() !== '' &&
+      !isValidPhone(this.formData.phone)) {
       errors.push('電話格式不正確');
     }
 
@@ -435,6 +437,14 @@ export class MemberProfileComponent implements OnInit {
 
         // 重新載入最新資料（包含後端處理後的圖片 URL）
         this.loadProfile();
+
+        if (response.data) {
+          this.authService.updateUserSession({
+            displayName: response.data.displayName as string | undefined,
+            avatar: response.data.avatar as string | undefined,
+          });
+          console.log('🔄 已同步更新用戶 Session');
+        }
 
         // 3 秒後自動隱藏成功訊息
         setTimeout(() => {

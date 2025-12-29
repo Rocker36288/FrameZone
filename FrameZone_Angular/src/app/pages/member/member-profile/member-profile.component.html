@@ -37,68 +37,6 @@
   </div>
 
   <form (ngSubmit)="onSubmit()" #profileForm="ngForm">
-
-    <!-- 封面圖片區塊 -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h5 class="mb-0">
-          <i class="bi bi-image"></i>
-          封面照片
-        </h5>
-      </div>
-      <div class="card-body">
-        <div class="cover-image-section">
-          <!-- 封面圖片預覽 -->
-          <div class="cover-image-preview" [class.has-image]="coverImagePreview || coverImageIsHeic">
-            <!-- 一般圖片預覽 -->
-            <img *ngIf="coverImagePreview && !coverImageIsHeic" [src]="coverImagePreview" alt="封面照片">
-
-            <!-- HEIC 格式佔位符 -->
-            <div *ngIf="coverImageIsHeic" class="heic-placeholder">
-              <i class="bi bi-file-earmark-image" style="font-size: 5rem; color: #667eea;"></i>
-              <p class="mt-3 mb-2"><strong>{{ coverImageFileName }}</strong></p>
-              <p class="text-muted mb-1">HEIC 格式已選擇</p>
-              <p class="text-muted" style="font-size: 0.9rem;">您的瀏覽器無法預覽此格式</p>
-              <p class="text-muted" style="font-size: 0.9rem;">儲存後將由後端處理並顯示</p>
-            </div>
-
-            <!-- 無圖片時的佔位符 -->
-            <div *ngIf="!coverImagePreview && !coverImageIsHeic" class="placeholder">
-              <i class="bi bi-image-fill"></i>
-              <p><strong>建議尺寸</strong></p>
-              <p>{{ imageLimits.COVER_IMAGE_RECOMMENDED_WIDTH }} x {{ imageLimits.COVER_IMAGE_RECOMMENDED_HEIGHT }} 像素</p>
-            </div>
-          </div>
-
-          <!-- 封面圖片操作按鈕 -->
-          <div class="cover-image-actions">
-            <input type="file"
-                   #coverImageInput
-                   accept="image/*,.heic,.heif"
-                   (change)="onCoverImageFileSelected($event)"
-                   style="display: none;">
-            <button type="button"
-                    class="btn btn-outline-primary"
-                    (click)="coverImageInput.click()">
-              <i class="bi bi-cloud-upload me-1"></i>
-              {{ (coverImagePreview || coverImageIsHeic) ? '更換封面照片' : '上傳封面照片' }}
-            </button>
-            <button type="button"
-                    *ngIf="coverImagePreview || coverImageIsHeic"
-                    class="btn btn-outline-danger"
-                    (click)="removeCoverImage()">
-              <i class="bi bi-trash me-1"></i>
-              移除封面照片
-            </button>
-            <small class="text-muted d-block mt-2">
-              <i class="bi bi-info-circle me-1"></i>
-              支援格式: JPG, PNG, GIF, WebP, HEIC | 檔案大小上限: {{ imageLimits.COVER_IMAGE_MAX_SIZE_MB }}MB
-            </small>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- 頭像區塊 -->
     <div class="card mb-4">
       <div class="card-header">
