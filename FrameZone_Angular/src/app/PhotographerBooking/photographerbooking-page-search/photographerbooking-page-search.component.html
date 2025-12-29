@@ -1,0 +1,13 @@
+<app-photographerbooking-header></app-photographerbooking-header>
+<app-photographerbooking-search
+  [(keyword)]="keyword"
+  [(filterLocation)]="filterLocation"
+  [(filterService)]="filterService"
+  [(filterPrice)]="filterPrice"
+></app-photographerbooking-search>
+<section class="grid">
+  <app-photographerbooking-card
+    *ngFor="let p of filteredPhotographers"
+    [photographer]="p"
+  ></app-photographerbooking-card>
+</section>

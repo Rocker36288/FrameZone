@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 interface CarouselImage {
   url: string;
   author: string;
@@ -20,12 +21,12 @@ export class PhotographerBookingheroComponent implements OnInit {
       style: '空間攝影',
     },
     {
-      url: '/images/Photographer/Carousel03.png',
+      url: '/images/Photographer/Carousel02.png',
       author: '張大衛',
       style: '活動紀錄',
     },
     {
-      url: '/images/Photographer/Carousel02.png',
+      url: '/images/Photographer/Carousel03.png',
       author: '陳小雅',
       style: '商業產品',
     },
@@ -41,6 +42,7 @@ export class PhotographerBookingheroComponent implements OnInit {
   // 快速標籤
   tags = ['韓系婚紗', '寵物攝影', '日系寫真'];
 
+  constructor(private router: Router) {}
   ngOnInit() {
     setInterval(() => this.nextSlide(), 5000);
   }
@@ -50,17 +52,19 @@ export class PhotographerBookingheroComponent implements OnInit {
   }
 
   onSearch() {
-    if (!this.city || !this.date || !this.type) {
-      alert('請完整選擇地區、日期與類型以查詢 2025 檔期');
-      return;
-    }
-    alert(`正在搜尋 ${this.date} 有空的攝影師...`);
-    console.log(
-      `/search?city=${this.city}&date=${this.date}&type=${this.type}`
-    );
+    const queryParams: any = {};
+
+    if (this.city) queryParams.city = this.city;
+    if (this.date) queryParams.date = this.date;
+    if (this.type) queryParams.type = this.type;
+
+    // 沒條件也可以 → {}
+    this.router.navigate(['/photographerbooking-page-search'], { queryParams });
   }
 
   quickSearch(tag: string) {
-    alert('正在為您過濾：' + tag);
+    this.router.navigate(['/photographerbooking-page-search'], {
+      queryParams: { tag },
+    });
   }
 }

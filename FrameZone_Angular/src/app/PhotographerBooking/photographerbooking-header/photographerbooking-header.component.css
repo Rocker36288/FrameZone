@@ -374,12 +374,12 @@
 
 :host {
   display: block;
-  position: fixed; /* 固定在頂部 */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 80px; /* 假設高度 */
-  z-index: 10;
-  background-color: white; /* 避免透明覆蓋 */
+  height: 80px; /* Header 高度 */
+  z-index: 20; /* 大於 Hero 的 z-index */
+  background-color: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
