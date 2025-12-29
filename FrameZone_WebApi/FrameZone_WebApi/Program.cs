@@ -210,6 +210,8 @@ builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<PostRepository>();
 builder.Services.AddScoped<IMemberProfileRepository, MemberProfileRepository>();
 builder.Services.AddScoped<IUserLogRepository, UserLogRepository>();
+builder.Services.AddScoped<IMemberSecurityRepository, MemberSecurityRepository>();
+builder.Services.AddScoped<IMemberNotificationRepository, MemberNotificationRepository>();
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -223,6 +225,8 @@ builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<IMemberProfileService, MemberProfileService>();
 builder.Services.AddScoped<IUserLogService, UserLogService>();
+builder.Services.AddScoped<IMemberSecurityService, MemberSecurityService>();
+builder.Services.AddScoped<IMemberNotificationService, MemberNotificationService>();
 
 
 builder.Services.AddHttpClient<IGeocodingService, GeocodingService>();
