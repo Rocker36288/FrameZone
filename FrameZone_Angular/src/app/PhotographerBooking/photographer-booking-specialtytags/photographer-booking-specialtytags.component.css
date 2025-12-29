@@ -1,0 +1,66 @@
+.container {
+  max-width: 1280px; /* 最大寬度稍微放大 */
+  margin: 0 auto;
+  padding-left: 32px; /* 左右內邊距加大 */
+  padding-right: 32px;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px; /* 標籤之間間距拉大 */
+  margin-bottom: 40px; /* 標籤與卡片距離拉大 */
+  align-items: center;
+  min-height: 60px; /* 標籤區高度增加 */
+}
+
+/* 共用標籤樣式 */
+.tag {
+  cursor: pointer;
+  padding: 12px 24px; /* 高度增加 */
+  border-radius: 50px;
+  font-size: 1.1rem; /* 文字稍大 */
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* --- 精緻邊框方案 --- */
+.tag-outline {
+  background-color: transparent;
+  color: #667eea;
+  border: 1.5px solid #667eea;
+}
+
+.tag-outline:hover,
+.tag-outline.active {
+  background-color: #667eea;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* 卡片 Grid */
+
+.photographer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px; /* 卡片間距 */
+  margin-bottom: 60px; /* 卡片區與下一區塊的間距 */
+  /* 移除 max-height 與 overflow:hidden，讓第二列完整顯示 */
+}
+
+/* 響應式 */
+@media (max-width: 1200px) {
+  .photographer-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 992px) {
+  .photographer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 576px) {
+  .photographer-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,24 @@
+<div class="container">
+  <h3>精選攝影風格</h3>
+  <div class="tags-container mb-3">
+    <button
+      *ngFor="let tag of tags"
+      class="tag tag-outline"
+      [class.active]="tag === selectedTag"
+      (click)="filterByTag(tag)"
+    >
+      {{ tag }}
+    </button>
+  </div>
+
+  <div
+    class="photographer-grid"
+    style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px"
+  >
+    <app-photographerbooking-card
+      *ngFor="let p of filteredPhotographers | slice : 0 : 8"
+      [photographer]="p"
+    >
+    </app-photographerbooking-card>
+  </div>
+</div>
