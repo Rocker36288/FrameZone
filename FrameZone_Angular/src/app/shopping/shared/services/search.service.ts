@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -6,5 +6,14 @@ import { Injectable } from '@angular/core';
 export class SearchService {
 
   constructor() { }
+  keyword = signal<string>('');
+
+  setKeyword(value: string) {
+    this.keyword.set(value.trim());
+  }
+
+  clear() {
+    this.keyword.set('');
+  }
 
 }

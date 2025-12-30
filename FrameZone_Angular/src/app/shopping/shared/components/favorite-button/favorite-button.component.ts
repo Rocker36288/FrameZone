@@ -4,6 +4,7 @@ import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-favorite-button',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './favorite-button.component.html',
   styleUrl: './favorite-button.component.css'
