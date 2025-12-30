@@ -6,6 +6,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { LoginRequestDto, GoogleLoginRequestDto } from '../../core/models/auth.models';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
@@ -19,8 +20,6 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   loginForm!: FormGroup;
 
   // UI 狀態
-  successMessage: string = '';
-  errorMessage: string = '';
   isSubmitting: boolean = false;
   showPassword: boolean = false;
 
@@ -41,8 +40,10 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private ngZone: NgZone  // 加入 NgZone
+    private ngZone: NgZone,
+    private toastr: ToastrService
   ) {
+    console.log('📦 ToastrService 注入狀態:', this.toastr ? '成功' : '失敗');
     this.initializeForm();
   }
 
@@ -84,10 +85,12 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
       rememberMe: [false]
     });
 
-    // 輸入時清除錯誤訊息
+    // 輸入時清除錯誤訊息（toastr 會自動消失，這裡保留以便未來擴展）
     this.loginForm.valueChanges
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.errorMessage = '');
+      .subscribe(() => {
+        // 如果需要在輸入時執行其他動作，可以在此處添加
+      });
   }
 
   /**
@@ -96,7 +99,7 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   private checkQueryParams(): void {
     this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
       if (params['message']) {
-        this.successMessage = params['message'];
+        this.toastr.success(params['message'], '✔ 提示');
       }
     });
   }
@@ -174,12 +177,12 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // 前端基本驗證失敗，不發送請求
     if (this.loginForm.invalid) {
+      this.toastr.warning('請檢查表單欄位', '⚠ 表單驗證失敗');
       return;
     }
 
     // 開始提交
     this.isSubmitting = true;
-    this.errorMessage = '';
 
     const loginData: LoginRequestDto = this.loginForm.value;
 
@@ -210,12 +213,20 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // 信任後端的 success 欄位
     if (response.success) {
-      // 導向原本要去的頁面或首頁
-      const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-      this.router.navigate([returnUrl]);
+      // 顯示成功訊息
+      this.toastr.success(
+        `歡迎回來，${response.displayName || response.account || '用戶'}！`,
+        '✔ 登入成功'
+      );
+
+      // 短暫延遲後導向，讓用戶看到成功訊息
+      setTimeout(() => {
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+        this.router.navigate([returnUrl]);
+      }, 800);
     } else {
       // 後端回覆失敗，顯示訊息
-      this.errorMessage = response.message || '登入失敗';
+      this.toastr.error(response.message || '登入失敗', '✗ 登入失敗');
     }
   }
 
@@ -226,27 +237,23 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   private handleError(error: any): void {
     this.isSubmitting = false;
 
-    // 直接使用後端返回的錯誤訊息
+    console.error('登入錯誤:', error);
+
+    // 處理不同類型的錯誤
+    let errorMessage = '登入時發生錯誤，請稍後再試';
+
     if (error.error?.message) {
-      this.errorMessage = error.error.message;
-    } else {
-      // 沒有具體訊息時的通用錯誤
-      this.errorMessage = '登入時發生錯誤，請稍後在試';
+      // 後端返回的具體錯誤訊息
+      errorMessage = error.error.message;
+    } else if (error.status === 401) {
+      errorMessage = '帳號或密碼錯誤';
+    } else if (error.status === 0) {
+      errorMessage = '無法連線到伺服器，請檢查網路連線';
+    } else if (error.status === 500) {
+      errorMessage = '伺服器錯誤，請稍後再試';
     }
-  }
 
-  /**
-   * 關閉成功訊息
-   */
-  dismissSuccessMessage(): void {
-    this.successMessage = '';
-  }
-
-  /**
-   * 關閉錯誤訊息
-   */
-  dismissErrorMessage(): void {
-    this.errorMessage = '';
+    this.toastr.error(errorMessage, '✗ 登入失敗');
   }
 
   /**
@@ -278,7 +285,7 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
     google.accounts.id.initialize({
       client_id: '836883046870-hl4oqsr1vatlgre0pfs7fn32ncpa6tkg.apps.googleusercontent.com',
       callback: (response: any) => {
-        console.log('📥 收到 Google 回應');
+        console.log('🔥 收到 Google 回應');
         // 使用 NgZone 確保在 Angular Zone 內執行
         this.ngZone.run(() => {
           this.handleGoogleSignIn(response);
@@ -320,16 +327,15 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
    * 處理 Google Sign-In 回應
    */
   private handleGoogleSignIn(response: any): void {
-    console.log('🔐 開始處理 Google 登入');
+    console.log('🔍 開始處理 Google 登入');
 
     if (!response.credential) {
       console.error('❌ 沒有收到 Google credential');
-      this.errorMessage = 'Google 登入失敗，請重試';
+      this.toastr.error('Google 登入失敗，請重試', '✗ 登入錯誤');
       return;
     }
 
     this.isSubmitting = true;
-    this.errorMessage = '';
 
     const googleLoginData: GoogleLoginRequestDto = {
       idToken: response.credential,
@@ -361,17 +367,21 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
     if (response.success) {
       console.log('🎉 Google 登入成功');
 
-      // 顯示歡迎訊息（如果是新使用者）
-      if (response.isNewUser) {
-        this.successMessage = '歡迎加入 FrameZone！';
-      }
+      // 顯示歡迎訊息
+      const welcomeMessage = response.isNewUser
+        ? `歡迎加入 FrameZone，${response.displayName || response.account || '新用戶'}！`
+        : `歡迎回來，${response.displayName || response.account || '用戶'}！`;
 
-      // 導向原本要去的頁面或首頁
-      const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-      this.router.navigate([returnUrl]);
+      this.toastr.success(welcomeMessage, response.isNewUser ? '✔ 註冊成功' : '✔ 登入成功');
+
+      // 短暫延遲後導向
+      setTimeout(() => {
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+        this.router.navigate([returnUrl]);
+      }, 800);
     } else {
       console.warn('⚠️ Google 登入失敗:', response.message);
-      this.errorMessage = response.message || 'Google 登入失敗';
+      this.toastr.error(response.message || 'Google 登入失敗', '✗ 登入失敗');
     }
   }
 
@@ -381,10 +391,18 @@ export class LoginComponent implements OnInit, OnDestroy, AfterViewInit {
   private handleGoogleLoginError(error: any): void {
     this.isSubmitting = false;
 
+    console.error('Google 登入錯誤:', error);
+
+    let errorMessage = 'Google 登入時發生錯誤，請稍後再試';
+
     if (error.error?.message) {
-      this.errorMessage = error.error.message;
-    } else {
-      this.errorMessage = 'Google 登入時發生錯誤，請稍後再試';
+      errorMessage = error.error.message;
+    } else if (error.status === 0) {
+      errorMessage = '無法連線到伺服器，請檢查網路連線';
+    } else if (error.status === 500) {
+      errorMessage = '伺服器錯誤，請稍後再試';
     }
+
+    this.toastr.error(errorMessage, '✗ Google 登入失敗');
   }
 }
