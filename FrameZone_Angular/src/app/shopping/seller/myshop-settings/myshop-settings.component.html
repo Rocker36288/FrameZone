@@ -2,7 +2,6 @@
   <div class="settings-header">
     <div>
       <h1 class="settings-title">我的賣場設定</h1>
-      <p class="settings-subtitle">管理您的賣場基本資訊與外觀</p>
     </div>
     <div class="header-actions">
       <button class="btn-preview" (click)="previewShop()">
@@ -44,15 +43,6 @@
         <div class="form-group">
           <label>賣場名稱 <span class="required">*</span></label>
           <input type="text" [(ngModel)]="settings.shopName" placeholder="請輸入賣場名稱" (blur)="generateSlug()">
-        </div>
-
-        <div class="form-group">
-          <label>賣場網址 <span class="required">*</span></label>
-          <div class="input-group">
-            <span class="input-prefix">yoursite.com/shop/</span>
-            <input type="text" [(ngModel)]="settings.shopSlug" placeholder="shop-url">
-          </div>
-          <p class="form-hint">💡 網址只能包含英文、數字和連字符</p>
         </div>
 
         <div class="form-group">

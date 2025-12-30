@@ -2,10 +2,10 @@
   <div class="settings-header">
     <div>
       <h1 class="settings-title">分類設定</h1>
-      <p class="settings-subtitle">管理您的商品分類</p>
     </div>
     <button class="btn-add" (click)="openAddModal()">
-      + 新增分類
+      <i class="ti ti-plus"></i>
+      新增分類
     </button>
   </div>
 
@@ -23,10 +23,10 @@
       <div class="item-col col-order">
         <div class="order-controls">
           <button class="order-btn" [disabled]="i === 0" (click)="moveUp(category)" title="向上移動">
-            ▲
+            <i class="ti ti-chevron-up"></i>
           </button>
           <button class="order-btn" [disabled]="i === categories.length - 1" (click)="moveDown(category)" title="向下移動">
-            ▼
+            <i class="ti ti-chevron-down"></i>
           </button>
         </div>
       </div>
@@ -48,19 +48,26 @@
 
       <div class="item-col col-actions">
         <button class="action-btn" (click)="openEditModal(category)" title="編輯">
-          ✏️ 編輯
+          <i class="ti ti-edit"></i>
+          編輯
         </button>
-        <button class="action-btn delete" (click)="confirmDelete(category)" title="刪除">
-          🗑️ 刪除
+        <button class="action-btn delete" (click)="deleteCategory(category)" title="刪除">
+          <i class="ti ti-trash"></i>
+          刪除
         </button>
       </div>
     </div>
 
     <div *ngIf="categories.length === 0" class="empty-state">
-      <div class="empty-icon">📂</div>
+      <div class="empty-icon">
+        <i class="ti ti-folder-open"></i>
+      </div>
       <h3>尚未建立分類</h3>
       <p>建立第一個分類來組織您的商品</p>
-      <button class="btn-add" (click)="openAddModal()">+ 新增分類</button>
+      <button class="btn-add" (click)="openAddModal()">
+        <i class="ti ti-plus"></i>
+        新增分類
+      </button>
     </div>
   </div>
 </div>
@@ -69,8 +76,13 @@
 <div class="modal-overlay" *ngIf="showCategoryModal" (click)="closeModal()">
   <div class="modal-content large" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>{{ isEditMode ? '編輯分類' : '新增分類' }}</h2>
-      <button class="btn-close" (click)="closeModal()">✕</button>
+      <h2>
+        <i class="ti" [ngClass]="isEditMode ? 'ti-edit' : 'ti-plus'"></i>
+        {{ isEditMode ? '編輯分類' : '新增分類' }}
+      </h2>
+      <button class="btn-close" (click)="closeModal()">
+        <i class="ti ti-x"></i>
+      </button>
     </div>
 
     <div class="modal-body">
@@ -91,31 +103,44 @@
       <div class="products-section">
         <div class="section-header-with-search">
           <h3 class="section-subtitle">
+            <i class="ti ti-package"></i>
             選擇商品
             <span class="selected-count">(已選 {{ getSelectedProductsCount() }} 個)</span>
           </h3>
-          <input type="text" [(ngModel)]="searchKeyword" placeholder="搜尋商品名稱或 SKU" class="search-input-small">
+          <div class="search-box">
+            <input type="text" [(ngModel)]="searchKeyword" placeholder="搜尋商品名稱或 SKU" class="search-input-small">
+            <button class="btn-search" (click)="onSearch()" title="搜尋">
+              <i class="ti ti-search"></i>
+            </button>
+          </div>
         </div>
 
         <div class="product-selection-list">
           <div *ngFor="let product of filteredProducts" class="product-item"
-            [class.selected]="isProductSelected(product.id)" (click)="toggleProduct(product.id)">
-            <div class="product-checkbox">
-              <input type="checkbox" [checked]="isProductSelected(product.id)" (click)="$event.stopPropagation()">
+            [class.selected]="isProductSelected(product.id)">
+            <div class="product-checkbox" (click)="toggleProduct(product.id)">
+              <input type="checkbox" [checked]="isProductSelected(product.id)" (click)="$event.preventDefault()">
             </div>
-            <div class="product-image-small">
+            <div class="product-image-small" (click)="toggleProduct(product.id)">
               <img [src]="product.image" [alt]="product.name">
             </div>
-            <div class="product-details">
+            <div class="product-details" (click)="toggleProduct(product.id)">
               <div class="product-name-small">{{ product.name }}</div>
               <div class="product-meta-small">
-                <span class="product-sku">{{ product.sku }}</span>
-                <span class="product-price-small">NT$ {{ product.price }}</span>
+                <span class="product-sku">
+                  <i class="ti ti-barcode"></i>
+                  {{ product.sku }}
+                </span>
+                <span class="product-price-small">
+                  <i class="ti ti-coin"></i>
+                  NT$ {{ product.price }}
+                </span>
               </div>
             </div>
           </div>
 
           <div *ngIf="filteredProducts.length === 0" class="empty-products">
+            <i class="ti ti-search-off"></i>
             <p>找不到符合的商品</p>
           </div>
         </div>
@@ -123,8 +148,12 @@
     </div>
 
     <div class="modal-footer">
-      <button class="btn-secondary" (click)="closeModal()">取消</button>
+      <button class="btn-secondary" (click)="closeModal()">
+        <i class="ti ti-x"></i>
+        取消
+      </button>
       <button class="btn-primary" (click)="saveCategory()">
+        <i class="ti ti-check"></i>
         {{ isEditMode ? '儲存' : '新增' }}
       </button>
     </div>
@@ -132,24 +161,37 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div class="modal-overlay" *ngIf="showDeleteModal" (click)="showDeleteModal = false">
+<!-- <div class="modal-overlay" *ngIf="showDeleteModal" (click)="showDeleteModal = false">
   <div class="modal-content small" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2>確認刪除</h2>
-      <button class="btn-close" (click)="showDeleteModal = false">✕</button>
+      <h2>
+        <i class="ti ti-alert-triangle"></i>
+        確認刪除
+      </h2>
+      <button class="btn-close" (click)="showDeleteModal = false">
+        <i class="ti ti-x"></i>
+      </button>
     </div>
 
     <div class="modal-body">
       <div class="delete-warning">
-        <div class="warning-icon">⚠️</div>
+        <div class="warning-icon">
+          <i class="ti ti-alert-circle"></i>
+        </div>
         <p>確定要刪除 <strong>{{ categoryToDelete?.name }}</strong> 分類嗎?</p>
         <p class="warning-text">此操作無法復原</p>
       </div>
     </div>
 
     <div class="modal-footer">
-      <button class="btn-secondary" (click)="showDeleteModal = false">取消</button>
-      <button class="btn-danger" (click)="deleteCategory()">確認刪除</button>
+      <button class="btn-secondary" (click)="showDeleteModal = false">
+        <i class="ti ti-x"></i>
+        取消
+      </button>
+      <button class="btn-danger" (click)="deleteCategory()">
+        <i class="ti ti-trash"></i>
+        確認刪除
+      </button>
     </div>
   </div>
-</div>
+</div> -->

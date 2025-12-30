@@ -1,0 +1,55 @@
+/* 只保留與商品卡片相關的樣式 */
+.card {
+  border: none;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: white;
+}
+
+.product-card {
+  transition: all 0.3s;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 0.75rem 1.5rem rgba(102, 126, 234, 0.2);
+  text-decoration: none;
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+  border-radius: 0.5rem 0.5rem 0 0;
+  transition: transform 0.3s;
+}
+
+.product-card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.card-title {
+  margin-bottom: 0.75rem;
+  color: #1e293b;
+  font-size: 1rem;
+  font-weight: 600;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+}
+
+.product-card:hover .card-title {
+  color: #667eea;
+  /* 假設這是你的 primary-color */
+}
+
+.text-primary {
+  color: #667eea !important;
+  font-weight: 700;
+}

@@ -447,7 +447,8 @@
 }
 
 .product-options .add-to-cart-btn {
-  background: linear-gradient(to right, #657bf8, #7738eb);
+  background-color: #5988ee;
+  border: none;
   color: #fff !important;
   border: none !important;
   padding: 12px 25px;
@@ -896,4 +897,10 @@
 .test ::ng-deep .favorite-icon {
   display: flex !important;
   line-height: 0;
+}
+
+.back-to-home {
+  background-color: #5988ee;
+  border: none;
+  color: white;
 }

@@ -220,9 +220,9 @@ export class ShoppingcartComponent {
   }
 
   // 範例頭像 URL，請替換為實際的會員服務獲取邏輯
-  memberAvatarUrl: string = 'https://i.pravatar.cc/30?img=68';
+  memberAvatarUrl: string = 'images/avatar/11.jpg';
 
   // 範例會員名稱
-  memberName: string = 'Angular用戶001';
+  memberName: string = 'ruka711';
 
 }

@@ -1,6 +1,7 @@
 /* src/app/shopping/seller/seller-layout/seller-sidebar/seller-sidebar.component.css */
 
 .seller-sidebar {
+  /* 基礎設定 */
   width: 260px;
   background: white;
   height: calc(100vh - 60px);
@@ -11,13 +12,58 @@
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
-  overflow-y: auto;
   z-index: 999;
+
+  /* 動態與文字溢出處理 */
+  transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  white-space: nowrap;
+
+  /* 捲動處理：關鍵在於 y 軸 auto, x 軸 hidden */
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
+/* 收合狀態 */
+.seller-sidebar.collapsed {
+  width: 70px;
+}
+
+/* 讓主內容區跟著側邊欄一起動 */
+.main-content {
+  margin-left: 260px;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.main-content.collapsed {
+  margin-left: 70px;
+}
+
+/* 文字隱藏動畫：統一管理 */
+.sidebar-header h3,
+.menu-item span,
+.menu-item .arrow,
+.menu-item .badge,
+.sidebar-footer span {
+  transition: opacity 0.3s ease;
+  opacity: 1;
+}
+
+/* 當收合時，讓文字透明 */
+.seller-sidebar.collapsed .sidebar-header h3,
+.seller-sidebar.collapsed .menu-item span,
+.seller-sidebar.collapsed .arrow,
+.seller-sidebar.collapsed .menu-item .badge,
+.seller-sidebar.collapsed .sidebar-footer span {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 標頭區 */
 .sidebar-header {
   padding: 20px 20px 16px;
   border-bottom: 1px solid #e5e7eb;
+  min-height: 57px;
+  box-sizing: border-box;
 }
 
 .sidebar-header h3 {
@@ -25,9 +71,9 @@
   font-weight: 600;
   color: #1f2937;
   margin: 0;
-  letter-spacing: 0.3px;
 }
 
+/* 選單區 */
 .sidebar-menu {
   flex: 1;
   padding: 8px 0;
@@ -36,24 +82,23 @@
 .menu-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 11px 16px;
   color: #6b7280;
   text-decoration: none;
-  transition: all 0.2s;
-  position: relative;
+  transition: background 0.2s, color 0.2s;
   font-size: 13.5px;
   cursor: pointer;
-  border: none;
-  background: none;
   width: 100%;
-  text-align: left;
   font-weight: 500;
+  padding: 11px 0;
+  /* 統一內距 */
 }
 
+/* 圖示容器：確保收合時絕對置中 */
 .menu-item i {
-  font-size: 17px;
-  min-width: 17px;
+  min-width: 70px;
+  text-align: center;
+  font-size: 18px;
+  flex-shrink: 0;
 }
 
 .menu-item:hover {
@@ -69,38 +114,15 @@
 }
 
 .menu-item .badge {
-  margin-left: auto;
+  margin-right: 16px;
   background: #ef4444;
   color: white;
   font-size: 10px;
   padding: 2px 6px;
   border-radius: 8px;
-  font-weight: 600;
-  min-width: 18px;
-  text-align: center;
 }
 
-/* 父選單項目 */
-.menu-item.parent {
-  justify-content: space-between;
-}
-
-.menu-item.parent .arrow {
-  margin-left: auto;
-  font-size: 14px;
-  transition: transform 0.2s;
-}
-
-.menu-item.parent.expanded {
-  color: #667eea;
-  background: #f9fafb;
-}
-
-.menu-item.parent.expanded .arrow {
-  transform: rotate(180deg);
-}
-
-/* 子選單 */
+/* 子選單邏輯 */
 .submenu {
   max-height: 0;
   overflow: hidden;
@@ -109,20 +131,16 @@
 }
 
 .submenu.show {
-  max-height: 600px;
+  max-height: 800px;
 }
 
-.menu-item.child {
-  padding-left: 44px;
-  font-size: 13px;
-  padding-top: 9px;
-  padding-bottom: 9px;
+/* 展開時子選單縮排 */
+.seller-sidebar:not(.collapsed) .menu-item.child {
+  padding-left: 10px;
+  /* 這裡調整子選單整體的向右偏移 */
 }
 
-.menu-item.child i {
-  font-size: 15px;
-}
-
+/* 頁尾區 */
 .sidebar-footer {
   padding: 14px;
   border-top: 1px solid #e5e7eb;
@@ -139,67 +157,33 @@
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   color: #6b7280;
-  font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
-  font-weight: 500;
 }
 
 .btn-back-to-shop:hover {
   background: #667eea;
   color: white;
-  border-color: #667eea;
-}
-
-.btn-back-to-shop i {
-  font-size: 16px;
 }
 
 /* 滾動條美化 */
 .seller-sidebar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.seller-sidebar::-webkit-scrollbar-track {
-  background: #f9fafb;
+  width: 4px;
 }
 
 .seller-sidebar::-webkit-scrollbar-thumb {
   background: #d1d5db;
-  border-radius: 3px;
+  border-radius: 10px;
 }
 
-.seller-sidebar::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
-}
-
+/* 響應式：手機版預設收合 */
 @media (max-width: 768px) {
   .seller-sidebar {
     width: 70px;
   }
 
-  .sidebar-header h3,
-  .menu-item span,
-  .btn-back-to-shop span {
-    display: none;
-  }
-
-  .menu-item {
-    justify-content: center;
-    padding: 11px 0;
-  }
-
-  .menu-item .badge {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-  }
-
-  .menu-item.parent .arrow {
-    display: none;
-  }
-
-  .submenu {
-    display: none;
+  /* 在手機版，如果不是主動展開，就維持收合狀態 */
+  .seller-sidebar:not(.expanded-mobile) {
+    width: 70px;
   }
 }

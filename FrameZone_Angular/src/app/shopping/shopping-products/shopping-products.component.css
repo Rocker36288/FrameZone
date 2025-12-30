@@ -1,46 +1,42 @@
 /* 頁面整體 */
 .page-wrapper {
-  background: #f8fafc;
+  background: linear-gradient(135deg, #f0f4ff 0%, #f5f3ff 50%, #faf5ff 100%);
   min-height: 100vh;
-  /* padding: 2rem 0; */
-  /* padding-top: 100px; */
 }
 
 .page-body {
-  padding-top: 0;
+  padding-top: 2rem;
 }
 
-/* 頁面標題 */
-.page-header {
-  padding: 1.5rem 0;
-}
-
-.page-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 0.5rem 0;
-}
-
-.page-subtitle {
-  color: #64748b;
-  font-size: 0.95rem;
+/* 自訂容器 - 縮小寬度 */
+.container-custom {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  width: 100%;
+  /* 確保寬度 */
 }
 
 /* 篩選側邊欄 */
 .filter-sidebar {
-  background: white;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
   border-radius: 12px;
-  padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.1);
   position: sticky;
   top: 20px;
+  width: 220px;
+  box-sizing: border-box;
+  margin-left: 0 !important;
+  /* 強制靠左 */
+  margin-right: auto !important;
 }
 
 .filter-section {
   margin-bottom: 1.5rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid rgba(102, 126, 234, 0.15);
 }
 
 .filter-section:last-of-type {
@@ -52,42 +48,11 @@
 .filter-title {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #1e293b;
+  color: #5b21b6;
   margin-bottom: 0.875rem;
-}
-
-/* 搜尋框 */
-.search-box {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 0.875rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.search-box:focus-within {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.search-box svg {
-  color: #94a3b8;
-  flex-shrink: 0;
-}
-
-.search-input {
-  border: none;
-  outline: none;
-  flex: 1;
-  font-size: 0.85rem;
-  color: #1e293b;
-  min-width: 0;
-}
-
-.search-input::placeholder {
-  color: #cbd5e1;
+  white-space: nowrap;
+  /* 確保標題「價格範圍」不折行 */
+  display: block;
 }
 
 /* 價格輸入 */
@@ -96,17 +61,27 @@
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.875rem;
+  flex-wrap: nowrap;
 }
 
 .price-input {
   flex: 1;
-  padding: 0.5rem;
-  border: 1px solid #e2e8f0;
+  white-space: normal;
+  /* 改為 normal，允許文字在空間不足時換行 */
+  word-break: break-all;
+  /* 確保長數字或字串能正常斷行 */
+  line-height: 1.4;
+  /* 增加行高，換行後才不會太擠 */
+  min-width: 0;
+  /* 設定最小寬度，防止縮得太小 */
+  padding: 0.5rem 0.4rem;
+  border: 1px solid rgba(102, 126, 234, 0.2);
   border-radius: 6px;
   outline: none;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   transition: all 0.2s ease;
   min-width: 0;
+  background: #fafbff;
 }
 
 .price-input:focus {
@@ -129,8 +104,8 @@
 
 .quick-price-btn {
   padding: 0.5rem 0.625rem;
-  border: 1px solid #e2e8f0;
-  background: white;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  background: linear-gradient(135deg, #ffffff 0%, #fafbff 100%);
   border-radius: 6px;
   color: #64748b;
   font-size: 0.8rem;
@@ -138,6 +113,10 @@
   transition: all 0.2s ease;
   text-align: left;
   white-space: nowrap;
+  word-break: break-all;
+  /* 確保長數字或字串能正常斷行 */
+  line-height: 1.4;
+  /* 增加行高，換行後才不會太擠 */
 }
 
 .quick-price-btn:hover {
@@ -173,13 +152,14 @@
 .sort-select {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(102, 126, 234, 0.2);
   border-radius: 6px;
   outline: none;
   font-size: 0.85rem;
   color: #334155;
   cursor: pointer;
   transition: all 0.2s ease;
+  background: #fafbff;
 }
 
 .sort-select:focus {
@@ -187,14 +167,39 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+/* 套用價格按鈕 */
+.choose-price-btn {
+  width: 170px;
+  padding: 0.625rem;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, #ffffff 0%, #f3f4ff 100%);
+  border-radius: 8px;
+  color: #667eea;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.choose-price-btn:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #667eea;
+}
+
+
 /* 清除篩選按鈕 */
 .clear-filters-btn {
-  width: 100%;
+  width: 170px;
   padding: 0.625rem;
-  border: 1px solid #e2e8f0;
-  background: white;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, #ffffff 0%, #f3f4ff 100%);
   border-radius: 8px;
-  color: #64748b;
+  color: #667eea;
   font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -206,25 +211,36 @@
 }
 
 .clear-filters-btn:hover {
-  background: #f1f5f9;
-  color: #334155;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #667eea;
 }
 
-/* 商品卡片 */
+/* 商品卡片 - 五個一排 */
+.col-custom {
+  flex: 0 0 auto;
+  width: 20%;
+  /* 5個一排 = 100% / 5 */
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+  margin-bottom: 1rem;
+}
+
 .product-card {
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(102, 126, 234, 0.15);
   border-radius: 10px;
   overflow: hidden;
   transition: all 0.3s ease;
-  background: white;
+  background: linear-gradient(135deg, #ffffff 0%, #fefeff 100%);
   height: 100%;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
 }
 
 .product-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
   border-color: #667eea;
 }
 
@@ -281,12 +297,13 @@
 
 .product-condition {
   font-size: 0.8rem;
-  color: #64748b;
-  background: #f1f5f9;
+  color: #7c3aed;
+  background: linear-gradient(135deg, #f3f4ff 0%, #ede9fe 100%);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   display: inline-block;
   width: fit-content;
+  border: 1px solid rgba(124, 58, 237, 0.2);
 }
 
 .product-footer {
@@ -342,11 +359,11 @@
 
 /* 分頁樣式 */
 .pagination {
-  background: white;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
   border-radius: 10px;
   padding: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.1);
 }
 
 .page-item {
@@ -380,23 +397,18 @@
   background: transparent;
 }
 
-/* Grid spacing */
-.row-cards {
-  margin-right: -0.5rem;
-  margin-left: -0.5rem;
-}
-
-.row-cards>[class*='col-'] {
-  padding-right: 0.5rem;
-  padding-left: 0.5rem;
-  margin-bottom: 1rem;
-}
-
 /* 響應式設計 */
+@media (max-width: 1400px) {
+  .col-custom {
+    width: 25%;
+    /* 4個一排 */
+  }
+}
+
 @media (max-width: 1200px) {
-  .col-xl-2 {
-    flex: 0 0 auto;
-    width: 20%;
+  .col-custom {
+    width: 33.333%;
+    /* 3個一排 */
   }
 }
 
@@ -404,6 +416,10 @@
   .filter-sidebar {
     position: static;
     margin-bottom: 1.5rem;
+    min-width: 180px;
+    /* 設定保險的最小寬度 */
+    overflow: hidden;
+    /* 防止內部元件陰影或邊框溢出 */
   }
 
   .col-lg-2 {
@@ -418,21 +434,13 @@
 }
 
 @media (max-width: 768px) {
-  .page-header {
-    padding: 1rem 0;
+  .page-body {
+    padding-top: 1rem;
   }
 
-  .page-title {
-    font-size: 1.5rem;
-  }
-
-  .page-wrapper {
-    padding: 1rem 0;
-  }
-
-  .col-6 {
-    flex: 0 0 auto;
+  .col-custom {
     width: 50%;
+    /* 2個一排 */
   }
 }
 
@@ -444,4 +452,66 @@
   .product-name {
     font-size: 0.85rem;
   }
+
+  .col-custom {
+    width: 50%;
+    /* 保持2個一排 */
+  }
+}
+
+/* 1. 解決重疊問題：為側邊欄所在的 col 增加右側間距 */
+.col-xl-2.col-lg-3.col-md-4 {
+  padding-right: 1.5rem;
+  /* 強制增加與右側商品的物理距離 */
+  flex-shrink: 0;
+  /* 防止收縮 */
+}
+
+/* 4. 解決沒商品時側邊欄移位：確保右側容器高度 */
+.empty-state-wrapper {
+  min-height: 500px;
+  text-align: center;
+  padding: 3rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 確保右側 column 始終佔據正確空間 */
+.col-xl-10.col-lg-9.col-md-8 {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  max-width: none !important;
+  padding-left: 0.5rem;
+  padding-right: 1rem;
+  min-height: 500px;
+}
+
+/* 強化 row 的佈局穩定性 */
+.row {
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+}
+
+/* 強制確保 row 使用 flexbox 並正確對齊 */
+.container-custom>.row {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  justify-content: flex-start !important;
+  /* 關鍵：強制靠左 */
+  align-items: flex-start !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* 確保左側欄位固定寬度和位置 */
+.col-xl-2.col-lg-3.col-md-4.mb-4 {
+  flex: 0 0 240px !important;
+  width: 240px !important;
+  max-width: 240px !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-right: 1.5rem;
+  padding-left: 1rem;
 }

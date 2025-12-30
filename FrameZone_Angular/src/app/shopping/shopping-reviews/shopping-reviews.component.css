@@ -1,9 +1,7 @@
 /* 頁面整體 */
 .page-wrapper {
-  background: #f8fafc;
   min-height: 100vh;
-  /* padding: 2rem 0; */
-  /* padding-top: 100px; */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .page-body {
@@ -12,7 +10,7 @@
 
 /* 頁面標題 */
 .page-header {
-  padding: 1.5rem 0;
+  /* padding: 1.5rem 0; */
 }
 
 .page-title {

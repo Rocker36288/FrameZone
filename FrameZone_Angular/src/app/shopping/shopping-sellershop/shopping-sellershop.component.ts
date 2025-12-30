@@ -5,6 +5,8 @@ import { RouterLink } from '@angular/router';
 import { FooterComponent } from "../../shared/components/footer/footer.component";
 import { FavoriteButtonComponent } from '../shared/components/favorite-button/favorite-button.component';
 import { ToastNotificationComponent } from '../shared/components/toast-notification/toast-notification.component';
+import { ProductCardComponent } from "../shared/components/product-card/product-card.component";
+import { ChatStateService } from '../shared/services/chat-state.service';
 
 interface Product {
   id: number;
@@ -30,26 +32,25 @@ interface Category {
 @Component({
   selector: 'app-shopping-sellershop',
   standalone: true,
-  imports: [FormsModule, CommonModule, RouterLink, FooterComponent, FavoriteButtonComponent, ToastNotificationComponent],
+  imports: [FormsModule, CommonModule, RouterLink, FooterComponent, FavoriteButtonComponent, ToastNotificationComponent, ProductCardComponent],
   templateUrl: './shopping-sellershop.component.html',
   styleUrl: './shopping-sellershop.component.css'
 })
 export class ShoppingSellershopComponent {
+  constructor(
+    private chatState: ChatStateService
+  ) { }
+
   sellerInfo = {
-    name: 'Ruby 的生活選物',
-    avatar: 'images/products/1.jpg',
+    name: 'Ruka 的生活選物',
+    avatar: 'images/avatar/11.jpg',
     rating: 4.9,
     reviewCount: 1253,
     isOnline: true,
-    description: '哈囉！我是 Ruby 👋 一個熱愛生活、喜歡分享好物的賣家。這個賣場就像我的小天地，每件商品都是我精心挑選、親自使用過覺得不錯才放上來的。',
-    shopImage: 'images/products/1.jpg',
+    description: '哈囉！我是 Ruka 👋 一個熱愛生活、喜歡分享好物的賣家。這個賣場就像我的小天地，每件商品都是我精心挑選、親自使用過覺得不錯才放上來的。',
+    shopImage: 'images/sellshop/sellshop4.png',
     productCount: 41
   };
-
-  // 聊天室相關
-  showChatRoom = false;
-  chatMessages: Array<{ text: string, sender: 'user' | 'seller', time: string }> = [];
-  newMessage = '';
 
   // 收藏相關
   favoriteProducts: Set<number> = new Set();
@@ -67,85 +68,85 @@ export class ShoppingSellershopComponent {
 
   categories: Category[] = [
     { id: 0, name: '全部' },
-    { id: 1, name: '手工藝品' },
-    { id: 2, name: '時尚配件' },
-    { id: 3, name: '居家裝飾' },
-    { id: 4, name: '生活用品' },
-    { id: 5, name: '3C配件' }
+    { id: 1, name: '相機' },
+    { id: 2, name: '拍立得' },
+    { id: 3, name: '腳架' },
+    { id: 4, name: '配件' },
+    { id: 5, name: '創作' }
   ];
 
   allProducts: Product[] = [
     {
-      id: 1, name: '精美手工藝品', image: 'images/products/1.jpg',
-      description: '手工製作的精美藝術品，獨一無二的設計風格', price: 1299,
+      id: 1, name: 'Manfrotto Befree Advanced 碳纖維旅行三腳架', image: 'images/products/2.jpg',
+      description: '輕巧穩定，全新未拆封', price: 7200,
       seller: { name: '賣場名稱', avatar: 'images/products/1.jpg' },
-      postedDate: '3 天前', sales: 45, categoryId: 1, isFavorite: false
+      postedDate: '3 天前', sales: 1, categoryId: 3, isFavorite: false
     },
     {
-      id: 2, name: '時尚配件組合', image: 'images/products/1.jpg',
-      description: '最新流行的時尚配件，多種顏色可選', price: 899,
+      id: 2, name: '【庫存出清】Kodak Ektar 100 底片 135', image: 'images/products/3.jpg',
+      description: '已過期一年，全程防潮箱保存', price: 350,
       seller: { name: '賣場名稱', avatar: 'images/products/1.jpg' },
-      postedDate: '5 天前', sales: 78, categoryId: 2, isFavorite: false
+      postedDate: '5 天前', sales: 2, categoryId: 4, isFavorite: false
     },
     {
-      id: 3, name: '居家裝飾品', image: 'images/products/1.jpg',
-      description: '簡約北歐風格居家裝飾', price: 2599,
+      id: 3, name: 'Leica M6 Classic 0.72 相機 (二手)', image: 'images/products/4.jpg',
+      description: '保存良好，功能正常', price: 85000,
       seller: { name: '賣場名稱', avatar: 'images/products/1.jpg' },
-      postedDate: '1 週前', sales: 32, categoryId: 3, isFavorite: false
+      postedDate: '1 週前', sales: 0, categoryId: 1, isFavorite: false
     },
     {
-      id: 4, name: '創意生活用品', image: 'images/products/1.jpg',
-      description: '實用又有趣的生活小物', price: 499,
+      id: 4, name: '「Wanderlust」精選旅遊攝影集', image: 'images/products/9.jpg',
+      description: '世界各地人文風景', price: 600,
       seller: { name: '賣場名稱', avatar: 'images/products/1.jpg' },
-      postedDate: '2 週前', sales: 156, categoryId: 4, isFavorite: false
+      postedDate: '1 週前', sales: 40, categoryId: 5, isFavorite: false
     },
     {
-      id: 5, name: '手機支架', image: 'images/products/1.jpg',
-      description: '多角度調整手機支架', price: 299,
+      id: 5, name: '【二手】拍立得相機 Fujifilm Instax mini 9', image: 'images/products/6.jpg',
+      description: '九成新，功能正常，適合入門拍立得玩家', price: 1999,
       seller: { name: '賣場名稱', avatar: 'images/products/1.jpg' },
-      postedDate: '3 天前', sales: 89, categoryId: 5, isFavorite: false
+      postedDate: '3 天前', sales: 1, categoryId: 1, isFavorite: false
     },
     {
-      id: 6, name: '藍牙耳機', image: 'images/products/1.jpg',
-      description: '高音質無線藍牙耳機', price: 1899,
+      id: 6, name: 'Godox V860II-C 佳能專用閃光燈 (二手)', image: 'images/products/7.jpg',
+      description: '功能正常，僅在室內棚拍使用過幾次', price: 3500,
       seller: { name: '賣場名稱', avatar: 'images/products/1.jpg' },
-      postedDate: '4 天前', sales: 67, categoryId: 5, isFavorite: false
+      postedDate: '4 天前', sales: 1, categoryId: 4, isFavorite: false
     },
     {
-      id: 7, name: '手工皮革錢包', image: 'images/products/1.jpg',
-      description: '真皮手工製作錢包', price: 1599,
+      id: 7, name: '攝影多功能單肩相機包 (全新)', image: 'images/products/8.jpg',
+      description: '可容納一機兩鏡，側邊快取設計', price: 1490,
       seller: { name: '賣場名稱', avatar: 'images/products/1.jpg' },
-      postedDate: '5 天前', sales: 43, categoryId: 1, isFavorite: false
+      postedDate: '5 天前', sales: 2, categoryId: 4, isFavorite: false
     },
     {
-      id: 8, name: '時尚手錶', image: 'images/products/1.jpg',
-      description: '簡約風格石英錶', price: 2199,
+      id: 8, name: '自製旅遊明信片A', image: 'images/products/10.jpg',
+      description: '世界各地旅遊景點', price: 50,
       seller: { name: '賣場名稱', avatar: 'images/products/1.jpg' },
-      postedDate: '6 天前', sales: 54, categoryId: 2, isFavorite: false
+      postedDate: '6 天前', sales: 30, categoryId: 5, isFavorite: false
     },
     {
-      id: 9, name: '香氛蠟燭', image: 'images/products/1.jpg',
-      description: '天然植物精油香氛', price: 599,
+      id: 9, name: '自製旅遊明信片B', image: 'images/products/11.jpg',
+      description: '世界各地旅遊景點', price: 50,
       seller: { name: '賣場名稱', avatar: 'images/products/1.jpg' },
-      postedDate: '1 週前', sales: 92, categoryId: 3, isFavorite: false
+      postedDate: '1 週前', sales: 28, categoryId: 5, isFavorite: false
     },
     {
-      id: 10, name: '保溫杯', image: 'images/products/1.jpg',
-      description: '316不鏽鋼保溫杯', price: 799,
+      id: 10, name: '復古皮革相機背帶（棕色）', image: 'images/products/5.jpg',
+      description: '全新，多買一條故出售，尺寸 125 x 1.5 cm（長x 寬） · 重量68g · 最大承重力10kg', price: 800,
       seller: { name: '賣場名稱', avatar: 'images/products/1.jpg' },
-      postedDate: '1 週前', sales: 128, categoryId: 4, isFavorite: false
+      postedDate: '2 週前', sales: 1, categoryId: 4, isFavorite: false
     },
     {
-      id: 11, name: '無線充電板', image: 'images/products/1.jpg',
-      description: '快速無線充電', price: 699,
+      id: 11, name: '【九成新】Fujifilm X-T3 相機', image: 'images/products/1.jpg',
+      description: '僅使用半年，快門數約 5000，功能正常', price: 38500,
       seller: { name: '賣場名稱', avatar: 'images/products/1.jpg' },
-      postedDate: '1 週前', sales: 76, categoryId: 5, isFavorite: false
+      postedDate: '1 週前', sales: 0, categoryId: 1, isFavorite: false
     },
     {
-      id: 12, name: '手工陶瓷杯', image: 'images/products/1.jpg',
-      description: '日式風格陶瓷杯', price: 399,
+      id: 12, name: '自製旅遊明信片C', image: 'images/products/12.jpg',
+      description: '世界各地旅遊景點', price: 50,
       seller: { name: '賣場名稱', avatar: 'images/products/1.jpg' },
-      postedDate: '2 週前', sales: 103, categoryId: 1, isFavorite: false
+      postedDate: '2 週前', sales: 69, categoryId: 1, isFavorite: false
     },
     {
       id: 13, name: '真皮手環', image: 'images/products/1.jpg',
@@ -468,42 +469,11 @@ export class ShoppingSellershopComponent {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 
-  toggleChatRoom() {
-    this.showChatRoom = !this.showChatRoom;
-    if (this.showChatRoom && this.chatMessages.length === 0) {
-      // 初始化歡迎訊息
-      this.chatMessages.push({
-        text: '您好！有什麼可以為您服務的嗎？',
-        sender: 'seller',
-        time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })
-      });
-    }
-  }
-
-  sendChatMessage() {
-    if (this.newMessage.trim()) {
-      // 添加使用者訊息
-      this.chatMessages.push({
-        text: this.newMessage,
-        sender: 'user',
-        time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })
-      });
-
-      this.newMessage = '';
-
-      // 模擬賣家回覆
-      setTimeout(() => {
-        this.chatMessages.push({
-          text: '收到您的訊息，我會盡快回覆您！',
-          sender: 'seller',
-          time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })
-        });
-      }, 1000);
-    }
-  }
-
-  closeChatRoom() {
-    this.showChatRoom = false;
+  openSharedChat() {
+    this.chatState.openFromSeller({
+      sellerName: this.sellerInfo.name,
+      sellerAvatar: this.sellerInfo.avatar
+    });
   }
 
   // toggleFavorite(product: Product, event: Event) {
