@@ -1,3 +1,4 @@
+import { AuthService } from './../../core/services/auth.service';
 import { Component, Input, Output, EventEmitter, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -24,7 +25,16 @@ export class SocialCommentsComponent {
 
   activeMenuId: number | null = null;
   editingCommentId: number | null = null;
-  editContent = '';
+  editContent = "";
+  currentUserId?: number;
+
+  constructor(private authService: AuthService) { }
+  ngOnInit(): void {
+    console.log(this.authService.getCurrentUser());
+
+    console.log(this.authService.getCurrentUser()?.userId);
+    this.currentUserId = this.authService.getCurrentUser()?.userId;
+  }
 
   @HostListener('document:click')
   onDocumentClick() {
