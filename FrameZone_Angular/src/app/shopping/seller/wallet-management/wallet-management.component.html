@@ -1,11 +1,8 @@
-<!-- src/app/shopping/seller/wallet-management/wallet-management.component.html -->
-
 <div class="wallet-management">
   <!-- 頁面標題 -->
-  <div class="page-header">
-    <div class="header-content">
-      <h1>財務中心</h1>
-      <p class="page-subtitle">管理您的收入與提領記錄</p>
+  <div class="wallet-page-header">
+    <div>
+      <h1 class="wallet-title">我的錢包</h1>
     </div>
     <button class="btn-withdraw" (click)="requestWithdraw()">
       <i class="ti ti-cash"></i>
@@ -103,7 +100,7 @@
     </div>
 
     <!-- 交易列表 -->
-    <div class="transactions-list">
+    <div class="transactions-list" *ngIf="filteredTransactions.length > 0">
       <div class="transaction-item" *ngFor="let transaction of filteredTransactions">
         <div class="transaction-icon-wrapper" [ngClass]="getTypeClass(transaction.type)">
           <i *ngIf="transaction.type === 'income'" class="ti ti-arrow-down-circle"></i>
@@ -134,12 +131,12 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- 空狀態 -->
-  <div *ngIf="filteredTransactions.length === 0" class="empty-state">
-    <i class="ti ti-receipt-off"></i>
-    <h3>沒有找到相關交易記錄</h3>
-    <p>試試調整搜尋條件或篩選器</p>
+    <!-- 空狀態 -->
+    <div *ngIf="filteredTransactions.length === 0" class="empty-state">
+      <i class="ti ti-receipt-off"></i>
+      <h3>沒有找到相關交易記錄</h3>
+      <p>試試調整搜尋條件或篩選器</p>
+    </div>
   </div>
 </div>

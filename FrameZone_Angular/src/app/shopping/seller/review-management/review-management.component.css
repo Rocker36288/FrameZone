@@ -9,6 +9,7 @@
 
 .page-header {
   margin-bottom: 24px;
+  justify-content: flex-start;
 }
 
 .page-header h1 {
@@ -57,6 +58,7 @@
   align-items: center;
   justify-content: center;
   font-size: 24px;
+  flex-shrink: 0;
 }
 
 .stat-icon.total {
@@ -81,6 +83,7 @@
 
 .stat-info {
   flex: 1;
+  min-width: 0;
 }
 
 .stat-label {
@@ -99,17 +102,29 @@
 .toolbar {
   background: white;
   border-radius: 12px;
-  padding: 16px 20px;
+  /*不要設定 width: 100%，這會讓它爆出去 */
+  width: auto;
+  /*將 margin 設為 0，確保它待在父容器的 Padding 範圍內 */
+  margin-left: 0;
+  margin-right: 0;
   margin-bottom: 20px;
+  /*確保 Padding 不會增加盒子的寬度 */
+  padding: 30px 20px;
+  box-sizing: border-box;
+
   display: flex;
   gap: 16px;
   align-items: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  flex-wrap: wrap;
+
+  /* 避免內容擠壓造成變形 */
+  flex-wrap: nowrap;
 }
 
+/* 搜尋框需要彈性伸縮 */
 .search-box {
   flex: 1;
+  /* 讓搜尋框佔據剩餘的所有空間 */
   display: flex;
   align-items: center;
   gap: 8px;
@@ -117,12 +132,13 @@
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 8px 16px;
-  min-width: 300px;
+  box-sizing: border-box;
 }
 
 .search-box i {
   color: #999;
   font-size: 18px;
+  flex-shrink: 0;
 }
 
 .search-box input {
@@ -132,6 +148,8 @@
   flex: 1;
   font-size: 14px;
   color: #333;
+  min-width: 0;
+  width: 100%;
 }
 
 .search-box input::placeholder {
@@ -141,6 +159,8 @@
 .filter-buttons {
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
 .filter-btn {
@@ -152,6 +172,7 @@
   font-size: 14px;
   cursor: pointer;
   transition: all 0.3s;
+  white-space: nowrap;
 }
 
 .filter-btn:hover {
@@ -177,6 +198,7 @@
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
 .review-header {
@@ -186,12 +208,15 @@
   margin-bottom: 16px;
   padding-bottom: 16px;
   border-bottom: 1px solid #f0f0f0;
+  gap: 16px;
 }
 
 .product-info {
   display: flex;
   gap: 12px;
   align-items: center;
+  flex: 1;
+  min-width: 0;
 }
 
 .product-image {
@@ -200,10 +225,12 @@
   border-radius: 8px;
   object-fit: cover;
   border: 1px solid #e0e0e0;
+  flex-shrink: 0;
 }
 
 .product-details {
   flex: 1;
+  min-width: 0;
 }
 
 .product-name {
@@ -211,6 +238,9 @@
   font-weight: 500;
   color: #333;
   margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .review-date {
@@ -220,6 +250,7 @@
 
 .customer-rating {
   text-align: right;
+  flex-shrink: 0;
 }
 
 .customer-name {
@@ -232,6 +263,7 @@
 .stars {
   display: flex;
   gap: 2px;
+  justify-content: flex-end;
 }
 
 .stars i {
@@ -252,6 +284,8 @@
   color: #666;
   line-height: 1.6;
   margin: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* 回覆區 */
@@ -285,6 +319,8 @@
   color: #666;
   line-height: 1.6;
   margin: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .reply-form {
@@ -302,6 +338,8 @@
   outline: none;
   resize: vertical;
   font-family: inherit;
+  box-sizing: border-box;
+  min-height: 80px;
 }
 
 .reply-textarea:focus {
@@ -330,6 +368,12 @@
   transform: translateY(-2px);
 }
 
+.btn-submit-reply:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .btn-submit-reply i {
   font-size: 16px;
 }
@@ -356,19 +400,49 @@
 }
 
 /* 響應式設計 */
+@media (max-width: 1200px) {
+  .toolbar {
+    /* gap: 12px; */
+    flex-wrap: wrap;
+    height: auto;
+  }
+
+  .search-box {
+    flex: 1 1 100%;
+    /* min-width: 100%; */
+  }
+
+  .filter-buttons {
+    flex: 1 1 100%;
+    /* width: 100%; */
+  }
+}
+
 @media (max-width: 768px) {
+  .review-management {
+    padding: 12px;
+  }
+
   .toolbar {
     flex-direction: column;
     align-items: stretch;
+    padding: 12px 16px;
+    gap: 12px;
   }
 
   .search-box {
     min-width: 100%;
+    width: 100%;
   }
 
   .filter-buttons {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .filter-btn {
+    flex: 1;
+    min-width: 0;
   }
 
   .review-header {
@@ -378,5 +452,13 @@
 
   .customer-rating {
     text-align: left;
+  }
+
+  .stars {
+    justify-content: flex-start;
+  }
+
+  .product-info {
+    flex-wrap: wrap;
   }
 }

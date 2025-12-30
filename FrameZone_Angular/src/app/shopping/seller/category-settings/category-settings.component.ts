@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
@@ -75,9 +75,7 @@ export class CategorySettingsComponent {
   ];
 
   showCategoryModal = false;
-  showDeleteModal = false;
   currentCategory: Category | null = null;
-  categoryToDelete: Category | null = null;
   isEditMode = false;
   searchKeyword: string = '';
 
@@ -89,6 +87,8 @@ export class CategorySettingsComponent {
     productCount: 0,
     productIds: []
   };
+
+  constructor(private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     // 初始化邏輯
@@ -116,7 +116,8 @@ export class CategorySettingsComponent {
     // 深拷貝整個物件,包括 productIds 陣列
     this.currentCategory = {
       ...category,
-      productIds: [...category.productIds]
+      productIds: [...category.productIds],
+      productCount: category.productIds.length
     };
     this.newCategory = {
       id: Date.now().toString(),
@@ -127,6 +128,7 @@ export class CategorySettingsComponent {
       productIds: []
     };
     this.showCategoryModal = true;
+    console.log('開啟編輯 Modal，當前商品:', this.currentCategory.productIds);
   }
 
   get modalCategory(): Category {
@@ -146,45 +148,42 @@ export class CategorySettingsComponent {
     }
 
     if (this.isEditMode && this.currentCategory) {
-      // 更新商品數量
-      this.currentCategory.productCount = this.currentCategory.productIds.length;
-
       // 找到要更新的分類
       const index = this.categories.findIndex(c => c.id === this.currentCategory!.id);
       if (index !== -1) {
-        // 完整替換整個物件
+        // 計算商品數量
+        const newProductCount = this.currentCategory.productIds.length;
+
+        // 完整更新分類
         this.categories[index] = {
-          id: this.currentCategory.id,
-          name: this.currentCategory.name,
-          order: this.currentCategory.order,
-          isActive: this.currentCategory.isActive,
-          productCount: this.currentCategory.productIds.length,
+          ...this.currentCategory,
+          productCount: newProductCount,
           productIds: [...this.currentCategory.productIds]
         };
+
+        console.log('更新後的分類:', this.categories[index]);
+        console.log('商品數量:', newProductCount);
+        console.log('商品 IDs:', this.categories[index].productIds);
       }
     } else {
       // 新增分類
-      this.newCategory.productCount = this.newCategory.productIds.length;
+      const newProductCount = this.newCategory.productIds.length;
       this.categories.push({
         ...this.newCategory,
+        productCount: newProductCount,
         productIds: [...this.newCategory.productIds]
       });
     }
 
-    console.log('儲存後的分類:', this.categories);
+    // 手動觸發變更檢測
+    this.cdr.detectChanges();
+
     this.closeModal();
   }
 
-  confirmDelete(category: Category): void {
-    this.categoryToDelete = category;
-    this.showDeleteModal = true;
-  }
-
-  deleteCategory(): void {
-    if (this.categoryToDelete) {
-      this.categories = this.categories.filter(c => c.id !== this.categoryToDelete!.id);
-      this.showDeleteModal = false;
-      this.categoryToDelete = null;
+  deleteCategory(category: Category): void {
+    if (confirm('確定要刪除此分類嗎？')) {
+      this.categories = this.categories.filter(c => c.id !== category.id);
     }
   }
 
@@ -229,7 +228,8 @@ export class CategorySettingsComponent {
   }
 
   isProductSelected(productId: string): boolean {
-    return this.modalCategory.productIds.includes(productId);
+    const selected = this.modalCategory.productIds.includes(productId);
+    return selected;
   }
 
   toggleProduct(productId: string): void {
@@ -239,9 +239,29 @@ export class CategorySettingsComponent {
     } else {
       this.modalCategory.productIds.push(productId);
     }
+
+    // 更新 productCount
+    this.modalCategory.productCount = this.modalCategory.productIds.length;
+
+    console.log('切換商品後:', {
+      productIds: this.modalCategory.productIds,
+      count: this.modalCategory.productCount
+    });
+
+    // 手動觸發變更檢測
+    this.cdr.detectChanges();
   }
 
   getSelectedProductsCount(): number {
-    return this.modalCategory.productIds.length;
+    const count = this.modalCategory.productIds.length;
+    console.log('取得選擇的商品數量:', count);
+    return count;
+  }
+
+  // 搜尋功能
+  onSearch(): void {
+    // 搜尋功能已經透過 filteredProducts getter 自動完成
+    // 這個方法保留用於未來可能需要的額外搜尋邏輯
+    console.log('搜尋關鍵字:', this.searchKeyword);
   }
 }

@@ -35,6 +35,9 @@
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .btn-add:hover {
@@ -72,6 +75,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  background: linear-gradient(135deg, #f8f9ff 0%, #f3f4ff 100%);
 }
 
 .method-info {
@@ -89,8 +93,8 @@
 }
 
 .provider-badge {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
   padding: 4px 12px;
   border-radius: 12px;
   font-size: 12px;
@@ -107,8 +111,8 @@
 }
 
 .status-badge.active {
-  background: #dcfce7;
-  color: #16a34a;
+  background: linear-gradient(135deg, #86f5b0 0%, #41e2ac 100%);
+  color: #028367;
 }
 
 .card-body {
@@ -134,15 +138,33 @@
 }
 
 .detail-icon {
-  font-size: 20px;
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f3f4f6;
-  border-radius: 8px;
+  border-radius: 10px;
   flex-shrink: 0;
+}
+
+.detail-icon.icon-coin {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #d97706;
+}
+
+.detail-icon.icon-clock {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #2563eb;
+}
+
+.detail-icon.icon-gift {
+  background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+  color: #db2777;
+}
+
+.detail-icon.icon-map {
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  color: #6366f1;
 }
 
 .detail-label {
@@ -159,7 +181,7 @@
 
 .card-footer {
   padding: 16px 20px;
-  background: #f9fafb;
+  background: linear-gradient(135deg, #f8f9ff 0%, #f3f4ff 100%);
   display: flex;
   gap: 8px;
   border-top: 1px solid #e5e7eb;
@@ -174,6 +196,11 @@
   cursor: pointer;
   transition: all 0.2s;
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #374151;
 }
 
 .btn-icon:hover {
@@ -181,9 +208,27 @@
   border-color: #d1d5db;
 }
 
-.btn-icon.delete:hover {
-  background: #fee2e2;
-  border-color: #fecaca;
+.btn-icon.btn-edit:hover {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: #3b82f6;
+  color: #2563eb;
+}
+
+.btn-icon.btn-toggle:hover {
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  border-color: #6366f1;
+  color: #4f46e5;
+}
+
+.btn-icon.btn-toggle.active {
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  border-color: #6366f1;
+  color: #4f46e5;
+}
+
+.btn-icon.btn-delete:hover {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border-color: #ef4444;
   color: #dc2626;
 }
 
@@ -219,6 +264,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: linear-gradient(135deg, #f8f9ff 0%, #f3f4ff 100%);
 }
 
 .modal-header h2 {
@@ -301,6 +347,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+  background: linear-gradient(135deg, #f8f9ff 0%, #f3f4ff 100%);
 }
 
 .btn-secondary {
