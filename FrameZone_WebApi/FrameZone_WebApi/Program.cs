@@ -1,4 +1,8 @@
 using Azure.Identity;
+using FrameZone.API.Repositories;
+using FrameZone.API.Repositories.Interfaces;
+using FrameZone.API.Services;
+using FrameZone.API.Services.Interfaces;
 using FrameZone_WebApi.Configuration;
 using FrameZone_WebApi.Helpers;
 using FrameZone_WebApi.Middlewares;
@@ -212,6 +216,7 @@ builder.Services.AddScoped<IMemberProfileRepository, MemberProfileRepository>();
 builder.Services.AddScoped<IUserLogRepository, UserLogRepository>();
 builder.Services.AddScoped<IMemberSecurityRepository, MemberSecurityRepository>();
 builder.Services.AddScoped<IMemberNotificationRepository, MemberNotificationRepository>();
+builder.Services.AddScoped<IMemberPrivacyRepository, MemberPrivacyRepository>();
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -227,6 +232,7 @@ builder.Services.AddScoped<IMemberProfileService, MemberProfileService>();
 builder.Services.AddScoped<IUserLogService, UserLogService>();
 builder.Services.AddScoped<IMemberSecurityService, MemberSecurityService>();
 builder.Services.AddScoped<IMemberNotificationService, MemberNotificationService>();
+builder.Services.AddScoped<IMemberPrivacyService, MemberPrivacyService>();
 
 
 builder.Services.AddHttpClient<IGeocodingService, GeocodingService>();
