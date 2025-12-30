@@ -93,8 +93,8 @@
 .page-wrapper {
   background: transparent;
   min-height: 100vh;
-  padding: 2rem 0;
-  padding-top: 100px;
+  /* padding: 2rem 0; */
+  /* padding-top: 50px; */
   /* 為固定導覽列留出空間 */
 }
 
@@ -102,7 +102,10 @@
 .card {
   border: none;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.3s ease;
+  /* 設定過渡動畫 */
+  overflow: hidden;
+  /* 圖片放大時不會溢出圓角邊界 */
   border-radius: 0.5rem;
   background: white;
 }
@@ -319,7 +322,7 @@
 }
 
 /* 商品卡片 */
-.product-card {
+/* .product-card {
   transition: all 0.3s;
   cursor: pointer;
   text-decoration: none;
@@ -357,7 +360,7 @@
 
 .product-card:hover .card-title {
   color: var(--primary-color);
-}
+} */
 
 /* 價格顯示 */
 .text-primary {

@@ -33,7 +33,7 @@
                   </div>
                 </div>
                 <div class="col-auto">
-                  <button class="btn btn-chat" (click)="toggleChatRoom()">
+                  <button class="btn btn-chat" (click)="openSharedChat()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                       class="icon me-2">
@@ -323,7 +323,11 @@
           <!-- 商品列表 -->
           <div class="row row-cards" *ngIf="displayProducts.length > 0">
             <div class="col-xl-2-4 col-lg-3 col-md-4 col-sm-6 mb-3" *ngFor="let product of displayProducts">
-              <div class="card d-flex flex-column h-100 product-card" [routerLink]="['/shopping/product', product.id]">
+              <app-product-card [product]="product" (favoriteChange)="product.isFavorite = $event">
+              </app-product-card>
+
+              <!-- <div class="card d-flex flex-column h-100 product-card"
+                [routerLink]="['/shopping/product-detail', product.id]">
                 <img class="card-img-top" [src]="product.image" [alt]="product.name" />
                 <div class="card-body d-flex flex-column">
                   <h4 class="card-title">
@@ -335,8 +339,8 @@
                   <div class="mt-auto d-flex align-items-center justify-content-between">
                     <div class="h3 text-primary mb-0">
                       NT$ {{ product.price }}
-                    </div>
-                    <!-- <a href="javascript:void(0)" class="favorite-icon" [class.favorited]="isFavorite(product.id)"
+                    </div> -->
+              <!-- <a href="javascript:void(0)" class="favorite-icon" [class.favorited]="isFavorite(product.id)"
                       (click)="toggleFavorite(product, $event)">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                         [attr.fill]="isFavorite(product.id) ? '#dc3545' : 'none'" stroke="currentColor" stroke-width="2"
@@ -344,190 +348,127 @@
                         <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
                       </svg>
                     </a> -->
-                    <app-favorite-button [isFavorite]="product.isFavorite" [itemName]="product.name"
-                      (favoriteChange)="product.isFavorite = $event">
-                    </app-favorite-button>
+              <!-- <app-favorite-button [isFavorite]="product.isFavorite" [itemName]="product.name"
+                (favoriteChange)="product.isFavorite = $event">
+              </app-favorite-button> -->
 
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 無商品提示 -->
-          <div class="card" *ngIf="displayProducts.length === 0">
-            <div class="card-body">
-              <div class="empty">
-                <div class="empty-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M16 16s-1.5-2-4-2-4 2-4 2"></path>
-                    <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                    <line x1="15" y1="9" x2="15.01" y2="9"></line>
-                  </svg>
-                </div>
-                <p class="empty-title">此分類目前沒有商品</p>
-                <p class="empty-subtitle text-secondary">
-                  請選擇其他分類查看
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- 分頁 -->
-          <div class="card mt-3" *ngIf="totalPages > 1">
-            <div class="card-body py-3">
-              <ul class="pagination justify-content-center mb-0 flex-wrap">
-                <!-- 第一頁 -->
-                <li class="page-item" [class.disabled]="currentPage === 1">
-                  <a class="page-link" href="javascript:void(0)" (click)="currentPage > 1 && goToPage(1)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                      class="icon">
-                      <path d="M11 7l-5 5l5 5" />
-                      <path d="M17 7l-5 5l5 5" />
-                    </svg>
-                  </a>
-                </li>
-
-                <!-- 上一頁 -->
-                <li class="page-item" [class.disabled]="currentPage === 1">
-                  <a class="page-link" href="javascript:void(0)" (click)="currentPage > 1 && goToPage(currentPage - 1)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                      class="icon">
-                      <path d="M15 6l-6 6l6 6" />
-                    </svg>
-                  </a>
-                </li>
-
-                <!-- 第一頁頁碼 -->
-                <li class="page-item" [class.active]="currentPage === 1">
-                  <a class="page-link" href="javascript:void(0)" (click)="goToPage(1)">1</a>
-                </li>
-
-                <!-- 省略號（前） -->
-                <li class="page-item disabled" *ngIf="showFirstPageDots()">
-                  <span class="page-link">...</span>
-                </li>
-
-                <!-- 中間頁碼 -->
-                <li class="page-item" *ngFor="let page of visiblePages" [class.active]="currentPage === page">
-                  <a class="page-link" href="javascript:void(0)" (click)="goToPage(page)"
-                    *ngIf="page !== 1 && page !== totalPages">
-                    {{ page }}
-                  </a>
-                </li>
-
-                <!-- 省略號（後） -->
-                <li class="page-item disabled" *ngIf="showLastPageDots()">
-                  <span class="page-link">...</span>
-                </li>
-
-                <!-- 最後一頁頁碼 -->
-                <li class="page-item" [class.active]="currentPage === totalPages" *ngIf="totalPages > 1">
-                  <a class="page-link" href="javascript:void(0)" (click)="goToPage(totalPages)">
-                    {{ totalPages }}
-                  </a>
-                </li>
-
-                <!-- 下一頁 -->
-                <li class="page-item" [class.disabled]="currentPage === totalPages">
-                  <a class="page-link" href="javascript:void(0)"
-                    (click)="currentPage < totalPages && goToPage(currentPage + 1)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                      class="icon">
-                      <path d="M9 6l6 6l-6 6" />
-                    </svg>
-                  </a>
-                </li>
-
-                <!-- 最後一頁 -->
-                <li class="page-item" [class.disabled]="currentPage === totalPages">
-                  <a class="page-link" href="javascript:void(0)"
-                    (click)="currentPage < totalPages && goToPage(totalPages)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                      class="icon">
-                      <path d="M7 7l5 5l-5 5" />
-                      <path d="M13 7l5 5l-5 5" />
-                    </svg>
-                  </a>
-                </li>
-              </ul>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- 聊天室 -->
-  <div class="chat-room" *ngIf="showChatRoom">
-    <div class="chat-header">
-      <div class="d-flex align-items-center">
-        <span class="avatar avatar-sm avatar-rounded me-2" [style.background-image]="'url(' + sellerInfo.avatar + ')'">
-        </span>
-        <span class="fw-bold">{{ sellerInfo.name }}</span>
-      </div>
-      <button class="btn-close-chat" (click)="closeChatRoom()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
-
-    <div class="chat-body">
-      <div class="chat-messages">
-        <div *ngFor="let msg of chatMessages" class="chat-message"
-          [ngClass]="msg.sender === 'user' ? 'chat-message-user' : 'chat-message-seller'">
-          <div class="message-content">
-            {{ msg.text }}
+    <!-- 無商品提示 -->
+    <div class="card" *ngIf="displayProducts.length === 0">
+      <div class="card-body">
+        <div class="empty">
+          <div class="empty-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M16 16s-1.5-2-4-2-4 2-4 2"></path>
+              <line x1="9" y1="9" x2="9.01" y2="9"></line>
+              <line x1="15" y1="9" x2="15.01" y2="9"></line>
+            </svg>
           </div>
-          <div class="message-time">{{ msg.time }}</div>
+          <p class="empty-title">此分類目前沒有商品</p>
+          <p class="empty-subtitle text-secondary">
+            請選擇其他分類查看
+          </p>
         </div>
       </div>
     </div>
 
-    <div class="chat-footer">
-      <div class="input-group">
-        <button class="btn btn-icon" type="button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-        </button>
-        <button class="btn btn-icon" type="button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="1"></circle>
-            <circle cx="19" cy="12" r="1"></circle>
-            <circle cx="5" cy="12" r="1"></circle>
-          </svg>
-        </button>
+    <!-- 分頁 -->
+    <div class="card mt-3" *ngIf="totalPages > 1">
+      <div class="card-body py-3">
+        <ul class="pagination justify-content-center mb-0 flex-wrap">
+          <!-- 第一頁 -->
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" href="javascript:void(0)" (click)="currentPage > 1 && goToPage(1)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                <path d="M11 7l-5 5l5 5" />
+                <path d="M17 7l-5 5l5 5" />
+              </svg>
+            </a>
+          </li>
+
+          <!-- 上一頁 -->
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" href="javascript:void(0)" (click)="currentPage > 1 && goToPage(currentPage - 1)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                <path d="M15 6l-6 6l6 6" />
+              </svg>
+            </a>
+          </li>
+
+          <!-- 第一頁頁碼 -->
+          <li class="page-item" [class.active]="currentPage === 1">
+            <a class="page-link" href="javascript:void(0)" (click)="goToPage(1)">1</a>
+          </li>
+
+          <!-- 省略號（前） -->
+          <li class="page-item disabled" *ngIf="showFirstPageDots()">
+            <span class="page-link">...</span>
+          </li>
+
+          <!-- 中間頁碼 -->
+          <li class="page-item" *ngFor="let page of visiblePages" [class.active]="currentPage === page">
+            <a class="page-link" href="javascript:void(0)" (click)="goToPage(page)"
+              *ngIf="page !== 1 && page !== totalPages">
+              {{ page }}
+            </a>
+          </li>
+
+          <!-- 省略號（後） -->
+          <li class="page-item disabled" *ngIf="showLastPageDots()">
+            <span class="page-link">...</span>
+          </li>
+
+          <!-- 最後一頁頁碼 -->
+          <li class="page-item" [class.active]="currentPage === totalPages" *ngIf="totalPages > 1">
+            <a class="page-link" href="javascript:void(0)" (click)="goToPage(totalPages)">
+              {{ totalPages }}
+            </a>
+          </li>
+
+          <!-- 下一頁 -->
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <a class="page-link" href="javascript:void(0)"
+              (click)="currentPage < totalPages && goToPage(currentPage + 1)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                <path d="M9 6l6 6l-6 6" />
+              </svg>
+            </a>
+          </li>
+
+          <!-- 最後一頁 -->
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <a class="page-link" href="javascript:void(0)" (click)="currentPage < totalPages && goToPage(totalPages)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                <path d="M7 7l5 5l-5 5" />
+                <path d="M13 7l5 5l-5 5" />
+              </svg>
+            </a>
+          </li>
+        </ul>
       </div>
-      <input type="text" class="form-control chat-input" placeholder="請輸入訊息..." [(ngModel)]="newMessage"
-        (keyup.enter)="sendChatMessage()">
-      <button class="btn btn-send" (click)="sendChatMessage()">
-        發送
-      </button>
     </div>
   </div>
+</div>
 
-  <!-- Toast 提示訊息 -->
-  <!-- <div class="toast-container" *ngIf="showToast">
+<!-- Toast 提示訊息 -->
+<!-- <div class="toast-container" *ngIf="showToast">
     <div class="toast show">
       <div class="toast-body">
         {{ toastMessage }}
       </div>
     </div>
   </div> -->
-</div>
 
 <div>
   <app-toast-notification></app-toast-notification>
