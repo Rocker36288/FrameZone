@@ -1,8 +1,7 @@
 /* 頁面整體 */
 .page-wrapper {
-  background: #f8fafc;
   min-height: 100vh;
-  /* padding: 2rem 0; */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .page-body {
@@ -11,7 +10,7 @@
 
 /* 頁面標題 */
 .page-header {
-  padding: 1.5rem 0;
+  /* padding: 1.5rem 0; */
 }
 
 .page-title {
@@ -167,7 +166,7 @@
 
 .chat-badge {
   position: absolute;
-  top: 1rem;
+  top: 2.75rem;
   right: 1rem;
   background: #ef4444;
   color: white;
@@ -204,20 +203,6 @@
   flex-shrink: 0;
 }
 
-.chat-header-left {
-  display: flex;
-  align-items: center;
-  flex: 1;
-  min-width: 0;
-}
-
-.chat-header-right {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-shrink: 0;
-}
-
 .chat-header-user {
   display: flex;
   align-items: center;
@@ -248,68 +233,6 @@
   height: 8px;
   background: #10b981;
   border-radius: 50%;
-}
-
-.chat-header-product {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  background: #f8fafc;
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-}
-
-.product-thumbnail {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  border-radius: 6px;
-}
-
-.product-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.product-label {
-  font-size: 0.7rem;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.product-name-text {
-  font-size: 0.85rem;
-  color: #1e293b;
-  font-weight: 500;
-}
-
-/* 右上角操作按鈕 */
-.header-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.action-btn {
-  width: 36px;
-  height: 36px;
-  border: 1px solid #e2e8f0;
-  background: white;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: #64748b;
-  padding: 0;
-}
-
-.action-btn:hover {
-  background: #f8fafc;
-  border-color: #667eea;
-  color: #667eea;
 }
 
 /* 訊息區域 */
@@ -471,10 +394,6 @@
   .chat-list-panel {
     width: 320px;
   }
-
-  .chat-header-product {
-    display: none;
-  }
 }
 
 @media (max-width: 768px) {
@@ -511,10 +430,6 @@
     right: 0;
     bottom: 0;
     z-index: 1000;
-  }
-
-  .header-actions {
-    display: none;
   }
 }
 
