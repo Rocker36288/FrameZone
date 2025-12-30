@@ -1,0 +1,91 @@
+<div class="chat-wrapper">
+  <!-- 右下角浮動按鈕：只在「沒開聊天室 + 非商品頁」 -->
+  <button class="chat-trigger" *ngIf="!isOpen && !openedFromProduct" (click)="openFloatingChat()" type="button">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z" />
+      <path d="M9.5 9h.01" />
+      <path d="M14.5 9h.01" />
+      <path d="M9.5 13a3.5 3.5 0 0 0 5 0" />
+    </svg>
+    <!-- 紅點 -->
+    <span class="unread-dot" *ngIf="unreadMessages"></span>
+  </button>
+
+  <!-- 聊天視窗 -->
+  <div class="chat-window" *ngIf="isOpen">
+    <div class="chat-header">
+      <div class="header-info">
+        <img src="https://via.placeholder.com/32" class="chat-avatar" />
+        <span class="chat-title">{{ sellerName }}</span>
+      </div>
+      <button class="header-close" (click)="closeChat()">✕</button>
+    </div>
+
+    <div class="chat-body" #scrollContainer>
+      <div *ngFor="let msg of messages" [ngClass]="msg.sender === 'me' ? 'msg-me' : 'msg-seller'">
+        <div class="bubble" [class.media-only]="(msg.image || msg.product) && !msg.text">
+
+          <div *ngIf="msg.product" class="product-info-card">
+            <img [src]="msg.product.image" class="mini-product-img">
+            <div class="mini-product-detail">
+              <div class="name">{{ msg.product.name }}</div>
+              <div class="price">NT$ {{ msg.product.price }}</div>
+            </div>
+          </div>
+
+          <img *ngIf="msg.image" [src]="msg.image" class="sent-img" (click)="lightboxImage = msg.image">
+
+          <div *ngIf="msg.text">
+            <div *ngFor="let line of msg.text.split('\n')">
+              {{ line }}
+            </div>
+          </div>
+        </div>
+        <div class="msg-time">{{ msg.time }}</div>
+      </div>
+    </div>
+
+    <div class="chat-footer">
+      <div class="sticker-panel" *ngIf="isStickerPanelOpen">
+        <div class="sticker-grid">
+          <img *ngFor="let s of stickers" [src]="s" class="sticker-item" (click)="sendSticker(s)" />
+        </div>
+      </div>
+
+      <div class="chat-toolbar">
+        <input type="file" #fileInput hidden multiple (change)="onFileSelected($event)">
+        <button class="tool-btn" (click)="triggerFileUpload()">＋</button>
+        <button class="tool-btn" (click)="toggleStickerPanel($event)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 21a9 9 0 1 1 0 -18a9 9 0 0 1 0 18z" />
+            <path d="M10 10c-.5 -1 -2.5 -1 -3 0" />
+            <path d="M17 10c-.5 -1 -2.5 -1 -3 0" />
+            <path d="M14.5 15a3.5 3.5 0 0 1 -5 0" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="chat-input-row">
+        <input class="main-input" placeholder="請輸入訊息..." [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" />
+        <button class="send-button" [disabled]="!newMessage.trim() && previewImages.length === 0"
+          (click)="sendMessage()">
+          發送
+        </button>
+      </div>
+
+      <div class="image-preview-container" *ngIf="previewImages.length">
+        <div class="preview-box" *ngFor="let img of previewImages; let i = index">
+          <img [src]="img" />
+          <button class="remove-preview" (click)="previewImages.splice(i, 1)">✕</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="image-lightbox" *ngIf="lightboxImage" (click)="lightboxImage = null">
+  <img [src]="lightboxImage" />
+</div>
