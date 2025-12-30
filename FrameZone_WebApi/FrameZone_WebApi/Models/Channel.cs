@@ -23,5 +23,7 @@ public partial class Channel
 
     public virtual User ChannelNavigation { get; set; }
 
+    public virtual ICollection<Following> Followings { get; set; } = new List<Following>();
+
     public virtual ICollection<Video> Videos { get; set; } = new List<Video>();
 }

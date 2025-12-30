@@ -25,6 +25,8 @@ public partial class Post
 
     public DateTime? DeletedAt { get; set; }
 
+    public virtual ICollection<CommentTarget> CommentTargets { get; set; } = new List<CommentTarget>();
+
     public virtual ICollection<PostImage> PostImages { get; set; } = new List<PostImage>();
 
     public virtual ICollection<PostLike> PostLikes { get; set; } = new List<PostLike>();

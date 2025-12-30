@@ -61,11 +61,15 @@ public partial class User
 
     public virtual ICollection<Follow> FollowFollowings { get; set; } = new List<Follow>();
 
+    public virtual ICollection<Following> Followings { get; set; } = new List<Following>();
+
     public virtual ICollection<Group> Groups { get; set; } = new List<Group>();
 
     public virtual ICollection<InvoiceSetting> InvoiceSettings { get; set; } = new List<InvoiceSetting>();
 
     public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
+
+    public virtual ICollection<Like> Likes { get; set; } = new List<Like>();
 
     public virtual ICollection<MessageRead> MessageReads { get; set; } = new List<MessageRead>();
 
@@ -160,6 +164,8 @@ public partial class User
     public virtual ICollection<UserSession> UserSessions { get; set; } = new List<UserSession>();
 
     public virtual ICollection<UserVerification> UserVerifications { get; set; } = new List<UserVerification>();
+
+    public virtual ICollection<View> Views { get; set; } = new List<View>();
 
     public virtual ICollection<WalletTransaction> WalletTransactions { get; set; } = new List<WalletTransaction>();
 }
