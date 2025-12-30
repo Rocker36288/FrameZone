@@ -28,4 +28,27 @@ export class VideoCreatorService {
       `${this.apiBase}/VideoCreator/edit/${guid}`
     );
   }
+
+  // ===== 單一影片編輯資料 =====
+  updateVideo(
+    guid: string,
+    payload: {
+      title: string;
+      description: string;
+      privacyStatus: string;
+    }
+  ): Observable<void> {
+    return this.http.patch<void>(
+      `${this.apiBase}/VideoCreator/edit/${guid}/update`,
+      payload
+    );
+  }
+
+  uploadThumbnail(guid: string, file: File): Observable<VideoDetailData> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.http.post<VideoDetailData>(`${this.apiBase}/VideoCreator/edit/${guid}/thumbnail`, formData);
+  }
+
 }

@@ -47,6 +47,42 @@ namespace FrameZone_WebApi.Videos.Controllers
             return Ok(video);
         }
 
+        //===================編輯影片===================
+        [HttpPatch("edit/{guid}/update")]
+        [Authorize]
+        public async Task<IActionResult> UpdateVideo(
+    string guid,
+    [FromBody] UpdateVideoMetadataDto dto)
+        {
+            var userId = GetUserId();
+
+            var result = await _videoCreatorService.UpdateVideoAsync(userId, guid, dto);
+
+            if (!result)
+                return Forbid();
+
+            return NoContent(); // 204
+        }
+
+        [HttpPost("edit/{guid}/thumbnail")]
+        [Authorize]
+        public async Task<IActionResult> UploadThumbnail(string guid, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("檔案不存在");
+
+            try
+            {
+                await _videoCreatorService.UpdateThumbnailAsync(guid, file);
+                return NoContent(); // 204，僅表示成功
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+
         //=============獲取userid=======================================
         private int GetUserId()
         {

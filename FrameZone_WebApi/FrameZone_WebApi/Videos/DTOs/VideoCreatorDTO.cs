@@ -63,5 +63,12 @@ namespace FrameZone_WebApi.Videos.DTOs
             public int DraftVideosCount { get; set; }          // 草稿影片數
             public int DaysSinceLastUpload { get; set; }       // 超過多少天未上傳
         }
+
+        public class UpdateVideoMetadataDto
+        {
+            public string Title { get; set; } = string.Empty;
+            public string? Description { get; set; }
+            public string PrivacyStatus { get; set; } = "PRIVATE";
+        }
     }
 }

@@ -38,8 +38,8 @@ export class VideoDetailData {
   commentCount: number = 0;
 
   // ─── 資源 / 技術 ──────────────
-  createdtime: Date = new Date();
-  updatetime: Date = new Date();
+  createdDate: Date = new Date();
+  updateDate: Date = new Date();
   resolution: string = '';
 
   videoUrl: string = '';

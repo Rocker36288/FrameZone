@@ -61,6 +61,20 @@ namespace FrameZone_WebApi.Videos.Respositories
             return video; // 找不到就回傳 null
         }
 
+        //影片資運編輯
+
+        public async Task<Video?> GetByGuidAsync(string guid)
+        {
+            return await _context.Videos
+                .FirstOrDefaultAsync(v => v.VideoUrl == guid);
+        }
+
+        public async Task UpdateAsync(Video video)
+        {
+            _context.Videos.Update(video);
+            await _context.SaveChangesAsync();
+        }
+
 
     }
 }

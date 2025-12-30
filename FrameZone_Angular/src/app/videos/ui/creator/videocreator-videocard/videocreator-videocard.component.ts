@@ -23,30 +23,30 @@ export class VideocreatorVideocardComponent {
     description: '',
     thumbnail: '',
     duration: 0,
-    publishDate: new Date(),
+    publishDate: new Date,
     viewsCount: 0,
     likesCount: 0,
     commentCount: 0,
+    createdDate: new Date,
+    updateDate: new Date,
+    resolution: '',
     videoUrl: '',
     processStatus: ProcessStatus.UPLOADING,
-    privacyStatus: PrivacyStatus.PUBLIC,
-    createdtime: new Date(),
-    updatetime: new Date(),
-    resolution: ''
+    privacyStatus: PrivacyStatus.PUBLIC
   }
 
   constructor(private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
-    if (!this.Video.thumbnail) {
+    if (this.Video?.thumbnail) {
       this.Video.thumbnail =
         'https://localhost:7213/api/Videos/video-thumbnail/' + this.Video.videoUrl;
     }
   }
 
   onVideoClick(): void {
-    console.log('Video clicked:', this.Video.id, 'guid:', this.Video.videoUrl);
-    this.router.navigate(['/videos/videocreator/videoedit', this.Video.videoUrl]);
+    console.log('Video clicked:', this.Video?.id, 'guid:', this.Video?.videoUrl);
+    this.router.navigate(['/videos/videocreator/videoedit', this.Video?.videoUrl]);
 
   }
 
