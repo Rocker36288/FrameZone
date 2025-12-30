@@ -1,75 +1,57 @@
-<div class="sidebar" id="videoSidebar">
-  <div class="sidebar-header">
+<!-- videos-sidebar.component.html -->
+<aside class="navbar navbar-vertical navbar-expand-lg" [ngClass]="{'collapsed': isCollapsed}" data-bs-theme="dark">
+  <div class="container-fluid">
 
-    <button class="toggle-btn" id="sidebarToggleBtn">
-      <i class="fas fa-chevron-left"></i>
-    </button>
-    <div class="logo">
+    <!-- Sidebar Header -->
+    <div class="navbar-brand">
+      <a [routerLink]="['/home']">
+        <div class="logo-image">
+          <img src="favicon2.png" alt="FrameZone Logo">
+        </div>
+        <h2 [class.d-none]="isCollapsed">FrameZone</h2>
+      </a>
+    </div>
 
+    <!-- 使用者資訊 -->
+    <div class="sidebar-user-info" [ngClass]="{'collapsed': isCollapsed}">
+      <div class="sidebar-avatar-wrapper">
+        <app-user-avatar></app-user-avatar>
+      </div>
+      <div class="user-name-tag" *ngIf="!isCollapsed">
+        {{ displayUserName }}
+      </div>
+    </div>
+
+    <!-- Toggle Button -->
+    <button class="btn btn-icon sidebar-toggle" (click)="toggleSidebar()" type="button"
+      [attr.aria-label]="isCollapsed ? '展開側邊欄' : '收合側邊欄'">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-        class="icon icon-tabler icons-tabler-outline icon-tabler-video">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-        <path d="M15 10l4.553 -2.276a1 1 0 0 1 1.447 .894v6.764a1 1 0 0 1 -1.447 .894l-4.553 -2.276v-4z" />
-        <path d="M3 6m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" />
+        [style.transform]="isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)'">
+        <polyline points="15 18 9 12 15 6"></polyline>
       </svg>
+    </button>
+
+    <!-- Navigation Menu -->
+    <app-videos-sidebar-menu *ngIf="!isCreatorPage" [isCollapsed]="isCollapsed">
+    </app-videos-sidebar-menu>
+
+    <app-videos-sidebar-creator *ngIf="isCreatorPage" [isCollapsed]="isCollapsed">
+    </app-videos-sidebar-creator>
+
+    <!-- 登入 / 登出 按鈕 -->
+    <div class="sidebar-auth-btn mt-auto d-flex justify-content-center sidebar-log-toggle "
+      [ngClass]="{'collapsed': isCollapsed}">
+      <button *ngIf="isLoggedIn; else loginBtn" class="btn btn-danger w-100" (click)="logout()">
+        <i class="icon-tabler icon-tabler-logout"></i>
+        <span>登出</span>
+      </button>
+      <ng-template #loginBtn>
+        <button class="btn btn-primary w-100" (click)="login()">
+          <i class="icon-tabler icon-tabler-login"></i>
+          <span>登入</span>
+        </button>
+      </ng-template>
     </div>
-    <span class="logo-text">FrameZoneVideo</span>
   </div>
-
-  <ul class="menu">
-    <li class="menu-item">
-      <a class="menu-link" href="http://localhost:4200/videos/">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
-          class="icon icon-tabler icons-tabler-filled icon-tabler-home">
-          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-          <path
-            d="M12.707 2.293l9 9c.63 .63 .184 1.707 -.707 1.707h-1v6a3 3 0 0 1 -3 3h-1v-7a3 3 0 0 0 -2.824 -2.995l-.176 -.005h-2a3 3 0 0 0 -3 3v7h-1a3 3 0 0 1 -3 -3v-6h-1c-.89 0 -1.337 -1.077 -.707 -1.707l9 -9a1 1 0 0 1 1.414 0m.293 11.707a1 1 0 0 1 1 1v7h-4v-7a1 1 0 0 1 .883 -.993l.117 -.007z" />
-        </svg>
-        <span class="menu-text">影片首頁</span>
-      </a>
-    </li>
-    <li class="menu-item">
-      <a href="http://localhost:4200/videos/channel/1" class="menu-link" data-controller="Videos" data-action="Create">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-          class="icon icon-tabler icons-tabler-outline icon-tabler-barrier-block">
-          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-          <path d="M4 7m0 1a1 1 0 0 1 1 -1h14a1 1 0 0 1 1 1v7a1 1 0 0 1 -1 1h-14a1 1 0 0 1 -1 -1z" />
-          <path d="M7 16v4" />
-          <path d="M7.5 16l9 -9" />
-          <path d="M13.5 16l6.5 -6.5" />
-          <path d="M4 13.5l6.5 -6.5" />
-          <path d="M17 16v4" />
-          <path d="M5 20h4" />
-          <path d="M15 20h4" />
-          <path d="M17 7v-2" />
-          <path d="M7 7v-2" />
-        </svg>
-        <span class="menu-text">假頻道</span>
-      </a>
-    </li>
-    <li class="menu-item">
-      <a href="http://localhost:4200/videos/videocreator/1" class="menu-link" data-controller="Videos"
-        data-action="Create">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-          class="icon icon-tabler icons-tabler-outline icon-tabler-barrier-block">
-          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-          <path d="M4 7m0 1a1 1 0 0 1 1 -1h14a1 1 0 0 1 1 1v7a1 1 0 0 1 -1 1h-14a1 1 0 0 1 -1 -1z" />
-          <path d="M7 16v4" />
-          <path d="M7.5 16l9 -9" />
-          <path d="M13.5 16l6.5 -6.5" />
-          <path d="M4 13.5l6.5 -6.5" />
-          <path d="M17 16v4" />
-          <path d="M5 20h4" />
-          <path d="M15 20h4" />
-          <path d="M17 7v-2" />
-          <path d="M7 7v-2" />
-        </svg>
-        <span class="menu-text">創作者工作室</span>
-      </a>
-    </li>
-
-
-  </ul>
+</aside>

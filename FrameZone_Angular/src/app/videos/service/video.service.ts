@@ -64,4 +64,14 @@ export class VideoService {
   getVideoStatus(videoGuid: string): Observable<any> {
     return this.http.get(`${this.apiBase}/videoupload/${videoGuid}/status`)
   }
+
+  // 取得頻道追隨狀態
+  checkChannelFollow(channelId: number): Observable<boolean> {
+    return this.http.get<boolean>(`${this.apiBase}/videos/channels/${channelId}/followcheck`);
+  }
+
+  // 切換頻道追隨狀態
+  toggleChannelFollow(channelId: number): Observable<boolean> {
+    return this.http.post<boolean>(`${this.apiBase}/videos/channels/${channelId}/followtoggle`, {});
+  }
 }

@@ -8,9 +8,9 @@ namespace FrameZone_WebApi.Videos.Services
 
     public class VideoServices
     {
-        private readonly VideoRespository _videoRepo;
+        private readonly VideoRepository _videoRepo;
 
-        public VideoServices(VideoRespository videoRepo)
+        public VideoServices(VideoRepository videoRepo)
         {
             _videoRepo = videoRepo;
         }
@@ -97,8 +97,27 @@ namespace FrameZone_WebApi.Videos.Services
         }
 
 
-        public async Task<Comment> PostVideoComment(VideoCommentRequest req)
+        public async Task<VideoCommentDto> PostVideoComment(VideoCommentRequest req, int userId)
         {
+            // 1️⃣ 嘗試取得既有 TargetTypeId
+            var targetTypeId = await _videoRepo
+                .GetTargetTypeIdBySystemIdAsync((int)TargetTypeEnum.Video);
+
+            if (targetTypeId == 0)
+            {
+                // 2️⃣ 不存在 → 建立新 TargetType
+                var newTargetType = new TargetType
+                {
+                    SystemId = (int)TargetTypeEnum.Video,
+                    TargetType1 = "VideoCommentTarget",
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                targetTypeId = await _videoRepo.CreateAsync(newTargetType);
+            }
+
+            
+
             // 1️⃣ 取得或建立 CommentTarget
             var commentTarget = await _videoRepo.GetCommentTargetAsync(req.Videoid);
 
@@ -107,7 +126,7 @@ namespace FrameZone_WebApi.Videos.Services
                 commentTarget = await _videoRepo.CreateCommentTargetAsync(new CommentTarget
                 {
                     VideoId = req.Videoid,
-                    TargetTypeId = (int)TargetTypeEnum.Video // 建議用 enum
+                    TargetTypeId = targetTypeId // 建議用 enum
                 });
             }
 
@@ -116,7 +135,7 @@ namespace FrameZone_WebApi.Videos.Services
             {
                 CommentContent = req.CommentContent,
                 CommentTargetId = commentTarget.CommentTargetId,
-                UserId = req.UserId,
+                UserId = userId,
                 ParentCommentId = req.ParentCommentId,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
@@ -138,6 +157,18 @@ namespace FrameZone_WebApi.Videos.Services
         public async Task<VideoLikesDto> VideosLikeToggle(int userId, string guid)
         {
             return await _videoRepo.VideosLikeToggleAsync(userId, guid);
+        }
+
+        //==============================頻道追隨================================
+        //#確認是否按讚
+        public async Task<bool> CheckChannelFollow(int userId, int channelId)
+        {
+            return await _videoRepo.CheckFollowingAsync(userId, channelId);
+        }
+
+        public async Task<bool> ChannelFollowToggle(int userId, int channelId)
+        {
+            return await _videoRepo.FollowingToggleAsync(userId, channelId);
         }
     }
 }

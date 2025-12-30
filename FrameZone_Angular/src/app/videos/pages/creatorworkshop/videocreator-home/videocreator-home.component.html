@@ -1,2 +1,139 @@
-<app-videocreator-sidebar></app-videocreator-sidebar>
-<app-videocreator-editvideo></app-videocreator-editvideo>
+<div class="container-xl">
+
+  <!-- Page Header -->
+  <div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="page-title">創作者管理首頁</h2>
+      <div class="text-secondary">歡迎回來，開始管理你的頻道</div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="btn-list">
+      <a class="btn btn-primary">
+        <i class="ti ti-upload me-1"></i>
+        上傳影片
+      </a>
+      <a class="btn btn-outline-primary">
+        <i class="ti ti-chart-bar me-1"></i>
+        查看分析
+      </a>
+    </div>
+  </div>
+
+  <!-- Overview Cards -->
+  <div class="row row-cards mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="subheader">總觀看數</div>
+          </div>
+          <div class="h1 mb-0">128,430</div>
+          <div class="text-success mt-2">
+            <i class="ti ti-arrow-up"></i> 12% 本週
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="subheader">訂閱人數</div>
+          <div class="h1 mb-0">3,420</div>
+          <div class="text-success mt-2">
+            <i class="ti ti-arrow-up"></i> +32
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="subheader">影片數量</div>
+          <div class="h1 mb-0">54</div>
+          <div class="text-muted mt-2">含草稿</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="subheader">本週觀看</div>
+          <div class="h1 mb-0">8,934</div>
+          <div class="text-danger mt-2">
+            <i class="ti ti-arrow-down"></i> -4%
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="row row-cards">
+
+    <!-- Recent Videos -->
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">最近影片</h3>
+        </div>
+        <div class="p-2">
+          <app-videos-list [variant]="'creator-list'" [VideoDetailData]="VideoDetailsData"></app-videos-list>
+        </div>
+        <div class="card-footer text-end">
+          <a class="btn btn-sm btn-outline-primary">查看全部影片</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="col-lg-4">
+
+      <!-- Todo -->
+      <div class="card mb-3">
+        <div class="card-header">
+          <h3 class="card-title">待辦事項</h3>
+        </div>
+        <div class="list-group list-group-flush">
+          <div class="list-group-item">
+            <i class="ti ti-alert-circle text-warning me-2"></i>
+            有 2 支影片尚未填寫描述
+          </div>
+          <div class="list-group-item">
+            <i class="ti ti-message-circle me-2"></i>
+            尚有 5 則留言未回覆
+          </div>
+          <div class="list-group-item">
+            <i class="ti ti-clock me-2"></i>
+            超過 7 天未上傳新影片
+          </div>
+        </div>
+      </div>
+
+      <!-- Engagement -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">最新互動</h3>
+        </div>
+        <div class="list-group list-group-flush">
+          <div class="list-group-item">
+            <div class="fw-bold">小明</div>
+            <div class="text-secondary">
+              在「Angular 教學影片」留言
+            </div>
+          </div>
+          <div class="list-group-item">
+            <div class="fw-bold">Amy</div>
+            <div class="text-secondary">
+              追蹤了你的頻道
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
