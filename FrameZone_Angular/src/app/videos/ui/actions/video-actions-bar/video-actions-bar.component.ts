@@ -16,8 +16,14 @@ export class VideoActionsBarComponent {
   @Input() likes?: number = 0;
 
   onLikeToggled(liked: boolean) {
-    // 可以在這裡做局部 UI 更新
-    // 再發射事件到 VideoMainComponent
     this.likeChanged.emit(liked);
   }
+
+  @Output() share = new EventEmitter<boolean>();
+
+  onShare() {
+    console.log('➡ ActionBar emit share');
+    this.share.emit();
+  }
+
 }

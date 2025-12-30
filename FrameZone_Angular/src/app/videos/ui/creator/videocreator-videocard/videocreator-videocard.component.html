@@ -30,7 +30,7 @@
             <!-- 發佈時間 -->
             <div class="text-muted d-flex align-items-center gap-1">
               <i class="ti ti-clock fs-5"></i>
-              <span class="fs-7">發佈於 {{ Video.uploadDate! | videoTimeago }}</span>
+              <span class="fs-7">發佈於 {{ Video.publishDate | date:'fullDate' }}</span>
             </div>
 
             <!-- 統計數據 -->
@@ -60,49 +60,35 @@
 
               <!-- 流程狀態 Badge -->
               <span class="badge fs-7 fw-semibold px-3 py-2 d-flex align-items-center gap-1" [ngClass]="{
-                    'bg-azure-lt text-azure': Video.processStatus === 'UPLOADING',
-                    'bg-cyan-lt text-cyan': Video.processStatus === 'UPLOADED' || Video.processStatus === 'PRE_PROCESSING',
-                    'bg-yellow-lt text-yellow': Video.processStatus === 'TRANSCODING' || Video.processStatus === 'AI_AUDITING',
-                    'bg-green-lt text-green': Video.processStatus === 'READY',
-                    'bg-red-lt text-red': Video.processStatus === 'FAILED_TRANSCODE' || Video.processStatus === 'FAILED_AUDIT'
+                    'bg-azure-lt text-azure': Video.processStatus === ProcessStatus.UPLOADING,
+                    'bg-cyan-lt text-cyan': Video.processStatus === ProcessStatus.UPLOADED || Video.processStatus === ProcessStatus.PRE_PROCESSING,
+                    'bg-yellow-lt text-yellow': Video.processStatus === ProcessStatus.TRANSCODING || Video.processStatus === ProcessStatus.AI_AUDITING,
+                    'bg-green-lt text-green': Video.processStatus === ProcessStatus.READY || Video.processStatus === ProcessStatus.PUBLISHED,
+                    'bg-red-lt text-red': Video.processStatus === ProcessStatus.FAILED_TRANSCODE || Video.processStatus === ProcessStatus.FAILED_AUDIT
                   }">
                 <i class="ti" [ngClass]="{
-                'ti-upload': Video.processStatus === 'UPLOADING',
-                'ti-cloud-check': Video.processStatus === 'UPLOADED',
-                'ti-loader': Video.processStatus === 'PRE_PROCESSING' || Video.processStatus === 'TRANSCODING' || Video.processStatus === 'AI_AUDITING',
-                'ti-circle-check': Video.processStatus === 'READY',
-                'ti-alert-circle': Video.processStatus === 'FAILED_TRANSCODE' || Video.processStatus === 'FAILED_AUDIT'
+                'ti-upload': Video.processStatus === ProcessStatus.UPLOADING,
+                'ti-cloud-check': Video.processStatus === ProcessStatus.UPLOADED,
+                'ti-loader': Video.processStatus === ProcessStatus.PRE_PROCESSING || Video.processStatus === ProcessStatus.TRANSCODING || Video.processStatus === ProcessStatus.AI_AUDITING,
+                'ti-circle-check': Video.processStatus === ProcessStatus.READY || Video.processStatus === ProcessStatus.PUBLISHED,
+                'ti-alert-circle': Video.processStatus === ProcessStatus.FAILED_TRANSCODE || Video.processStatus === ProcessStatus.FAILED_AUDIT
               }"></i>
-                {{
-                Video.processStatus === 'UPLOADING' ? '上傳中' :
-                Video.processStatus === 'UPLOADED' ? '已上傳' :
-                Video.processStatus === 'PRE_PROCESSING' ? '前處理中' :
-                Video.processStatus === 'TRANSCODING' ? '轉碼中' :
-                Video.processStatus === 'AI_AUDITING' ? 'AI審核中' :
-                Video.processStatus === 'READY' ? '已就緒' :
-                Video.processStatus === 'FAILED_TRANSCODE' ? '轉碼失敗' :
-                Video.processStatus === 'FAILED_AUDIT' ? '審核未過' : ''
-                }}
+                {{ getProcessStatusText() }}
               </span>
 
               <!-- 隱私狀態 Badge -->
               <span class="badge fs-7 fw-semibold px-3 py-2 d-flex align-items-center gap-1" [ngClass]="{
-                    'bg-green-lt text-green': Video.privacyStatus === 'PUBLIC',
-                    'bg-dark-lt text-dark': Video.privacyStatus === 'UNLISTED',
-                    'bg-secondary-lt text-secondary': Video.privacyStatus === 'PRIVATE' || Video.privacyStatus === 'DRAFT'
+                    'bg-green-lt text-green': Video.privacyStatus === PrivacyStatus.PUBLIC,
+                    'bg-dark-lt text-dark': Video.privacyStatus === PrivacyStatus.UNLISTED,
+                    'bg-secondary-lt text-secondary': Video.privacyStatus === PrivacyStatus.PRIVATE || Video.privacyStatus === PrivacyStatus.DRAFT
                   }">
                 <i class="ti" [ngClass]="{
-                'ti-world': Video.privacyStatus === 'PUBLIC',
-                'ti-link': Video.privacyStatus === 'UNLISTED',
-                'ti-lock': Video.privacyStatus === 'PRIVATE',
-                'ti-file-text': Video.privacyStatus === 'DRAFT'
+                'ti-world': Video.privacyStatus === PrivacyStatus.PUBLIC,
+                'ti-link': Video.privacyStatus === PrivacyStatus.UNLISTED,
+                'ti-lock': Video.privacyStatus === PrivacyStatus.PRIVATE,
+                'ti-file-text': Video.privacyStatus === PrivacyStatus.DRAFT
               }"></i>
-                {{
-                Video.privacyStatus === 'PUBLIC' ? '公開' :
-                Video.privacyStatus === 'UNLISTED' ? '非公開' :
-                Video.privacyStatus === 'PRIVATE' ? '私人' :
-                Video.privacyStatus === 'DRAFT' ? '草稿' : ''
-                }}
+                {{ getPrivacyStatusText() }}
               </span>
             </div>
 

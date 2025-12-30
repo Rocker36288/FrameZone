@@ -103,4 +103,15 @@
     {
        public bool IsLikes { get; set; }
     }
+
+    //頻道 DTO
+    public class ChannelFollowRequset
+    {
+        public bool IsFollow { get; set; }
+        public int ChannelId { get; set; }
+    }
+    public class ChannelFollowDto
+    {
+        public bool IsFollow { get; set; }
+    }
 }

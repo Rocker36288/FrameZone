@@ -1,4 +1,6 @@
-<app-videos-sidebar></app-videos-sidebar>
+<app-searchbox></app-searchbox>
+<app-videos-shared-modal *ngIf="showShare" [shareUrl]="videoUrl" (closed)="showShare = false"></app-videos-shared-modal>
+<app-videos-notloginyet-modal *ngIf="showLoginModal" (close)="showLoginModal = false"></app-videos-notloginyet-modal>
 <div class="spotlight-wrapper container-xl py-4">
   <div class="row g-4">
 
@@ -21,7 +23,9 @@
 
             <!-- 播放器容器 -->
             <div class="ratio ratio-16x9 bg-dark rounded overflow-hidden">
-              <app-video-player [src]="videoUrl"></app-video-player>
+              <div *ngIf="video">
+                <app-video-player [src]="videoUrl!"></app-video-player>
+              </div>
             </div>
 
             <!-- 播放器角落裝飾 -->
@@ -52,7 +56,7 @@
                   <path d="M21 21l-4 -4"></path>
                 </svg>
               </div>
-              <div class="fs-1 fw-bold mb-0 lh-sm flex-grow-1 title-text">
+              <div class="fw-bold mb-0 lh-sm flex-grow-1 title-text">
                 <div *ngIf="video">
                   {{video?.title}}
                 </div>
@@ -95,20 +99,19 @@
                 <path d="M8 3v4"></path>
                 <path d="M4 11h16"></path>
               </svg>
-              {{video?.publishDate! | videoTimeago}}
+              {{video?.publishDate | date:'yyyy-MM-dd':'UTC'}}
             </div>
 
             <div class="ms-auto">
-              <app-video-actions-bar [likes]="video?.likes" [isLiked]="isLiked"
-                (likeChanged)="onLikeChanged($event)">></app-video-actions-bar>
+              <app-video-actions-bar [likes]="video?.likes" [isLiked]="isLiked" (likeChanged)="onLikeChanged($event)"
+                (share)="openShare()"></app-video-actions-bar>
             </div>
           </div>
-
           <div class="divider-glow my-3"></div>
 
           <!-- 頻道資訊 -->
           <div class="channel-section mb-3" *ngIf="channel">
-            <app-channel-card [channel]="channel"></app-channel-card>
+            <app-channel-card [channel]="channel" (loginRequired)="CheckLogin()"></app-channel-card>
           </div>
 
           <!-- 影片描述 - 霓虹邊框效果 -->
@@ -129,8 +132,7 @@
               </div>
 
               <p class="mb-2 text-break description-text" [class.collapsed]="!isDescriptionExpanded && showExpandButton"
-                style="white-space: pre-wrap; line-height: 1.7;">
-                {{getDisplayDescription()}}
+                style="white-space: pre-wrap; line-height: 1.7;">{{getDisplayDescription()}}
               </p>
 
               <button *ngIf="showExpandButton" (click)="toggleDescription()"
@@ -208,7 +210,7 @@
               <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"></path>
               <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"></path>
             </svg>
-            <h6 class="mb-0 fw-bold">推薦影片</h6>
+            <h6 class="mb-0 fw-bold fs-1">推薦影片</h6>
           </div>
         </div>
         <div class="card-body p-3">

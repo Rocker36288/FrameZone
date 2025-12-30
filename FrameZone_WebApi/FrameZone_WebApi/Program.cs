@@ -6,6 +6,7 @@ using FrameZone.API.Services.Interfaces;
 using FrameZone_WebApi.Configuration;
 using FrameZone_WebApi.Helpers;
 using FrameZone_WebApi.Middlewares;
+using FrameZone_WebApi.Middlewares;
 using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Repositories;
 using FrameZone_WebApi.Repositories.Member;
@@ -15,15 +16,18 @@ using FrameZone_WebApi.Socials.Repositories;
 using FrameZone_WebApi.Socials.Services;
 using FrameZone_WebApi.Videos.Helpers;
 using FrameZone_WebApi.Videos.Repositories;
+using FrameZone_WebApi.Videos.Respositories;
 using FrameZone_WebApi.Videos.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using SixLabors.ImageSharp;
+using System.Text;
 using System.Text;
 using Xabe.FFmpeg;
 using Xabe.FFmpeg.Downloader;
@@ -31,30 +35,30 @@ using static FrameZone_WebApi.Videos.Helpers.AaContextFactoryHelper;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ========== Azure Key Vault 設定 ==========
-var keyVaultUri = builder.Configuration["KeyVault:VaultUri"];
-if (!string.IsNullOrEmpty(keyVaultUri))
-{
-    try
-    {
-        Console.WriteLine($"正在連接到 Key Vault: {keyVaultUri}");
+//// ========== Azure Key Vault 設定 ==========
+//var keyVaultUri = builder.Configuration["KeyVault:VaultUri"];
+//if (!string.IsNullOrEmpty(keyVaultUri))
+//{
+//    try
+//    {
+//        Console.WriteLine($"正在連接到 Key Vault: {keyVaultUri}");
 
-        builder.Configuration.AddAzureKeyVault(
-            new Uri(keyVaultUri),
-            new DefaultAzureCredential());
+//        builder.Configuration.AddAzureKeyVault(
+//            new Uri(keyVaultUri),
+//            new DefaultAzureCredential());
 
-        Console.WriteLine("✓ Key Vault 連接成功!");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"✗ Key Vault 連接失敗: {ex.Message}");
-        Console.WriteLine("將使用本地配置繼續運行...");
-    }
-}
-else
-{
-    Console.WriteLine("未設定 Key Vault URI，使用本地配置");
-}
+//        Console.WriteLine("✓ Key Vault 連接成功!");
+//    }
+//    catch (Exception ex)
+//    {
+//        Console.WriteLine($"✗ Key Vault 連接失敗: {ex.Message}");
+//        Console.WriteLine("將使用本地配置繼續運行...");
+//    }
+//}
+//else
+//{
+//    Console.WriteLine("未設定 Key Vault URI，使用本地配置");
+//}
 
 
 ////////////--------------------------在應用程式啟動前下載 FFmpeg---------------
@@ -249,11 +253,14 @@ builder.Services.AddScoped<CommentService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<AaContextFactoryHelper>();
 builder.Services.AddHttpClient(); // 註冊 HttpClient 工廠
-builder.Services.AddScoped<VideoRespository>(); // 註冊 Repository
+builder.Services.AddHostedService<ChannelEnsureHostedService>();
+builder.Services.AddScoped<VideoCreatorRepository>(); // 註冊 Repository
 builder.Services.AddScoped<VideoUploadRepository>();// 註冊 Repository
+builder.Services.AddScoped<VideoRepository>();// 註冊 Repository
 builder.Services.AddScoped<VideoTranscodeServices>();
 builder.Services.AddScoped<IVideoUploadService, VideoUploadService>();
 builder.Services.AddScoped<VideoServices>();
+builder.Services.AddScoped<VideoCreatorService>();
 builder.Services.AddScoped<VideoPlayerService>();
 
 

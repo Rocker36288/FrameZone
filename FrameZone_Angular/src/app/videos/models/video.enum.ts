@@ -7,8 +7,8 @@ export enum ProcessStatus {
   PRE_PROCESSING = 'PRE_PROCESSING',
   TRANSCODING = 'TRANSCODING',
   AI_AUDITING = 'AI_AUDITING',
-  PUBLISHED = 'PUBLISHED',
   READY = 'READY',
+  PUBLISHED = 'PUBLISHED',
   FAILED_TRANSCODE = 'FAILED_TRANSCODE',
   FAILED_AUDIT = 'FAILED_AUDIT'
 }
@@ -24,8 +24,8 @@ export enum PrivacyStatus {
 export enum TargetTypeEnum {
   None = 0,
   Photo = 1,
-  Social = 2,
-  Shopping = 3,
-  Studio = 4,
-  Video = 5
+  Video = 2,
+  Social = 3,
+  Shopping = 4,
+  Studio = 5
 }

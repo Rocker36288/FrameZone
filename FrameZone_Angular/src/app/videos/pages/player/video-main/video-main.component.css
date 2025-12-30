@@ -166,6 +166,7 @@
 
 /* // Spotlight 徽章 */
 .spotlight-badge {
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -195,6 +196,8 @@
 
 /* // 標題文字效果 */
 .title-text {
+  margin-left: 1rem;
+  font-size: 2rem;
   background: linear-gradient(135deg, #212529 0%, #495057 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

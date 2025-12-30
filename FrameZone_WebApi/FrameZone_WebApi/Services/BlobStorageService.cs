@@ -26,18 +26,19 @@ namespace FrameZone_WebApi.Services
             _configuration = configuration;
             _logger = logger;
 
-            var connectionString = _configuration["AzureStorageConnectionString"];
+            //var connectionString = _configuration["AzureStorageConnectionString"];
 
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                _logger.LogError("❌ Azure Blob Storage 設定驗證失敗: Azure Storage ConnectionString 未設定");
-                throw new InvalidOperationException("Azure Blob Storage 設定錯誤: Azure Storage ConnectionString 未設定");
-            }
+            //if (string.IsNullOrEmpty(connectionString))
+            //{
+            //    _logger.LogError("❌ Azure Blob Storage 設定驗證失敗: Azure Storage ConnectionString 未設定");
+            //    throw new InvalidOperationException("Azure Blob Storage 設定錯誤: Azure Storage ConnectionString 未設定");
+            //}
 
-            _logger.LogInformation("✅ Azure Storage ConnectionString 已從 Key Vault 載入，長度: {Length}", connectionString.Length);
+            //_logger.LogInformation("✅ Azure Storage ConnectionString 已從 Key Vault 載入，長度: {Length}", connectionString.Length);
 
-            // 初始化 BlobServiceClient
-            _blobServiceClient = new BlobServiceClient(connectionString);
+            //// 初始化 BlobServiceClient
+            //_blobServiceClient = new BlobServiceClient(connectionString);
+            _blobServiceClient = new BlobServiceClient(_settings.ConnectionString);
 
             // 初始化容器 Client
             _photoContainerClient = _blobServiceClient.GetBlobContainerClient(_settings.ContainerName);

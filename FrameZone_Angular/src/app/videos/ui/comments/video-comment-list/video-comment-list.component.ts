@@ -17,4 +17,8 @@ export class VideoCommentListComponent {
   onSubmitReply(event: { parentId: number; message: string }) {
     this.submitReply.emit(event);
   }
+
+  trackById(_: number, item: VideoCommentCard) {
+    return item.id;
+  }
 }

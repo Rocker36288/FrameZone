@@ -8,14 +8,11 @@ import { NgClass } from '@angular/common';
   styleUrl: './like-button.component.css'
 })
 export class LikeButtonComponent {
-
-  @Input() likes?: number = 0;  // 初始喜歡數，可從後端帶入
-  @Input() isLiked: boolean = false; // 使用者是否已點擊
-  @Output() likeToggled = new EventEmitter<boolean>();
+  @Input() likes?: number = 0;  // 初始喜歡數
+  @Input() isLiked: boolean = false; // 父元件控制
+  @Output() likeToggled = new EventEmitter<boolean>(); // 只發射事件，交給父元件決定
 
   toggleLike() {
-    this.isLiked = !this.isLiked;
-    this.likes! += this.isLiked ? 1 : -1;
-    this.likeToggled.emit(this.isLiked); // 通知父元件
+    this.likeToggled.emit();
   }
 }
