@@ -4,6 +4,7 @@ import { VideosListComponent } from "../../../ui/video/videos-list/videos-list.c
 import { VideoCardData, VideoListCard } from '../../../models/video-model';
 import { MockChannelService } from './../../../service/mock-channel.service';
 import { PrivacyStatus, ProcessStatus } from '../../../models/video.enum';
+import { VideoCreatorService } from '../../../service/video-creator.service';
 @Component({
   selector: 'app-videocreator-videomanage',
   imports: [VideosListComponent],
@@ -12,28 +13,18 @@ import { PrivacyStatus, ProcessStatus } from '../../../models/video.enum';
 })
 export class VideocreatorVideomanageComponent {
 
-  @Input() VideoDetailsData: VideoDetailData[] = [{
-    id: 0,
-    title: '',
-    description: '',
-    thumbnail: '',
-    duration: 0,
-    publishDate: new Date(),
-    viewsCount: 0,
-    likesCount: 0,
-    commentCount: 0,
-    videoUrl: '',
-    processStatus: ProcessStatus.UPLOADING,
-    privacyStatus: PrivacyStatus.PUBLIC
-  }]
+  @Input() VideoDetailsData: VideoDetailData[] | undefined
 
 
-  constructor(private MockChannelService: MockChannelService) { }
+  constructor(private MockChannelService: MockChannelService, private videoCreatorService: VideoCreatorService) { }
 
 
 
   ngOnInit(): void {
-    this.MockChannelService.getVideoDetailsData().subscribe(data => { this.VideoDetailsData = data; })
+    this.videoCreatorService.getRecentUploadVideos(5)
+      .subscribe(videos => {
+        this.VideoDetailsData = videos;
+      });
   }
 
 }

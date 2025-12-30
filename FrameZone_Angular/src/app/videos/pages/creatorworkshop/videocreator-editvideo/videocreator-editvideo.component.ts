@@ -42,6 +42,7 @@ export class VideocreatorEditvideoComponent {
   ngOnInit(): void {
     this.guid = this.route.snapshot.paramMap.get('guid')!;
     this.loadVideo();
+
   }
 
   loadVideo() {
@@ -53,6 +54,10 @@ export class VideocreatorEditvideoComponent {
         this.video = data;
         this.isLoading = false;
         this.videoUrl = 'https://localhost:7213/api/videoplayer/' + data.videoUrl
+        this.video!.thumbnail =
+          'https://localhost:7213/api/Videos/video-thumbnail/' + this.video!.videoUrl;
+        console.log(data)
+        console.log(this.video)
       },
       error: (err) => {
         this.isLoading = false;

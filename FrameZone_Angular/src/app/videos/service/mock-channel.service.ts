@@ -311,7 +311,10 @@ export class MockChannelService {
     commentCount: 0,
     videoUrl: '',
     processStatus: ProcessStatus.UPLOADING,
-    privacyStatus: PrivacyStatus.PUBLIC
+    privacyStatus: PrivacyStatus.PUBLIC,
+    createdtime: new Date(),
+    updatetime: new Date(),
+    resolution: ''
   }
 
   VideoDetailsData: VideoDetailData[] = [{
@@ -326,7 +329,10 @@ export class MockChannelService {
     commentCount: 0,
     videoUrl: '',
     processStatus: ProcessStatus.UPLOADING,
-    privacyStatus: PrivacyStatus.PUBLIC
+    privacyStatus: PrivacyStatus.PUBLIC,
+    createdtime: new Date(),
+    updatetime: new Date(),
+    resolution: ''
   }, {
     id: 0,
     title: '',
@@ -339,7 +345,10 @@ export class MockChannelService {
     commentCount: 0,
     videoUrl: '',
     processStatus: ProcessStatus.UPLOADING,
-    privacyStatus: PrivacyStatus.PUBLIC
+    privacyStatus: PrivacyStatus.PUBLIC,
+    createdtime: new Date(),
+    updatetime: new Date(),
+    resolution: ''
   }, {
     id: 0,
     title: '',
@@ -352,7 +361,10 @@ export class MockChannelService {
     commentCount: 0,
     videoUrl: '',
     processStatus: ProcessStatus.UPLOADING,
-    privacyStatus: PrivacyStatus.PUBLIC
+    privacyStatus: PrivacyStatus.PUBLIC,
+    createdtime: new Date(),
+    updatetime: new Date(),
+    resolution: ''
   }]
 
   getvideos2() {

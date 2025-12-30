@@ -29,7 +29,10 @@ export class VideocreatorVideocardComponent {
     commentCount: 0,
     videoUrl: '',
     processStatus: ProcessStatus.UPLOADING,
-    privacyStatus: PrivacyStatus.PUBLIC
+    privacyStatus: PrivacyStatus.PUBLIC,
+    createdtime: new Date(),
+    updatetime: new Date(),
+    resolution: ''
   }
 
   constructor(private router: Router, private route: ActivatedRoute) { }

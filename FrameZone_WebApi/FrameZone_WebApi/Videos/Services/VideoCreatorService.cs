@@ -24,6 +24,7 @@ namespace FrameZone_WebApi.Videos.Services
             {
                 var viewCount = await _videoRepo.GetViewsCountAsync(video.VideoId);
                 var likesCount = await _videoRepo.GetLikesCountAsync(video.VideoId);
+                var commentCount = await _videoRepo.GetCommentCountAsync(video.VideoId);
 
                 // 安全轉 enum
                 ProcessStatus processStatus = Enum.TryParse<ProcessStatus>(video.ProcessStatus, out var ps) ? ps : ProcessStatus.UPLOADING;
@@ -39,6 +40,7 @@ namespace FrameZone_WebApi.Videos.Services
                     Duration = video.Duration ?? 0,
                     ViewsCount = viewCount,
                     LikesCount = likesCount,
+                    CommentCount = commentCount,
                     PublishDate = video.PublishDate ?? DateTime.MinValue,
                     ProcessStatus = processStatus,
                     PrivacyStatus = privacyStatus
@@ -55,6 +57,7 @@ namespace FrameZone_WebApi.Videos.Services
 
             var viewCount = await _videoRepo.GetViewsCountAsync(video.VideoId);
             var likesCount = await _videoRepo.GetLikesCountAsync(video.VideoId);
+            var commentCount = await _videoRepo.GetCommentCountAsync(video.VideoId);
 
             // 安全轉 enum
             ProcessStatus processStatus = Enum.TryParse<ProcessStatus>(video.ProcessStatus, out var ps) ? ps : ProcessStatus.UPLOADING;
@@ -68,6 +71,10 @@ namespace FrameZone_WebApi.Videos.Services
                 Thumbnail = video.ThumbnailUrl ?? "",
                 VideoUrl = video.VideoUrl ?? "",
                 Duration = video.Duration ?? 0,
+                CreatedDate = video.CreatedAt,
+                UpdateDate = video.UpdateAt,
+                Resolution = video.Resolution,
+                CommentCount = commentCount,
                 ViewsCount = viewCount,
                 LikesCount = likesCount,
                 PublishDate = video.PublishDate ?? DateTime.MinValue,

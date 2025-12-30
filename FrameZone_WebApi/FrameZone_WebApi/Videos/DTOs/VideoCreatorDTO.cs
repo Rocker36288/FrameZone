@@ -24,6 +24,9 @@ namespace FrameZone_WebApi.Videos.DTOs
             public int Duration { get; set; }
 
             public DateTime PublishDate { get; set; } = DateTime.UtcNow;
+            public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+            public DateTime UpdateDate { get; set; } = DateTime.UtcNow;
+            
 
             // ─── 成效數據 ─────────────────
             public int ViewsCount { get; set; } = 0;
@@ -33,6 +36,8 @@ namespace FrameZone_WebApi.Videos.DTOs
             // ─── 資源 / 技術 ──────────────
             [MaxLength(500)]
             public string VideoUrl { get; set; } = string.Empty;
+
+            public string Resolution { get; set; } = "";
 
             [Required]
             public ProcessStatus ProcessStatus { get; set; } = ProcessStatus.UPLOADING;

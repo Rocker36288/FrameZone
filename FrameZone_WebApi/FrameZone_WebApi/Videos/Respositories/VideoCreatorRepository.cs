@@ -40,6 +40,14 @@ namespace FrameZone_WebApi.Videos.Respositories
             return await _context.Likes.CountAsync(l => l.VideoId == videoId);
         }
 
+        public async Task<int> GetCommentCountAsync(int videoId)
+        {
+            return await _context.CommentTargets
+    .Where(ct => ct.VideoId == videoId)
+    .CountAsync();
+
+        }
+
         /* =====================================================
          * 🎬 Video Edit Data with Ownership Check
          * ===================================================== */

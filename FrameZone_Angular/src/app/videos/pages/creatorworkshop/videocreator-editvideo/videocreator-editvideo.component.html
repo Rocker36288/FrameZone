@@ -284,7 +284,7 @@
                     <div class="datagrid-title">建立時間</div>
                     <div class="datagrid-content">
                       <i class="ti ti-clock text-muted me-1"></i>
-                      {{ video.publishDate | date:'yyyy-MM-dd HH:mm' }}
+                      {{ video.createdtime| date:'yyyy-MM-dd HH:mm' }}
                     </div>
                   </div>
 
@@ -292,7 +292,7 @@
                     <div class="datagrid-title">更新時間</div>
                     <div class="datagrid-content">
                       <i class="ti ti-refresh text-muted me-1"></i>
-                      {{ video.publishDate | date:'yyyy-MM-dd HH:mm' }}
+                      {{ video.updatetime | date:'yyyy-MM-dd HH:mm' }}
                     </div>
                   </div>
                 </div>
@@ -308,17 +308,17 @@
               </div>
               <div class="card-body">
                 <div class="datagrid">
-                  <div class="datagrid-item">
+                  <!-- <div class="datagrid-item">
                     <div class="datagrid-title">檔案大小</div>
                     <div class="datagrid-content">
                       <strong>{{ getReadableSize(video.id) }}</strong>
                     </div>
-                  </div>
+                  </div> -->
 
                   <div class="datagrid-item">
                     <div class="datagrid-title">解析度</div>
                     <div class="datagrid-content">
-                      <span class="badge bg-blue-lt">{{ video.id }}</span>
+                      <span class="badge bg-blue-lt">{{ video.resolution }}</span>
                     </div>
                   </div>
                 </div>
