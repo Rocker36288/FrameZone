@@ -212,10 +212,14 @@
 .member-name {
   color: white;
   font-size: 1rem;
-  margin-right: 50px;
+  margin-right: 5px;
   text-decoration: none;
   opacity: 0.8;
   transition: all 0.3s ease;
+  white-space: nowrap;
+  /* 確保名字不會換行 */
+  max-width: 150px;
+  /* 限制名字最大寬度，避免撐爆導覽列 */
 }
 
 /* 確保頭像連結 hover 時保持樣式一致 */
@@ -237,14 +241,101 @@
 }
 
 .top-nav-left {
-  margin-left: -50px;
+  margin-left: -40px;
 }
 
 .top-nav-right {
-  margin-right: -180px;
+  margin-right: -140px;
 }
 
 /* 防止內容被固定導覽列遮住，您可以根據實際 header 高度調整這個數值 */
 .shopping-main-content {
   margin-top: 150px;
+}
+
+/* 整合組員的下拉選單樣式 */
+.member-dropdown-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 120px;
+  /* 給予最小寬度，防止帳號被蓋掉 */
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1000;
+  display: none;
+  min-width: 280px;
+  padding: 0.5rem 0;
+  margin: 0.125rem 0 0;
+  font-size: 0.875rem;
+  color: #1e293b;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(98, 105, 118, 0.16);
+  border-radius: 8px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-item {
+  padding: 10px 20px;
+  color: #333;
+  text-decoration: none;
+  display: block;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: #764ba2;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: #eee;
+  margin: 8px 0;
+}
+
+
+/* 修正原本頭像樣式 */
+.member-profile-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* 登入按鈕 */
+.login-align {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  /* 圖示與文字的距離 */
+  margin-top: 0 !important;
+  /* 強制覆蓋 nav-link-sm 的 margin-top 10px */
+  padding-bottom: 5px;
+  /* 根據視覺微調，讓它與旁邊的文字基準線對齊 */
+  padding-top: 10px;
 }

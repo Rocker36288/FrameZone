@@ -56,7 +56,7 @@
       <div class="d-flex top-nav-right">
         <a routerLink="/shopping/chats" class="nav-link-sm">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
             class="icon icon-tabler icons-tabler-outline icon-tabler-brand-hipchat">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
             <path
@@ -68,7 +68,7 @@
 
         <a routerLink="/shopping/reviews" class="nav-link-sm">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
             class="icon icon-tabler icons-tabler-outline icon-tabler-thumb-up">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
             <path
@@ -87,10 +87,49 @@
           </svg>
           通知
         </a>
-        <a routerLink="/home" class="member-profile-link">
-          <img [src]="memberAvatarUrl" alt="會員頭像" class="member-avatar">
-          <span class="member-name">{{ memberName }}</span>
-        </a>
+        <div class="member-dropdown-container nav-item dropdown">
+          @if (isLoggedIn) {
+          <a href="javascript:void(0)" (click)="toggleDropdown(); $event.preventDefault()"
+            class="member-profile-link d-flex align-items-center">
+            <img [src]="getUserAvatar()" alt="會員頭像" class="member-avatar">
+            <span class="member-name">{{ displayAccount }}</span>
+          </a>
+
+          <div class="dropdown-menu dropdown-menu-end" [class.show]="isDropdownOpen">
+            <div class="dropdown-item d-flex align-items-center gap-2 py-2">
+              <img [src]="getUserAvatar()" class="member-avatar" style="width: 35px; height: 35px;">
+              <div>
+                <div class="fw-bold" style="color: #333;">{{ displayUserName }}</div>
+                <div class="text-muted small">{{ userSession.email }}</div>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+
+            <a routerLink="/profile" class="dropdown-item">個人資料</a>
+            <a routerLink="/settings" class="dropdown-item">設定</a>
+
+            <div class="dropdown-divider"></div>
+            <a href="javascript:void(0)" (click)="onLogout()"
+              class="dropdown-item text-danger d-flex align-items-center gap-2">
+              <span>登出</span>
+            </a>
+          </div>
+          } @else {
+          <div class="member-dropdown-container">
+            <a href="javascript:void(0)" (click)="navigateToLogin(); $event.preventDefault()"
+              class="nav-link-sm login-align">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="icon-login">
+                <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"></path>
+                <path d="M9 12h12l-3 -3"></path>
+                <path d="M18 15l3 -3"></path>
+              </svg>
+              <span>登入</span>
+            </a>
+          </div>
+          }
+        </div>
       </div>
     </div>
   </div>
@@ -108,9 +147,9 @@
         <div class="search-group">
           <div class="search-input-container">
             <div class="input-icon">
-              <input type="text" class="form-control" placeholder="Search…" [(ngModel)]="searchText"
-                (keyup.enter)="onSearch()" />
-              <span class="input-icon-addon" (click)="onSearch()" style="cursor: pointer;">
+              <input type="text" class="form-control" placeholder="搜尋商品" (keyup.enter)="search()"
+                [(ngModel)]="searchText" />
+              <span class="input-icon-addon" (click)="search()" style="cursor: pointer;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                   class="icon icon-1">
@@ -120,14 +159,14 @@
               </span>
             </div>
           </div>
-          <button type="button" class="btn btn-indigo" (click)="onSearch()">搜尋</button>
+          <button type="button" class="btn btn-indigo" (click)="search()">搜尋</button>
         </div>
 
         <!-- 購物車圖示 -->
         <div class="cart-icon">
           <a routerLink="/shoppingcart" class="position-relative">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-              stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
               class="icon icon-tabler icons-tabler-outline icon-tabler-shopping-cart">
               <path stroke="none" d="M0 0h24v24H0z" fill="none" />
               <path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
@@ -152,5 +191,7 @@
 <main class="shopping-main-content">
   <router-outlet></router-outlet>
 </main>
+
+<app-chat-window></app-chat-window>
 
 <!-- <app-footer></app-footer> -->
