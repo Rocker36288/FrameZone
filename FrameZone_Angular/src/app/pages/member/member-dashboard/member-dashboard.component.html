@@ -28,10 +28,39 @@
     </div>
   </div>
 
-  <!-- 最近活動（預留） -->
+  <!-- 最近活動 -->
   <div class="section">
-    <h2 class="section-title">最近活動</h2>
-    <div class="activity-card">
+    <div class="section-header">
+      <h2 class="section-title">最近活動</h2>
+      <a routerLink="/member/logs" class="view-all-link">
+        查看全部
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14"></path>
+          <path d="M13 18l6 -6"></path>
+          <path d="M13 6l6 6"></path>
+        </svg>
+      </a>
+    </div>
+
+    <!-- 載入中 -->
+    <div class="activity-card" *ngIf="isLoadingActivities">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p class="loading-text">載入中...</p>
+      </div>
+    </div>
+
+    <!-- 錯誤訊息 -->
+    <div class="activity-card" *ngIf="!isLoadingActivities && activitiesError">
+      <div class="error-state">
+        <div class="error-icon">⚠️</div>
+        <p class="error-text">{{ activitiesError }}</p>
+        <button class="btn-retry" (click)="loadRecentActivities()">重試</button>
+      </div>
+    </div>
+
+    <!-- 空狀態 -->
+    <div class="activity-card" *ngIf="!isLoadingActivities && !activitiesError && recentActivities.length === 0">
       <div class="empty-state">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
@@ -39,6 +68,37 @@
         </svg>
         <p class="empty-text">暫無活動記錄</p>
       </div>
+    </div>
+
+    <!-- 活動列表 -->
+    <div class="activities-list" *ngIf="!isLoadingActivities && !activitiesError && recentActivities.length > 0">
+      @for (activity of recentActivities; track activity.logId) {
+        <div class="activity-item">
+          <div class="activity-icon">{{ getActionIcon(activity.actionType) }}</div>
+          <div class="activity-content">
+            <div class="activity-main">
+              <span class="activity-type">{{ getActionTypeName(activity.actionType) }}</span>
+              <span class="activity-badge" [ngClass]="getStatusClass(activity.status)">
+                {{ activity.status === 'Success' ? '成功' : '失敗' }}
+              </span>
+            </div>
+            <div class="activity-description">{{ activity.actionDescription }}</div>
+            <div class="activity-meta">
+              <span class="activity-time">{{ formatRelativeTime(activity.createdAt) }}</span>
+              @if (activity.ipAddress) {
+                <span class="activity-ip">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                  </svg>
+                  {{ activity.ipAddress }}
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+      }
     </div>
   </div>
 </div>
