@@ -1,0 +1,341 @@
+<div class="security-container">
+  <!-- 頁面標題 -->
+  <div class="page-header">
+    <h2>帳號安全</h2>
+    <p>管理您的密碼、登入裝置和帳號安全設定</p>
+  </div>
+
+  <!-- 成功訊息 -->
+  @if (successMessage) {
+    <div class="alert alert-success">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      {{ successMessage }}
+      <button class="alert-close" (click)="successMessage = ''">×</button>
+    </div>
+  }
+
+  <!-- ==================== 變更密碼 ==================== -->
+  <div class="section">
+    <h3 class="section-title">變更密碼</h3>
+
+    <div class="password-card">
+      <form (ngSubmit)="changePassword()">
+        <div class="form-group">
+          <label class="form-label">目前密碼</label>
+          <input
+            type="password"
+            class="form-control"
+            [(ngModel)]="changePasswordForm.currentPassword"
+            name="currentPassword"
+            placeholder="請輸入目前密碼"
+            [disabled]="isChangingPassword"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">新密碼</label>
+          <input
+            type="password"
+            class="form-control"
+            [(ngModel)]="changePasswordForm.newPassword"
+            name="newPassword"
+            placeholder="至少 8 個字元，包含大小寫字母、數字及特殊字元"
+            [disabled]="isChangingPassword"
+            (input)="checkPasswordStrength()"
+          />
+          @if (changePasswordForm.newPassword && passwordStrength.score > 0) {
+            <div class="password-strength">
+              <div class="strength-bar">
+                <div
+                  class="strength-fill"
+                  [style.width.%]="(passwordStrength.score / 6) * 100"
+                  [style.background-color]="passwordStrength.color"
+                ></div>
+              </div>
+              <span class="strength-text" [style.color]="passwordStrength.color">
+                密碼強度：{{ passwordStrength.text }}
+              </span>
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">確認新密碼</label>
+          <input
+            type="password"
+            class="form-control"
+            [(ngModel)]="changePasswordForm.confirmPassword"
+            name="confirmPassword"
+            placeholder="請再次輸入新密碼"
+            [disabled]="isChangingPassword"
+          />
+        </div>
+
+        @if (passwordErrorMessage) {
+          <div class="error-message">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            {{ passwordErrorMessage }}
+          </div>
+        }
+
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="isChangingPassword"
+          >
+            @if (isChangingPassword) {
+              <span class="spinner"></span>
+              變更中...
+            } @else {
+              變更密碼
+            }
+          </button>
+        </div>
+      </form>
+
+      <div class="password-tips">
+        <h4>密碼安全建議：</h4>
+        <ul>
+          <li>至少 8 個字元</li>
+          <li>包含大寫字母 (A-Z)</li>
+          <li>包含小寫字母 (a-z)</li>
+          <li>包含數字 (0-9)</li>
+          <li>包含特殊字元 (!&#64;#$%^&*)</li>
+          <li>避免使用個人資訊或常見密碼</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 登入裝置管理 ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <h3 class="section-title">登入裝置管理</h3>
+      @if (sessions.length > 1) {
+        <button class="btn btn-danger-outline" (click)="logoutOtherSessions()">
+          登出所有其他裝置
+        </button>
+      }
+    </div>
+
+    <!-- 載入中 -->
+    @if (isLoadingSessions) {
+      <div class="loading-card">
+        <div class="spinner"></div>
+        <p>載入中...</p>
+      </div>
+    }
+
+    <!-- 錯誤訊息 -->
+    @if (!isLoadingSessions && sessionsErrorMessage) {
+      <div class="error-card">
+        <div class="error-icon">⚠️</div>
+        <p>{{ sessionsErrorMessage }}</p>
+        <button class="btn btn-retry" (click)="loadSessions()">重試</button>
+      </div>
+    }
+
+    <!-- 空狀態 -->
+    @if (!isLoadingSessions && !sessionsErrorMessage && sessions.length === 0) {
+      <div class="empty-card">
+        <div class="empty-icon">💻</div>
+        <p>暫無登入裝置</p>
+      </div>
+    }
+
+    <!-- 裝置列表 -->
+    @if (!isLoadingSessions && !sessionsErrorMessage && sessions.length > 0) {
+      <div class="devices-list">
+        @for (session of sessions; track session.sessionId) {
+          <div class="device-card" [class.current-device]="session.isCurrentSession">
+            <div class="device-icon">{{ getDeviceIcon(session.deviceType) }}</div>
+            <div class="device-content">
+              <div class="device-header">
+                <span class="device-name">
+                  {{ session.browserName }} ({{ session.operatingSystem }})
+                </span>
+                @if (session.isCurrentSession) {
+                  <span class="current-badge">目前裝置</span>
+                }
+              </div>
+              <div class="device-details">
+                <div class="device-detail-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                  </svg>
+                  <span>{{ session.ipAddress || '未知' }}</span>
+                </div>
+                <div class="device-detail-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span>{{ formatRelativeTime(session.lastActivityAt) }}</span>
+                </div>
+              </div>
+            </div>
+            @if (!session.isCurrentSession) {
+              <button
+                class="btn-logout-device"
+                (click)="logoutSession(session.sessionId)"
+                title="登出此裝置"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ==================== 帳號鎖定狀態 ==================== -->
+  <div class="section">
+    <h3 class="section-title">帳號狀態</h3>
+
+    <!-- 載入中 -->
+    @if (isLoadingLockStatus) {
+      <div class="loading-card">
+        <div class="spinner"></div>
+        <p>載入中...</p>
+      </div>
+    }
+
+    <!-- 錯誤訊息 -->
+    @if (!isLoadingLockStatus && lockStatusErrorMessage) {
+      <div class="error-card">
+        <div class="error-icon">⚠️</div>
+        <p>{{ lockStatusErrorMessage }}</p>
+        <button class="btn btn-retry" (click)="loadLockStatus()">重試</button>
+      </div>
+    }
+
+    <!-- 帳號狀態卡片 -->
+    @if (!isLoadingLockStatus && !lockStatusErrorMessage && lockStatus) {
+      <div class="lock-status-card" [class.locked]="lockStatus.isLocked">
+        @if (lockStatus.isLocked) {
+          <div class="status-icon locked">🔒</div>
+          <div class="status-content">
+            <h4 class="status-title">帳號已鎖定</h4>
+            <p class="status-description">
+              由於登入失敗次數過多，您的帳號已被鎖定
+            </p>
+            @if (lockStatus.remainingLockMinutes && lockStatus.remainingLockMinutes > 0) {
+              <div class="lock-info">
+                <div class="lock-info-item">
+                  <span class="lock-label">剩餘鎖定時間：</span>
+                  <span class="lock-value">{{ lockStatus.remainingLockMinutes }} 分鐘</span>
+                </div>
+              </div>
+            }
+            @if (lockStatus.lockedReason) {
+              <div class="lock-info">
+                <div class="lock-info-item">
+                  <span class="lock-label">鎖定原因：</span>
+                  <span class="lock-value">{{ lockStatus.lockedReason }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="status-icon unlocked">✅</div>
+          <div class="status-content">
+            <h4 class="status-title">帳號正常</h4>
+            <p class="status-description">您的帳號目前處於正常狀態</p>
+            @if (lockStatus.failedLoginAttempts > 0) {
+              <div class="lock-info">
+                <div class="lock-info-item">
+                  <span class="lock-label">登入失敗次數：</span>
+                  <span class="lock-value">{{ lockStatus.failedLoginAttempts }} / 5</span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ==================== 最近登入記錄 ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <h3 class="section-title">最近登入記錄</h3>
+      <a routerLink="/member/logs" class="view-all-link">
+        查看全部
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14"></path>
+          <path d="M13 18l6 -6"></path>
+          <path d="M13 6l6 6"></path>
+        </svg>
+      </a>
+    </div>
+
+    <!-- 載入中 -->
+    @if (isLoadingRecentLogins) {
+      <div class="loading-card">
+        <div class="spinner"></div>
+        <p>載入中...</p>
+      </div>
+    }
+
+    <!-- 空狀態 -->
+    @if (!isLoadingRecentLogins && recentLogins.length === 0) {
+      <div class="empty-card">
+        <div class="empty-icon">📋</div>
+        <p>暫無登入記錄</p>
+      </div>
+    }
+
+    <!-- 登入記錄列表 -->
+    @if (!isLoadingRecentLogins && recentLogins.length > 0) {
+      <div class="logins-list">
+        @for (log of recentLogins; track log.logId) {
+          <div class="login-item">
+            <div class="login-icon">{{ getStatusIcon(log.status) }}</div>
+            <div class="login-content">
+              <div class="login-status">
+                <span class="login-type">{{ log.status === 'Success' ? '登入成功' : '登入失敗' }}</span>
+                <span class="login-time">{{ formatRelativeTime(log.createdAt) }}</span>
+              </div>
+              <div class="login-details">
+                @if (log.ipAddress) {
+                  <span class="login-detail">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="2" y1="12" x2="22" y2="12"></line>
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    {{ log.ipAddress }}
+                  </span>
+                }
+                @if (log.deviceType) {
+                  <span class="login-detail">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                      <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                    </svg>
+                    {{ log.deviceType }}
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

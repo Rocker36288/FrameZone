@@ -15,6 +15,7 @@ import {
   CreateCustomTagRequest,
   CreateCustomTagResponse
 } from '../models/photo.models';
+import { PhotoConstants } from '../../shared/constants/photo.constants';
 import { splitNsName } from '@angular/compiler';
 
 @Injectable({
@@ -111,7 +112,10 @@ export class PhotoService {
    * @param pageIndex 頁碼
    * @param pageSize 每頁筆數
    */
-  getPhotosList(pageIndex: number = 1, pageSize: number = 20): Observable<PhotoListResponse> {
+  getPhotosList(
+    pageIndex: number = 1,
+    pageSize: number = PhotoConstants.DEFAULT_PAGE_SIZE
+  ): Observable<PhotoListResponse> {
     return this.http.get<PhotoListResponse>(
       `${this.apiUrl}/list`,
       {
@@ -154,7 +158,7 @@ export class PhotoService {
   getPhotosByTags(
     tagIds: number[],
     pageNumber: number = 1,
-    pageSize: number = 20
+    pageSize: number = PhotoConstants.DEFAULT_PAGE_SIZE
   ): Observable<PhotoQueryResponse> {
     const request: PhotoQueryRequest = {
       tagIds: tagIds,
@@ -183,22 +187,19 @@ export class PhotoService {
    * @param file 檔案
    */
   validateFile(file: File): { valid: boolean; error?: string } {
-    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.heic', '.gif', '.bmp'];
-    const maxFileSize = 50 * 1024 * 1024;
-
-    const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-
-    if (!allowedExtensions.includes(fileExtension)) {
+    // 檔案格式驗證
+    if (!PhotoConstants.isFileExtensionValid(file.name)) {
       return {
         valid: false,
-        error: `不支援的檔案格式，僅支援: ${allowedExtensions.join('.')}`
+        error: PhotoConstants.getUnsupportedFileFormatMessage()
       };
     }
 
-    if (file.size > maxFileSize) {
+    // 檔案大小驗證
+    if (!PhotoConstants.isFileSizeValid(file.size)) {
       return {
         valid: false,
-        error: `檔案大小不能超過 ${maxFileSize / (1024 * 1024)} MB`
+        error: PhotoConstants.getFileSizeExceededMessage()
       };
     }
 

@@ -1,0 +1,250 @@
+<!-- 操作記錄頁面 -->
+<div class="logs-container">
+  <!-- 頁面標題 -->
+  <div class="page-header">
+    <h2>操作記錄</h2>
+    <p>查看您的帳號活動歷史記錄</p>
+  </div>
+
+  <!-- 統計卡片 -->
+  <div class="stats-section" *ngIf="stats">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-content">
+          <div class="stat-value">{{ stats.totalLogs }}</div>
+          <div class="stat-label">總記錄數</div>
+        </div>
+      </div>
+
+      <div class="stat-card success">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <div class="stat-value">{{ stats.successCount }}</div>
+          <div class="stat-label">成功次數</div>
+        </div>
+      </div>
+
+      <div class="stat-card failure">
+        <div class="stat-icon">❌</div>
+        <div class="stat-content">
+          <div class="stat-value">{{ stats.failureCount }}</div>
+          <div class="stat-label">失敗次數</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🔐</div>
+        <div class="stat-content">
+          <div class="stat-value">{{ formatRelativeTime(stats.lastLoginAt) }}</div>
+          <div class="stat-label">最後登入</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 工具列 -->
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <button class="btn btn-filter" (click)="toggleFilters()" [class.active]="showFilters">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        </svg>
+        篩選
+      </button>
+
+      <button class="btn btn-export" (click)="exportLogs()" [disabled]="isExporting || logs.length === 0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        {{ isExporting ? '匯出中...' : '匯出 CSV' }}
+      </button>
+    </div>
+
+    <div class="toolbar-right">
+      <select class="form-select-sm" [(ngModel)]="queryParams.pageSize" (change)="changePageSize()">
+        <option *ngFor="let size of pageSizes" [value]="size.value">{{ size.label }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 篩選面板 -->
+  <div class="filter-panel" [class.show]="showFilters">
+    <div class="filter-grid">
+      <div class="filter-group">
+        <label class="filter-label">操作類型</label>
+        <select class="form-select" [(ngModel)]="queryParams.actionType">
+          <option *ngFor="let type of actionTypes" [value]="type.value">{{ type.label }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">操作類別</label>
+        <select class="form-select" [(ngModel)]="queryParams.actionCategory">
+          <option *ngFor="let category of actionCategories" [value]="category.value">{{ category.label }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">狀態</label>
+        <select class="form-select" [(ngModel)]="queryParams.status">
+          <option *ngFor="let status of statuses" [value]="status.value">{{ status.label }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">嚴重性</label>
+        <select class="form-select" [(ngModel)]="queryParams.severity">
+          <option *ngFor="let severity of severities" [value]="severity.value">{{ severity.label }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">開始日期</label>
+        <input type="date" class="form-control" [(ngModel)]="queryParams.startDate">
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">結束日期</label>
+        <input type="date" class="form-control" [(ngModel)]="queryParams.endDate">
+      </div>
+    </div>
+
+    <div class="filter-actions">
+      <button class="btn btn-reset" (click)="resetFilters()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+          <path d="M3 3v5h5"></path>
+        </svg>
+        重置
+      </button>
+      <button class="btn btn-apply" (click)="applyFilters()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        套用篩選
+      </button>
+    </div>
+  </div>
+
+  <!-- 錯誤訊息 -->
+  <div class="error-container" *ngIf="errorMessage">
+    <div class="error-icon">⚠️</div>
+    <p>{{ errorMessage }}</p>
+    <button class="btn btn-retry" (click)="loadLogs()">重試</button>
+  </div>
+
+  <!-- 空狀態 -->
+  <div class="empty-container" *ngIf="!errorMessage && logs.length === 0">
+    <div class="empty-icon">📋</div>
+    <p class="empty-title">暫無記錄</p>
+    <p class="empty-subtitle">尚未有任何操作記錄</p>
+  </div>
+
+  <!-- 日誌列表 -->
+  <div class="logs-list" *ngIf="!errorMessage && logs.length > 0">
+    <div class="log-card" *ngFor="let log of logs">
+      <div class="log-header">
+        <div class="log-title-row">
+          <span class="log-device">{{ getDeviceIcon(log.deviceType) }}</span>
+          <span class="log-type">{{ log.actionType }}</span>
+          <span class="log-badge" [ngClass]="getStatusClass(log.status)">
+            {{ log.status === 'Success' ? '成功' : '失敗' }}
+          </span>
+          <span class="log-badge" [ngClass]="getSeverityClass(log.severity)">
+            {{ log.severity }}
+          </span>
+        </div>
+        <div class="log-time">{{ formatDateTime(log.createdAt) }}</div>
+      </div>
+
+      <div class="log-body">
+        <div class="log-description">{{ log.actionDescription }}</div>
+
+        <div class="log-details">
+          <div class="log-detail-item" *ngIf="log.ipAddress">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            <span>{{ log.ipAddress }}</span>
+          </div>
+
+          <div class="log-detail-item" *ngIf="log.deviceType">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+              <line x1="12" y1="18" x2="12.01" y2="18"></line>
+            </svg>
+            <span>{{ log.deviceType }}</span>
+          </div>
+
+          <div class="log-detail-item" *ngIf="log.executionTime">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>{{ log.executionTime }}ms</span>
+          </div>
+        </div>
+
+        <div class="log-error" *ngIf="log.errorMessage">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          {{ log.errorMessage }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 分頁控制 -->
+  <div class="pagination" *ngIf="!errorMessage && pagedData && pagedData.totalPages > 1">
+    <button
+      class="page-btn"
+      (click)="changePage(1)"
+      [disabled]="queryParams.pageNumber === 1">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="11 17 6 12 11 7"></polyline>
+        <polyline points="18 17 13 12 18 7"></polyline>
+      </svg>
+    </button>
+
+    <button
+      class="page-btn"
+      (click)="changePage(queryParams.pageNumber - 1)"
+      [disabled]="!pagedData.hasPreviousPage">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+
+    <span class="page-info">
+      第 {{ queryParams.pageNumber }} / {{ pagedData.totalPages }} 頁
+      <span class="text-muted">（共 {{ pagedData.totalCount }} 筆）</span>
+    </span>
+
+    <button
+      class="page-btn"
+      (click)="changePage(queryParams.pageNumber + 1)"
+      [disabled]="!pagedData.hasNextPage">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+
+    <button
+      class="page-btn"
+      (click)="changePage(pagedData.totalPages)"
+      [disabled]="queryParams.pageNumber === pagedData.totalPages">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="13 17 18 12 13 7"></polyline>
+        <polyline points="6 17 11 12 6 7"></polyline>
+      </svg>
+    </button>
+  </div>
+</div>

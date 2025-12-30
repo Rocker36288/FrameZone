@@ -1,8 +1,9 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
-using FrameZone_WebApi.DTOs;
 using FrameZone_WebApi.Configuration;
+using FrameZone_WebApi.DTOs;
+using FrameZone_WebApi.Helpers;
 using Microsoft.Extensions.Options;
 
 namespace FrameZone_WebApi.Services
@@ -10,6 +11,7 @@ namespace FrameZone_WebApi.Services
     public class BlobStorageService : IBlobStorageService
     {
         private readonly AzureBlobStorageSettings _settings;
+        private readonly IConfiguration _configuration;
         private readonly BlobServiceClient _blobServiceClient;
         private readonly BlobContainerClient _photoContainerClient;
         private readonly BlobContainerClient _thumbnailContainerClient;
@@ -17,21 +19,25 @@ namespace FrameZone_WebApi.Services
 
         public BlobStorageService(
             IOptions<AzureBlobStorageSettings> settings,
+            IConfiguration configuration,
             ILogger<BlobStorageService> logger)
         {
             _settings = settings.Value;
+            _configuration = configuration;
             _logger = logger;
 
-            // 驗證設定
-            var (isValid, errorMessage) = _settings.Validate();
-            if (!isValid)
+            var connectionString = _configuration["AzureStorageConnectionString"];
+
+            if (string.IsNullOrEmpty(connectionString))
             {
-                _logger.LogError("❌ Azure Blob Storage 設定驗證失敗: {ErrorMessage}", errorMessage);
-                throw new InvalidOperationException($"Azure Blob Storage 設定錯誤: {errorMessage}");
+                _logger.LogError("❌ Azure Blob Storage 設定驗證失敗: Azure Storage ConnectionString 未設定");
+                throw new InvalidOperationException("Azure Blob Storage 設定錯誤: Azure Storage ConnectionString 未設定");
             }
 
+            _logger.LogInformation("✅ Azure Storage ConnectionString 已從 Key Vault 載入，長度: {Length}", connectionString.Length);
+
             // 初始化 BlobServiceClient
-            _blobServiceClient = new BlobServiceClient(_settings.ConnectionString);
+            _blobServiceClient = new BlobServiceClient(connectionString);
 
             // 初始化容器 Client
             _photoContainerClient = _blobServiceClient.GetBlobContainerClient(_settings.ContainerName);
@@ -163,10 +169,10 @@ namespace FrameZone_WebApi.Services
                     HttpHeaders = new BlobHttpHeaders
                     {
                         ContentType = contentType,
-                        CacheControl = "public, max-age=31536000" // 快取 1 年
+                        CacheControl = BlobStorageConstants.CACHE_CONTROL_ONE_YEAR // 快取 1 年
                     },
                     // 設定存取層級（初期都是 Hot）
-                    AccessTier = ParseAccessTier(_settings.DefaultAccessTier)
+                    AccessTier = ParseAccessTier(_settings.DefaultAccessTier ?? BlobStorageConstants.DEFAULT_ACCESS_TIER)
                 };
 
                 // 上傳到 Blob Storage
@@ -393,8 +399,7 @@ namespace FrameZone_WebApi.Services
                     BlobName = blobPath,
                     Resource = "b", // "b" = Blob
                     StartsOn = DateTimeOffset.UtcNow.AddMinutes(-5), // 提前 5 分鐘防止時間差
-                    ExpiresOn = DateTimeOffset.UtcNow.AddMinutes(
-                        expiryMinutes ?? _settings.SasTokenExpiryMinutes)
+                    ExpiresOn = DateTimeOffset.UtcNow.AddMinutes(PhotoConstants.SAS_TOKEN_DEFAULT_EXPIRY_MINUTES)
                 };
 
                 // 設定權限（只允許讀取）

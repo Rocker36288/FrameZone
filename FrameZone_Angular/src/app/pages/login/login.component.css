@@ -70,3 +70,31 @@
   width: 40px;
   height: 40px;
 }
+
+/* Google 登入按鈕容器 - 確保完全獨立且不會觸發其他事件 */
+.google-signin-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 50px;
+  padding: 0;
+  margin: 0;
+  /* 防止事件冒泡和層疊上下文問題 */
+  isolation: isolate;
+  position: relative;
+  z-index: 1;
+}
+
+/* 確保 Google 按鈕容器可以正常接收點擊事件 */
+#googleSignInButton {
+  pointer-events: auto;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* Google 按鈕內部元素置中 */
+#googleSignInButton > div {
+  margin: 0 auto !important;
+}

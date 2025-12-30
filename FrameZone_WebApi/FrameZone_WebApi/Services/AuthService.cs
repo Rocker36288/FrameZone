@@ -10,12 +10,14 @@ namespace FrameZone_WebApi.Services
         private readonly UserRepository _userRepository;
         private readonly JwtHelper _jwtHelper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IBlobStorageService _blobStorageService;
 
-        public AuthService(UserRepository userRepository, JwtHelper jwtHelper,IHttpContextAccessor httpContextAccessor)
+        public AuthService(UserRepository userRepository, JwtHelper jwtHelper,IHttpContextAccessor httpContextAccessor, IBlobStorageService blobStorageService)
         {
             _userRepository = userRepository;
             _jwtHelper = jwtHelper;
             _httpContextAccessor = httpContextAccessor;
+            _blobStorageService = blobStorageService;
         }
 
         // ========== 登入相關 ===========
@@ -110,6 +112,33 @@ namespace FrameZone_WebApi.Services
                 // 建立使用者會話
                 await CreateUserSessionAsync(user.UserId, token, request.RememberMe);
 
+                string? avatarWithSas = null;
+                if (!string.IsNullOrWhiteSpace(user.UserProfile?.Avatar))
+                {
+                    try
+                    {
+                        // 從 URL 提取 Blob 名稱
+                        // URL 格式: https://xxx.blob.core.windows.net/avatars/avatar_10016_20251227132637.jpg
+                        var uri = new Uri(user.UserProfile.Avatar);
+                        var segments = uri.Segments; // 例如: ["/", "avatars/", "avatar_10016_20251227132637.jpg"]
+
+                        // 取得最後一個 segment (檔名)
+                        var blobName = segments[segments.Length - 1].TrimEnd('/');
+
+                        Console.WriteLine($"🔐 生成登入頭像 SAS URL - BlobName: {blobName}");
+
+                        // 生成 SAS URL
+                        avatarWithSas = await _blobStorageService.GenerateSasUrlAsync(blobName, "avatars");
+
+                        Console.WriteLine($"✅ 登入頭像 SAS URL 生成成功");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"⚠️ 生成登入頭像 SAS URL 失敗: {ex.Message}");
+                        avatarWithSas = user.UserProfile.Avatar; // 失敗時使用原始 URL
+                    }
+                }
+
                 // 回傳登入成功結果
                 return new LoginResponseDto
                 {
@@ -120,7 +149,7 @@ namespace FrameZone_WebApi.Services
                     Account = user.Account,
                     Email = user.Email,
                     DisplayName = user.UserProfile?.DisplayName ?? user.Account,
-                    Avatar = user.UserProfile?.Avatar
+                    Avatar = avatarWithSas
                 };
             }
             catch (Exception ex)
@@ -333,7 +362,9 @@ namespace FrameZone_WebApi.Services
                 string userAgent = httpContext?.Request.Headers["User-Agent"].ToString() ?? "Unknown";
 
                 // 計算過期時間
-                int expirationMinutes = rememberMe ? 7 : 1;
+                int expirationDays = rememberMe
+                    ? AuthConstants.JWT_EXPIRY_DAYS_REMEMBER
+                    : AuthConstants.JWT_EXPIRY_DAYS_DEFAULT;
 
                 var userSession = new UserSession
                 {
@@ -341,7 +372,7 @@ namespace FrameZone_WebApi.Services
                     UserAgent = userAgent,                                          // 活耀中  
                     IsActive = true,                                                // 最後活動時間
                     LastActivityAt = DateTime.UtcNow,                               // 過期時間
-                    ExpiresAt = DateTime.UtcNow.AddMinutes(expirationMinutes),
+                    ExpiresAt = DateTime.UtcNow.AddDays(expirationDays),
                     CreatedAt = DateTime.UtcNow,
                 };
 
@@ -386,5 +417,7 @@ namespace FrameZone_WebApi.Services
             return "Desktop";
 
         }
+
+
     }
 }

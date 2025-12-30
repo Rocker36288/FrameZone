@@ -111,3 +111,62 @@ export interface UserInfo {
   displayName?: string;
   avatar?: string;
 }
+
+/**
+ * Google 登入請求
+ */
+export interface GoogleLoginRequestDto {
+  idToken: string;
+  rememberMe: boolean;
+}
+
+/**
+ * Google 登入回應
+ */
+export interface GoogleLoginResponseDto {
+  success: boolean;
+  message: string;
+  token?: string;
+  userId?: number;
+  account?: string;
+  email?: string;
+  displayName?: string;
+  avatar?: string;
+  isNewUser: boolean;
+}
+
+/**
+ * Google 使用者資訊 (從 Google 取得)
+ */
+export interface GoogleUserInfo {
+  sub: string;
+  email: string;
+  email_verified: boolean;
+  name: string;
+  given_name: string;
+  family_name: string;
+  picture: string;
+  locale: string;
+}
+
+/**
+ * 綁定 Google 帳號請求
+ */
+export interface LinkGoogleAccountRequestDto {
+  idToken: string;
+}
+
+/**
+ * 解除綁定 Google 帳號請求
+ */
+export interface UnlinkGoogleAccountRequestDto {
+  currentPassword: string;
+}
+
+/**
+ * Google 綁定狀態回應
+ */
+export interface GoogleLinkedStatusResponseDto {
+  success: boolean;
+  isLinked: boolean;
+}

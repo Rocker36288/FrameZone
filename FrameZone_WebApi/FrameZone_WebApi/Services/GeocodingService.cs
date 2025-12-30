@@ -1,4 +1,5 @@
 ﻿using FrameZone_WebApi.DTOs;
+using FrameZone_WebApi.Helpers;
 using Microsoft.Extensions.Caching.Memory;
 using System.Text.Json;
 
@@ -29,11 +30,16 @@ namespace FrameZone_WebApi.Services
             _cache = cache;
 
             // 從 appsettings.json 讀取 Google API Key
-            _googleApiKey = _configuration["GoogleMaps:ApiKey"];
+            _googleApiKey = _configuration["GoogleMaps"];
 
             if (string.IsNullOrEmpty(_googleApiKey))
             {
                 _logger.LogWarning("⚠️ Google Maps API Key 未設定，地理編碼功能將無法使用");
+            }
+            else
+            {
+                // 記錄成功載入的日誌
+                _logger.LogInformation("✅ Google Maps API Key 已從 Key Vault 載入，長度: {Length}", _googleApiKey.Length);
             }
         }
 
@@ -72,8 +78,8 @@ namespace FrameZone_WebApi.Services
 
                 // ===== 座標四捨五入（減少快取鍵的數量）=====
                 // 四捨五入到 4 位小數 ≈ 11 公尺精度
-                var lat = Math.Round(request.Latitude, 4);
-                var lng = Math.Round(request.Longitude, 4);
+                var lat = Math.Round(request.Latitude, GeocodingConstants.GPS_COORDINATE_PRECISION);
+                var lng = Math.Round(request.Longitude, GeocodingConstants.GPS_COORDINATE_PRECISION);
 
                 // ===== 生成快取鍵 =====
                 var cacheKey = $"geocode:{lat}:{lng}:{request.Language}";
@@ -142,8 +148,8 @@ namespace FrameZone_WebApi.Services
 
                 // ===== 儲存到快取（30 天有效期）=====
                 var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromDays(30))  // 30 天內沒被存取就移除
-                    .SetAbsoluteExpiration(TimeSpan.FromDays(90))  // 絕對 90 天後過期
+                    .SetSlidingExpiration(TimeSpan.FromDays(GeocodingConstants.CACHE_SLIDING_EXPIRATION_DAYS))  // 30 天內沒被存取就移除
+                    .SetAbsoluteExpiration(TimeSpan.FromDays(GeocodingConstants.CACHE_ABSOLUTE_EXPIRATION_DAYS))  // 絕對 90 天後過期
                     .SetPriority(CacheItemPriority.Normal)
                     .SetSize(1);
 

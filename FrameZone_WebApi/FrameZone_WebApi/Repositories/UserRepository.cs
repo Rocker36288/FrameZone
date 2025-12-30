@@ -446,5 +446,152 @@ namespace FrameZone_WebApi.Repositories
                 return false;
             }
         }
+
+        // ========== 第三方認證相關 (Google 登入) ==========
+
+        /// <summary>
+        /// 根據第三方提供者和提供者ID查詢認證記錄
+        /// </summary>
+        /// <param name="provider">提供者名稱 (Google, Facebook, etc.)</param>
+        /// <param name="providerId">提供者的使用者ID</param>
+        /// <returns>第三方認證記錄，找不到回傳 null</returns>
+        public async Task<UserThirdPartyAuth?> GetThirdPartyAuthByProviderIdAsync(string provider, string providerId)
+        {
+            return await _context.UserThirdPartyAuths
+                .FirstOrDefaultAsync(a => a.Provider == provider && a.ProviderId == providerId);
+        }
+
+        /// <summary>
+        /// 根據使用者ID和提供者查詢認證記錄
+        /// </summary>
+        /// <param name="userId">使用者ID</param>
+        /// <param name="provider">提供者名稱</param>
+        /// <returns>第三方認證記錄，找不到回傳 null</returns>
+        public async Task<UserThirdPartyAuth?> GetThirdPartyAuthByUserIdAndProviderAsync(long userId, string provider)
+        {
+            return await _context.UserThirdPartyAuths
+                .FirstOrDefaultAsync(a => a.UserId == userId && a.Provider == provider);
+        }
+
+        /// <summary>
+        /// 建立第三方認證記錄
+        /// </summary>
+        /// <param name="thirdPartyAuth">第三方認證物件</param>
+        /// <returns>建立成功回傳 true，失敗回傳 false</returns>
+        public async Task<bool> CreateThirdPartyAuthAsync(UserThirdPartyAuth thirdPartyAuth)
+        {
+            try
+            {
+                thirdPartyAuth.CreatedAt = DateTime.UtcNow;
+                thirdPartyAuth.UpdatedAt = DateTime.UtcNow;
+
+                await _context.UserThirdPartyAuths.AddAsync(thirdPartyAuth);
+                var result = await _context.SaveChangesAsync();
+
+                return result > 0;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 更新第三方認證的最後使用時間
+        /// </summary>
+        /// <param name="authId">認證ID</param>
+        /// <returns>更新成功回傳 true，失敗回傳 false</returns>
+        public async Task<bool> UpdateThirdPartyAuthLastUsedAsync(long authId)
+        {
+            try
+            {
+                var auth = await _context.UserThirdPartyAuths.FindAsync(authId);
+                if (auth == null)
+                {
+                    return false;
+                }
+
+                auth.LastUsedAt = DateTime.UtcNow;
+                auth.UpdatedAt = DateTime.UtcNow;
+
+                _context.UserThirdPartyAuths.Update(auth);
+                var result = await _context.SaveChangesAsync();
+
+                return result > 0;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 刪除第三方認證記錄
+        /// </summary>
+        /// <param name="authId">認證ID</param>
+        /// <returns>刪除成功回傳 true，失敗回傳 false</returns>
+        public async Task<bool> DeleteThirdPartyAuthAsync(long authId)
+        {
+            try
+            {
+                var auth = await _context.UserThirdPartyAuths.FindAsync(authId);
+                if (auth == null)
+                {
+                    return false;
+                }
+
+                _context.UserThirdPartyAuths.Remove(auth);
+                var result = await _context.SaveChangesAsync();
+
+                return result > 0;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 更新第三方認證的 Access Token
+        /// </summary>
+        /// <param name="authId">認證ID</param>
+        /// <param name="accessToken">新的 Access Token</param>
+        /// <param name="refreshToken">新的 Refresh Token (可選)</param>
+        /// <param name="expiresAt">Token 過期時間 (可選)</param>
+        /// <returns>更新成功回傳 true，失敗回傳 false</returns>
+        public async Task<bool> UpdateThirdPartyAuthTokenAsync(long authId, string accessToken, string? refreshToken = null, DateTime? expiresAt = null)
+        {
+            try
+            {
+                var auth = await _context.UserThirdPartyAuths.FindAsync(authId);
+                if (auth == null)
+                {
+                    return false;
+                }
+
+                auth.AccessToken = accessToken;
+                if (refreshToken != null)
+                {
+                    auth.RefreshToken = refreshToken;
+                }
+                if (expiresAt.HasValue)
+                {
+                    auth.TokenExpiresAt = expiresAt.Value;
+                }
+                auth.UpdatedAt = DateTime.UtcNow;
+
+                _context.UserThirdPartyAuths.Update(auth);
+                var result = await _context.SaveChangesAsync();
+
+                return result > 0;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+
+
     }
 }

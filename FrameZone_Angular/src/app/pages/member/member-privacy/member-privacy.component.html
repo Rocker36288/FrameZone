@@ -1,0 +1,311 @@
+<!-- 頁面標題 -->
+<div class="page-header d-print-none mb-3">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <h2 class="page-title">
+          🔐 隱私設定
+        </h2>
+        <div class="text-secondary mt-1">
+          控制您的個人資料對他人的可見性
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 頁面內容 -->
+<div class="page-body">
+  <div class="container-xl">
+    <!-- 成功訊息 -->
+    @if (successMessage) {
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <div class="d-flex align-items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-2">
+          <path d="M5 12l5 5l10 -10"></path>
+        </svg>
+        <div>{{ successMessage }}</div>
+      </div>
+      <button type="button" class="btn-close" (click)="dismissSuccess()"></button>
+    </div>
+    }
+
+    <!-- 錯誤訊息 -->
+    @if (errorMessage) {
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <div class="d-flex align-items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-2">
+          <path d="M12 9v4"></path>
+          <path d="M12 17h.01"></path>
+          <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75"></path>
+        </svg>
+        <div>{{ errorMessage }}</div>
+      </div>
+      <button type="button" class="btn-close" (click)="dismissError()"></button>
+    </div>
+    }
+
+    <!-- 快速設定 -->
+    <div class="card mb-3">
+      <div class="card-header">
+        <h3 class="card-title">⚡ 快速設定</h3>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-3 col-6">
+            <button type="button" class="btn btn-outline-success w-100" (click)="setAllPublic()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-1">
+                <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path>
+                <path d="M3.6 9h16.8"></path>
+                <path d="M3.6 15h16.8"></path>
+                <path d="M11.5 3a17 17 0 0 0 0 18"></path>
+                <path d="M12.5 3a17 17 0 0 1 0 18"></path>
+              </svg>
+              全部公開
+            </button>
+          </div>
+          <div class="col-md-3 col-6">
+            <button type="button" class="btn btn-outline-info w-100" (click)="setAllFriendsOnly()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-1">
+                <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"></path>
+                <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"></path>
+              </svg>
+              全部僅好友
+            </button>
+          </div>
+          <div class="col-md-3 col-6">
+            <button type="button" class="btn btn-outline-secondary w-100" (click)="setAllPrivate()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-1">
+                <path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z"></path>
+                <path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0"></path>
+                <path d="M8 11v-4a4 4 0 1 1 8 0v4"></path>
+              </svg>
+              全部私密
+            </button>
+          </div>
+          <div class="col-md-3 col-6">
+            <button type="button" class="btn btn-outline-warning w-100" (click)="resetToDefault()"
+              [disabled]="!hasChanges">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-1">
+                <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"></path>
+                <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"></path>
+              </svg>
+              重設
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 載入中 -->
+    @if (isLoading) {
+    <div class="card">
+      <div class="card-body text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">載入中...</span>
+        </div>
+        <p class="text-secondary mt-3">載入隱私設定中...</p>
+      </div>
+    </div>
+    } @else {
+
+    <!-- 基本資訊 -->
+    <div class="card mb-3">
+      <div class="card-header">
+        <h3 class="card-title">{{ getCategoryIcon('basic') }} {{ getCategoryName('basic') }}</h3>
+      </div>
+      <div class="card-body">
+        <div class="list-group list-group-flush">
+          @for (field of getFieldsByCategory('basic'); track field.fieldName) {
+          <div class="list-group-item">
+            <div class="row align-items-center">
+              <div class="col-md-4">
+                <div class="d-flex align-items-center">
+                  <span class="me-2" style="font-size: 1.5rem;">{{ field.icon }}</span>
+                  <div>
+                    <div class="fw-bold">{{ field.displayName }}</div>
+                    <div class="text-secondary small">{{ field.description }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-8">
+                <div class="btn-group w-100" role="group">
+                  @for (option of visibilityOptions; track option.value) {
+                  <button type="button" class="btn"
+                    [class.btn-success]="getVisibility(field.fieldName) === option.value && option.value === 'Public'"
+                    [class.btn-info]="getVisibility(field.fieldName) === option.value && option.value === 'FriendsOnly'"
+                    [class.btn-secondary]="getVisibility(field.fieldName) === option.value && option.value === 'Private'"
+                    [class.btn-outline-secondary]="getVisibility(field.fieldName) !== option.value"
+                    (click)="changeVisibility(field.fieldName, option.value)">
+                    <span class="me-1">{{ option.icon }}</span>
+                    {{ option.label }}
+                  </button>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- 私密資訊 -->
+    <div class="card mb-3">
+      <div class="card-header">
+        <h3 class="card-title">{{ getCategoryIcon('private') }} {{ getCategoryName('private') }}</h3>
+      </div>
+      <div class="card-body">
+        <div class="list-group list-group-flush">
+          @for (field of getFieldsByCategory('private'); track field.fieldName) {
+          <div class="list-group-item">
+            <div class="row align-items-center">
+              <div class="col-md-4">
+                <div class="d-flex align-items-center">
+                  <span class="me-2" style="font-size: 1.5rem;">{{ field.icon }}</span>
+                  <div>
+                    <div class="fw-bold">{{ field.displayName }}</div>
+                    <div class="text-secondary small">{{ field.description }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-8">
+                <div class="btn-group w-100" role="group">
+                  @for (option of visibilityOptions; track option.value) {
+                  <button type="button" class="btn"
+                    [class.btn-success]="getVisibility(field.fieldName) === option.value && option.value === 'Public'"
+                    [class.btn-info]="getVisibility(field.fieldName) === option.value && option.value === 'FriendsOnly'"
+                    [class.btn-secondary]="getVisibility(field.fieldName) === option.value && option.value === 'Private'"
+                    [class.btn-outline-secondary]="getVisibility(field.fieldName) !== option.value"
+                    (click)="changeVisibility(field.fieldName, option.value)">
+                    <span class="me-1">{{ option.icon }}</span>
+                    {{ option.label }}
+                  </button>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- 聯絡資訊 -->
+    <div class="card mb-3">
+      <div class="card-header">
+        <h3 class="card-title">{{ getCategoryIcon('contact') }} {{ getCategoryName('contact') }}</h3>
+      </div>
+      <div class="card-body">
+        <div class="list-group list-group-flush">
+          @for (field of getFieldsByCategory('contact'); track field.fieldName) {
+          <div class="list-group-item">
+            <div class="row align-items-center">
+              <div class="col-md-4">
+                <div class="d-flex align-items-center">
+                  <span class="me-2" style="font-size: 1.5rem;">{{ field.icon }}</span>
+                  <div>
+                    <div class="fw-bold">{{ field.displayName }}</div>
+                    <div class="text-secondary small">{{ field.description }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-8">
+                <div class="btn-group w-100" role="group">
+                  @for (option of visibilityOptions; track option.value) {
+                  <button type="button" class="btn"
+                    [class.btn-success]="getVisibility(field.fieldName) === option.value && option.value === 'Public'"
+                    [class.btn-info]="getVisibility(field.fieldName) === option.value && option.value === 'FriendsOnly'"
+                    [class.btn-secondary]="getVisibility(field.fieldName) === option.value && option.value === 'Private'"
+                    [class.btn-outline-secondary]="getVisibility(field.fieldName) !== option.value"
+                    (click)="changeVisibility(field.fieldName, option.value)">
+                    <span class="me-1">{{ option.icon }}</span>
+                    {{ option.label }}
+                  </button>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- 儲存按鈕 -->
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="text-secondary">
+            @if (hasChanges) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="icon text-warning me-1">
+              <path d="M12 9v4"></path>
+              <path d="M12 17h.01"></path>
+              <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75">
+              </path>
+            </svg>
+            您有未儲存的變更
+            } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="icon text-success me-1">
+              <path d="M5 12l5 5l10 -10"></path>
+            </svg>
+            所有變更已儲存
+            }
+          </div>
+          <button type="button" class="btn btn-primary" [disabled]="!hasChanges || isSaving"
+            (click)="savePrivacySettings()">
+            @if (isSaving) {
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            儲存中...
+            } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-1">
+              <path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2"></path>
+              <path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"></path>
+              <path d="M14 4l0 4l-6 0l0 -4"></path>
+            </svg>
+            儲存變更
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- 說明資訊 -->
+    <div class="alert alert-info mt-3" role="alert">
+      <div class="d-flex">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-2">
+            <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
+            <path d="M12 9h.01"></path>
+            <path d="M11 12h1v4h1"></path>
+          </svg>
+        </div>
+        <div>
+          <h4 class="alert-title">隱私設定說明</h4>
+          <div class="text-secondary">
+            <ul class="mb-0">
+              <li><strong>🌐 公開：</strong>所有人都可以在您的個人資料頁面看到這項資訊</li>
+              <li><strong>👥 僅好友：</strong>只有您的好友可以看到這項資訊</li>
+              <li><strong>🔒 僅自己：</strong>只有您自己可以看到這項資訊，其他人完全看不到</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

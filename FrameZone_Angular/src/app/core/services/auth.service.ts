@@ -14,7 +14,12 @@ import {
   ResetPasswordResponseDto,
   ChangePasswordRequestDto,
   ChangePasswordResponseDto,
-  UserInfo
+  UserInfo,
+  LinkGoogleAccountRequestDto,
+  GoogleLoginRequestDto,
+  GoogleLoginResponseDto,
+  UnlinkGoogleAccountRequestDto,
+  GoogleLinkedStatusResponseDto
 } from '../models/auth.models';
 
 @Injectable({
@@ -97,6 +102,37 @@ export class AuthService {
   logout() {
     this.clearStorage();
     this.currentUserSubject.next(null);
+  }
+
+  /**
+   * 更新用戶 Session 資料（用於個人資料更新後同步）
+   * @param updatedUser 更新後的用戶資料
+   */
+  updateUserSession(updatedUser: Partial<LoginResponseDto>): void {
+    const currentUser = this.currentUserSubject.value;
+
+    if (currentUser) {
+      // 合併更新的資料
+      const mergedUser: LoginResponseDto = {
+        ...currentUser,
+        ...updatedUser
+      };
+
+      // 更新 localStorage（檢查是否存在於 localStorage，若不存在則檢查 sessionStorage）
+      const isInLocalStorage = localStorage.getItem('currentUser');
+      const isInSessionStorage = sessionStorage.getItem('currentUser');
+
+      if (isInLocalStorage) {
+        localStorage.setItem('currentUser', JSON.stringify(mergedUser));
+      } else if (isInSessionStorage) {
+        sessionStorage.setItem('currentUser', JSON.stringify(mergedUser));
+      }
+
+      // 更新 BehaviorSubject，觸發所有訂閱者更新
+      this.currentUserSubject.next(mergedUser);
+
+      console.log('用戶 Session 已更新:', mergedUser);
+    }
   }
 
   /**
@@ -187,6 +223,49 @@ export class AuthService {
    */
   testApi(): Observable<any> {
     return this.http.get(`${this.apiUrl}/test`);
+  }
+
+
+  /**
+   * 使用 Google 登入
+   * @param googleLoginData Google 登入資料
+   * @returns 登入結果
+   */
+  googleLogin(googleLoginData: GoogleLoginRequestDto): Observable<GoogleLoginResponseDto> {
+    return this.http.post<GoogleLoginResponseDto>(`${this.apiUrl}/google-login`, googleLoginData)
+      .pipe(
+        tap(response => {
+          if (response.success && response.token) {
+            this.handleLoginSuccess(response, googleLoginData.rememberMe);
+          }
+        })
+      );
+  }
+
+  /**
+   * 綁定 Google 帳號
+   * @param request 綁定請求資料
+   * @returns 處理結果
+   */
+  linkGoogleAccount(request: LinkGoogleAccountRequestDto): Observable<any> {
+    return this.http.post(`${this.apiUrl}/link-google`, request);
+  }
+
+  /**
+   * 解除 Google 帳號綁定
+   * @param request 解除綁定請求資料
+   * @returns 處理結果
+   */
+  unlinkGoogleAccount(request: UnlinkGoogleAccountRequestDto): Observable<any> {
+    return this.http.post(`${this.apiUrl}/unlink-google`, request);
+  }
+
+  /**
+   * 檢查是否已綁定 Google 帳號
+   * @returns 綁定狀態
+   */
+  isGoogleLinked(): Observable<GoogleLinkedStatusResponseDto> {
+    return this.http.get<GoogleLinkedStatusResponseDto>(`${this.apiUrl}/google-linked`);
   }
 
 }

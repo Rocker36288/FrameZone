@@ -1,0 +1,399 @@
+/* ==================== 容器 ==================== */
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ==================== 頁面標題 ==================== */
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.page-subtitle {
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ==================== 區塊 ==================== */
+.section {
+  margin-bottom: 3rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e2e8f0;
+  flex: 1;
+}
+
+.view-all-link {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  color: #0054a6;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+}
+
+.view-all-link:hover {
+  background-color: #f1f5f9;
+  color: #003d7a;
+}
+
+.view-all-link svg {
+  transition: transform 0.2s ease;
+}
+
+.view-all-link:hover svg {
+  transform: translateX(2px);
+}
+
+/* ==================== 系統卡片網格 ==================== */
+.systems-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.system-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #0054a6;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.system-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: currentColor;
+}
+
+.system-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.system-content {
+  flex: 1;
+}
+
+.system-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
+}
+
+.system-description {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.system-arrow {
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.system-card:hover .system-arrow {
+  color: #475569;
+  transform: translateX(4px);
+}
+
+/* ==================== 活動卡片 ==================== */
+.activity-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 2rem;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==================== 載入中狀態 ==================== */
+.loading-state {
+  text-align: center;
+  color: #94a3b8;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 1rem;
+  border: 3px solid #e2e8f0;
+  border-top-color: #0054a6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ==================== 錯誤狀態 ==================== */
+.error-state {
+  text-align: center;
+  color: #dc2626;
+}
+
+.error-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.error-text {
+  font-size: 1rem;
+  margin: 0 0 1rem 0;
+}
+
+.btn-retry {
+  padding: 0.5rem 1.5rem;
+  background-color: #0054a6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-retry:hover {
+  background-color: #003d7a;
+}
+
+/* ==================== 空狀態 ==================== */
+.empty-state {
+  text-align: center;
+  color: #94a3b8;
+}
+
+.empty-state svg {
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ==================== 活動列表 ==================== */
+.activities-list {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.2s ease;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-item:hover {
+  background-color: #f8fafc;
+}
+
+.activity-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.activity-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-main {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.activity-type {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.activity-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 9999px;
+}
+
+.activity-badge.status-success {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.activity-badge.status-failure {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.activity-description {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.activity-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.activity-time {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.activity-ip {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.activity-ip svg {
+  flex-shrink: 0;
+}
+
+/* ==================== 響應式設計 ==================== */
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .systems-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .system-card {
+    padding: 1.25rem;
+  }
+
+  .system-icon {
+    font-size: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .view-all-link {
+    align-self: flex-end;
+  }
+
+  .activity-item {
+    padding: 1rem;
+  }
+
+  .activity-icon {
+    font-size: 1.5rem;
+  }
+
+  .activity-main {
+    gap: 0.5rem;
+  }
+
+  .activity-meta {
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .page-title {
+    font-size: 1.25rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .activity-item {
+    gap: 0.75rem;
+  }
+
+  .activity-type {
+    font-size: 0.9rem;
+  }
+
+  .activity-description {
+    font-size: 0.85rem;
+  }
+
+  .activity-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}

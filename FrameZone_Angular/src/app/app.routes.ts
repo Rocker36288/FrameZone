@@ -60,6 +60,47 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'member',
+    loadComponent: () => import('./layouts/member-layout/member-layout.component').then(m => m.MemberLayoutComponent),
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./pages/member/member-dashboard/member-dashboard.component').then(m => m.MemberDashboardComponent),
+        title: 'FrameZone - 會員中心'
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./pages/member/member-profile/member-profile.component').then(m => m.MemberProfileComponent),
+        title: 'FrameZone - 個人資料'
+      },
+      {
+        path: 'security',
+        loadComponent: () => import('./pages/member/member-security/member-security.component').then(m => m.MemberSecurityComponent),
+        title: 'FrameZone - 帳號安全'
+      },
+      {
+        path: 'notifications',
+        loadComponent: () => import('./pages/member/member-notifications/member-notifications.component').then(m => m.MemberNotificationsComponent),
+        title: 'FrameZone - 通知設定'
+      },
+      {
+        path: 'privacy',
+        loadComponent: () => import('./pages/member/member-privacy/member-privacy.component').then(m => m.MemberPrivacyComponent),
+        title: 'FrameZone - 隱私設定'
+      },
+      {
+        path: 'logs',
+        loadComponent: () => import('./pages/member/member-logs/member-logs.component').then(m => m.MemberLogsComponent),
+        title: 'FrameZone - 操作記錄'
+      }
+    ]
+  },
+  {
     path: 'shopping',
     loadComponent: () => import('./shopping/shopping-header/shopping-header.component').then(m => m.ShoppingHeaderComponent),
     children: [

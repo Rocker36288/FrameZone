@@ -1,10 +1,18 @@
-using FrameZone_WebApi.Middlewares;
-using System.Text;
+using Azure.Identity;
+using FrameZone.API.Repositories;
+using FrameZone.API.Repositories.Interfaces;
+using FrameZone.API.Services;
+using FrameZone.API.Services.Interfaces;
 using FrameZone_WebApi.Configuration;
 using FrameZone_WebApi.Helpers;
+using FrameZone_WebApi.Middlewares;
 using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Repositories;
+using FrameZone_WebApi.Repositories.Member;
 using FrameZone_WebApi.Services;
+using FrameZone_WebApi.Services.Member;
+using FrameZone_WebApi.Socials.Repositories;
+using FrameZone_WebApi.Socials.Services;
 using FrameZone_WebApi.Videos.Helpers;
 using FrameZone_WebApi.Videos.Repositories;
 using FrameZone_WebApi.Videos.Services;
@@ -14,18 +22,39 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.StaticFiles;
-
 using Microsoft.OpenApi;
 using SixLabors.ImageSharp;
 using System.Text;
 using Xabe.FFmpeg;
 using Xabe.FFmpeg.Downloader;
 using static FrameZone_WebApi.Videos.Helpers.AaContextFactoryHelper;
-using FrameZone_WebApi.Socials.Repositories;
-using FrameZone_WebApi.Socials.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ========== Azure Key Vault 設定 ==========
+var keyVaultUri = builder.Configuration["KeyVault:VaultUri"];
+if (!string.IsNullOrEmpty(keyVaultUri))
+{
+    try
+    {
+        Console.WriteLine($"正在連接到 Key Vault: {keyVaultUri}");
+
+        builder.Configuration.AddAzureKeyVault(
+            new Uri(keyVaultUri),
+            new DefaultAzureCredential());
+
+        Console.WriteLine("✓ Key Vault 連接成功!");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"✗ Key Vault 連接失敗: {ex.Message}");
+        Console.WriteLine("將使用本地配置繼續運行...");
+    }
+}
+else
+{
+    Console.WriteLine("未設定 Key Vault URI，使用本地配置");
+}
 
 
 ////////////--------------------------在應用程式啟動前下載 FFmpeg---------------
@@ -169,6 +198,13 @@ builder.Services.AddMemoryCache(options =>
 builder.Services.Configure<AzureBlobStorageSettings>(
     builder.Configuration.GetSection(AzureBlobStorageSettings.SectionName));
 
+// 設定 Google 認證
+builder.Services.Configure<GoogleAuthSettings>(
+    builder.Configuration.GetSection("GoogleAuth")
+);
+
+// 註冊 HttpClient
+builder.Services.AddHttpClient();
 
 
 // ========== 註冊依賴注入服務 (DI注入) ==========
@@ -176,6 +212,11 @@ builder.Services.Configure<AzureBlobStorageSettings>(
 builder.Services.AddScoped<IPhotoRepository, PhotoRepository>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<PostRepository>();
+builder.Services.AddScoped<IMemberProfileRepository, MemberProfileRepository>();
+builder.Services.AddScoped<IUserLogRepository, UserLogRepository>();
+builder.Services.AddScoped<IMemberSecurityRepository, MemberSecurityRepository>();
+builder.Services.AddScoped<IMemberNotificationRepository, MemberNotificationRepository>();
+builder.Services.AddScoped<IMemberPrivacyRepository, MemberPrivacyRepository>();
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -186,6 +227,12 @@ builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<ITagCategorizationService, TagCategorizationService>();
 builder.Services.AddScoped<IBackgroundGeocodingService, BackgroundGeocodingService>();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
+builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+builder.Services.AddScoped<IMemberProfileService, MemberProfileService>();
+builder.Services.AddScoped<IUserLogService, UserLogService>();
+builder.Services.AddScoped<IMemberSecurityService, MemberSecurityService>();
+builder.Services.AddScoped<IMemberNotificationService, MemberNotificationService>();
+builder.Services.AddScoped<IMemberPrivacyService, MemberPrivacyService>();
 
 
 builder.Services.AddHttpClient<IGeocodingService, GeocodingService>();

@@ -180,13 +180,17 @@ namespace FrameZone_WebApi.Services
 
                 byte[] thumbnailData = null;
                 int retryCount = 0;
-                const int maxRetries = 3;
+                int maxRetries = PhotoConstants.MAX_RETRY_COUNT;
 
                 while (thumbnailData == null && retryCount < maxRetries)
                 {
                     try
                     {
-                        thumbnailData = await GenerateThumbnailAsync(fileBytes, 200, 150);
+                        thumbnailData = await GenerateThumbnailAsync(
+                            fileBytes, 
+                            PhotoConstants.THUMBNAIL_WIDTH,
+                            PhotoConstants.THUMBNAIL_HEIGHT
+                        );
 
                         if (thumbnailData != null && thumbnailData.Length > 0)
                         {
@@ -844,18 +848,26 @@ namespace FrameZone_WebApi.Services
                             image.Width, image.Height, thumbnailWidth, thumbnailHeight);
 
                         // 調整大小
-                        image.Mutate(x => x.Resize(thumbnailWidth, thumbnailHeight));
+                        image.Mutate(x => x
+                            .Resize(new ResizeOptions
+                            {
+                                Size = new Size(thumbnailWidth, thumbnailHeight),
+                                Mode = ResizeMode.Max,
+                                Sampler = KnownResamplers.Lanczos3
+                            })
+                            .GaussianSharpen(PhotoConstants.THUMBNAIL_SHARPEN_STRENGTH)
+                        );
 
                         // 儲存為 JPEG
                         using var outputStream = new MemoryStream();
-                        var encoder = new JpegEncoder { Quality = 85 };
+                        var encoder = new JpegEncoder { Quality = PhotoConstants.THUMBNAIL_JPEG_QUALITY };
                         await image.SaveAsync(outputStream, encoder);
 
                         var thumbnail = outputStream.ToArray();
 
                         // 存入快取
                         var cacheOptions = new MemoryCacheEntryOptions()
-                            .SetSlidingExpiration(TimeSpan.FromHours(1))
+                            .SetSlidingExpiration(TimeSpan.FromHours(PhotoConstants.THUMBNAIL_CACHE_HOURS))
                             .SetSize(thumbnail.Length);
 
                         _cache.Set(cacheKey, thumbnail, cacheOptions);
@@ -875,7 +887,7 @@ namespace FrameZone_WebApi.Services
                     if (retryCount < maxRetries)
                     {
                         // 等待後重試
-                        await Task.Delay(TimeSpan.FromMilliseconds(500 * retryCount));
+                        await Task.Delay(TimeSpan.FromMilliseconds(PhotoConstants.BASE_RETRY_DELAY_MS * retryCount));
                     }
                     else
                     {
