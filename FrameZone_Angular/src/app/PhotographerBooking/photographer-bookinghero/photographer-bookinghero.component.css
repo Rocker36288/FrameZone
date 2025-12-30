@@ -4,6 +4,7 @@
   height: 85vh;
   margin-left: calc(50% - 50vw);
   overflow: hidden;
+  margin-top: 80px; /* Header 高度 */
 }
 .carousel-item {
   position: absolute;
@@ -57,56 +58,76 @@ p {
   margin-bottom: 2.5rem;
   opacity: 0.9;
 }
+
 .search-bar {
   background: white;
   width: 100%;
   max-width: 900px;
-  border-radius: 12px;
+  border-radius: 999px; /* Airbnb 關鍵 */
   display: flex;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
+  align-items: center;
+  padding: 6px; /* 讓內部有空氣感 */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 .search-group {
   flex: 1;
   display: flex;
   align-items: center;
-  padding: 15px 20px;
-  border-right: 1px solid #eee;
+  padding: 14px 18px;
+  border-right: 1px solid #f1f1f1; /* 非常淡 */
 }
+.search-group:last-of-type {
+  border-right: none;
+}
+
 .search-group i {
-  color: #999;
+  color: #666;
   margin-right: 10px;
 }
+
 select,
 input[type="date"] {
   border: none;
   outline: none;
   width: 100%;
-  font-size: 16px;
+  font-size: 15px;
+  color: #222;
   background: transparent;
+  cursor: pointer;
 }
+
+/* 3. CTA 按鈕 */
 .btn-search {
-  background: #4f46e5;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 0 35px;
-  font-size: 18px;
-  font-weight: 700;
+  padding: 0 32px;
+  height: 52px;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: 0.3s;
+  white-space: nowrap;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
+
 .btn-search:hover {
-  background: #4338ca;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transform: scale(1.03);
 }
+
+/* 快速標籤 (Quick Tags) */
 .quick-tags {
   margin-top: 25px;
   display: flex;
   gap: 12px;
   align-items: center;
 }
+
 .tag {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
@@ -117,20 +138,25 @@ input[type="date"] {
   transition: 0.3s;
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
+
 .tag:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+/* RWD 響應式 */
 @media (max-width: 768px) {
   .search-bar {
     flex-direction: column;
+    border-radius: 24px;
   }
   .search-group {
     border-right: none;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #f1f1f1;
   }
   .btn-search {
-    padding: 15px;
+    width: 100%;
     justify-content: center;
+    margin-top: 6px;
   }
   h1 {
     font-size: 2.2rem;

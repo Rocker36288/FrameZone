@@ -1,17 +1,9 @@
 <app-photographerbooking-header></app-photographerbooking-header>
-<app-photographer-bookinghero></app-photographer-bookinghero>
-<app-photographerbooking-search
-  [(keyword)]="keyword"
-  [(filterLocation)]="filterLocation"
-  [(filterService)]="filterService"
-  [(filterPrice)]="filterPrice"
->
-</app-photographerbooking-search>
 
-<section class="grid">
-  <app-photographerbooking-card
-    *ngFor="let p of filteredPhotographers"
-    [photographer]="p"
-  >
-  </app-photographerbooking-card>
-</section>
+<app-photographer-bookinghero></app-photographer-bookinghero>
+
+<app-photographer-booking-servicetypes></app-photographer-booking-servicetypes>
+
+<app-photographer-booking-specialtytags></app-photographer-booking-specialtytags>
+
+<app-footer></app-footer>

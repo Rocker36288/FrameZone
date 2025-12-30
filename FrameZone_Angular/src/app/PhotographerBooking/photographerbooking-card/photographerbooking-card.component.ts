@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
+import { Photographer } from '../models/photographer-booking.models';
 
 @Component({
   selector: 'app-photographerbooking-card',
@@ -8,5 +9,14 @@ import { Component, Input } from '@angular/core';
   styleUrl: './photographerbooking-card.component.css',
 })
 export class PhotographerbookingCardComponent {
-  @Input() photographer!: any;
+  @Input() photographer!: Photographer;
+
+  onViewDetails(): void {
+    console.log('View details for:', this.photographer.name);
+    // 這裡可以導航到詳細頁面或開啟 modal
+  }
+
+  get formattedPrice(): string {
+    return `NT$ ${this.photographer.price.toLocaleString()}`;
+  }
 }

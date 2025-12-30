@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component,  OnInit} from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { PhotographerBookingService } from '../services/photographer-booking.service';
 
 @Component({
   selector: 'app-photographerbooking-search',
@@ -8,21 +9,37 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './photographerbooking-search.component.html',
   styleUrl: './photographerbooking-search.component.css',
 })
-export class PhotographerbookingSearchComponent {
-  @Input() keyword = '';
-  @Input() filterLocation = '';
-  @Input() filterService = '';
-  @Input() filterPrice = '';
+export class PhotographerbookingSearchComponent implements OnInit {
+  serviceTypes: string[] = [];
+  selectedServiceType = '';
+  searchKeyword = '';
+  dateRange: string = '';
 
-  @Output() keywordChange = new EventEmitter<string>();
-  @Output() filterLocationChange = new EventEmitter<string>();
-  @Output() filterServiceChange = new EventEmitter<string>();
-  @Output() filterPriceChange = new EventEmitter<string>();
+  constructor(private bookingService: PhotographerBookingService) {}
 
-  clear() {
-    this.keywordChange.emit('');
-    this.filterLocationChange.emit('');
-    this.filterServiceChange.emit('');
-    this.filterPriceChange.emit('');
+  ngOnInit(): void {
+    this.serviceTypes = this.bookingService.getServiceTypes();
+  }
+
+  onServiceTypeChange(): void {
+    this.bookingService.updateFilters({
+      serviceType: this.selectedServiceType,
+    });
+  }
+
+  onKeywordChange(): void {
+    this.bookingService.updateFilters({ keyword: this.searchKeyword });
+  }
+
+  onSearch(): void {
+    this.bookingService.updateFilters({
+      serviceType: this.selectedServiceType,
+      keyword: this.searchKeyword,
+    });
+  }
+
+  onDateChange(event: any): void {
+    // 處理日期變更，可以在後續整合 flatpickr 或其他日期選擇器
+    console.log('Date changed:', event);
   }
 }

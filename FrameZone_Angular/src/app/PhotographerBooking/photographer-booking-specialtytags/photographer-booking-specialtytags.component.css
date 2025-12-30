@@ -1,0 +1,133 @@
+.container {
+  max-width: 1280px; /* 最大寬度稍微放大 */
+  margin: 0 auto;
+  padding-left: 32px; /* 左右內邊距加大 */
+  padding-right: 32px;
+}
+.specialty-explore h2 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.specialty-explore p.desc {
+  color: #6b7280;
+  margin-bottom: 32px;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px; /* 標籤之間間距拉大 */
+  margin-bottom: 40px; /* 標籤與卡片距離拉大 */
+  align-items: center;
+  min-height: 60px; /* 標籤區高度增加 */
+}
+
+/* 共用標籤樣式 */
+.tag {
+  cursor: pointer;
+  padding: 12px 24px; /* 高度增加 */
+  border-radius: 50px;
+  font-size: 1.1rem; /* 文字稍大 */
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* --- 精緻邊框方案 --- */
+.tag-outline {
+  background-color: transparent;
+  color: #667eea;
+  border: 1.5px solid #667eea;
+}
+
+.tag-outline:hover,
+.tag-outline.active {
+  background-color: #667eea;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* 卡片 Grid */
+
+.photographer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px; /* 卡片間距 */
+  margin-bottom: 50px; /* 卡片區與下一區塊的間距 */
+}
+
+/* 響應式 */
+@media (max-width: 1200px) {
+  .photographer-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 992px) {
+  .photographer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 576px) {
+  .photographer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 1. 外層容器：保持不變 */
+.custom-btn-container {
+  margin-top: 3rem;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 60px; /* 卡片區與下一區塊的間距 */
+}
+
+/* 2. 按鈕主體：套用漸層色 */
+.explore-more-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 2.5rem; /* 稍微增加寬度感 */
+
+  /* 漸層背景 */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  /* 文字設為白色以確保對比度 */
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 9999px;
+
+  /* 移除原本的深色邊框，或改為透明 */
+  border: none;
+
+  text-decoration: none;
+  transition: all 0.3s ease;
+
+  /* 加入微弱陰影增加立體感 */
+  box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+}
+
+/* 3. 按鈕 Hover 效果 */
+.explore-more-btn:hover {
+  /* 懸停時稍微放大並加強陰影 */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
+
+  /* 讓漸層稍微變亮一點 (透過濾鏡) */
+  filter: brightness(1.1);
+  color: #ffffff; /* 確保文字維持白色 */
+}
+
+/* 4. 圖標樣式：顏色改為白色 */
+.arrow-icon {
+  margin-left: 0.5rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  stroke: #ffffff; /* 確保箭頭也是白的 */
+  transition: transform 0.3s ease;
+}
+
+/* 5. 圖標 Hover 位移 */
+.explore-more-btn:hover .arrow-icon {
+  transform: translateX(4px);
+}
