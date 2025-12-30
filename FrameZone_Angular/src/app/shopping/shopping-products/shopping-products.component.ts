@@ -1,35 +1,47 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FooterComponent } from "../../shared/components/footer/footer.component";
 import { ActivatedRoute } from '@angular/router';
+import { SearchService } from '../shared/services/search.service';
+import { ProductCardComponent } from "../shared/components/product-card/product-card.component";
+import { ToastNotificationComponent } from "../shared/components/toast-notification/toast-notification.component";
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 interface Product {
   id: number;
   name: string;
-  description: string;
   image: string;
-  condition: string;
+  description: string;
   price: number;
   seller: {
     name: string;
     avatar: string;
   };
   postedDate: string;
+  sales: number;
+  categoryId: number;
   isFavorite: boolean;
-  isNew: boolean;
 }
 
 @Component({
   selector: 'app-shopping-products',
   standalone: true,
-  imports: [FormsModule, CommonModule, FooterComponent],
+  imports: [FormsModule, CommonModule, FooterComponent, ProductCardComponent, ToastNotificationComponent],
   templateUrl: './shopping-products.component.html',
   styleUrl: './shopping-products.component.css'
 })
 export class ShoppingProductsComponent {
-
-  constructor(private route: ActivatedRoute) { }
+  constructor(
+    private searchService: SearchService
+  ) {
+    // 將 effect 放在 constructor 或屬性初始化層級 (Angular 16/17+ 推薦)
+    effect(() => {
+      const keyword = this.searchService.keyword().toLowerCase();
+      this.searchKeyword = keyword; // 同步內部的搜尋框
+      this.applyFilters(); // 當全站搜尋變動時，觸發篩選
+    });
+  }
 
   allProducts: Product[] = [];
   filteredProducts: Product[] = [];
@@ -44,43 +56,41 @@ export class ShoppingProductsComponent {
   searchKeyword: string = '';
   minPrice: number | null = null;
   maxPrice: number | null = null;
-  filterNew: boolean = false;
-  filterUsed: boolean = false;
   sortBy: string = 'default';
 
   ngOnInit(): void {
-    this.generateProducts();
+    this.generateProducts(); // 1. 先生成資料
 
-    // 接收 Header 搜尋參數
-    this.route.queryParams.subscribe(params => {
-      const keyword = (params['search'] || '').trim();
-      this.searchKeyword = keyword;
-
-      // 套用你原本的篩選邏輯
-      this.applyFilters();
-    });
+    // 2. 獲取 Service 的初始值並執行第一次篩選
+    this.searchKeyword = this.searchService.keyword();
+    this.applyFilters();
   }
 
   generateProducts(): void {
     const productNames = ['相機', '鏡頭', '腳架', '記憶卡', '閃光燈', '背包', '濾鏡', '相機包'];
-    const conditions = ['全新', '二手'];
 
     for (let i = 1; i <= 100; i++) {
-      const isNew = Math.random() > 0.5;
+      //先取出這一次迴圈要用的名稱
+      const name = productNames[Math.floor(Math.random() * productNames.length)];
+      //根據名稱決定圖片關鍵字
+      let keyword = 'camera';
+      if (name === '相機包') keyword = 'camera-bag';
+      if (name === '腳架') keyword = 'tripod';
+
       this.allProducts.push({
         id: i,
-        name: productNames[Math.floor(Math.random() * productNames.length)],
-        description: isNew ? '全新未拆封' : '二手使用過',
-        image: `https://images.unsplash.com/photo-${this.getRandomPhotoId()}?w=400`,
-        condition: isNew ? '全新' : '二手',
+        name: name,
+        description: '全新未拆封',
+        image: `https://loremflickr.com/400/300/${keyword}?lock=${i}`,
         price: Math.floor(Math.random() * 30000) + 1000,
         seller: {
           name: `賣家${i}`,
           avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`
         },
         postedDate: `${Math.floor(Math.random() * 30) + 1} 天前`,
+        sales: 45,
+        categoryId: 1,
         isFavorite: false,
-        isNew: isNew
       });
     }
   }
@@ -95,31 +105,61 @@ export class ShoppingProductsComponent {
     return photoIds[Math.floor(Math.random() * photoIds.length)];
   }
 
+  // 即時驗證最低價格（防止負數）
+  validateMinPrice(): void {
+    if (this.minPrice !== null && this.minPrice !== undefined) {
+      const value = Number(this.minPrice);
+      if (isNaN(value) || value < 0) {
+        this.minPrice = 0;
+      } else {
+        this.minPrice = Math.floor(value); // 只保留整數
+      }
+    }
+  }
+
+  // 即時驗證最高價格（防止負數）
+  validateMaxPrice(): void {
+    if (this.maxPrice !== null && this.maxPrice !== undefined) {
+      const value = Number(this.maxPrice);
+      if (isNaN(value) || value < 0) {
+        this.maxPrice = 0;
+      } else {
+        this.maxPrice = Math.floor(value); // 只保留整數
+      }
+    }
+  }
+
   applyFilters(): void {
+    // 優先判斷目前的關鍵字來源
+    // 如果 Service 有值且本地沒值，使用 Service 值
+    // 這裡我們確保 searchKeyword 始終反映最新的搜尋意圖
+    const finalKeyword = this.searchKeyword.trim().toLowerCase();
+
+    // 強制轉為數字，解決字串比較導致的錯誤
+    const min = (this.minPrice !== null && this.minPrice !== undefined && this.minPrice !== ('' as any)) ? Number(this.minPrice) : null;
+    const max = (this.maxPrice !== null && this.maxPrice !== undefined && this.maxPrice !== ('' as any)) ? Number(this.maxPrice) : null;
+
     this.filteredProducts = this.allProducts.filter(product => {
       // 搜尋關鍵字
-      if (this.searchKeyword) {
-        const keyword = this.searchKeyword.toLowerCase();
-        if (!product.name.toLowerCase().includes(keyword)) {
-          return false;
-        }
+      if (finalKeyword) {
+        // 建議：同時搜尋名稱與描述，增加「閃光燈」這類關鍵字的命中率
+        const isMatch = product.name.toLowerCase().includes(finalKeyword) ||
+          product.description.toLowerCase().includes(finalKeyword);
+        if (!isMatch) return false;
       }
 
-      // 價格範圍
-      if (this.minPrice !== null && product.price < this.minPrice) {
-        return false;
-      }
-      if (this.maxPrice !== null && product.price > this.maxPrice) {
-        return false;
-      }
+      // 價格範圍篩選 (使用轉換過的 min, max)
+      if (min !== null && product.price < min) return false;
+      if (max !== null && product.price > max) return false;
 
-      // 商品狀況
-      if (this.filterNew || this.filterUsed) {
-        if (this.filterNew && !product.isNew) return false;
-        if (this.filterUsed && product.isNew) return false;
+      // 如果最高價低於最低價，點擊搜尋時自動清空最高價或給予提示
+      if (min !== null && max !== null && max < min) {
+        // 這裡可以選擇清空 maxPrice 或不執行搜尋
+        // this.maxPrice = null;
       }
 
       return true;
+
     });
 
     // 排序
@@ -158,8 +198,6 @@ export class ShoppingProductsComponent {
     this.searchKeyword = '';
     this.minPrice = null;
     this.maxPrice = null;
-    this.filterNew = false;
-    this.filterUsed = false;
     this.sortBy = 'default';
     this.applyFilters();
   }

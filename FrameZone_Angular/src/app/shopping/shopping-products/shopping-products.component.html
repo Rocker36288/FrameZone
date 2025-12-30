@@ -1,46 +1,34 @@
 <div class="page-wrapper">
   <div class="page-body">
-    <div class="container-fluid">
-      <!-- 頁面標題 -->
-      <div class="page-header mb-4">
-        <h1 class="page-title">所有商品</h1>
-        <div class="page-subtitle">
-          共 {{ filteredProducts.length }} 件商品
-          <ng-container *ngIf="searchKeyword">
-            ，搜尋：「{{ searchKeyword }}」
-          </ng-container>
-        </div>
-      </div>
-
+    <div class="container-custom">
       <div class="row">
         <!-- 左側篩選欄 -->
-        <div class="col-lg-2 col-md-3 mb-4">
+        <div class="col-xl-2 col-lg-3 col-md-4 mb-4">
           <div class="filter-sidebar">
-            <!-- 搜尋 -->
-            <div class="filter-section">
-              <h3 class="filter-title">搜尋商品</h3>
-              <div class="search-box">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="11" cy="11" r="8" />
-                  <path d="m21 21-4.35-4.35" />
-                </svg>
-                <input type="text" class="search-input" placeholder="搜尋..." [(ngModel)]="searchKeyword"
-                  (input)="applyFilters()" />
-              </div>
-            </div>
-
             <!-- 價格範圍 -->
             <div class="filter-section">
               <h3 class="filter-title">價格範圍</h3>
               <div class="price-inputs">
                 <input type="number" class="price-input" placeholder="最低" [(ngModel)]="minPrice"
-                  (input)="applyFilters()" />
+                  (input)="validateMinPrice()" (keyup.enter)="applyFilters()" min="0" />
                 <span class="price-separator">-</span>
                 <input type="number" class="price-input" placeholder="最高" [(ngModel)]="maxPrice"
-                  (input)="applyFilters()" />
+                  (input)="validateMaxPrice()" (keyup.enter)="applyFilters()" min="0" />
               </div>
-              <div class="quick-price-filters">
+
+              <div class="mt-2">
+                <button
+                  class="choose-price-btn btn-outline-primary w-100 btn-sm d-flex align-items-center justify-content-center gap-1"
+                  (click)="applyFilters()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12l5 5l10 -10" />
+                  </svg>
+                  套用價格
+                </button>
+              </div>
+
+              <div class="quick-price-filters mt-3">
                 <button class="quick-price-btn" (click)="setQuickPrice(0, 5000)">$5000以下</button>
                 <button class="quick-price-btn" (click)="setQuickPrice(5000, 10000)">$5000-$10000</button>
                 <button class="quick-price-btn" (click)="setQuickPrice(10000, 20000)">$10000-$20000</button>
@@ -49,7 +37,7 @@
             </div>
 
             <!-- 商品狀況 -->
-            <div class="filter-section">
+            <!-- <div class="filter-section">
               <h3 class="filter-title">商品狀況</h3>
               <div class="checkbox-group">
                 <label class="checkbox-item">
@@ -61,7 +49,7 @@
                   <span>二手</span>
                 </label>
               </div>
-            </div>
+            </div> -->
 
             <!-- 排序 -->
             <div class="filter-section">
@@ -88,36 +76,11 @@
         </div>
 
         <!-- 右側商品列表 -->
-        <div class="col-lg-10 col-md-9">
-          <!-- 商品網格 -->
+        <div class="col-xl-10 col-lg-9 col-md-8">
+          @if (displayedProducts.length > 0) {
           <div class="row row-cards">
-            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6" *ngFor="let product of displayedProducts">
-              <div class="card product-card">
-                <a href="#" class="product-image-link">
-                  <img class="card-img-top" [src]="product.image" [alt]="product.name" />
-                </a>
-                <div class="card-body">
-                  <h3 class="product-name">
-                    <a href="#">{{ product.name }}</a>
-                  </h3>
-                  <div class="product-price">${{ product.price.toLocaleString() }}</div>
-                  <div class="product-condition">{{ product.condition }}</div>
-                  <div class="product-footer">
-                    <div class="seller-info">
-                      <span class="avatar-small" [style.background-image]="'url(' + product.seller.avatar + ')'"></span>
-                      <span class="seller-name-small">{{ product.seller.name }}</span>
-                    </div>
-                    <a href="#" class="favorite-icon" [class.active]="product.isFavorite"
-                      (click)="toggleFavorite(product); $event.preventDefault()">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                        [attr.fill]="product.isFavorite ? 'currentColor' : 'none'" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
-                      </svg>
-                    </a>
-                  </div>
-                </div>
-              </div>
+            <div class="col-custom" *ngFor="let product of displayedProducts">
+              <app-product-card [product]="product" (favoriteChange)="product.isFavorite = $event"></app-product-card>
             </div>
           </div>
 
@@ -126,7 +89,7 @@
             <div class="col-12 d-flex justify-content-center">
               <ul class="pagination">
                 <li class="page-item" [class.disabled]="currentPage === 1">
-                  <a class="page-link" href="#" (click)="goToFirstPage(); $event.preventDefault()" tabindex="-1">
+                  <a class="page-link" href="#" (click)="goToFirstPage(); $event.preventDefault()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M11 7l-5 5l5 5" />
@@ -135,7 +98,7 @@
                   </a>
                 </li>
                 <li class="page-item" [class.disabled]="currentPage === 1">
-                  <a class="page-link" href="#" (click)="goToPreviousPage(); $event.preventDefault()" tabindex="-1">
+                  <a class="page-link" href="#" (click)="goToPreviousPage(); $event.preventDefault()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M15 6l-6 6l6 6" />
@@ -165,11 +128,33 @@
               </ul>
             </div>
           </div>
+
+          } @else {
+
+          <div class="empty-state-wrapper d-flex flex-column align-items-center justify-content-center">
+            <div class="mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="text-muted">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <h3>找不到符合條件的商品</h3>
+            <p class="text-muted">請嘗試調整價格範圍或關鍵字</p>
+            <button class="clear-filters-btn btn-primary" (click)="clearFilters()">清除篩選條件</button>
+          </div>
+          }
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<div>
+  <app-toast-notification></app-toast-notification>
+</div>
+
 <div>
   <app-footer></app-footer>
 </div>
