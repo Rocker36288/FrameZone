@@ -211,7 +211,6 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddScoped<IPhotoRepository, PhotoRepository>();
 builder.Services.AddScoped<UserRepository>();
-builder.Services.AddScoped<PostRepository>();
 builder.Services.AddScoped<IMemberProfileRepository, MemberProfileRepository>();
 builder.Services.AddScoped<IUserLogRepository, UserLogRepository>();
 builder.Services.AddScoped<IMemberSecurityRepository, MemberSecurityRepository>();
@@ -221,7 +220,6 @@ builder.Services.AddScoped<IMemberPrivacyRepository, MemberPrivacyRepository>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
-builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<IExifService, ExifService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<ITagCategorizationService, TagCategorizationService>();
@@ -240,6 +238,12 @@ builder.Services.AddScoped<IGeocodingService, GeocodingService>();
 
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddHttpContextAccessor();
+
+// ========== 社群服務 (DI注入) ==========
+builder.Services.AddScoped<PostRepository>();
+builder.Services.AddScoped<CommentRepository>();
+builder.Services.AddScoped<PostService>();
+builder.Services.AddScoped<CommentService>();
 
 // ========== 影片服務 (DI注入) ==========
 builder.Services.AddMemoryCache();

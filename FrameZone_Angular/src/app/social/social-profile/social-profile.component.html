@@ -1,0 +1,42 @@
+<div class="profile-container">
+  <header class="profile-header card-style">
+    <div class="top-section">
+      <div class="user-info">
+        <div class="avatar-circle">
+          <img src="images/social/Patrick.jpg" />
+        </div>
+        <div class="user-text">
+          <h1>派大星</h1>
+          <p>10位好友</p>
+        </div>
+      </div>
+
+      <div class="action-group">
+        <button class="btn btn-primary" (click)="addFriend()">新增好友</button>
+        <button class="btn btn-secondary" (click)="sendMessage()">發送訊息</button>
+      </div>
+    </div>
+
+    <nav class="tab-nav">
+      <button [class.active]="currentView() === 'all'" (click)="setView('all')">全部貼文</button>
+      <button [class.active]="currentView() === 'photos'" (click)="setView('photos')">貼文照片</button>
+      <button [class.active]="currentView() === 'friends'" (click)="setView('friends')">好友清單</button>
+    </nav>
+  </header>
+
+  <main class="content-area">
+    @switch (currentView()) {
+    @case ('all') {
+    <app-social-posts-list></app-social-posts-list>
+    }
+
+    @case ('photos') {
+    <app-social-posts-images></app-social-posts-images>
+    }
+
+    @case ('friends') {
+    <div class="card-style p-4 text-center">好友清單</div>
+    }
+    }
+  </main>
+</div>

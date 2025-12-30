@@ -257,11 +257,16 @@ export const routes: Routes = [
             loadComponent: () => import('./social/social-index/social-index.component').then(m => m.SocialIndexComponent)
           },
           {
+            path: 'profile',
+            loadComponent: () => import('./social/social-profile/social-profile.component').then(m => m.SocialProfileComponent),
+          },
+          {
             path: 'friends',
             loadComponent: () => import('./social/social-friends/social-friends.component').then(m => m.SocialFriendsComponent)
           },
         ]
-      }
+      },
+
     ]
   },
   {
