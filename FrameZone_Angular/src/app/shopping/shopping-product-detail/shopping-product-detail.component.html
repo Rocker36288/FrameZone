@@ -1,4 +1,5 @@
 <div class="product-detail-container">
+  @if (currentProduct) {
   <div class="content-wrapper">
 
     <main class="product-main-info">
@@ -56,8 +57,9 @@
                   <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
                 </svg>
               </button> -->
-              <app-favorite-button class="icon-border" [isFavorite]="product.isFavorite" [itemName]="product.name"
-                (favoriteChange)="product.isFavorite = $event">
+              <app-favorite-button *ngIf="currentProduct" class="icon-border" class="icon-border"
+                [isFavorite]="currentProduct.isFavorite" [itemName]="currentProduct.name"
+                (favoriteChange)="currentProduct.isFavorite = $event">
               </app-favorite-button>
             </div>
           </div>
@@ -74,7 +76,7 @@
               </div>
             </div>
             <div class="seller-actions">
-              <button class="seller-chat-btn" (click)="toggleChatWindow()">
+              <button class="seller-chat-btn" (click)="openChatFromProduct()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                   class="icon icon-tabler icons-tabler-outline icon-tabler-message-chatbot">
@@ -106,9 +108,9 @@
       </div>
       <section class="product-options">
 
-        <h1 class="product-title">{{ product.name }}</h1>
+        <h1 class="product-title">{{ currentProduct?.name }}</h1>
 
-        <div class="price-section"><span class="price">NT$ {{ product.price }}</span></div>
+        <div class="price-section"><span class="price">NT$ {{ currentProduct?.price }}</span></div>
 
         <div class="option-row">
           <label for="spec-select" class="label">規格:</label>
@@ -168,7 +170,7 @@
     <section class="product-section product-description-section">
       <h2>商品描述</h2>
       <div class="content-box content-bordered-box">
-        <p>本書深入探討了軟體設計中常見的模式與應用。適用於中高級開發者。</p>
+        <p>{{ currentProduct?.description }}</p>
         <p>二手，使用過幾次。</p>
       </div>
     </section>
@@ -185,8 +187,10 @@
       <div class="similar-list row similar-list-override">
 
         <div class="similar-col" *ngFor="let item of similarProducts">
-          <div class="card d-flex flex-column h-100 product-card-override">
-            <a [routerLink]="['/shopping/product', item.id]">
+          <app-product-card [product]="item" (favoriteChange)="item.isFavorite = $event"></app-product-card>
+
+          <!-- <div class="card d-flex flex-column h-100 product-card-override">
+            <a [routerLink]="['/shopping/product-detail', item.id]">
               <div class="card-img-top card-img-placeholder"><img [src]="item.img" [alt]="item.name"
                   class="product-thumb-image">
               </div>
@@ -202,8 +206,8 @@
               <div class="d-flex align-items-center pt-2 mt-auto">
                 <div class="fw-bold price-color-override me-auto">NT$ {{ item.price }}</div>
 
-                <div class="ms-auto">
-                  <!-- <a href="javascript:void(0)" class="icon d-none d-md-inline-block ms-3 similar-fav-btn"
+                <div class="ms-auto"> -->
+          <!-- <a href="javascript:void(0)" class="icon d-none d-md-inline-block ms-3 similar-fav-btn"
                     [class.favorited]="item.isFavorite" (click)="toggleSimilarFavorite(item)">
 
                     <svg *ngIf="item.isFavorite" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -218,20 +222,47 @@
                       <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
                     </svg>
                   </a> -->
-                  <app-favorite-button [isFavorite]="item.isFavorite" [itemName]="product.name"
+          <!-- <app-favorite-button [isFavorite]="item.isFavorite" [itemName]="product.name"
                     (favoriteChange)="item.isFavorite = $event">
-                  </app-favorite-button>
-
-                </div>
-              </div>
-            </div>
-          </div>
+                  </app-favorite-button> -->
         </div>
-
       </div>
     </section>
-
   </div>
+  }
+  @else {
+  <div class="content-wrapper">
+    <div class="container mt-5">
+      <div class="text-center p-5 border rounded-3 bg-light">
+        <div class="mb-3 text-secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+            class="icon icon-tabler icon-tabler-search">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+            <path d="M21 21l-6 -6" />
+          </svg>
+          找不到商品
+        </div>
+        <p class="text-secondary mb-4">抱歉，您查詢的商品可能已下架、刪除或網址輸入錯誤。</p>
+
+        <hr class="my-4">
+
+        <button routerLink="/shopping/home" class="back-to-home btn d-inline-flex align-items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="icon icon-tabler icon-tabler-arrow-left">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M5 12l14 0" />
+            <path d="M5 12l6 6" />
+            <path d="M5 12l6 -6" />
+          </svg>
+          回到購物中心首頁
+        </button>
+      </div>
+    </div>
+  </div>
+  }
 
   <div class="app-modal-overlay" *ngIf="showShippingModal">
     <div class="app-modal">
@@ -273,7 +304,7 @@
     </div>
   </div>
 
-  <div class="chat-window" *ngIf="showChatWindow">
+  <!-- <div class="chat-window" *ngIf="showChatWindow">
     <div class="chat-header">
       <span>{{ sellerInfo.account }}</span>
       <button class="close-btn" (click)="toggleChatWindow()">
@@ -313,7 +344,7 @@
         <button class="send-btn">發送</button>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <!-- <div class="app-toast" *ngIf="showToast">
     {{ toastMessage }}
@@ -335,6 +366,10 @@
     <img [src]="currentImage" alt="放大圖片" class="image-modal-content">
   </div>
 </div>
+
+<!-- <div>
+  <app-chat-window></app-chat-window>
+</div> -->
 
 <div>
   <app-toast-notification></app-toast-notification>
