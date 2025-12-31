@@ -26,15 +26,24 @@ export class SocialCommentsComponent {
   activeMenuId: number | null = null;
   editingCommentId: number | null = null;
   editContent = "";
-  currentUserId?: number;
+  CurrentUserId: any;
 
   constructor(private authService: AuthService) { }
   ngOnInit(): void {
-    console.log(this.authService.getCurrentUser());
+    const userJson =
+      localStorage.getItem('currentUser') ??
+      sessionStorage.getItem('currentUser');
 
-    console.log(this.authService.getCurrentUser()?.userId);
-    this.currentUserId = this.authService.getCurrentUser()?.userId;
+    if (!userJson) {
+      console.warn('currentUser not found');
+      return;
+    }
+
+    const user = JSON.parse(userJson);
+    this.CurrentUserId = user.userID ?? user.userId;
+    console.log(this.CurrentUserId);
   }
+
 
   @HostListener('document:click')
   onDocumentClick() {

@@ -19,6 +19,7 @@
         </div>
 
         <!-- 右側：功能選單 -->
+        @if(comment.userId===CurrentUserId){
         <div class="position-absolute top-0 end-0 me-2 mt-2">
           <button class="btn btn-sm btn-light" (click)="toggleMenu(comment.commentId, $event)">
             ...
@@ -39,8 +40,6 @@
           </ul>
           }
         </div>
-        @if(comment.userId===currentUserId){
-
         }
       </div>
 
