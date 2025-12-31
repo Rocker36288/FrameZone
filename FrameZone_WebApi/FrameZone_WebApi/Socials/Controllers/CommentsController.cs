@@ -39,7 +39,18 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpGet("post/{postId:int}")]
         public async Task<ActionResult<List<CommentReadDto>>> GetByPost(int postId)
         {
-            var result = await _commentService.GetByPostIdAsync(postId);
+            long currentUserId = 0; // 預設：未登入
+
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier); // ⭐ 正確
+                if (userIdClaim != null)
+                {
+                    currentUserId = long.Parse(userIdClaim.Value);
+                }
+            }
+            
+            var result = await _commentService.GetByPostIdAsync(postId, currentUserId);
             return Ok(result);
         }
 
