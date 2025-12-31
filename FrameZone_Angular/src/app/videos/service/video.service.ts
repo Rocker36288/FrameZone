@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 // import { environment } from '../../environments/environment';
-import { ChannelCard, ChannelHome, VideoCardData, VideoCommentCard, VideoCommentRequest, VideoLikesDto, VideoLikesRequest } from '../models/video-model';
+import { ChannelCard, ChannelHome, UpdateWatchHistoryRequest, VideoCardData, VideoCommentCard, VideoCommentRequest, VideoLikesDto, VideoLikesRequest, VideoWatchHistoryDto } from '../models/video-model';
 
 @Injectable({
   providedIn: 'root'
@@ -73,5 +73,16 @@ export class VideoService {
   // 切換頻道追隨狀態
   toggleChannelFollow(channelId: number): Observable<boolean> {
     return this.http.post<boolean>(`${this.apiBase}/videos/channels/${channelId}/followtoggle`, {});
+  }
+
+  // 更新觀看紀錄
+  updateWatchHistory(videoId: number, lastPosition: number): Observable<boolean> {
+    const body: UpdateWatchHistoryRequest = { videoId, lastPosition };
+    return this.http.post<boolean>(`${this.apiBase}/videos/views/update`, body);
+  }
+
+  // 更新觀看紀錄
+  GetWatchHistory(): Observable<VideoWatchHistoryDto[]> {
+    return this.http.get<VideoWatchHistoryDto[]>(`${this.apiBase}/videos/views/history`);
   }
 }

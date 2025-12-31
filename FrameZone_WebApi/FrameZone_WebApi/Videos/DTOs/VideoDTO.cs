@@ -114,4 +114,16 @@
     {
         public bool IsFollow { get; set; }
     }
+
+    //觀看歷史紀錄顯示
+    public class WatchHistoryDto
+    {
+        public VideoCardDto Video { get; set; } = new VideoCardDto();
+
+        // 已看過秒數
+        public int LastPosition { get; set; }
+
+        // 可選：最後觀看時間
+        public DateTime LastWatchedAt { get; set; }
+    }
 }

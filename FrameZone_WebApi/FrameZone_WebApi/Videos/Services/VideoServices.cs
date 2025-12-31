@@ -14,19 +14,6 @@ namespace FrameZone_WebApi.Videos.Services
         {
             _videoRepo = videoRepo;
         }
-
-
-        //public async Task<VideoCommentDto?> GetVideoCommentByCommentidAsync(int videoid)
-        //{
-        //    var dto = await _videoRepo.GetVideoCommentByCommentid(videoid);
-
-        //    if (dto == null)
-        //    {
-        //        return null;
-        //    }
-
-        //    return dto;
-        //}
         public async Task<List<VideoCardDto>> GetVideoRecommendAsync()
         {
             var dto = await _videoRepo.GetRecommendVideosAsync();
@@ -169,6 +156,46 @@ namespace FrameZone_WebApi.Videos.Services
         public async Task<bool> ChannelFollowToggle(int userId, int channelId)
         {
             return await _videoRepo.FollowingToggleAsync(userId, channelId);
+        }
+
+        /* =====================================================
+       * Watch History
+       * ===================================================== */
+        public async Task WatchVideoUpdateAsync(int userId, int videoId, int lastPosition)
+        {
+            var watchRecord = await _videoRepo
+                .GetByUserAndVideoViewsAsync(userId, videoId);
+
+            if (watchRecord != null)
+            {
+                watchRecord.LastPosition = lastPosition;
+                watchRecord.UpdateAt = DateTime.UtcNow;
+
+                _videoRepo.ViewsUpdate(watchRecord);
+            }
+            else
+            {
+                var newRecord = new View
+                {
+                    UserId = userId,
+                    VideoId = videoId,
+                    LastPosition = lastPosition,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdateAt = DateTime.UtcNow
+                };
+
+                await _videoRepo.ViewsAddAsync(newRecord);
+            }
+
+            await _videoRepo.ViewsSaveChangesAsync();
+        }
+
+        /// <summary>
+        /// 取得觀看紀錄（含影片資訊 + 已看秒數）
+        /// </summary>
+        public async Task<List<WatchHistoryDto>> GetWatchHistoryAsync(int userId)
+        {
+            return await _videoRepo.GetWatchHistoryByUserIdAsync(userId);
         }
     }
 }

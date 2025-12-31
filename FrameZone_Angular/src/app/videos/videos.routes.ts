@@ -12,6 +12,8 @@ import { VideocreatorLayoutComponent } from './pages/creatorworkshop/videocreato
 import { videoGuard } from './guard/video.guard';
 import { VideoHomeComponent } from './pages/home/video-home/video-home.component';
 import { VideocreatorEditvideoComponent } from './pages/creatorworkshop/videocreator-editvideo/videocreator-editvideo.component';
+import { ChannelHistoryComponent } from './pages/channel/channel-history/channel-history.component';
+import { VideoSearchComponent } from './pages/search/video-search/video-search.component';
 
 export const VIDEO_ROUTES: Routes = [
   {
@@ -22,6 +24,7 @@ export const VIDEO_ROUTES: Routes = [
       // 預設首頁
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: VideoHomeComponent }, // 註：如果 Shell 本身就是 Home，這裡可調整
+      { path: 'search', component: VideoSearchComponent },
 
       // 影片播放頁
       { path: 'watch/:guid', component: VideoMainComponent },
@@ -37,7 +40,12 @@ export const VIDEO_ROUTES: Routes = [
           { path: 'playlists', component: ChannelPlaylistsComponent }
         ]
       },
-
+      {
+        path: 'personal',
+        component: ChannelHistoryComponent,
+        canActivate: [videoGuard],
+        canActivateChild: [videoGuard],
+      },
       // 創作者工作台（包含您之前的 Guard 邏輯）
       {
         path: 'videocreator',

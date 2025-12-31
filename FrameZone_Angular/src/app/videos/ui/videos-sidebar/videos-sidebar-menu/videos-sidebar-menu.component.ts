@@ -11,7 +11,7 @@ import { NgForOf, NgSwitch, NgSwitchCase } from "@angular/common";
 export class VideosSidebarMenuComponent {
   @Input() menuItems = [
     { title: '回到影片首頁', route: '/videos/home', icon: 'home' },
-    { title: '觀看紀錄', route: '/videos/history', icon: 'home' },
+    { title: '觀看紀錄', route: '/videos/personal', icon: 'home' },
     { title: '創作者工作室', route: '/videos/videocreator', icon: 'video' }
   ];
 

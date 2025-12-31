@@ -23,6 +23,12 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
+.thumbnail-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
 .video-thumb-container::before {
   content: '';
   position: absolute;
@@ -221,6 +227,30 @@
   width: 32px;
   height: 32px;
   object-fit: cover;
+}
+
+/* 進度條主題顏色 */
+.video-progress {
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.2);
+  /* 底色淡淡的白色透明 */
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.video-progress .progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  /* 跟縮圖漸層統一 */
+}
+
+.img-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 讓圖片填滿容器且保持比例 */
+  display: block;
+  border-radius: 8px;
 }
 
 /* 載入動畫 (可選) */

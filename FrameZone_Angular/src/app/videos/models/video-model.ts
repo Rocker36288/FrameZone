@@ -96,7 +96,7 @@ export interface VideoCommentRequest {
   ParentCommentId: number | undefined;
 }
 
-
+//likeDto
 export interface VideoLikesRequest {
   isLikes: boolean;
   videoId: number;
@@ -105,3 +105,16 @@ export interface VideoLikesRequest {
 export interface VideoLikesDto {
   isLikes: boolean;
 }
+
+//viewHistoryDto
+export interface UpdateWatchHistoryRequest {
+  videoId: number;
+  lastPosition: number;
+}
+
+export interface VideoWatchHistoryDto {
+  video: VideoCardData;
+  lastPosition: number; // 已看秒數
+  lastWatchedAt: string;
+}
+

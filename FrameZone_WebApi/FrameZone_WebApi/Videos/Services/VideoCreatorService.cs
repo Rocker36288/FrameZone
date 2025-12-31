@@ -56,6 +56,10 @@ namespace FrameZone_WebApi.Videos.Services
         public async Task<VideoDetailDto> GetVideoForEdit(string guid, int id)
         {
             var video = await _videoRepo.GetVideoByGuidForUser(guid, id);
+            if (video == null)
+            {
+                return null; // 沒找到或沒權限，直接回傳 null
+            }
 
 
             var viewCount = await _videoRepo.GetViewsCountAsync(video.VideoId);

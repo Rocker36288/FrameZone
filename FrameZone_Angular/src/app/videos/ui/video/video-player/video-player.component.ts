@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, OnDestroy, AfterViewInit, Input } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnDestroy, AfterViewInit, Input, Output, EventEmitter } from '@angular/core';
 import Hls from 'hls.js';
 import { NgIf, NgFor, NgClass } from '@angular/common';
 
@@ -51,6 +51,11 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
   currentPlaybackRate: number = 1;
   showRateMenu: boolean = false;
 
+  // 觀看位置輸出
+  @Output() timeUpdate = new EventEmitter<number>();
+  private lastEmitTime = 0;
+
+
 
   ngAfterViewInit(): void {
     const video = this.videoRef.nativeElement;
@@ -92,6 +97,15 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
     // 監聽影片播放/暫停來控制控制列顯示
     video.addEventListener('play', () => this.hideControlsAfterDelay());
     video.addEventListener('pause', () => this.showControls = true);
+
+    //輸出影片播放時間
+    video.addEventListener('timeupdate', () => {
+      const current = Math.floor(video.currentTime);
+      if (current - this.lastEmitTime >= 1) {
+        this.lastEmitTime = current;
+        this.timeUpdate.emit(current);
+      }
+    });
   }
 
   private initCustomControls(): void {

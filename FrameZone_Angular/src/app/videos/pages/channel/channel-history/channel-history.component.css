@@ -1,0 +1,12 @@
+:host {
+  display: block;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 確保 header 緊貼頂部 */
+header.navbar {
+  margin: 0 !important;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}

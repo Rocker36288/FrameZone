@@ -404,36 +404,51 @@ namespace FrameZone_WebApi.Videos.Repositories
         /* =====================================================
         * Watch History
         * ===================================================== */
-        public async Task WatchVideoUpdateAsync(int userId, int videoId, int lastPosition)
+        public async Task<View?> GetByUserAndVideoViewsAsync(int userId, int videoId)
         {
-            // 嘗試取得既有紀錄
-            var watchRecord = await _context.Views
+            return await _context.Views
                 .FirstOrDefaultAsync(v => v.UserId == userId && v.VideoId == videoId);
+        }
 
-            if (watchRecord != null)
-            {
-                // 更新最後觀看位置與時間
-                watchRecord.LastPosition = lastPosition;
-                watchRecord.UpdateAt = DateTime.UtcNow;
-                _context.Views.Update(watchRecord);
-            }
-            else
-            {
-                // 新增紀錄
-                var newRecord = new View
-                {
-                    UserId = userId,
-                    VideoId = videoId,
-                    LastPosition = lastPosition,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdateAt = DateTime.UtcNow
-                };
-                await _context.Views.AddAsync(newRecord);
-            }
+        public async Task ViewsAddAsync(View view)
+        {
+            await _context.Views.AddAsync(view);
+        }
 
-            // 儲存變更
+        public void ViewsUpdate(View view)
+        {
+            _context.Views.Update(view);
+        }
+
+        public async Task ViewsSaveChangesAsync()
+        {
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<WatchHistoryDto>> GetWatchHistoryByUserIdAsync(int userId)
+        {
+            var views = await _context.Views
+                .Include(v => v.Video)
+                    .ThenInclude(video => video.Channel)
+                        .ThenInclude(c => c.UserProfile)
+                .Where(v => v.UserId == userId)
+                .OrderBy(v => v.UpdateAt)
+                .ToListAsync();
+
+            var videos = views.Select(v => v.Video!).ToList();
+
+            var videoDtos = await MapVideosToDtoAsync(videos);
+
+            var result = views.Select(v => new WatchHistoryDto
+            {
+                Video = videoDtos.First(dto => dto.VideoId == v.VideoId),
+                LastPosition = v.LastPosition,
+                LastWatchedAt = v.UpdateAt
+            }).ToList();
+
+            return result;
+        }
+
 
         /* =====================================================
         * 搜尋

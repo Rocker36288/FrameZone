@@ -22,9 +22,12 @@ export class VideoCardComponent {
     | 'large'
     | 'creator-long'
     | 'search'
+    | 'history'
     = 'small';
   @Input() showChannel: boolean = true;
   @Input() showDescription: boolean = true;
+  @Input() lastPosition: number = 0;
+
 
   @Output() videoClick = new EventEmitter<string>();
 

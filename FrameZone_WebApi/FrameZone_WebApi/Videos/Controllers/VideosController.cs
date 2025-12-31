@@ -209,6 +209,39 @@ namespace FrameZone_WebApi.Videos.Controllers
             return Ok(isFollowing);
         }
 
+        // ============================== 更新觀看 ==============================
+
+        public class UpdateWatchHistoryDto
+        {
+            public int VideoId { get; set; }
+            public int LastPosition { get; set; }
+        }
+
+       
+        [HttpPost("views/update")]
+        [Authorize]
+        public async Task<IActionResult> UpdateWatchHistory([FromBody] UpdateWatchHistoryDto dto)
+        {
+            var userId = GetUserId();
+
+            await _videoServices
+                .WatchVideoUpdateAsync(userId, dto.VideoId, dto.LastPosition);
+
+            return Ok(true);
+        }
+
+        /// <summary>
+        /// 取得使用者觀看紀錄
+        /// </summary>
+        [HttpGet("views/history")]
+        [Authorize]
+        public async Task<ActionResult<List<WatchHistoryDto>>> GetWatchHistory()
+        {
+            // 假設 User.Identity.Name 或 Claims 取得 UserId
+            var userId = GetUserId();
+            var history = await _videoServices.GetWatchHistoryAsync(userId);
+            return Ok(history);
+        }
 
         //=============獲取userid=======================================
         private int GetUserId()

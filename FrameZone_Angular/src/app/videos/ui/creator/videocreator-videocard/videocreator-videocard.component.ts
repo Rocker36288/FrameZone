@@ -38,7 +38,7 @@ export class VideocreatorVideocardComponent {
   constructor(private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
-    if (this.Video?.thumbnail) {
+    if (!this.Video.thumbnail) {
       this.Video.thumbnail =
         'https://localhost:7213/api/Videos/video-thumbnail/' + this.Video.videoUrl;
     }
