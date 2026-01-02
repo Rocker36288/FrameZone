@@ -82,6 +82,27 @@ namespace FrameZone_WebApi.Videos.Controllers
             }
         }
 
+        /// <summary>
+        /// 取得創作者頻道數據分析
+        /// </summary>
+        /// <param name="period">分析區間（7days / 30days / 90days）</param>
+        [HttpGet("analytics")]  // 完整路徑：api/VideoCreator/analytics
+        public async Task<IActionResult> GetCreatorAnalytics([FromQuery] string period = "7days")
+        {
+            if (!IsValidPeriod(period))
+                return BadRequest("Invalid period. Allowed values: 7days, 30days, 90days");
+
+            var result = await _videoCreatorService
+                .GetAnalyticsAsync(GetUserId(), period);
+
+            return Ok(result);
+        }
+
+        private static bool IsValidPeriod(string period)
+        {
+            return period is "7days" or "30days" or "90days";
+        }
+
 
         //=============獲取userid=======================================
         private int GetUserId()

@@ -1,8 +1,10 @@
-﻿using FrameZone_WebApi.Models;
+﻿using System;
+using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Videos.DTOs;
 using FrameZone_WebApi.Videos.Enums;
 using Microsoft.EntityFrameworkCore;
 using static FrameZone_WebApi.Videos.DTOs.VideoCreatorDTO;
+using static FrameZone_WebApi.Videos.Respositories.VideoCreatorRepository;
 
 namespace FrameZone_WebApi.Videos.Respositories
 {
@@ -74,7 +76,116 @@ namespace FrameZone_WebApi.Videos.Respositories
             _context.Videos.Update(video);
             await _context.SaveChangesAsync();
         }
+        /* =====================================================
+        * 🎬 影片資訊解析區
+        * ===================================================== */
 
+        public async Task<int> GetTotalVideosAsync(int channelId)
+        {
+            return await _context.Videos
+                .AsNoTracking()
+                .CountAsync(v =>
+                    v.ChannelId == channelId &&
+                    !v.IsDeleted &&
+                    v.PrivacyStatus == "PUBLIC");
+        }
 
+        public async Task<long> GetTotalViewsAsync(
+            int channelId, DateTime from, DateTime to)
+        {
+            return await _context.Views
+                .AsNoTracking()
+                .Where(v =>
+                    v.Video.ChannelId == channelId &&
+                    v.CreatedAt >= from &&
+                    v.CreatedAt <= to)
+                .LongCountAsync();
+        }
+
+        public async Task<int> GetSubscribersCountAsync(int channelId)
+        {
+            return await _context.Followings
+                .AsNoTracking()
+                .CountAsync(f => f.ChannelId == channelId);
+        }
+
+        public async Task<int> GetLikesCountAsync(
+            int channelId, DateTime from, DateTime to)
+        {
+            return await _context.Likes
+                .AsNoTracking()
+                .Where(l =>
+                    l.Video.ChannelId == channelId &&
+                    l.CreatedAt >= from &&
+                    l.CreatedAt <= to)
+                .CountAsync();
+        }
+
+        public async Task<int> GetCommentsCountAsync(
+            int channelId, DateTime from, DateTime to)
+        {
+            return await _context.Comments
+                .AsNoTracking()
+                .Join(_context.CommentTargets,
+                    c => c.CommentTargetId,
+                    t => t.CommentTargetId,
+                    (c, t) => new { c, t })
+                .Where(x =>
+                    x.t.VideoId != null &&
+                    x.c.CreatedAt >= from &&
+                    x.c.CreatedAt <= to &&
+                    _context.Videos.Any(v =>
+                        v.VideoId == x.t.VideoId &&
+                        v.ChannelId == channelId))
+                .CountAsync();
+        }
+
+        public async Task<List<DailyViewStatDto>> GetDailyViewsAsync(
+            int channelId, DateTime from, DateTime to)
+        {
+            return await _context.Views
+                .AsNoTracking()
+                .Where(v =>
+                    v.Video.ChannelId == channelId &&
+                    v.CreatedAt >= from &&
+                    v.CreatedAt <= to)
+                .GroupBy(v => v.CreatedAt.Date)
+                .Select(g => new DailyViewStatDto
+                {
+                    Date = g.Key,
+                    Views = g.Count()
+                })
+                .OrderBy(x => x.Date)
+                .ToListAsync();
+        }
+
+        public async Task<List<RecentVideoStatDto>> GetRecentVideosAsync(
+            int channelId, int take)
+        {
+            return await _context.Videos
+                .AsNoTracking()
+                .Where(v =>
+                    v.ChannelId == channelId &&
+                    !v.IsDeleted)
+                .OrderByDescending(v => v.PublishDate)
+                .Take(take)
+                .Select(v => new RecentVideoStatDto
+                {
+                    VideoId = v.VideoId,
+                    Title = v.Title,
+                    ThumbnailUrl = v.ThumbnailUrl,
+                    PublishDate = (DateTime)v.PublishDate,
+                    Views = _context.Views.Count(x => x.VideoId == v.VideoId),
+                    Likes = _context.Likes.Count(x => x.VideoId == v.VideoId),
+                    Comments = _context.CommentTargets
+                        .Where(t => t.VideoId == v.VideoId)
+                        .Join(_context.Comments,
+                            t => t.CommentTargetId,
+                            c => c.CommentTargetId,
+                            (t, c) => c)
+                        .Count()
+                })
+                .ToListAsync();
+        }
     }
 }

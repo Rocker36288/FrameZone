@@ -148,7 +148,7 @@
                 <div class="d-flex justify-content-around align-items-end" style="height: 100%;">
                   <div *ngFor="let data of analytics.performanceChart" class="text-center" style="flex: 1;">
                     <div class="mb-2">
-                      <div class="chart-bar" [style.height.px]="(data.views / 25600) * 250"
+                      <div class="chart-bar" [style.height.px]="(data.views / getMaxViews()) * 250"
                         style="background: linear-gradient(180deg, #667eea 0%, #764ba2 100%); border-radius: 4px 4px 0 0; margin: 0 auto; width: 40px;"
                         [title]="data.views + ' 觀看'">
                       </div>
@@ -186,7 +186,7 @@
                     <tr *ngFor="let video of analytics.recentVideos">
                       <td>
                         <div class="d-flex align-items-center">
-                          <img [src]="video.thumbnail" alt="縮圖" class="rounded me-3"
+                          <img [src]="video.thumbnailUrl" alt="縮圖" class="rounded me-3"
                             style="width: 80px; height: 45px; object-fit: cover;">
                           <div>
                             <div class="fw-bold">{{video.title}}</div>

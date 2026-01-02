@@ -52,3 +52,33 @@ export class VideoDetailData {
     }
   }
 }
+
+// ===== 創作者分析總 DTO =====
+export interface CreatorAnalyticsDto {
+  totalViews: number;
+  totalSubscribers: number;
+  totalVideos: number;
+  avgEngagement: number;
+  viewsGrowth: number;
+  subscribersGrowth: number;
+  recentVideos: RecentVideoDto[];
+  performanceChart: PerformanceChartDto[];
+}
+
+// ===== 近期影片 =====
+export interface RecentVideoDto {
+  videoId: number;
+  title: string;
+  views: number;
+  likes: number;
+  comments: number;
+  publishDate: string;
+  thumbnailUrl: string;
+}
+
+// ===== 圖表資料 =====
+export interface PerformanceChartDto {
+  date: string;
+  views: number;
+  engagement: number;
+}

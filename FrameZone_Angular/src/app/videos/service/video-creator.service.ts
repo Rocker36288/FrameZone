@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { VideoDetailData } from '../models/videocreator-model';
+import { CreatorAnalyticsDto, VideoDetailData } from '../models/videocreator-model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -49,6 +49,22 @@ export class VideoCreatorService {
     formData.append('file', file);
 
     return this.http.post<VideoDetailData>(`${this.apiBase}/VideoCreator/edit/${guid}/thumbnail`, formData);
+  }
+
+  // ===============================
+  // 創作者數據分析
+  // ===============================
+  getCreatorAnalytics(
+    period: '7days' | '30days' | '90days' = '7days'
+  ): Observable<CreatorAnalyticsDto> {
+
+    const params = new HttpParams()
+      .set('period', period);
+
+    return this.http.get<CreatorAnalyticsDto>(
+      `${this.apiBase}/VideoCreator/analytics`,
+      { params }
+    );
   }
 
 }

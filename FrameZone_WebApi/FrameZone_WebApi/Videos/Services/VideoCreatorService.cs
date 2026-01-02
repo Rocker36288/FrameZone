@@ -134,5 +134,76 @@ namespace FrameZone_WebApi.Videos.Services
 
             // 不需回傳 DTO，也不用更新資料庫
         }
+
+        //創作者解析服務
+        public async Task<CreatorAnalyticsDto> GetAnalyticsAsync(
+       int channelId, string period)
+        {
+            var (from, to, prevFrom, prevTo) = ResolvePeriod(period);
+
+            var totalVideos = await _videoRepo.GetTotalVideosAsync(channelId);
+            var subscribers = await _videoRepo.GetSubscribersCountAsync(channelId);
+
+            var views = await _videoRepo.GetTotalViewsAsync(channelId, from, to);
+            var prevViews = await _videoRepo.GetTotalViewsAsync(channelId, prevFrom, prevTo);
+
+            var likes = await _videoRepo.GetLikesCountAsync(channelId, from, to);
+            var comments = await _videoRepo.GetCommentsCountAsync(channelId, from, to);
+
+            var avgEngagement = views == 0
+                ? 0
+                : Math.Round((double)(likes + comments) / views * 100, 2);
+
+            var dailyViews = await _videoRepo.GetDailyViewsAsync(channelId, from, to);
+            var recentVideoStats = await _videoRepo.GetRecentVideosAsync(channelId, 5);
+
+            var recentVideos = recentVideoStats.Select(v => new RecentVideoDto
+            {
+                VideoId = v.VideoId,
+                Title = v.Title,
+                ThumbnailUrl = v.ThumbnailUrl,
+                PublishDate = v.PublishDate,
+                Views = v.Views,
+                Likes = v.Likes,
+                Comments = v.Comments
+            }).ToList();
+
+            return new CreatorAnalyticsDto
+            {
+                TotalViews = views,
+                TotalSubscribers = subscribers,
+                TotalVideos = totalVideos,
+                AvgEngagement = avgEngagement,
+                ViewsGrowth = CalcGrowth(views, prevViews),
+                SubscribersGrowth = 0, // 可再補歷史表
+                PerformanceChart = dailyViews.Select(d => new CreatorChartDto
+                {
+                    Date = d.Date.ToString("MM/dd"),
+                    Views = d.Views
+                }).ToList(),
+                RecentVideos = recentVideos
+            };
+        }
+
+        private static double CalcGrowth(long now, long prev)
+        {
+            if (prev == 0) return 0;
+            return Math.Round((double)(now - prev) / prev * 100, 2);
+        }
+
+        private static (DateTime, DateTime, DateTime, DateTime)
+            ResolvePeriod(string period)
+        {
+            var to = DateTime.UtcNow;
+            var from = period switch
+            {
+                "30days" => to.AddDays(-30),
+                "90days" => to.AddDays(-90),
+                _ => to.AddDays(-7)
+            };
+
+            var span = to - from;
+            return (from, to, from - span, from);
+        }
     } 
 }
