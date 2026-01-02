@@ -1,0 +1,36 @@
+/* 相簿網格系統 */
+.airbnb-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
+  height: 450px;
+  border-radius: 1rem;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 1. 確保容器會裁切掉超出範圍的圖片 */
+.grid-item {
+  overflow: hidden; /* 關鍵：隱藏溢出的圖片部分 */
+  position: relative;
+  background-color: #eee; /* 預載入時的底色 */
+}
+
+.grid-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease; /* 動畫平滑度 */
+  display: block;
+}
+
+/* 2. 當滑鼠懸停在容器上時，圖片放大 */
+.grid-item:hover img {
+  transform: scale(1.1); /* 放大比例，1.1 通常比 1.05 更有感 */
+}
+
+.grid-main {
+  grid-column: 1 / 2;
+  grid-row: 1 / 3;
+}

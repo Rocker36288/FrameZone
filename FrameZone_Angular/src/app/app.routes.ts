@@ -83,6 +83,13 @@ export const routes: Routes = [
       ).then((m) => m.PhotographerbookingPageSearchComponent),
   },
   {
+    path: 'photographer-detail',
+    loadComponent: () =>
+      import(
+        './PhotographerBooking/photographer-detail/photographer-detail.component'
+      ).then((m) => m.PhotographerDetailComponent),
+  },
+  {
     path: '',
     loadComponent: () =>
       import('./layouts/main-layout/main-layout.component').then(
@@ -90,49 +97,74 @@ export const routes: Routes = [
       ),
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
-      { path: 'home', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) },
-    ]
+      {
+        path: 'home',
+        loadComponent: () =>
+          import('./pages/home/home.component').then((m) => m.HomeComponent),
+      },
+    ],
   },
   {
     path: 'member',
-    loadComponent: () => import('./layouts/member-layout/member-layout.component').then(m => m.MemberLayoutComponent),
+    loadComponent: () =>
+      import('./layouts/member-layout/member-layout.component').then(
+        (m) => m.MemberLayoutComponent
+      ),
     children: [
       {
         path: '',
         redirectTo: 'dashboard',
-        pathMatch: 'full'
+        pathMatch: 'full',
       },
       {
         path: 'dashboard',
-        loadComponent: () => import('./pages/member/member-dashboard/member-dashboard.component').then(m => m.MemberDashboardComponent),
-        title: 'FrameZone - 會員中心'
+        loadComponent: () =>
+          import(
+            './pages/member/member-dashboard/member-dashboard.component'
+          ).then((m) => m.MemberDashboardComponent),
+        title: 'FrameZone - 會員中心',
       },
       {
         path: 'profile',
-        loadComponent: () => import('./pages/member/member-profile/member-profile.component').then(m => m.MemberProfileComponent),
-        title: 'FrameZone - 個人資料'
+        loadComponent: () =>
+          import('./pages/member/member-profile/member-profile.component').then(
+            (m) => m.MemberProfileComponent
+          ),
+        title: 'FrameZone - 個人資料',
       },
       {
         path: 'security',
-        loadComponent: () => import('./pages/member/member-security/member-security.component').then(m => m.MemberSecurityComponent),
-        title: 'FrameZone - 帳號安全'
+        loadComponent: () =>
+          import(
+            './pages/member/member-security/member-security.component'
+          ).then((m) => m.MemberSecurityComponent),
+        title: 'FrameZone - 帳號安全',
       },
       {
         path: 'notifications',
-        loadComponent: () => import('./pages/member/member-notifications/member-notifications.component').then(m => m.MemberNotificationsComponent),
-        title: 'FrameZone - 通知設定'
+        loadComponent: () =>
+          import(
+            './pages/member/member-notifications/member-notifications.component'
+          ).then((m) => m.MemberNotificationsComponent),
+        title: 'FrameZone - 通知設定',
       },
       {
         path: 'privacy',
-        loadComponent: () => import('./pages/member/member-privacy/member-privacy.component').then(m => m.MemberPrivacyComponent),
-        title: 'FrameZone - 隱私設定'
+        loadComponent: () =>
+          import('./pages/member/member-privacy/member-privacy.component').then(
+            (m) => m.MemberPrivacyComponent
+          ),
+        title: 'FrameZone - 隱私設定',
       },
       {
         path: 'logs',
-        loadComponent: () => import('./pages/member/member-logs/member-logs.component').then(m => m.MemberLogsComponent),
-        title: 'FrameZone - 操作記錄'
-      }
-    ]
+        loadComponent: () =>
+          import('./pages/member/member-logs/member-logs.component').then(
+            (m) => m.MemberLogsComponent
+          ),
+        title: 'FrameZone - 操作記錄',
+      },
+    ],
   },
   {
     path: 'shopping',
@@ -400,11 +432,17 @@ export const routes: Routes = [
           { path: '', redirectTo: 'index', pathMatch: 'full' },
           {
             path: 'index',
-            loadComponent: () => import('./social/social-index/social-index.component').then(m => m.SocialIndexComponent)
+            loadComponent: () =>
+              import('./social/social-index/social-index.component').then(
+                (m) => m.SocialIndexComponent
+              ),
           },
           {
             path: 'profile',
-            loadComponent: () => import('./social/social-profile/social-profile.component').then(m => m.SocialProfileComponent),
+            loadComponent: () =>
+              import('./social/social-profile/social-profile.component').then(
+                (m) => m.SocialProfileComponent
+              ),
           },
           {
             path: 'friends',
@@ -413,10 +451,9 @@ export const routes: Routes = [
                 (m) => m.SocialFriendsComponent
               ),
           },
-        ]
+        ],
       },
-
-    ]
+    ],
   },
   {
     path: 'videos',

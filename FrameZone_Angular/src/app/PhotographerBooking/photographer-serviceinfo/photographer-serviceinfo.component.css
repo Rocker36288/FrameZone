@@ -1,0 +1,22 @@
+.package-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.2s;
+  cursor: pointer;
+  background: white;
+}
+
+.package-card:hover {
+  border-color: #000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.kkday-tag {
+  border: 1px solid #00a5b8;
+  color: #00a5b8;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
