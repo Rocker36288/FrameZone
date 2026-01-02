@@ -689,6 +689,299 @@ namespace FrameZone_WebApi.Controllers
             }
         }
 
+        /// <summary>
+        /// 批次添加標籤到多張照片
+        /// </summary>
+        /// <param name="request">批次添加標籤請求</param>
+        /// <returns>批次添加結果</returns>
+        [HttpPost("tags/batch-add")]
+        [ProducesResponseType(typeof(BatchAddTagsResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> BatchAddTags([FromBody] BatchAddTagsRequestDTO request)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                _logger.LogInformation(
+                    "🏷️ API: 批次添加標籤，UserId: {UserId}, 照片數: {PhotoCount}, 現有標籤: {ExistingTagCount}, 新標籤: {NewTagCount}",
+                    userId,
+                    request.PhotoIds?.Count ?? 0,
+                    request.ExistingTagIds?.Count ?? 0,
+                    request.NewTags?.Count ?? 0);
+
+                // 驗證請求
+                if (request.PhotoIds == null || !request.PhotoIds.Any())
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "照片 ID 列表不能為空"
+                    });
+                }
+
+                if ((request.ExistingTagIds == null || !request.ExistingTagIds.Any()) &&
+                    (request.NewTags == null || !request.NewTags.Any()))
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "必須提供至少一個現有標籤或新標籤"
+                    });
+                }
+
+                var result = await _photoService.BatchAddTagsToPhotosAsync(request, userId);
+
+                if (!result.Success)
+                {
+                    _logger.LogWarning("⚠️ 批次添加標籤失敗: {Message}", result.Message);
+                    return BadRequest(result);
+                }
+
+                _logger.LogInformation(
+                    "✅ 批次添加標籤成功，總照片: {TotalPhotos}, 成功: {SuccessCount}, 失敗: {FailedCount}, 新建標籤: {CreatedTagCount}",
+                    result.TotalPhotos,
+                    result.SuccessCount,
+                    result.FailedCount,
+                    result.CreatedTags?.Count ?? 0);
+
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning("⚠️ 未授權訪問: {Message}", ex.Message);
+                return Unauthorized(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ 批次添加標籤時發生錯誤");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "批次添加標籤失敗",
+                    error = ex.Message
+                });
+            }
+        }
+
+        /// <summary>
+        /// 搜尋標籤
+        /// </summary>
+        /// <param name="request">搜尋標籤請求</param>
+        /// <returns>搜尋結果</returns>
+        [HttpGet("tags/search")]
+        [ProducesResponseType(typeof(SearchTagsResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SearchTags([FromQuery] SearchTagsRequestDTO request)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                _logger.LogInformation(
+                    "🏷️ API: 搜尋標籤，UserId: {UserId}, 關鍵字: {Keyword}, 限制: {Limit}",
+                    userId,
+                    request.Keyword ?? "(無)",
+                    request.Limit);
+
+                var result = await _photoService.SearchTagsAsync(request, userId);
+
+                if (!result.Success)
+                {
+                    _logger.LogWarning("⚠️ 搜尋標籤失敗: {Message}", result.Message);
+                    return BadRequest(result);
+                }
+
+                _logger.LogInformation(
+                    "✅ 搜尋標籤成功，找到 {TotalCount} 個標籤，回傳 {ReturnCount} 個",
+                    result.TotalCount,
+                    result.Tags?.Count ?? 0);
+
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning("⚠️ 未授權訪問: {Message}", ex.Message);
+                return Unauthorized(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ 搜尋標籤時發生錯誤");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "搜尋標籤失敗",
+                    error = ex.Message
+                });
+            }
+        }
+
+        /// <summary>
+        /// 獲取可用分類列表
+        /// </summary>
+        /// <returns>系統分類和用戶自定義分類列表</returns>
+        [HttpGet("categories/available")]
+        [ProducesResponseType(typeof(AvailableCategoriesResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAvailableCategories()
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                _logger.LogInformation(
+                    "🏷️ API: 獲取可用分類列表，UserId: {UserId}",
+                    userId);
+
+                var result = await _photoService.GetAvailableCategoriesAsync(userId);
+
+                if (!result.Success)
+                {
+                    _logger.LogWarning("⚠️ 獲取可用分類失敗: {Message}", result.Message);
+                    return BadRequest(result);
+                }
+
+                _logger.LogInformation(
+                    "✅ 成功獲取可用分類，系統分類: {SystemCount}, 用戶分類: {UserCount}",
+                    result.SystemCategories?.Count ?? 0,
+                    result.UserCategories?.Count ?? 0);
+
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning("⚠️ 未授權訪問: {Message}", ex.Message);
+                return Unauthorized(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ 獲取可用分類時發生錯誤");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "獲取可用分類失敗",
+                    error = ex.Message
+                });
+            }
+        }
+
+        /// <summary>
+        /// 獲取單張照片的所有標籤
+        /// </summary>
+        /// <param name="photoId">照片 ID</param>
+        /// <returns>照片的標籤詳細資訊</returns>
+        [HttpGet("{photoId:long}/tags")]
+        [ProducesResponseType(typeof(PhotoTagsDetailDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetPhotoTags(long photoId)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                _logger.LogInformation(
+                    "🏷️ API: 獲取照片標籤，UserId: {UserId}, PhotoId: {PhotoId}",
+                    userId,
+                    photoId);
+
+                var result = await _photoService.GetPhotoTagsAsync(photoId, userId);
+
+                _logger.LogInformation(
+                    "✅ 成功獲取照片標籤，PhotoId: {PhotoId}, 總標籤數: {TotalTags}",
+                    photoId,
+                    result.AllTags?.Count ?? 0);
+
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning("⚠️ 未授權訪問: {Message}", ex.Message);
+                return Unauthorized(new { success = false, message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning("⚠️ 照片不存在: {Message}", ex.Message);
+                return NotFound(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ 獲取照片標籤時發生錯誤");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "獲取照片標籤失敗",
+                    error = ex.Message
+                });
+            }
+        }
+
+        /// <summary>
+        /// 從單張照片移除指定標籤
+        /// </summary>
+        /// <param name="photoId">照片 ID</param>
+        /// <param name="tagId">標籤 ID</param>
+        /// <returns>移除結果</returns>
+        [HttpDelete("{photoId:long}/tags/{tagId:int}")]
+        [ProducesResponseType(typeof(RemoveTagResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> RemovePhotoTag(long photoId, int tagId)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                _logger.LogInformation(
+                    "🏷️ API: 移除照片標籤，UserId: {UserId}, PhotoId: {PhotoId}, TagId: {TagId}",
+                    userId,
+                    photoId,
+                    tagId);
+
+                var result = await _photoService.RemoveTagFromPhotoAsync(photoId, tagId, userId);
+
+                if (!result.Success)
+                {
+                    _logger.LogWarning("⚠️ 移除照片標籤失敗: {Message}", result.Message);
+
+                    // 根據錯誤訊息判斷返回的狀態碼
+                    if (result.Message.Contains("不存在"))
+                    {
+                        return NotFound(result);
+                    }
+                    else if (result.Message.Contains("不屬於") || result.Message.Contains("無權限"))
+                    {
+                        return Forbid();
+                    }
+
+                    return BadRequest(result);
+                }
+
+                _logger.LogInformation("✅ 成功移除照片標籤，PhotoId: {PhotoId}, TagId: {TagId}", photoId, tagId);
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning("⚠️ 未授權訪問: {Message}", ex.Message);
+                return Unauthorized(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ 移除照片標籤時發生錯誤");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "移除標籤失敗",
+                    error = ex.Message
+                });
+            }
+        }
+
         #endregion
 
         /// <summary>

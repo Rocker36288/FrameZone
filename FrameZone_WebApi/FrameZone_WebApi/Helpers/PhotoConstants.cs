@@ -278,6 +278,11 @@
         /// </summary>
         public const string CATEGORY_SCENE = "SCENE";
 
+        /// <summary>
+        /// 分類：用戶自定義（使用者建立的自訂標籤預設分類）
+        /// </summary>
+        public const string CATEGORY_USER_CUSTOM = "USER_CUSTOM";
+
         #endregion
 
         #region 標籤類型 (PhotoTag.TagType)

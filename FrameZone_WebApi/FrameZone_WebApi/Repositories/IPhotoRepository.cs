@@ -105,6 +105,25 @@ namespace FrameZone_WebApi.Repositories
         /// <returns>標籤物件</returns>
         Task<PhotoTag> GetOrCreateTagAsync(string tagName, string tagType, int categoryId, int? parentTagId = null, long? userId = null);
 
+        /// <summary>
+        /// 搜尋標籤
+        /// 支援關鍵字搜尋、標籤類型篩選、分類篩選
+        /// </summary>
+        /// <param name="keyword">搜尋關鍵字（模糊搜尋標籤名稱）</param>
+        /// <param name="userId">使用者 ID</param>
+        /// <param name="includeSystemTags">是否包含系統標籤（TAG_TYPE_SYSTEM）</param>
+        /// <param name="includeUserTags">是否包含用戶標籤（TAG_TYPE_USER, TAG_TYPE_CUSTOM）</param>
+        /// <param name="categoryId">指定分類 ID（可選，null 表示不限制分類）</param>
+        /// <param name="limit">限制返回數量（預設 20，最大 100）</param>
+        /// <returns>標籤列表（包含分類資訊、照片數量統計）</returns>
+        Task<List<TagItemDTO>> SearchTagsAsync(
+            string keyword,
+            long userId,
+            bool includeSystemTags = true,
+            bool includeUserTags = true,
+            int? categoryId = null,
+            int limit = 20);
+
         #endregion
 
         #region PhotoPhotoTag 表操作
@@ -132,6 +151,15 @@ namespace FrameZone_WebApi.Repositories
         /// <param name="photoId">照片 ID</param>
         /// <returns>標籤列表</returns>
         Task<List<PhotoTag>> GetPhotoTagsByPhotoIdAsync(long photoId);
+
+        /// <summary>
+        /// 取得照片標籤詳細資訊
+        /// 返回該照片的所有標籤，並按來源分類（EXIF、MANUAL、AI、GEOCODING）
+        /// 每個標籤包含完整資訊：標籤名稱、類型、分類、來源、信心度、是否可移除等
+        /// </summary>
+        /// <param name="photoId">照片 ID</param>
+        /// <returns>照片標籤詳細資訊 DTO（包含按來源分類的標籤列表）</returns>
+        Task<PhotoTagsDetailDTO> GetPhotoTagsWithDetailsAsync(long photoId);
 
         /// <summary>
         /// 移除照片的標籤
@@ -218,6 +246,15 @@ namespace FrameZone_WebApi.Repositories
         /// <param name="parentCategoryId">父分類 ID（null 表示根節點）</param>
         /// <returns>分類樹節點列表</returns>
         Task<List<CategoryTreeNodeDTO>> GetCategoryTreeWithCountsAsync(long userId, int? parentCategoryId = null);
+
+        /// <summary>
+        /// 取得可用分類列表
+        /// 返回系統分類和用戶自定義分類，用於標籤建立時選擇分類
+        /// 包含每個分類下的標籤數量統計
+        /// </summary>
+        /// <param name="userId">使用者 ID</param>
+        /// <returns>可用分類列表 DTO（區分系統分類和用戶自定義分類）</returns>
+        Task<AvailableCategoriesResponseDTO> GetCategoryListAsync(long userId);
 
         #endregion
 

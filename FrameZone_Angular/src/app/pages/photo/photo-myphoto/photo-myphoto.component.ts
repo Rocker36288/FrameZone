@@ -1,16 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { Component, ViewChild, computed, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PhotoListItem, PhotoQueryRequest } from '../../../core/models/photo.models';
 import { PhotoService } from '../../../core/services/photo.service';
+import { TagManagementService } from '../../../core/services/tag-management.service';
+import { BatchAddTagsRequest, NewTagItem } from '../../../core/models/tag-management.models';
 import { ToastrService } from 'ngx-toastr';
 import { firstValueFrom } from 'rxjs';
 import { PhotoSidebarComponent } from "../../../shared/components/photo-sidebar/photo-sidebar.component";
 import { PhotoConstants } from '../../../shared/constants/photo.constants';
+import { BatchAddTagsDialogComponent } from "../batch-add-tags-dialog/batch-add-tags-dialog.component";
 
 @Component({
   selector: 'app-photo-myphoto',
-  imports: [CommonModule, RouterLink, PhotoSidebarComponent],
+  imports: [CommonModule, RouterLink, PhotoSidebarComponent, BatchAddTagsDialogComponent],
   templateUrl: './photo-myphoto.component.html',
   styleUrl: './photo-myphoto.component.css'
 })
@@ -38,6 +41,12 @@ export class PhotoMyphotoComponent implements OnInit {
   /** Sidebar 是否開啟（手機版用 */
   isSidebarOpen = signal(typeof window !== 'undefined' ? window.innerWidth >= 992 : true);
 
+  /** 🆕 批次添加標籤對話框是否開啟 */
+  isBatchAddTagsDialogOpen = signal(false);
+
+  /** Sidebar 實例（用於刷新標籤階層） */
+  @ViewChild(PhotoSidebarComponent) sidebar?: PhotoSidebarComponent;
+
   // ==================== Computed ====================
 
   totalPages = computed(() => Math.ceil(this.totalCount() / this.pageSize()));
@@ -57,6 +66,7 @@ export class PhotoMyphotoComponent implements OnInit {
 
   constructor(
     private photoService: PhotoService,
+    private tagService: TagManagementService, // 🆕 注入標籤管理服務
     private toastr: ToastrService
   ) { }
 
@@ -66,7 +76,7 @@ export class PhotoMyphotoComponent implements OnInit {
     this.loadPhotos();
   }
 
-  // ==================== 載入照片s ====================
+  // ==================== 載入照片 ====================
 
   /**
    * 載入照片列表
@@ -223,6 +233,114 @@ export class PhotoMyphotoComponent implements OnInit {
     }
   }
 
+  // ==================== 🆕 批次添加標籤功能 ====================
+
+  /**
+   * 🆕 打開批次添加標籤對話框
+   */
+  openBatchAddTagsDialog(): void {
+    if (this.selectedCount() === 0) {
+      this.toastr.warning('請先選擇照片', '提示');
+      return;
+    }
+
+    console.log('🏷️ [MyPhoto] Opening batch add tags dialog for', this.selectedCount(), 'photos');
+    this.isBatchAddTagsDialogOpen.set(true);
+  }
+
+  /**
+   * 🆕 關閉批次添加標籤對話框
+   */
+  closeBatchAddTagsDialog(): void {
+    console.log('🏷️ [MyPhoto] Closing batch add tags dialog');
+    this.isBatchAddTagsDialogOpen.set(false);
+  }
+
+  /**
+   * 🆕 處理批次添加標籤
+   * @param data 包含 existingTagIds 和 newTags 的資料
+   */
+  async handleBatchAddTags(data: { existingTagIds: number[]; newTags: NewTagItem[] }): Promise<void> {
+    try {
+      console.log('🏷️ [MyPhoto] Handling batch add tags', data);
+
+      // 驗證是否有選擇照片
+      if (this.selectedCount() === 0) {
+        this.toastr.warning('請先選擇照片', '提示');
+        return;
+      }
+
+      // 驗證是否有選擇或建立標籤
+      if (data.existingTagIds.length === 0 && data.newTags.length === 0) {
+        this.toastr.warning('請至少選擇一個標籤或建立新標籤', '提示');
+        return;
+      }
+
+      this.isLoading.set(true);
+
+      // 準備請求資料
+      const request: BatchAddTagsRequest = {
+        photoIds: Array.from(this.selectedPhotos()),
+        existingTagIds: data.existingTagIds.length > 0 ? data.existingTagIds : undefined,
+        newTags: data.newTags.length > 0 ? data.newTags : undefined
+      };
+
+      console.log('📤 [MyPhoto] Sending batch add tags request:', request);
+
+      // 調用 API
+      const response = await firstValueFrom(
+        this.tagService.batchAddTags(request)
+      );
+
+      if (response.success) {
+        // 顯示成功訊息
+        let message = `成功為 ${response.successCount} 張照片添加標籤`;
+
+        if (response.createdTags.length > 0) {
+          const tagNames = response.createdTags.map(t => t.tagName).join('、');
+          message += `\n新建標籤：${tagNames}`;
+        }
+
+        if (response.failedCount > 0) {
+          message += `\n失敗：${response.failedCount} 張`;
+        }
+
+        this.toastr.success(message, '✅ 標籤添加成功', {
+          timeOut: 5000,
+          progressBar: true
+        });
+
+        console.log('✅ [MyPhoto] Batch add tags succeeded:', response);
+
+        // 關閉對話框
+        this.closeBatchAddTagsDialog();
+
+        // 清除選取
+        this.selectedPhotos.set(new Set());
+
+        // 重新載入照片列表（標籤會更新）
+        await this.loadPhotos();
+
+        // 🆕 重新載入 Sidebar 的標籤階層（讓新建/更新的標籤立即出現在 Sidebar）
+        await this.sidebar?.loadTagHierarchy();
+
+      } else {
+        this.toastr.error(response.message || '添加標籤失敗', '錯誤');
+        console.error('❌ [MyPhoto] Batch add tags failed:', response);
+      }
+
+    } catch (error: any) {
+      console.error('❌ [MyPhoto] Batch add tags error:', error);
+
+      const errorMessage = error?.message || '添加標籤時發生錯誤';
+      this.toastr.error(errorMessage, '錯誤');
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  // ==================== 刪除照片 ====================
+
   async deleteSelectedPhotos() {
     const selectedCount = this.selectedCount();
 
@@ -231,7 +349,7 @@ export class PhotoMyphotoComponent implements OnInit {
       return;
     }
 
-    if (!confirm(`確定要刪除 ${selectedCount} 張照片嗎?此操作無法復原。`)) {
+    if (!confirm(`確定要刪除 ${selectedCount} 張照片嗎？此操作無法復原。`)) {
       return;
     }
 
@@ -244,7 +362,7 @@ export class PhotoMyphotoComponent implements OnInit {
 
       await Promise.all(deletePromises);
 
-      this.toastr.success(`成功刪除 ${selectedCount} 張照片`, '✓ 刪除成功');
+      this.toastr.success(`成功刪除 ${selectedCount} 張照片`, '✔ 刪除成功');
       this.selectedPhotos.set(new Set());
 
       // 重新載入照片列表
@@ -263,7 +381,7 @@ export class PhotoMyphotoComponent implements OnInit {
   async deletePhoto(photoId: number, event?: Event) {
     event?.stopPropagation();
 
-    if (!confirm('確定要刪除這張照片嗎?此操作無發復原。')) {
+    if (!confirm('確定要刪除這張照片嗎？此操作無發復原。')) {
       return;
     }
 
@@ -272,7 +390,7 @@ export class PhotoMyphotoComponent implements OnInit {
 
       await firstValueFrom(this.photoService.deletePhoto(photoId));
 
-      this.toastr.success('照片已刪除', '✓ 成功');
+      this.toastr.success('照片已刪除', '✔ 成功');
 
       // 刪除成功後，如果正在看這張，就關閉詳細資訊 modal
       if (this.activePhoto()?.photoId === photoId) {
@@ -288,6 +406,8 @@ export class PhotoMyphotoComponent implements OnInit {
       this.isLoading.set(false);
     }
   }
+
+  // ==================== 分頁 ====================
 
   /**
    * 換頁
@@ -316,6 +436,8 @@ export class PhotoMyphotoComponent implements OnInit {
   async nextPage() {
     await this.goToPage(this.currentPage() + 1);
   }
+
+  // ==================== 輔助方法 ====================
 
   /**
    * 格式化日期

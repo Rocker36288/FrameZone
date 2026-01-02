@@ -1,0 +1,729 @@
+/* ===========================
+   🎨 批次添加標籤對話框樣式
+   =========================== */
+
+/* 背景遮罩 */
+.dialog-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(2px);
+  z-index: 1055;  /* ✅ 高於 sidebar (1040)，不需要太高 */
+  animation: fadeIn 0.2s ease;
+}
+
+/* 對話框容器 */
+.dialog-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(600px, calc(100vw - 2rem));
+  max-height: calc(100vh - 4rem);
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+              0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  z-index: 1056;  /* ✅ 高於背景遮罩 */
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.3s ease;
+}
+
+/* ===========================
+   📋 Header（標題欄）
+   =========================== */
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e6e7e9;
+  flex-shrink: 0;
+}
+
+.dialog-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+}
+
+.dialog-title i {
+  color: #206bc4;
+}
+
+.btn-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-close:hover {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.btn-close i {
+  font-size: 1.25rem;
+}
+
+/* ===========================
+   📦 Body（主要內容）
+   =========================== */
+
+.dialog-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* 自定義滾動條 */
+.dialog-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dialog-body::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.dialog-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.dialog-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* 照片數量提示 */
+.photo-count-hint {
+  padding: 0.75rem 1rem;
+  background-color: #f0f9ff;
+  border-left: 3px solid #206bc4;
+  border-radius: 4px;
+  color: #0f172a;
+  font-size: 0.9375rem;
+  display: flex;
+  align-items: center;
+}
+
+.photo-count-hint i {
+  color: #206bc4;
+}
+
+.photo-count-hint strong {
+  color: #206bc4;
+  font-weight: 600;
+}
+
+/* 搜尋框 */
+.search-box {
+  margin-bottom: 0.5rem;
+}
+
+.input-icon {
+  position: relative;
+}
+
+.input-icon-addon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  color: #64748b;
+  pointer-events: none;
+}
+
+.input-icon .form-control {
+  padding-left: 2.5rem;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #1e293b;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #206bc4;
+  box-shadow: 0 0 0 3px rgba(32, 107, 196, 0.1);
+}
+
+.form-control:disabled {
+  background-color: #f1f5f9;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 搜尋狀態 */
+.search-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  color: #64748b;
+  font-size: 0.9375rem;
+}
+
+/* 提示文字 */
+.hint-text {
+  display: flex;
+  align-items: center;
+  padding: 2rem 1rem;
+  color: #64748b;
+  font-size: 0.9375rem;
+  text-align: center;
+  justify-content: center;
+}
+
+.hint-text i {
+  color: #94a3b8;
+}
+
+/* ===========================
+   🔍 搜尋結果區域
+   =========================== */
+
+.search-results-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e6e7e9;
+}
+
+.section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.badge {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+.bg-secondary-lt {
+  background-color: #f1f5f9;
+  color: #64748b;
+}
+
+.bg-primary {
+  background-color: #206bc4;
+  color: #ffffff;
+}
+
+/* 標籤列表 */
+.tag-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* 自定義滾動條（標籤列表） */
+.tag-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tag-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.tag-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.tag-list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* 標籤項目 */
+.tag-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid #e6e7e9;
+  border-radius: 6px;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tag-item:hover {
+  border-color: #206bc4;
+  background-color: #f8fafc;
+  transform: translateX(2px);
+}
+
+.tag-item.selected {
+  border-color: #206bc4;
+  background-color: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(32, 107, 196, 0.1);
+}
+
+/* 勾選框 */
+.tag-checkbox {
+  flex-shrink: 0;
+}
+
+.tag-checkbox .form-check-input {
+  width: 1.125rem;
+  height: 1.125rem;
+  margin: 0;
+  cursor: pointer;
+  border: 2px solid #cbd5e1;
+  border-radius: 4px;
+}
+
+.tag-checkbox .form-check-input:checked {
+  background-color: #206bc4;
+  border-color: #206bc4;
+}
+
+/* 標籤資訊 */
+.tag-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.tag-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #1e293b;
+  font-size: 0.9375rem;
+}
+
+.tag-icon {
+  font-size: 1.125rem;
+  flex-shrink: 0;
+}
+
+.tag-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tag-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+
+.tag-type {
+  flex-shrink: 0;
+}
+
+.tag-count {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.tag-count i {
+  font-size: 0.875rem;
+}
+
+/* ===========================
+   ❌ 空狀態
+   =========================== */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  gap: 1rem;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  color: #cbd5e1;
+}
+
+.empty-text {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9375rem;
+}
+
+/* 父標籤選擇（建立階層式標籤） */
+.parent-tag-select {
+  width: 100%;
+  max-width: 420px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+  text-align: left;
+}
+
+.form-select {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #1e293b;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: #206bc4;
+  box-shadow: 0 0 0 3px rgba(32, 107, 196, 0.1);
+}
+
+.form-select:disabled {
+  background-color: #f1f5f9;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-hint {
+  margin-top: 0.25rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+  text-align: left;
+}
+
+/* ===========================
+   ✅ 已選標籤區域
+   =========================== */
+
+.selected-tags-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e6e7e9;
+}
+
+.selected-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  background-color: #f8fafc;
+  border-radius: 6px;
+}
+
+/* Badge 標籤樣式 */
+.badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  max-width: 100%;
+}
+
+.badge-tag:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 已存在的標籤 */
+.badge-existing {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+
+/* 新建的標籤 */
+.badge-new {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.badge-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.badge-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.badge-label {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.badge-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: currentColor;
+  border-radius: 3px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.badge-remove:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.badge-remove:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.badge-remove i {
+  font-size: 0.875rem;
+}
+
+/* ===========================
+   🔘 Footer（按鈕欄）
+   =========================== */
+
+.dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e6e7e9;
+  flex-shrink: 0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.5;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-outline-secondary {
+  color: #64748b;
+  border-color: #cbd5e1;
+  background-color: #ffffff;
+}
+
+.btn-outline-secondary:hover:not(:disabled) {
+  color: #1e293b;
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.btn-primary {
+  color: #ffffff;
+  background-color: #206bc4;
+  border-color: #206bc4;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #1a5da8;
+  border-color: #1a5da8;
+}
+
+.btn-primary:disabled {
+  background-color: #93c5fd;
+  border-color: #93c5fd;
+}
+
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Loading Spinner */
+.spinner-border {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinner-border 0.75s linear infinite;
+}
+
+.spinner-border-sm {
+  width: 0.875rem;
+  height: 0.875rem;
+  border-width: 2px;
+}
+
+.text-primary {
+  color: #206bc4;
+}
+
+/* ===========================
+   📱 響應式設計
+   =========================== */
+
+@media (max-width: 576px) {
+  .dialog-container {
+    width: calc(100vw - 1rem);
+    max-height: calc(100vh - 2rem);
+  }
+
+  .dialog-header,
+  .dialog-body,
+  .dialog-footer {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .dialog-title {
+    font-size: 1.125rem;
+  }
+
+  .tag-list {
+    max-height: 200px;
+  }
+
+  .selected-tags-list {
+    max-height: 150px;
+  }
+
+  .dialog-footer {
+    flex-direction: column-reverse;
+  }
+
+  .dialog-footer .btn {
+    width: 100%;
+  }
+}
+
+/* ===========================
+   🎬 動畫效果
+   =========================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@keyframes spinner-border {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===========================
+   🔧 輔助工具類
+   =========================== */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { AfterViewInit, ElementRef, ViewChild, OnDestroy, Component, signal } from '@angular/core';
 import { FooterComponent } from "../../shared/components/footer/footer.component";
 import { NavigationEnd, Router, RouterModule, RouterOutlet } from "@angular/router";
 import { UserMenuComponent } from "../../shared/components/user-menu/user-menu.component";
@@ -11,7 +11,27 @@ import { filter } from 'rxjs';
   templateUrl: './photo-layout.component.html',
   styleUrl: './photo-layout.component.css'
 })
-export class PhotoLayoutComponent {
+export class PhotoLayoutComponent implements AfterViewInit, OnDestroy {
+  @ViewChild('appNavbar', { static: true }) appNavbar!: ElementRef<HTMLElement>;
+  private ro?: ResizeObserver;
+
+  ngAfterViewInit() {
+    const el = this.appNavbar.nativeElement;
+
+    const sync = () => {
+      const h = el.getBoundingClientRect().height;
+      document.documentElement.style.setProperty('--navbar-height', `${Math.ceil(h)}px`);
+    };
+
+    sync();
+    this.ro = new ResizeObserver(sync);
+    this.ro.observe(el);
+  }
+
+  ngOnDestroy() {
+    this.ro?.disconnect();
+  }
+
   isHome = false;
   isNavOpen = signal(false);
 

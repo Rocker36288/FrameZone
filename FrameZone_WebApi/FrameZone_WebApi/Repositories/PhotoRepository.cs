@@ -353,6 +353,117 @@ namespace FrameZone_WebApi.Repositories
             }
         }
 
+        /// <summary>
+        /// 搜尋標籤
+        /// 支援關鍵字搜尋、標籤類型篩選、分類篩選
+        /// </summary>
+        public async Task<List<TagItemDTO>> SearchTagsAsync(
+            string keyword,
+            long userId,
+            bool includeSystemTags = true,
+            bool includeUserTags = true,
+            int? categoryId = null,
+            int limit = 20)
+        {
+            try
+            {
+                _logger.LogInformation($"🔍 開始搜尋標籤，Keyword: {keyword}, UserId: {userId}, Limit: {limit}");
+
+                // 建立基礎查詢
+                var query = _context.PhotoTags
+                    .AsNoTracking()
+                    .Where(t => t.IsActive == true);
+
+                // 關鍵字模糊搜尋
+                if (!string.IsNullOrWhiteSpace(keyword))
+                {
+                    query = query.Where(t => EF.Functions.Like(t.TagName, $"%{keyword}%"));
+                }
+
+                // 標籤類型篩選
+                var tagTypes = new List<string>();
+                if (includeSystemTags)
+                {
+                    tagTypes.Add(PhotoConstants.TAG_TYPE_SYSTEM);
+                }
+                if (includeUserTags)
+                {
+                    tagTypes.Add(PhotoConstants.TAG_TYPE_USER);
+                    tagTypes.Add(PhotoConstants.TAG_TYPE_CUSTOM);
+                }
+
+                if (tagTypes.Any())
+                {
+                    query = query.Where(t => tagTypes.Contains(t.TagType));
+                }
+
+                // 分類篩選
+                if (categoryId.HasValue)
+                {
+                    query = query.Where(t => t.CategoryId == categoryId.Value);
+                }
+
+                // JOIN 分類資訊並統計照片數量
+                var results = await query
+                    .Join(_context.PhotoCategories,
+                        tag => tag.CategoryId,
+                        category => category.CategoryId,
+                        (tag, category) => new { Tag = tag, Category = category })
+                    .GroupJoin(
+                        _context.PhotoPhotoTags
+                            .Join(_context.Photos,
+                                pt => pt.PhotoId,
+                                p => p.PhotoId,
+                                (pt, p) => new { pt, p })
+                            .Where(x => x.p.UserId == userId && x.p.IsDeleted == false),
+                        tc => tc.Tag.TagId,
+                        pt => pt.pt.TagId,
+                        (tc, photoTags) => new { tc.Tag, tc.Category, PhotoCount = photoTags.Count() })
+                    .Select(x => new TagItemDTO
+                    {
+                        TagId = x.Tag.TagId,
+                        TagName = x.Tag.TagName,
+                        TagType = x.Tag.TagType,
+                        CategoryId = x.Category.CategoryId,
+                        CategoryName = x.Category.CategoryName,
+                        ParentTagId = x.Tag.ParentTagId,
+                        PhotoCount = x.PhotoCount,
+                        DisplayOrder = x.Tag.DisplayOrder,
+                        IsUserCreated = x.Tag.TagType == PhotoConstants.TAG_TYPE_CUSTOM
+                    })
+                    .OrderByDescending(t => t.PhotoCount)
+                    .ThenBy(t => t.TagName)
+                    .Take(limit)
+                    .ToListAsync();
+
+                // 查詢父標籤名稱
+                var parentTagIds = results.Where(r => r.ParentTagId.HasValue).Select(r => r.ParentTagId.Value).Distinct().ToList();
+                if (parentTagIds.Any())
+                {
+                    var parentTags = await _context.PhotoTags
+                        .AsNoTracking()
+                        .Where(t => parentTagIds.Contains(t.TagId))
+                        .ToDictionaryAsync(t => t.TagId, t => t.TagName);
+
+                    foreach (var result in results.Where(r => r.ParentTagId.HasValue))
+                    {
+                        if (parentTags.TryGetValue(result.ParentTagId.Value, out var parentName))
+                        {
+                            result.ParentTagName = parentName;
+                        }
+                    }
+                }
+
+                _logger.LogInformation($"✅ 標籤搜尋完成，找到 {results.Count} 個標籤");
+                return results;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"❌ 搜尋標籤時發生錯誤，Keyword: {keyword}");
+                throw;
+            }
+        }
+
         #endregion
 
         #region PhotoPhotoTag 表操作
@@ -428,6 +539,63 @@ namespace FrameZone_WebApi.Repositories
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"查詢照片標籤時發生錯誤，PhotoId: {photoId}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 取得照片標籤詳細資訊
+        /// 返回該照片的所有標籤，並按來源分類（EXIF、MANUAL、AI、GEOCODING）
+        /// </summary>
+        public async Task<PhotoTagsDetailDTO> GetPhotoTagsWithDetailsAsync(long photoId)
+        {
+            try
+            {
+                _logger.LogInformation($"🏷️ 開始查詢照片標籤詳細資訊，PhotoId: {photoId}");
+
+                // 查詢照片的所有標籤關聯
+                var photoTags = await _context.PhotoPhotoTags
+                    .AsNoTracking()
+                    .Where(pt => pt.PhotoId == photoId)
+                    .Include(pt => pt.Tag)
+                        .ThenInclude(t => t.Category)
+                    .Include(pt => pt.Source)
+                    .Where(pt => pt.Tag.IsActive == true)
+                    .OrderBy(pt => pt.Tag.TagName)
+                    .ToListAsync();
+
+                // 組裝 DTO
+                var allTags = photoTags.Select(pt => new PhotoTagItemDTO
+                {
+                    TagId = pt.TagId,
+                    TagName = pt.Tag.TagName,
+                    TagType = pt.Tag.TagType,
+                    CategoryName = pt.Tag.Category?.CategoryName,
+                    SourceId = pt.SourceId,
+                    SourceName = pt.Source?.SourceName,
+                    Confidence = pt.Confidence,
+                    AddedAt = pt.AddedAt,
+                    CanRemove = pt.Source?.SourceCode == PhotoConstants.SOURCE_MANUAL
+                }).ToList();
+
+                // 按來源分類
+                var result = new PhotoTagsDetailDTO
+                {
+                    PhotoId = photoId,
+                    AllTags = allTags,
+                    ExifTags = allTags.Where(t => t.SourceName == PhotoConstants.SOURCE_EXIF).ToList(),
+                    GeocodingTags = allTags.Where(t => t.SourceName == PhotoConstants.SOURCE_GEOCODING).ToList(),
+                    ManualTags = allTags.Where(t => t.SourceName == PhotoConstants.SOURCE_MANUAL).ToList(),
+                    AiTags = allTags.Where(t => t.SourceName == PhotoConstants.SOURCE_AI).ToList(),
+                    TotalCount = allTags.Count
+                };
+
+                _logger.LogInformation($"✅ 照片標籤查詢完成，共 {result.TotalCount} 個標籤");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"❌ 查詢照片標籤詳細資訊時發生錯誤，PhotoId: {photoId}");
                 throw;
             }
         }
@@ -709,6 +877,82 @@ namespace FrameZone_WebApi.Repositories
             {
                 _logger.LogError(ex, $"查詢分類樹時發生錯誤，UserId: {userId}");
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// 取得可用分類列表
+        /// 返回系統分類和用戶自定義分類，用於標籤建立時選擇分類
+        /// </summary>
+        public async Task<AvailableCategoriesResponseDTO> GetCategoryListAsync(long userId)
+        {
+            try
+            {
+                _logger.LogInformation($"📂 開始查詢可用分類列表，UserId: {userId}");
+
+                // 查詢系統分類（UserId IS NULL）
+                var systemCategories = await _context.PhotoCategories
+                    .AsNoTracking()
+                    .Where(c => c.UserId == null && c.IsActive == true)
+                    .GroupJoin(_context.PhotoTags.Where(t => t.IsActive == true),
+                        category => category.CategoryId,
+                        tag => tag.CategoryId,
+                        (category, tags) => new { Category = category, TagCount = tags.Count() })
+                    .Select(x => new CategoryItemDTO
+                    {
+                        CategoryId = x.Category.CategoryId,
+                        CategoryName = x.Category.CategoryName,
+                        CategoryCode = x.Category.CategoryCode,
+                        IsUserDefined = false,
+                        TagCount = x.TagCount,
+                        DisplayOrder = x.Category.DisplayOrder
+                    })
+                    .OrderBy(c => c.DisplayOrder)
+                    .ThenBy(c => c.CategoryName)
+                    .ToListAsync();
+
+                // 查詢用戶自定義分類（UserId = userId）
+                var userCategories = await _context.PhotoCategories
+                    .AsNoTracking()
+                    .Where(c => c.UserId == userId && c.IsActive == true)
+                    .GroupJoin(_context.PhotoTags.Where(t => t.IsActive == true),
+                        category => category.CategoryId,
+                        tag => tag.CategoryId,
+                        (category, tags) => new { Category = category, TagCount = tags.Count() })
+                    .Select(x => new CategoryItemDTO
+                    {
+                        CategoryId = x.Category.CategoryId,
+                        CategoryName = x.Category.CategoryName,
+                        CategoryCode = x.Category.CategoryCode,
+                        IsUserDefined = true,
+                        TagCount = x.TagCount,
+                        DisplayOrder = x.Category.DisplayOrder
+                    })
+                    .OrderBy(c => c.DisplayOrder)
+                    .ThenBy(c => c.CategoryName)
+                    .ToListAsync();
+
+                var result = new AvailableCategoriesResponseDTO
+                {
+                    Success = true,
+                    Message = "查詢成功",
+                    SystemCategories = systemCategories,
+                    UserCategories = userCategories
+                };
+
+                _logger.LogInformation($"✅ 分類列表查詢完成，系統分類: {systemCategories.Count}，用戶分類: {userCategories.Count}");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"❌ 查詢可用分類列表時發生錯誤，UserId: {userId}");
+                return new AvailableCategoriesResponseDTO
+                {
+                    Success = false,
+                    Message = $"查詢失敗：{ex.Message}",
+                    SystemCategories = new List<CategoryItemDTO>(),
+                    UserCategories = new List<CategoryItemDTO>()
+                };
             }
         }
 

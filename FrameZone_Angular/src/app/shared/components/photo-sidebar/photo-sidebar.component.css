@@ -255,7 +255,7 @@
 /* ==================== RWD 響應式 (手機版) ==================== */
 
 /* 平板以下 */
-@media (max-width: 991px) {
+/* @media (max-width: 991px) {
   .sidebar {
     position: fixed;
     top: var(--navbar-height);
@@ -269,7 +269,7 @@
   .sidebar.sidebar-open {
     transform: translateX(0);
   }
-}
+} */
 
 /* 手機版 */
 @media (max-width: 575px) {
