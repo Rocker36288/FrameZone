@@ -1,35 +1,61 @@
-<div class="container my-4">
-  <div class="search-box card shadow-sm border-0">
-    <div class="card-body p-4">
-
-      <!-- 搜尋輸入 -->
-      <form class="row g-2 align-items-center mb-3" (ngSubmit)="onSearch()">
-        <div class="col-12 col-md input-icon">
-          <span class="input-icon-addon">
-            <i class="ti ti-search"></i>
-          </span>
-          <input type="search" class="form-control form-control-lg" placeholder="搜尋影片、創作者或關鍵字" [(ngModel)]="keyword"
-            name="keyword" />
-        </div>
-
-        <div class="col-12 col-md-auto">
-          <button class="btn btn-primary btn-lg w-100" type="submit">搜尋</button>
-        </div>
-      </form>
-
-      <!-- 篩選 / 排序按鈕群 -->
-      <div class="d-flex flex-wrap gap-2 align-items-center">
-
-        <!-- 排序下拉 -->
-        <div class="ms-auto">
-          <select class="form-select" [(ngModel)]="sortBy" name="sortBy" (change)="onSearch()">
-            <option value="date">最新</option>
-            <option value="views">觀看數</option>
-            <option value="likes">喜歡數</option>
-          </select>
-        </div>
+<div class="container">
+  <div class="search-container">
+    <!-- 搜尋輸入框 -->
+    <div class="search-box">
+      <div class="input-group">
+        <span class="input-group-text bg-white border-end-0">
+          <i class="bi bi-search"></i>
+        </span>
+        <input type="text" class="form-control border-start-0 ps-0" placeholder="搜尋影片標題或描述..." [(ngModel)]="keyword"
+          (keyup.enter)="search()" aria-label="搜尋影片" />
+        <button *ngIf="keyword" class="btn btn-link text-secondary" type="button" (click)="clearSearch()"
+          aria-label="清除搜尋">
+          <i class="bi bi-x-circle"></i>
+        </button>
+        <button class="btn btn-primary" type="button" (click)="search()">
+          搜尋
+        </button>
       </div>
+    </div>
 
+    <!-- 排序選項 -->
+    <div class="sort-options">
+      <div class="sort-label">排序方式：</div>
+
+      <div class="btn-group" role="group" aria-label="排序選項">
+        <!-- 按讚排序 -->
+        <button type="button" class="btn" [class.btn-primary]="isActiveSort('likes')"
+          [class.btn-outline-primary]="!isActiveSort('likes')" (click)="sortLikes()">
+          <i class="bi bi-hand-thumbs-up-fill"></i>
+          喜歡數
+          <span *ngIf="isActiveSort('likes')" class="ms-1">
+            <i class="bi" [class.bi-sort-down]="isDescending()" [class.bi-sort-up]="!isDescending()"></i>
+          </span>
+        </button>
+
+        <!-- 觀看排序 -->
+        <button type="button" class="btn" [class.btn-primary]="isActiveSort('views')"
+          [class.btn-outline-primary]="!isActiveSort('views')" (click)="sortViews()">
+          <i class="bi bi-eye-fill"></i>
+          觀看數
+          <span *ngIf="isActiveSort('views')" class="ms-1">
+            <i class="bi" [class.bi-sort-down]="isDescending()" [class.bi-sort-up]="!isDescending()"></i>
+          </span>
+        </button>
+
+        <!-- 日期排序 -->
+        <button type="button" class="btn" [class.btn-primary]="isActiveSort('date') && sortOrder === 'desc'"
+          [class.btn-outline-primary]="!isActiveSort('date') || sortOrder !== 'desc'" (click)="sortDate('desc')">
+          <i class="bi bi-clock-fill"></i>
+          最新
+        </button>
+
+        <button type="button" class="btn" [class.btn-primary]="isActiveSort('date') && sortOrder === 'asc'"
+          [class.btn-outline-primary]="!isActiveSort('date') || sortOrder !== 'asc'" (click)="sortDate('asc')">
+          <i class="bi bi-clock-history"></i>
+          最舊
+        </button>
+      </div>
     </div>
   </div>
 </div>

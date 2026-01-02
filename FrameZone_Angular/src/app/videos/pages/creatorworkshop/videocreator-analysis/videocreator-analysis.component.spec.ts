@@ -10,7 +10,7 @@ describe('VideocreatorAnalysisComponent', () => {
     await TestBed.configureTestingModule({
       imports: [VideocreatorAnalysisComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(VideocreatorAnalysisComponent);
     component = fixture.componentInstance;

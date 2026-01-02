@@ -14,6 +14,7 @@ import { VideoHomeComponent } from './pages/home/video-home/video-home.component
 import { VideocreatorEditvideoComponent } from './pages/creatorworkshop/videocreator-editvideo/videocreator-editvideo.component';
 import { ChannelHistoryComponent } from './pages/channel/channel-history/channel-history.component';
 import { VideoSearchComponent } from './pages/search/video-search/video-search.component';
+import { VideocreatorAnalysisComponent } from './pages/creatorworkshop/videocreator-analysis/videocreator-analysis.component';
 
 export const VIDEO_ROUTES: Routes = [
   {
@@ -58,7 +59,7 @@ export const VIDEO_ROUTES: Routes = [
           { path: 'videos', component: VideocreatorVideomanageComponent },
           { path: 'videoedit/:guid', component: VideocreatorEditvideoComponent },
           { path: 'upload', component: VideocreatorUploadComponent },
-          { path: 'stats', component: VideocreatorUploadComponent }
+          { path: 'stats', component: VideocreatorAnalysisComponent }
         ]
       }
     ]

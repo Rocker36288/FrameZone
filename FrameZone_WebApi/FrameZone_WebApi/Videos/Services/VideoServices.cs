@@ -3,6 +3,7 @@ using FrameZone_WebApi.Videos.DTOs;
 using FrameZone_WebApi.Videos.Enums;
 using FrameZone_WebApi.Videos.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 namespace FrameZone_WebApi.Videos.Services
 {
 
@@ -196,6 +197,18 @@ namespace FrameZone_WebApi.Videos.Services
         public async Task<List<WatchHistoryDto>> GetWatchHistoryAsync(int userId)
         {
             return await _videoRepo.GetWatchHistoryByUserIdAsync(userId);
+        }
+
+        /// <summary>
+        /// 搜尋影片
+        /// </summary>
+        public async Task<List<VideoCardDto>> SearchVideosAsync(
+            string? keyword = null,
+            string sortBy = "date",
+            string sortOrder = "desc",
+            int take = 10)
+        {
+            return await _videoRepo.SearchVideosAsync(keyword, sortBy, sortOrder, take);
         }
     }
 }

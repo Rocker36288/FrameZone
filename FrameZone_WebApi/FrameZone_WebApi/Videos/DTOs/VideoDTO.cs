@@ -1,4 +1,6 @@
-﻿namespace FrameZone_WebApi.Videos.DTOs
+﻿using FrameZone_WebApi.Models;
+
+namespace FrameZone_WebApi.Videos.DTOs
 {
     //用於傳輸資料給前端的影片卡片資料
     public class VideoCardDto
@@ -125,5 +127,13 @@
 
         // 可選：最後觀看時間
         public DateTime LastWatchedAt { get; set; }
+    }
+
+    //搜尋回饋
+    public class VideoSearchResult
+    {
+        public Video Video { get; set; } = null!;
+        public int LikeCount { get; set; }
+        public int ViewCount { get; set; }
     }
 }

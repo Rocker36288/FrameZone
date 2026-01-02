@@ -118,3 +118,9 @@ export interface VideoWatchHistoryDto {
   lastWatchedAt: string;
 }
 
+export interface VideoSearchParams {
+  keyword?: string;
+  sortBy?: 'likes' | 'views' | 'date';
+  sortOrder?: 'asc' | 'desc';
+  take?: number;
+}

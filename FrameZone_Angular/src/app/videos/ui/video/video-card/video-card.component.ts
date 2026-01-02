@@ -34,10 +34,12 @@ export class VideoCardComponent {
   constructor(private router: Router) { }
 
   ngOnInit(): void {
-    if (!this.video.thumbnail) {
-      this.video.thumbnail =
-        'https://localhost:7213/api/Videos/video-thumbnail/' + this.video.videoUri;
-    }
+    // 可以移除 thumbnail 相關邏輯
+  }
+
+  get thumbnailUrl(): string {
+    return this.video?.thumbnail ||
+      `https://localhost:7213/api/Videos/video-thumbnail/${this.video?.videoUri}`;
   }
 
   onVideoClick() {

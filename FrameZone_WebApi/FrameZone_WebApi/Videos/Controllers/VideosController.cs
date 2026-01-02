@@ -1,11 +1,13 @@
-﻿using FrameZone_WebApi.Videos.DTOs;
+﻿using System.Diagnostics;
+using System.Security.Claims;
+using System.Text;
+using System.Text.Encodings.Web;
+using FrameZone_WebApi.Videos.DTOs;
 using FrameZone_WebApi.Videos.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using System.Security.Claims;
 using Xabe.FFmpeg;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -255,6 +257,20 @@ namespace FrameZone_WebApi.Videos.Controllers
             }
 
             return userId;
+        }
+
+        //搜尋
+        [HttpGet("search")]
+        public async Task<IActionResult> Search(
+     [FromQuery] string? keyword,
+     [FromQuery] string sortBy = "date",
+     [FromQuery] string sortOrder = "desc",
+     [FromQuery] int take = 10)
+        {
+            var result = await _videoServices.SearchVideosAsync(
+                keyword, sortBy, sortOrder, take);
+
+            return Ok(result);
         }
     }
 }
