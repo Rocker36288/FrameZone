@@ -47,7 +47,8 @@
               [class.active]="category.isExpanded">
 
               <div class="category-info">
-                <i [class]="getCategoryIconClass(category.icon)"></i>
+                <!-- 修正：使用 getCategoryIconClass 方法 -->
+                <i [ngClass]="getCategoryIconClass(category.icon)" class="category-icon"></i>
                 <span class="category-name">{{ category.categoryName }}</span>
 
                 @if (category.isComingSoon) {
@@ -57,7 +58,7 @@
 
               @if (hasTags(category)) {
                 <i
-                  class="category-toggle"
+                  class="ti category-toggle"
                   [class.ti-chevron-down]="category.isExpanded"
                   [class.ti-chevron-right]="!category.isExpanded">
                 </i>
@@ -93,7 +94,7 @@
       <!-- 展開/收合圖示（僅有子標籤時顯示） -->
       @if (hasChildren(tag)) {
         <i
-          class="tag-toggle"
+          class="ti tag-toggle"
           [class.ti-chevron-down]="tag.isExpanded"
           [class.ti-chevron-right]="!tag.isExpanded"
           (click)="toggleTag(tag.tagId); $event.stopPropagation()">
