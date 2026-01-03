@@ -1,10 +1,12 @@
-﻿using FrameZone_WebApi.Models;
+﻿using System.Text.Json;
+using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Videos.DTOs;
 using FrameZone_WebApi.Videos.Enums;
 using FrameZone_WebApi.Videos.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using static FrameZone_WebApi.Videos.Services.VideoUploadService;
 
 namespace FrameZone_WebApi.Videos.Repositories
 {
@@ -72,6 +74,28 @@ namespace FrameZone_WebApi.Videos.Repositories
                 ProcessStatus = video.ProcessStatus,
                 PublishDate = video.PublishDate.Value
             };
+        }
+
+        //儲存AI審核結果
+        public async Task SaveAuditResultAsync(string videoguid, ReviewResult result)
+        {
+            var video = await _context.Videos
+                .FirstOrDefaultAsync(v => v.VideoUrl == videoguid);
+
+            if (video == null)
+                throw new Exception($"Video not found: {videoguid}");
+
+            var auditJson = JsonSerializer.Serialize(new
+            {
+                passed = result.Passed,
+                reason = result.Reason,
+                reviewedAt = DateTime.UtcNow,
+                sightengine = JsonDocument.Parse(result.RawJson).RootElement  // ✅ 改名為 sightengine
+            });
+
+            video.AiAuditResult = auditJson;
+            video.UpdateAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
         }
     }
 }

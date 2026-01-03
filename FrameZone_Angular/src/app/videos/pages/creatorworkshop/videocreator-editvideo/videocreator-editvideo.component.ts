@@ -8,12 +8,12 @@ import { VideoDetailData } from '../../../models/videocreator-model';
 import { VideoPlayerComponent } from "../../../ui/video/video-player/video-player.component";
 import { PrivacyStatus } from '../../../models/video.enum';
 import { ViewChild, ElementRef } from '@angular/core';
-
+import { VideosReviewModalComponent } from "../../../ui/videos-review-modal/videos-review-modal.component";
 
 
 @Component({
   selector: 'app-videocreator-editvideo',
-  imports: [DatePipe, NgClass, NgIf, NgForOf, FormsModule, VideoPlayerComponent],
+  imports: [DatePipe, NgClass, NgIf, NgForOf, FormsModule, VideoPlayerComponent, VideosReviewModalComponent],
   templateUrl: './videocreator-editvideo.component.html',
   styleUrl: './videocreator-editvideo.component.css'
 })
@@ -307,5 +307,31 @@ export class VideocreatorEditvideoComponent {
       }
     });
   }
+  // 父元件 TS
+  videoReviewResult = {
+    "passed": true,
+    "reason": "Content approved",
+    "reviewedAt": "2026-01-03T09:29:40.408415Z",
+    "sightengine": {
+      "status": "success",
+      "nudity": {
+        "sexual_activity": 0.001,
+        "sexual_display": 0.001,
+        "erotica": 0.001,
+        "very_suggestive": 0.001,
+        "suggestive": 0.001,
+        "mildly_suggestive": 0.001,
+        "context": { "sea_lake_pool": 0.001, "outdoor_other": 0.99, "indoor_other": 0.001 }
+      },
+      "media": {
+        "uri": "thumbnail_0_compressed.jpg"
+      }
+    }
+  };
+  showModal = false;
 
+  // 開啟 modal 方法
+  openReviewModal() {
+    this.showModal = true;
+  }
 }

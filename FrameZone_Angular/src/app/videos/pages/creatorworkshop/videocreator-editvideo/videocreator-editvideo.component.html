@@ -1,3 +1,5 @@
+<app-videos-review-modal *ngIf="showModal" [reviewData]="videoReviewResult"
+  (close)="showModal = false"></app-videos-review-modal>
 <div class="page-wrapper">
 
   <!-- ===== 載入中狀態 ===== -->
@@ -311,19 +313,22 @@
 
             <!-- ===== 技術細節 ===== -->
             <div class="card shadow-sm">
-              <div class="card-header">
+              <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="card-title">
                   <i class="ti ti-file-info me-2"></i>技術細節
                 </h3>
+
+
               </div>
+
               <div class="card-body">
                 <div class="datagrid">
                   <!-- <div class="datagrid-item">
-                    <div class="datagrid-title">檔案大小</div>
-                    <div class="datagrid-content">
-                      <strong>{{ getReadableSize(video.id) }}</strong>
-                    </div>
-                  </div> -->
+        <div class="datagrid-title">檔案大小</div>
+        <div class="datagrid-content">
+          <strong>{{ getReadableSize(video.id) }}</strong>
+        </div>
+      </div> -->
 
                   <div class="datagrid-item">
                     <div class="datagrid-title">解析度</div>
@@ -331,9 +336,22 @@
                       <span class="badge bg-blue-lt">{{ video.resolution }}</span>
                     </div>
                   </div>
+
+                  <div class="datagrid-item">
+                    <div class="datagrid-title">審核結果(管理員專屬)</div>
+                    <div class="datagrid-content">
+                      <!-- 新增按鈕 -->
+                      <button class="btn btn-sm btn-primary" (click)="openReviewModal()">
+                        <i class="ti ti-eye"></i> 查看審核結果
+                      </button>
+                    </div>
+                  </div>
+
+
                 </div>
               </div>
             </div>
+
 
           </div>
 
