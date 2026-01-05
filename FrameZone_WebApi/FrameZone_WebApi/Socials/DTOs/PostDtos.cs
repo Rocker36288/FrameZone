@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace FrameZone_WebApi.Socials.DTOs
 {
@@ -19,5 +20,18 @@ namespace FrameZone_WebApi.Socials.DTOs
 
         // 貼文種類 Id: 對應社團Id / 活動Id / 個人(null)
         public int? PostTypeId { get; set; }
+    }
+
+    public class PostReadDto
+    {
+        public int PostId { get; set; }
+        public long UserId { get; set; }
+        public string UserName { get; set; } = "新使用者";
+        public string? Avatar { get; set; }
+        public string PostContent { get; set; } = string.Empty;
+        public string? PostType { get; set; }
+        public int? PostTypeId { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 }

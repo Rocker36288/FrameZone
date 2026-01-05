@@ -25,7 +25,7 @@
     <!-- 頭貼 + UserId + 時間 -->
     <div class="d-flex align-items-center mb-2">
       <div class="avatar-wrapper me-2">
-        <img src="images/social/Patrick.jpg" />
+        <img [src]="post.avatar || 'images/social/default-avatar.png'" [alt]="post.userName" />
       </div>
 
       <div>

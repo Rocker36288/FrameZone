@@ -49,7 +49,7 @@ namespace FrameZone_WebApi.Socials.Controllers
         public async Task<IActionResult> CreatePost([FromBody] PostDto dto)
         {
             if (!ModelState.IsValid)
-            { 
+            {
                 return BadRequest(ModelState);
             }
 
@@ -132,4 +132,3 @@ namespace FrameZone_WebApi.Socials.Controllers
         }
     }
 }
-
