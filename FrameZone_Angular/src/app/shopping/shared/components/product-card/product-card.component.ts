@@ -3,22 +3,7 @@ import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { FavoriteButtonComponent } from '../favorite-button/favorite-button.component';
-
-interface Product {
-  id: number;
-  name: string;
-  image: string;
-  description: string;
-  price: number;
-  seller: {
-    name: string;
-    avatar: string;
-  };
-  postedDate: string;
-  sales: number;
-  categoryId: number;
-  isFavorite: boolean;
-}
+import { ShopProduct } from '../../../interfaces/products';
 
 @Component({
   selector: 'app-product-card',
@@ -29,7 +14,7 @@ interface Product {
 })
 export class ProductCardComponent {
   // 比 @Input() 更效能優異
-  product = input.required<Product>();
+  product = input.required<ShopProduct>();
 
   // 當收藏狀態改變時通知父元件（如果需要同步資料庫）
   favoriteChange = output<boolean>();

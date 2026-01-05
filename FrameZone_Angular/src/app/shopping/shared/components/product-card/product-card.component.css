@@ -53,3 +53,15 @@
   color: #667eea !important;
   font-weight: 700;
 }
+
+.truncate-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  /* 限制顯示 1 行 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.5em;
+  max-height: 3em;
+  /* 2 行的高度 (1.5em × 2) */
+}
