@@ -10,11 +10,13 @@ import { filter, Subject, takeUntil } from 'rxjs';
 import { ChatWindowComponent } from "../shared/components/chat-window/chat-window.component";
 import { AuthService } from '../../core/services/auth.service';
 import { LoginResponseDto } from '../../core/models/auth.models';
+import { ToastService } from '../shared/services/toast.service';
+import { ToastNotificationComponent } from '../shared/components/toast-notification/toast-notification.component';
 
 @Component({
   selector: 'app-shopping-header',
   standalone: true,
-  imports: [FormsModule, CommonModule, RouterOutlet, RouterLink, FooterComponent, ChatWindowComponent],
+  imports: [FormsModule, CommonModule, RouterOutlet, RouterLink, FooterComponent, ChatWindowComponent, ToastNotificationComponent],
   templateUrl: './shopping-header.component.html',
   styleUrl: './shopping-header.component.css'
 })
@@ -39,7 +41,8 @@ export class ShoppingHeaderComponent {
     public cartService: CartService,
     private searchService: SearchService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastService: ToastService
   ) {
     // 關鍵：監聽 Service 的 Signal 變化
     effect(() => {
@@ -109,6 +112,26 @@ export class ShoppingHeaderComponent {
     this.isDropdownOpen = false;
     this.authService.logout();
     this.router.navigate(['/']);
+  }
+
+  goToMyReviews(): void {
+    this.checkAuthAndNavigate('/shopping/reviews');
+  }
+
+  checkAuthAndNavigate(targetUrl: string, queryParams: any = {}): void {
+    if (this.isLoggedIn && this.currentUser) {
+      // 特殊處理：評價頁面需要帶入 userId
+      if (targetUrl === '/shopping/reviews') {
+        queryParams = { ...queryParams, userId: this.currentUser.userId };
+      }
+      this.router.navigate([targetUrl], { queryParams });
+    } else {
+      this.toastService.show('請先登入會員', 'top');
+      // 延遲 1000ms 再跳轉，確保使用者看得到提示
+      setTimeout(() => {
+        this.router.navigate(['/login'], { queryParams: { returnUrl: targetUrl } });
+      }, 1000);
+    }
   }
 
   navigateToLogin(): void {
