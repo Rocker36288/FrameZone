@@ -3,11 +3,16 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { FooterComponent } from "../../shared/components/footer/footer.component";
+import { FavoriteService, FavoriteItem } from '../shared/services/favorite.service';
+import { CartService } from '../shared/services/cart.service';
+import { ToastService } from '../shared/services/toast.service';
+import { CartItem } from '../interfaces/cart';
+import { ToastNotificationComponent } from '../shared/components/toast-notification/toast-notification.component';
 
 @Component({
   selector: 'app-shopping-buyer-center',
   standalone: true,
-  imports: [FormsModule, CommonModule, RouterLink, FooterComponent],
+  imports: [FormsModule, CommonModule, RouterLink, FooterComponent, ToastNotificationComponent],
   templateUrl: './shopping-buyer-center.component.html',
   styleUrl: './shopping-buyer-center.component.css'
 })
@@ -86,16 +91,35 @@ export class ShoppingBuyerCenterComponent {
   ];
 
   // 收藏資料
-  allFavorites = [
-    { id: 1, name: '無線降噪耳機', price: 2990, desc: '極致靜謐體驗。', imageUrl: 'https://placehold.co/400x300/6c5ce7/fff?text=Audio', date: '3 天前' },
-    { id: 2, name: '人體工學辦公椅', price: 4500, desc: '舒適支撐您的腰椎。', imageUrl: 'https://placehold.co/400x300/a29bfe/fff?text=Chair', date: '5 天前' }
+  allFavorites: FavoriteItem[] = [
+    { favoriteId: 1, productId: 1, name: '無線降噪耳機', price: 2990, imageUrl: 'https://placehold.co/400x300/6c5ce7/fff?text=Audio', date: '3 天前' },
+    { favoriteId: 2, productId: 2, name: '人體工學辦公椅', price: 4500, imageUrl: 'https://placehold.co/400x300/a29bfe/fff?text=Chair', date: '5 天前' }
   ];
 
   displayOrders: any[] = [];
-  displayFavorites: any[] = [];
+  displayFavorites: FavoriteItem[] = [];
+
+  constructor(
+    private favoriteService: FavoriteService,
+    private cartService: CartService,
+    private toastService: ToastService
+  ) { }
 
   ngOnInit() {
     this.resetDisplay();
+    this.loadFavorites();
+  }
+
+  loadFavorites() {
+    this.favoriteService.getUserFavorites().subscribe({
+      next: (data) => {
+        this.allFavorites = data as any;
+        this.displayFavorites = [...this.allFavorites];
+      },
+      error: (err) => {
+        console.error('無法取得收藏資料：', err);
+      }
+    });
   }
 
   // 核心搜尋功能
@@ -154,15 +178,35 @@ export class ShoppingBuyerCenterComponent {
     if (confirm('確定取消嗎？未儲存的變更將遺失。')) this.showModal = false;
   }
 
-  toggleFavorite(item: any) {
+  toggleFavorite(item: FavoriteItem) {
     if (confirm(`取消收藏「${item.name}」？`)) {
-      this.allFavorites = this.allFavorites.filter(f => f.id !== item.id);
-      this.onSearch();
+      this.favoriteService.toggleFavorite(item.productId).subscribe({
+        next: () => {
+          this.allFavorites = this.allFavorites.filter(f => f.favoriteId !== item.favoriteId);
+          this.onSearch();
+          this.toastService.show(`已從收藏移除：${item.name}`);
+        },
+        error: (err) => {
+          console.error('取消收藏失敗：', err);
+          this.toastService.show('取消操作失敗，請稍後再試');
+        }
+      });
     }
   }
 
-  addToCart(item: any) {
-    alert(`已加入購物車：${item.name}`);
+  addToCart(item: FavoriteItem) {
+    const cartItem: CartItem = {
+      id: item.productId,
+      name: item.name,
+      price: item.price,
+      quantity: 1,
+      selected: true,
+      imageUrl: item.imageUrl,
+      sellerId: 0, // 收藏清單暫無賣家資訊，先給 0
+      sellerName: '收藏商品'
+    };
+    this.cartService.addToCart(cartItem);
+    this.toastService.show(`已將「${item.name}」加入購物車！`);
   }
 
   redeemCoupon() {
