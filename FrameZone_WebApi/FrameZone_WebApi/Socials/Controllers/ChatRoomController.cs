@@ -1,4 +1,4 @@
-using FrameZone_WebApi.Socials.DTOs;
+﻿using FrameZone_WebApi.Socials.DTOs;
 using FrameZone_WebApi.Socials.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -76,6 +76,21 @@ namespace FrameZone_WebApi.Socials.Controllers
         public ActionResult<List<MessageDto>> GetMessages(int roomId)
         {
             return _messageService.GetMessages(roomId);
+        }
+
+        // =======================
+        // 發送聊天室文字訊息
+        // =======================
+        [Authorize]
+        [HttpPost("{roomId}/messages")]
+        public ActionResult<MessageDto> SendMessage(int roomId, SendMessageDto dto)
+        {
+            if (!TryGetUserId(out var userId))
+                return Unauthorized();
+            var content = dto?.MessageContent?.Trim();
+            if (string.IsNullOrWhiteSpace(content))
+                return BadRequest("訊息內容不可為空");
+            return _messageService.SendTextMessage(roomId, userId, content);
         }
 
         private bool TryGetUserId(out long userId)

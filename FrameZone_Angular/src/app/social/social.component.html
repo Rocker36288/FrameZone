@@ -16,7 +16,7 @@
       <!-- 右側欄（朋友列表 / 廣告） -->
       <div class="col-md-3 col-sm-12 p-2">
         <div class="sidebar">
-          <app-social-friends></app-social-friends>
+          <app-social-friends (friendSelected)="onFriendSelected($event)"></app-social-friends>
         </div>
         <!-- 回到最上面按鈕 -->
         @if(showBackToTop){
@@ -30,4 +30,4 @@
 
 </section>
 <!-- 聊天室 -->
-<app-social-chat></app-social-chat>
+<app-social-chat [selectedFriend]="selectedFriend" (closed)="onChatClosed()"></app-social-chat>

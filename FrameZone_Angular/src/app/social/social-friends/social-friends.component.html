@@ -10,95 +10,28 @@
     </div>
 
     <div class="friend-list-content">
-
-      <button class="friend-btn rounded" type="button">
-        <img src="https://i.pravatar.cc/150?u=a1" class="friend-avatar" alt="Alex Thompson" />
-        <span class="friend-name">Alex Thompson</span>
-        <span class="status-dot bg-success"></span>
+      @for (f of friends; track f.id) {
+      <button class="friend-btn rounded" type="button" (click)="selectFriend(f)">
+        <img [src]="f.avatar" class="friend-avatar" [alt]="f.name" />
+        <span class="friend-name">{{ f.name }}</span>
+        <span class="status-dot" [ngClass]="f.online ? 'bg-success' : 'bg-secondary'"></span>
       </button>
-
-      <button class="friend-btn rounded" type="button">
-        <img src="https://i.pravatar.cc/150?img=37" class="friend-avatar" alt="李詩涵" />
-        <span class="friend-name">李詩涵</span>
-        <span class="status-dot bg-success"></span>
-      </button>
-
-      <button class="friend-btn rounded" type="button">
-        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Jessica" class="friend-avatar" alt="Jessica Wu" />
-        <span class="friend-name">Jessica Wu</span>
-        <span class="status-dot bg-success"></span>
-      </button>
-
-      <button class="friend-btn rounded" type="button">
-        <img src="https://i.pravatar.cc/150?img=25" class="friend-avatar" alt="張佳玲" />
-        <span class="friend-name">張佳玲</span>
-        <span class="status-dot bg-success"></span>
-      </button>
-
-      <button class="friend-btn rounded" type="button">
-        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=JunYu" class="friend-avatar" alt="林俊宇" />
-        <span class="friend-name">林俊宇</span>
-        <span class="status-dot bg-success"></span>
-      </button>
-
-      <button class="friend-btn rounded" type="button">
-        <img src="https://i.pravatar.cc/150?u=zh6" class="friend-avatar" alt="趙敏君" />
-        <span class="friend-name">趙敏君</span>
-        <span class="status-dot bg-success"></span>
-      </button>
-
-      <button class="friend-btn rounded" type="button">
-        <img src="https://api.dicebear.com/7.x/micah/svg?seed=NightHaze" class="friend-avatar" alt="夜羽 Night" />
-        <span class="friend-name">夜羽</span>
-        <span class="status-dot bg-secondary"></span>
-      </button>
-
-      <button class="friend-btn rounded" type="button">
-        <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Emily" class="friend-avatar" alt="Emily Chen" />
-        <span class="friend-name">Emily Chen</span>
-        <span class="status-dot bg-success"></span>
-      </button>
-
-      <button class="friend-btn rounded" type="button">
-        <img src="https://i.pravatar.cc/150?img=40" class="friend-avatar" alt="曾可欣" />
-        <span class="friend-name">曾可欣</span>
-        <span class="status-dot bg-success"></span>
-      </button>
-
-      <button class="friend-btn rounded" type="button">
-        <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Amy" class="friend-avatar" alt="Amy Wang" />
-        <span class="friend-name">Amy Wang</span>
-        <span class="status-dot bg-secondary"></span>
-      </button>
+      }
 
       <hr class="my-3">
 
       <h3 class="friend-list-title">群組聊天室</h3>
 
+      @for (g of groupChats; track g.id) {
       <button class="friend-btn rounded" type="button">
         <div class="icon-circle d-flex align-items-center justify-content-center"
-          style="width: 35px; height: 35px; margin-right: 12px; background-color: #e7f3ff; border-radius: 50%;">
-          <i class="bi bi-chat-left-quote-fill" style="font-size: 0.9rem; color: #007bff;"></i>
+          style="width: 35px; height: 35px; margin-right: 12px; border-radius: 50%;"
+          [style.backgroundColor]="g.bgColor">
+          <i [ngClass]="g.iconClass" style="font-size: 0.9rem;" [style.color]="g.iconColor"></i>
         </div>
-        <span class="friend-name">大學同學會</span>
+        <span class="friend-name">{{ g.name }}</span>
       </button>
-
-      <button class="friend-btn rounded" type="button">
-        <div class="icon-circle d-flex align-items-center justify-content-center"
-          style="width: 35px; height: 35px; margin-right: 12px; background-color: #fce4ec; border-radius: 50%;">
-          <i class="bi bi-controller" style="font-size: 0.9rem; color: #d81b60;"></i>
-        </div>
-        <span class="friend-name">遊戲開團群</span>
-      </button>
-
-      <button class="friend-btn rounded" type="button">
-        <div class="icon-circle d-flex align-items-center justify-content-center"
-          style="width: 35px; height: 35px; margin-right: 12px; background-color: #f0f2f5; border-radius: 50%;">
-          <i class="bi bi-briefcase-fill" style="font-size: 0.9rem; color: #555;"></i>
-        </div>
-        <span class="friend-name">專題討論小組</span>
-      </button>
-
+      }
     </div>
   </div>
 </div>

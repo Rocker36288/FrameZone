@@ -4,14 +4,41 @@
 <!-- 聊天室視窗 -->
 <div class="chat-window" [class.open]="isOpen">
   <div class="chat-header">
-    聊天室
+    {{ selectedFriend?.name || '聊天' }}
     <span class="close-btn" (click)="toggleChat()">關閉</span>
   </div>
+
   <div class="chat-body">
-    聊天內容
+    @if (loading) {
+    <div>建立聊天室中...</div>
+    }
+
+    @else if (error) {
+    <div class="text-danger">{{ error }}</div>
+    }
+
+    @else if (room) {
+    <!-- 房間 ID：{{ room.roomId }} ({{ room.roomCategory }}) -->
+    <div class="message-list">
+      @if (messages.length === 0) {
+      <div class="text-muted">尚無訊息</div>
+      }
+      @else {
+      @for (message of messages; track $index) {
+      <div class="message-item" [class.own]="message.isOwn">
+        <div class="message-content">{{ message.content }}</div>
+        <div class="message-time">{{ message.time }}</div>
+      </div>
+      }
+      }
+    </div>
+    }
   </div>
+
+  @if (room) {
   <div class="chat-typing">
-    <input type="text" placeholder="輸入訊息…" />
-    <button class="send-btn">➤</button>
+    <input #messageInput type="text" placeholder="輸入訊息..." (keyup.enter)="sendMessage(messageInput.value); messageInput.value='';" />
+    <button class="send-btn" (click)="sendMessage(messageInput.value); messageInput.value='';">送出</button>
   </div>
+  }
 </div>
