@@ -1,6 +1,8 @@
-﻿using FrameZone_WebApi.Socials.DTOs;
+using FrameZone_WebApi.Socials.DTOs;
 using FrameZone_WebApi.Socials.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace FrameZone_WebApi.Socials.Controllers
 {
@@ -22,40 +24,48 @@ namespace FrameZone_WebApi.Socials.Controllers
         // =======================
         // 社交私聊
         // =======================
+        [Authorize]
         [HttpPost("private/social")]
         public ActionResult<ChatRoomDto> CreateSocialPrivateRoom(CreatePrivateRoomDto dto)
         {
-            long userId = 1; // TODO: 從 JWT 拿到使用者 ID
+            if (!TryGetUserId(out var userId))
+                return Unauthorized();
             return _roomService.GetOrCreateSocialPrivateRoom(userId, dto.TargetUserId);
         }
 
         // =======================
         // 商城私聊
         // =======================
+        [Authorize]
         [HttpPost("private/shopping")]
         public ActionResult<ChatRoomDto> CreateShoppingPrivateRoom(CreatePrivateRoomDto dto)
         {
-            long userId = 1; // TODO: 從 JWT 拿到使用者 ID
+            if (!TryGetUserId(out var userId))
+                return Unauthorized();
             return _roomService.GetOrCreateShoppingPrivateRoom(userId, dto.TargetUserId);
         }
 
         // =======================
         // 多人聊天室
         // =======================
+        [Authorize]
         [HttpPost("group")]
         public ActionResult<ChatRoomDto> CreateGroupRoom(CreateGroupRoomDto dto)
         {
-            long userId = 1; // TODO: 從 JWT 拿到使用者 ID
+            if (!TryGetUserId(out var userId))
+                return Unauthorized();
             return _roomService.CreateGroupRoom(userId, dto);
         }
 
         // =======================
         // 取得使用者聊天室清單（私聊 + 群聊）
         // =======================
+        [Authorize]
         [HttpGet("rooms")]
         public ActionResult<List<ChatRoomDto>> GetMyRooms()
         {
-            long userId = 1; // TODO: 從 JWT 拿到使用者 ID
+            if (!TryGetUserId(out var userId))
+                return Unauthorized();
             return _roomService.GetUserRooms(userId);
         }
 
@@ -66,6 +76,13 @@ namespace FrameZone_WebApi.Socials.Controllers
         public ActionResult<List<MessageDto>> GetMessages(int roomId)
         {
             return _messageService.GetMessages(roomId);
+        }
+
+        private bool TryGetUserId(out long userId)
+        {
+            userId = 0;
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return !string.IsNullOrEmpty(userIdClaim) && long.TryParse(userIdClaim, out userId);
         }
     }
 
