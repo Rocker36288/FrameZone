@@ -1,0 +1,3 @@
+<form #paymentForm method="POST" [action]="apiUrl" style="display:none">
+  <input type="hidden" *ngFor="let item of postData | keyvalue" [name]="$any(item.key)" [value]="item.value" />
+</form>

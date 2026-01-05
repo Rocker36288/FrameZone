@@ -5,11 +5,17 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { CartService } from '../shared/services/cart.service';
+import { OrderService } from '../shared/services/order.service';
+import { EcpayFormComponent } from '../shared/components/ecpay-form/ecpay-form.component';
+import { frontendPublicUrl, backendPublicUrl } from '../shared/configuration/url';
+import { AuthService } from '../../core/services/auth.service';
+import { ToastService } from '../shared/services/toast.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-shopping-checkout',
   standalone: true,
-  imports: [FormsModule, CommonModule, ReactiveFormsModule, HeaderComponent, RouterLink],
+  imports: [FormsModule, CommonModule, ReactiveFormsModule, HeaderComponent, RouterLink, EcpayFormComponent],
   templateUrl: './shopping-checkout.component.html',
   styleUrl: './shopping-checkout.component.css'
 })
@@ -18,8 +24,13 @@ export class ShoppingCheckoutComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    public cartService: CartService // 改為 public 方便 HTML 直接讀取 Service 的 Signal
+    public cartService: CartService, // 改為 public 方便 HTML 直接讀取 Service 的 Signal
+    private orderService: OrderService,
+    private authService: AuthService,
+    private toastService: ToastService
   ) { }
+
+  private destroy$ = new Subject<void>();
 
 
   currentStep: number = 2;
@@ -54,10 +65,27 @@ export class ShoppingCheckoutComponent {
     }
   ];
 
-  // 使用 Signal 的 Computed 屬性：從 Service 篩選出「已勾選」商品
-  selectedItems = computed(() =>
-    this.cartService.items().filter(item => item.selected)
-  );
+  // 使用 Signal 的 Computed 屬性：從 Service 篩選出「已勾選」商品並進行分組
+  groupedSelectedItems = computed(() => {
+    const items = this.cartService.items().filter(item => item.selected);
+    const groups: { sellerId: string | number; sellerName: string; sellerAvatar?: string; items: CartItem[] }[] = [];
+
+    items.forEach(item => {
+      let group = groups.find(g => g.sellerId === item.sellerId);
+      if (!group) {
+        group = {
+          sellerId: item.sellerId,
+          sellerName: item.sellerName || '官方賣場',
+          sellerAvatar: item.sellerAvatar || `https://i.pravatar.cc/150?u=${item.sellerId}`,
+          items: []
+        };
+        groups.push(group);
+      }
+      group.items.push(item);
+    });
+
+    return groups;
+  });
 
   // 2. 屬性 (Property): 模擬購物車資料
   // cartItems: CartItem[] = [
@@ -84,14 +112,26 @@ export class ShoppingCheckoutComponent {
   ];
 
   // 會員資料
-  memberAvatarUrl: string = 'https://i.pravatar.cc/30?img=68';
-  memberName: string = 'Angular用戶001';
+  memberAvatarUrl: string = '';
+  memberName: string = '';
+
+
+  // 使用綠界 API 需要的相關參數
+  ecpayParams: any = null;
 
   ngOnInit(): void {
-    // 初始化表單
+    if (!this.authService.isAuthenticated()) {
+      this.toastService.show('請先登入會員', 'top');
+      setTimeout(() => {
+        this.router.navigate(['/login'], { queryParams: { returnUrl: '/checkout' } });
+      }, 1000);
+      return;
+    }
+
+    // 1. 初始化表單
     this.checkoutForm = this.fb.group({
-      paymentMethod: ['credit', Validators.required],
-      shippingMethod: ['', Validators.required], // 預設改為空，讓用戶必須點選
+      paymentMethod: ['Credit', Validators.required],
+      shippingMethod: ['standard', Validators.required],
       selectedAddressId: ['', Validators.required] // 必選收件人
     });
 
@@ -107,9 +147,29 @@ export class ShoppingCheckoutComponent {
     });
 
     // 安全檢查：若無勾選商品，退回購物車
-    if (this.selectedItems().length === 0) {
+    if (this.groupedSelectedItems().length === 0) {
       this.router.navigate(['/shoppingcart']);
     }
+
+    // 訂閱會員資料
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        if (user) {
+          this.memberName = user.account || user.displayName || '會員';
+          if (user.avatar) {
+            this.memberAvatarUrl = user.avatar;
+          } else {
+            const initial = (this.memberName || 'U').charAt(0).toUpperCase();
+            this.memberAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+          }
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // 取得目前選取的運費金額
@@ -197,14 +257,50 @@ export class ShoppingCheckoutComponent {
       return;
     }
 
-    // 這裡未來可以換成呼叫 API 建立訂單
-    // this.orderService.createOrder(...)
+    // 呼叫 API 建立訂單
+    var orderItems = this.cartService.items().filter((item) => item.selected).map((item) => {
+      return {
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity
+      }
+    });
 
-    // 訂單完成：清空購物車 + 優惠券
-    this.cartService.markOrderCompleted();
+    var clientBackURL = "";
+    if (this.checkoutForm.value.paymentMethod == "Credit") {
+      clientBackURL = `${frontendPublicUrl}/shopping/home`;
+    }
+    else {
+      clientBackURL = `${frontendPublicUrl}/order-success`;
+    }
+
+    this.orderService.createOrder({
+      orderItems: orderItems,
+      totalAmount: this.getFinalTotal(),
+      paymentMethod: this.checkoutForm.value.paymentMethod,
+      returnURL: `${backendPublicUrl}/api/order/pay-result`,
+      optionParams: {
+        ClientBackURL: clientBackURL,
+        OrderResultURL: `${backendPublicUrl}/api/order/success-redirect`
+      }
+    }).subscribe({
+      next: (res) => {
+        console.log("Success", res);
+
+        // 訂單完成：清空購物車 + 優惠券
+        this.cartService.markOrderCompleted();
+
+        // 用參數填到表單並用綠界 API 發送訂單
+        this.ecpayParams = res;
+      },
+      error: (err) => {
+        console.log("Error", err);
+      }
+    });
 
     // 前往成功頁
-    this.router.navigate(['/order-success']);
+    //this.router.navigate(['/order-success']);
   }
 
 }

@@ -55,19 +55,21 @@
   <form [formGroup]="checkoutForm">
     <div class="row">
       <div class="col-lg-8">
-        <div class="card mb-4 seller-group">
+        <div *ngFor="let group of groupedSelectedItems()" class="card mb-4 seller-group">
           <div class="card-header">
             <h3 class="card-title">
               <div class="d-flex align-items-center pt-1 mt-auto">
-                <span class="avatar" style="background-image: url(/static/avatars/029m.jpg)"></span>
+                <span class="avatar"
+                  [style.background-image]="'url(' + (group.sellerAvatar || 'https://i.pravatar.cc/150?u=' + group.sellerId) + ')'"></span>
                 <div class="ms-3">
-                  <a href="#" class="text-body">賣家帳號</a>
+                  <a [routerLink]="['/shopping/sellershop', group.sellerId]" class="text-body">{{ group.sellerName
+                    }}</a>
                 </div>
               </div>
             </h3>
           </div>
           <div class="card-body">
-            <div *ngFor="let item of selectedItems()" class="card mb-2 border-0 border-bottom pb-2">
+            <div *ngFor="let item of group.items" class="card mb-2 border-0 border-bottom pb-2">
               <div class="row align-items-center">
                 <div class="col-3 col-md-2">
                   <img [src]="item.imageUrl || 'images/products/1.jpg'" class="img-fluid rounded" />
@@ -87,8 +89,12 @@
           </div>
           <div class="card-body">
             <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" value="credit" formControlName="paymentMethod" id="p1">
-              <label class="form-check-label" for="p1">信用卡</label>
+              <input class="form-check-input" type="radio" value="Credit" formControlName="paymentMethod"
+                id="payCredit">
+              <label class="form-check-label" for="payCredit">信用卡</label>
+              <br>
+              <input class="form-check-input" type="radio" value="ATM" formControlName="paymentMethod" id="payATM">
+              <label class="form-check-label" for="payATM">ATM轉帳</label>
             </div>
           </div>
         </div>
@@ -98,7 +104,7 @@
             <h3 class="card-title">運送方式</h3>
           </div>
           <div class="card-body p-0">
-            <div class="p-3 border-bottom">
+            <div class="p-3">
               <div class="form-check">
                 <input class="form-check-input" type="radio" value="post" formControlName="shippingMethod" id="s1"
                   (change)="checkoutForm.get('selectedAddressId')?.reset()">
@@ -177,4 +183,9 @@
 </div>
 
 <div class="modal fade" id="couponModal" tabindex="-1" #couponModalElement>
+</div>
+
+<div>
+  <app-ecpay-form *ngIf="ecpayParams" [apiUrl]="ecpayParams.serviceURL"
+    [postData]="ecpayParams.params"></app-ecpay-form>
 </div>
