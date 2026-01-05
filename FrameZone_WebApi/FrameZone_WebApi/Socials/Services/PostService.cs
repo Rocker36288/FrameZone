@@ -38,35 +38,55 @@ namespace FrameZone_WebApi.Socials.Services
         }
 
         // ================= 編輯貼文 =================
-        public async Task<Post?> EditPostAsync(int postId, PostDto dto)
+        public async Task<Post> EditPostAsync(long userId, int postId, PostDto dto)
         {
             var post = await _postRepository.GetPostByIdAsync(postId);
 
             //貼文不存在
             if (post == null) 
             {   
-                return null;
+                throw new KeyNotFoundException("貼文不存在");
+            }
+
+            if (post.UserId != userId)
+            {
+                throw new UnauthorizedAccessException("無權修改他人貼文");
             }
 
             post.PostContent = dto.PostContent;
             post.PostType = dto.PostType ?? post.PostType;
             post.PostTypeId = dto.PostTypeId ?? post.PostTypeId;
 
-            return await _postRepository.UpdatePostAsync(post);
+            var updatedPost = await _postRepository.UpdatePostAsync(post);
+            if (updatedPost == null)
+            {
+                throw new InvalidOperationException("編輯貼文失敗");
+            }
+
+            return updatedPost;
         }
 
         // ================= 刪除貼文 =================
-        public async Task<bool> DeletePostAsync(int postId)
+        public async Task DeletePostAsync(long userId, int postId)
         {
             var post = await _postRepository.GetPostByIdAsync(postId);
 
             //貼文不存在
             if (post == null)
             {
-                return false;
+                throw new KeyNotFoundException("貼文不存在或已刪除");
             }
 
-            return await _postRepository.DeletePostAsync(post);
+            if (post.UserId != userId)
+            {
+                throw new UnauthorizedAccessException("無權刪除他人貼文");
+            }
+
+            var success = await _postRepository.DeletePostAsync(post);
+            if (!success)
+            {
+                throw new InvalidOperationException("刪除貼文失敗");
+            }
         }       
 
 
