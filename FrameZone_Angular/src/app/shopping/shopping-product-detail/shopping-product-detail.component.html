@@ -57,26 +57,35 @@
                   <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
                 </svg>
               </button> -->
-              <app-favorite-button *ngIf="currentProduct" class="icon-border" class="icon-border"
-                [isFavorite]="currentProduct.isFavorite" [itemName]="currentProduct.name"
+              <app-favorite-button *ngIf="currentProduct" class="icon-border" [isFavorite]="currentProduct.isFavorite"
+                [itemName]="currentProduct.name" [productId]="currentProduct.productId"
                 (favoriteChange)="currentProduct.isFavorite = $event">
               </app-favorite-button>
             </div>
           </div>
         </section>
 
-        <section class="seller-info-section">
-          <h3 class="seller-title">賣家資訊</h3>
+        <div class="seller-info-section product-section">
+          <h2 class="seller-title">賣家資訊</h2>
           <div class="seller-detail-box">
             <div class="avatar-and-name">
-              <div class="seller-avatar-placeholder"></div>
-              <div class="seller-text">
-                <div class="seller-name">{{ sellerInfo.account }}</div>
-                <div class="seller-status">{{ sellerInfo.onlineStatus }}</div>
+              <div class="seller-avatar-placeholder">
+                <img [src]="sellerInfo.avatar" class="reviewer-avatar" alt="賣家頭像">
+              </div>
+              <div class="seller-name-row">
+                <div class="name-status">
+                  <div class="seller-name">{{ sellerInfo.account }}</div>
+                  <div class="seller-status">{{ sellerInfo.onlineStatus }}</div>
+                </div>
+                <div class="seller-rating-right" (click)="goToSellerReviews(sellerInfo.userId)">
+                  <span class="star">★</span>
+                  <span class="rating-val">{{ sellerInfo.rating || 0 }}</span>
+                  <span class="review-count">({{ sellerInfo.reviewCount || 0 }}評價)</span>
+                </div>
               </div>
             </div>
             <div class="seller-actions">
-              <button class="seller-chat-btn" (click)="openChatFromProduct()">
+              <button class="seller-chat-btn" (click)="openSharedChat()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                   class="icon icon-tabler icons-tabler-outline icon-tabler-message-chatbot">
@@ -88,7 +97,7 @@
                 </svg>
                 聊聊
               </button>
-              <button class="seller-store-btn" [routerLink]="['/shopping/sellershop', sellerInfo.account]">
+              <button class="seller-store-btn" (click)="goToSellerShop(sellerInfo.userId)">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                   class="icon icon-tabler icons-tabler-outline icon-tabler-building-store">
@@ -103,26 +112,47 @@
               </button>
             </div>
           </div>
-        </section>
-
+        </div>
       </div>
-      <section class="product-options">
 
+      <section class="product-options">
         <h1 class="product-title">{{ currentProduct?.name }}</h1>
 
-        <div class="price-section"><span class="price">NT$ {{ currentProduct?.price }}</span></div>
-
-        <div class="option-row">
-          <label for="spec-select" class="label">規格:</label>
-          <select id="spec-select" [(ngModel)]="selectedSpec" class="form-select w-auto">
-            <option *ngFor="let spec of specs" [value]="spec">{{ spec }}</option>
-          </select>
+        <div class="product-rating-summary" *ngIf="currentProduct?.reviewCount > 0">
+          <div class="stars">
+            <span *ngFor="let i of [1,2,3,4,5]" class="star" [class.filled]="i <= currentProduct.averageRating">★</span>
+            <span class="rating-number">{{ currentProduct.averageRating | number:'1.1-1' }}</span>
+          </div>
+          <span class="divider">|</span>
+          <span class="review-count">{{ currentProduct.reviewCount }} 個評價</span>
         </div>
 
+        <div class="price-section">
+          <span class="price">NT$ {{ currentProduct?.price }}</span>
+        </div>
+
+        @if (currentProduct?.specifications?.length > 1) {
         <div class="option-row">
+          <label class="label">規格:</label>
+          <div class="spec-chips">
+            <button *ngFor="let spec of currentProduct.specifications" (click)="selectSpecification(spec)"
+              [class.active]="selectedSpecification === spec" class="spec-chip">
+              {{ spec.specName || '規格' }}
+            </button>
+          </div>
+        </div>
+        }
+
+        <div class="option-row align-items-center">
           <label for="quantity-input" class="label">數量:</label>
-          <input type="number" id="quantity-input" [(ngModel)]="quantity" min="1"
-            class="quantity-input form-control w-auto" />
+          <div class="d-flex align-items-center gap-3">
+            <input type="number" id="quantity-input" [(ngModel)]="quantity" min="1"
+              [max]="selectedSpecification?.stockQuantity" class="quantity-input form-control w-auto" />
+
+            <span class="stock-text text-secondary">
+              庫存: {{ selectedSpecification?.stockQuantity ?? 0 }}
+            </span>
+          </div>
         </div>
 
         <div class="payment-method-info info-row">
@@ -171,14 +201,43 @@
       <h2>商品描述</h2>
       <div class="content-box content-bordered-box">
         <p>{{ currentProduct?.description }}</p>
-        <p>二手，使用過幾次。</p>
       </div>
     </section>
 
     <section class="product-section product-reviews-section">
-      <h2>商品評價</h2>
+      <h2>商品評價 ({{ currentProduct?.reviewCount || 0 }})</h2>
       <div class="content-box content-bordered-box">
-        <p>目前尚無評價。</p>
+        <div *ngIf="!currentProduct?.reviews || currentProduct.reviews.length === 0" class="no-reviews">
+          目前尚無評價。
+        </div>
+
+        <div class="review-list" *ngIf="currentProduct?.reviews && currentProduct.reviews.length > 0">
+          <div class="review-item" *ngFor="let review of currentProduct.reviews">
+            <div class="review-header">
+              <img [src]="review.reviewerAvatar" alt="評價者" class="reviewer-avatar">
+              <div class="reviewer-info">
+                <div class="reviewer-name">{{ review.reviewerName }}</div>
+                <div class="review-rating">
+                  <span *ngFor="let i of [1,2,3,4,5]" class="star" [class.filled]="i <= review.rating">★</span>
+                </div>
+                <div class="review-date">{{ review.createdAt | date:'yyyy-MM-dd HH:mm' }}</div>
+              </div>
+            </div>
+
+            <div class="review-content">
+              {{ review.content }}
+            </div>
+
+            <div class="review-photos" *ngIf="review.imageUrls && review.imageUrls.length > 0">
+              <img *ngFor="let photo of review.imageUrls" [src]="photo" alt="評價圖片" class="review-photo">
+            </div>
+
+            <div class="seller-reply" *ngIf="review.reply">
+              <div class="reply-title">賣家回覆:</div>
+              <div class="reply-content">{{ review.reply }}</div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -225,6 +284,15 @@
           <!-- <app-favorite-button [isFavorite]="item.isFavorite" [itemName]="product.name"
                     (favoriteChange)="item.isFavorite = $event">
                   </app-favorite-button> -->
+        </div>
+      </div>
+    </section>
+
+    <section class="product-section recommended-products-section similar-products-section">
+      <h2>猜你喜歡</h2>
+      <div class="similar-list row similar-list-override">
+        <div class="similar-col" *ngFor="let item of recommendedProducts">
+          <app-product-card [product]="item" (favoriteChange)="item.isFavorite = $event"></app-product-card>
         </div>
       </div>
     </section>
