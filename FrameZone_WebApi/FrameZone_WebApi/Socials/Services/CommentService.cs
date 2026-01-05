@@ -60,7 +60,7 @@ namespace FrameZone_WebApi.Socials.Services
         /// </summary>
         /// <param name="postId">貼文 ID</param>
         /// <returns>樹狀留言清單</returns>
-        public async Task<List<CommentReadDto>> GetByPostIdAsync(int postId, long currentUserId)
+        public async Task<List<CommentReadDto>> GetByPostIdAsync(int postId, long? currentUserId)
         {
             // 1. 取得資料庫中的所有留言（扁平結構）
             var comments = await _repository.GetByPostIdAsync(postId);
@@ -135,7 +135,7 @@ namespace FrameZone_WebApi.Socials.Services
         /// 若留言已被刪除，會隱藏使用者資訊與內容
         /// 判斷是不是本人，如果是本人則IsOwner=true
         /// </summary>
-        private CommentReadDto MapToReadDto(Comment comment, long currentUserId)
+        private CommentReadDto MapToReadDto(Comment comment, long? currentUserId)
         {
             bool isDeleted = comment.DeletedAt != null;
 
@@ -158,7 +158,7 @@ namespace FrameZone_WebApi.Socials.Services
                 UpdatedAt = comment.UpdatedAt,
 
                 // 判斷是不是本人
-                IsOwner = comment.UserId == currentUserId
+                IsOwner = currentUserId.HasValue && comment.UserId == currentUserId.Value
             };
         }
 

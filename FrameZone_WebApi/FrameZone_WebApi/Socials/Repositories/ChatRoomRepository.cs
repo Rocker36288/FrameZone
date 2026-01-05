@@ -1,5 +1,4 @@
 ﻿using FrameZone_WebApi.Models;
-using FrameZone_WebApi.Socials.Enums;
 
 namespace FrameZone_WebApi.Socials.Repositories
 {

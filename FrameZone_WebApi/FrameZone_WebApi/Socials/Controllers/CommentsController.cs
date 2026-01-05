@@ -1,5 +1,6 @@
 ﻿using FrameZone_WebApi.Socials.DTOs;
 using FrameZone_WebApi.Socials.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -39,7 +40,11 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpGet("post/{postId:int}")]
         public async Task<ActionResult<List<CommentReadDto>>> GetByPost(int postId)
         {
-            long currentUserId = 0; // 預設：未登入
+            // 預設：未登入
+            long? currentUserId = User.Identity?.IsAuthenticated == true
+    ? long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!)
+    : null;
+
 
             if (User.Identity?.IsAuthenticated == true)
             {
@@ -61,6 +66,7 @@ namespace FrameZone_WebApi.Socials.Controllers
         /// <param name="dto">建立留言所需資料</param>
         /// <returns>建立完成後的留言資料</returns>
         /// POST: api/comments
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<CommentReadDto>> Create(
             [FromBody] CommentCreateDto dto)
@@ -83,6 +89,7 @@ namespace FrameZone_WebApi.Socials.Controllers
         /// <param name="commentId">留言 ID</param>
         /// <param name="dto">更新內容</param>
         /// PUT: api/comments/{commentId}
+        [Authorize]
         [HttpPut("{commentId:int}")]
         public async Task<ActionResult<CommentReadDto>> Update(
             int commentId,
@@ -117,6 +124,7 @@ namespace FrameZone_WebApi.Socials.Controllers
         /// </summary>
         /// <param name="commentId">留言 ID</param>
         /// DELETE: api/comments/{commentId}
+        [Authorize]
         [HttpDelete("{commentId:int}")]
         public async Task<IActionResult> Delete(int commentId)
         {
