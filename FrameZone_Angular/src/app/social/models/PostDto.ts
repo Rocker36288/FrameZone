@@ -5,6 +5,7 @@ export interface PostDto {
   avatar?: string | null;
   postContent: string;
   updatedAt: string;
+  isOwner?: boolean //就是本人
 }
 
 

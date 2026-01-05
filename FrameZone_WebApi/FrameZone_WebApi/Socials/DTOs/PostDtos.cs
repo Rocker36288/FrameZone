@@ -33,5 +33,6 @@ namespace FrameZone_WebApi.Socials.DTOs
         public int? PostTypeId { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public bool IsOwner { get; set; }   //就是本人
     }
 }

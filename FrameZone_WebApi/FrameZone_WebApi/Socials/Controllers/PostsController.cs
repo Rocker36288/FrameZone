@@ -21,7 +21,8 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpGet]
         public async Task<IActionResult> GetPosts()
         {
-            var post = await _postService.GetPostsAsync();
+            var currentUserId = TryGetUserId();
+            var post = await _postService.GetPostsAsync(currentUserId);
 
             if (post == null)
             {
@@ -34,7 +35,8 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpGet("{postId}")]
         public async Task<IActionResult> GetPostById(int postId)
         {
-            var post = await _postService.GetPostByIdAsync(postId);
+            var currentUserId = TryGetUserId();
+            var post = await _postService.GetPostByIdAsync(postId, currentUserId);
 
             if (post == null)
             {
@@ -127,6 +129,15 @@ namespace FrameZone_WebApi.Socials.Controllers
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userIdClaim == null)
                 throw new UnauthorizedAccessException("尚未登入");
+
+            return long.Parse(userIdClaim);
+        }
+
+        private long? TryGetUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim == null)
+                return null;
 
             return long.Parse(userIdClaim);
         }

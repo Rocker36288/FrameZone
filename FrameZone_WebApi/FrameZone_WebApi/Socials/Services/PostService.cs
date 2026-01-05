@@ -14,7 +14,7 @@ namespace FrameZone_WebApi.Socials.Services
         }
 
         // ================= 取得多筆貼文 =================
-        public async Task<List<PostReadDto>> GetPostsAsync()
+        public async Task<List<PostReadDto>> GetPostsAsync(long? currentUserId)
         {
             var posts = await _postRepository.GetPostsAsync();
             if (posts == null)
@@ -22,11 +22,11 @@ namespace FrameZone_WebApi.Socials.Services
                 return null;
             }
 
-            return posts.Select(MapToReadDto).ToList();
+            return posts.Select(p => MapToReadDto(p, currentUserId)).ToList();
         }
 
         // ================= 取得貼文 =================
-        public async Task<PostReadDto?> GetPostByIdAsync(int postId)
+        public async Task<PostReadDto?> GetPostByIdAsync(int postId, long? currentUserId)
         {
             var post = await _postRepository.GetPostByIdAsync(postId);
             if (post == null)
@@ -34,7 +34,7 @@ namespace FrameZone_WebApi.Socials.Services
                 return null;
             }
 
-            return MapToReadDto(post);
+            return MapToReadDto(post, currentUserId);
         }
 
         // ================= 新增貼文 =================
@@ -54,7 +54,7 @@ namespace FrameZone_WebApi.Socials.Services
             }
 
             var createdWithUser = await _postRepository.GetPostByIdAsync(created.PostId);
-            return createdWithUser == null ? null : MapToReadDto(createdWithUser);
+            return createdWithUser == null ? null : MapToReadDto(createdWithUser, userId);
         }
 
         // ================= 編輯貼文 =================
@@ -83,7 +83,7 @@ namespace FrameZone_WebApi.Socials.Services
                 throw new InvalidOperationException("編輯貼文失敗");
             }
 
-            return MapToReadDto(post);
+            return MapToReadDto(post, userId);
         }
 
         // ================= 刪除貼文 =================
@@ -109,7 +109,7 @@ namespace FrameZone_WebApi.Socials.Services
             }
         }
 
-        private static PostReadDto MapToReadDto(Post post)
+        private static PostReadDto MapToReadDto(Post post, long? currentUserId)
         {
             return new PostReadDto
             {
@@ -121,7 +121,8 @@ namespace FrameZone_WebApi.Socials.Services
                 PostType = post.PostType,
                 PostTypeId = post.PostTypeId,
                 CreatedAt = post.CreatedAt,
-                UpdatedAt = post.UpdatedAt
+                UpdatedAt = post.UpdatedAt,
+                IsOwner = currentUserId.HasValue && post.UserId == currentUserId.Value
             };
         }
     }

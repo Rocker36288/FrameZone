@@ -2,6 +2,7 @@
 <div class="card mb-3" id="">
   <div class="card-body">
     <!-- 功能選單（右上角） -->
+    @if(post.isOwner){
     <div class="position-absolute top-0 end-0 m-2">
       <div class="dropdown">
         <button class="btn btn-sm btn-light" type="button" (click)="toggleMenu(); $event.stopPropagation()">
@@ -21,7 +22,7 @@
         </ul>
       </div>
     </div>
-
+    }
     <!-- 頭貼 + UserId + 時間 -->
     <div class="d-flex align-items-center mb-2">
       <div class="avatar-wrapper me-2">
@@ -98,7 +99,7 @@
     <!-- 發布留言區 -->
     <div class="mt-3">
       <div class="d-flex align-items-center">
-        <img src="images/social/Patrick.jpg" class="rounded-circle me-2"
+        <img [src]="currentUserAvatar || 'images/social/default-avatar.png'" class="rounded-circle me-2"
           style="width:35px; height:35px; object-fit: cover;" />
 
         <div class="position-relative flex-grow-1">

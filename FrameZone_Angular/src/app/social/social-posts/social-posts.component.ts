@@ -1,11 +1,12 @@
 import { PostService } from '../services/post.service';
 import { CommentService } from '../services/comment.service';
-import { Component, ElementRef, EventEmitter, HostListener, Input, Output, signal } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, Output, signal, inject } from '@angular/core';
 import { PostDto } from "../models/PostDto";
 import { CommentDto } from "../models/CommentDto";
 import { DatePipe, SlicePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SocialCommentsComponent } from "../social-comments/social-comments.component";
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-social-posts',
@@ -16,6 +17,9 @@ import { SocialCommentsComponent } from "../social-comments/social-comments.comp
 export class SocialPostsComponent {
   @Input() post!: PostDto;
   @Output() postDeleted = new EventEmitter<number>();
+
+  private authService = inject(AuthService);
+  currentUserAvatar = this.authService.getCurrentUser()?.avatar || null;
 
   // --- 貼文狀態 ---
   isEditing = false;
