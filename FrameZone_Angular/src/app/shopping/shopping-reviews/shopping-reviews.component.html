@@ -84,16 +84,26 @@
 
               <div class="review-body">
                 <div class="product-info-row">
-                  <img [src]="review.productImage" [alt]="review.productName" class="product-thumbnail" />
+                  <img [src]="review.productImage || 'https://api.dicebear.com/7.x/shapes/svg?seed=product'"
+                    [alt]="review.productName" class="product-thumbnail" />
                   <div class="product-details">
                     <div class="product-name">{{ review.productName }}</div>
-                    <div class="seller-info-text">
-                      <span *ngIf="viewMode === 'buyer'">賣家：{{ review.seller }}</span>
-                      <span *ngIf="viewMode === 'seller'">買家：{{ review.reviewer.name }}</span>
-                    </div>
                   </div>
                 </div>
                 <div class="review-comment">{{ review.comment }}</div>
+
+                <!-- 賣家回覆區塊 -->
+                <div class="seller-reply mt-3 p-3 bg-light rounded" *ngIf="review.reply">
+                  <div class="reply-header d-flex align-items-center mb-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                      class="me-2 text-primary">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    <strong class="small text-muted">賣家回覆：</strong>
+                  </div>
+                  <div class="reply-content small">{{ review.reply }}</div>
+                </div>
               </div>
             </div>
           </div>

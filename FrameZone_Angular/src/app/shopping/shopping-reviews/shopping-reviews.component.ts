@@ -1,7 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FooterComponent } from "../../shared/components/footer/footer.component";
+import { ActivatedRoute } from '@angular/router';
+import { ProductApiService } from '../shared/services/product-api.service';
+import { AuthService } from '../../core/services/auth.service';
+import { filter, Subject, take, takeUntil } from 'rxjs';
+
 
 interface Review {
   id: number;
@@ -12,11 +17,13 @@ interface Review {
   rating: number;
   date: string;
   comment: string;
+  reply?: string; // 加入賣家回覆
   productName: string;
   productImage: string;
   seller: string;
   type: 'buyer' | 'seller'; // 買家評價或賣家收到的評價
 }
+
 
 @Component({
   selector: 'app-shopping-reviews',
@@ -25,7 +32,14 @@ interface Review {
   templateUrl: './shopping-reviews.component.html',
   styleUrl: './shopping-reviews.component.css'
 })
-export class ShoppingReviewsComponent {
+export class ShoppingReviewsComponent implements OnInit, OnDestroy {
+  private route = inject(ActivatedRoute);
+  private productApiService = inject(ProductApiService);
+  private authService = inject(AuthService);
+  private destroy$ = new Subject<void>();
+
+  userId: string | number | null = null;
+  ownerName: string = '我';
   allReviews: Review[] = [];
   displayedReviews: Review[] = [];
 
@@ -38,13 +52,111 @@ export class ShoppingReviewsComponent {
   viewMode: 'buyer' | 'seller' = 'buyer'; // 預設顯示買家評價
   isSeller: boolean = true; // 是否為賣家身份
 
-  averageRating: number = 4.5;
+  averageRating: number = 0;
   totalReviews: number = 0;
-  roundedRating: number = 5;
+  roundedRating: number = 0;
 
   ngOnInit(): void {
-    this.generateReviews();
-    this.switchViewMode('buyer');
+    this.route.queryParams.subscribe(params => {
+      const pId = params['userId'];
+      // 如果 pId 是數字字串，轉成數字；如果不是（例如帳號名稱），保持原樣
+      if (pId) {
+        const numId = Number(pId);
+        this.userId = isNaN(numId) ? pId : numId;
+      } else {
+        this.userId = null;
+      }
+      this.loadInitialData();
+    });
+  }
+
+  loadInitialData(): void {
+    // 取得目前使用者，判斷是在看自己的還是別人的
+    this.authService.currentUser$.pipe(take(1)).subscribe(currentUser => {
+      if (this.userId) {
+        // 使用 == 比較，容許數字與字串類型的差異 (例如 '123' == 123)
+        if (currentUser && (this.userId == currentUser.userId || this.userId == currentUser.account)) {
+          this.ownerName = '我';
+          this.viewMode = 'seller'; // 預設顯示別人給我的評價 (收到的)
+          this.userId = currentUser.userId ?? this.userId;
+          this.loadReviews();
+        } else {
+          // 在看別人的評價
+          this.ownerName = '賣家';
+          this.viewMode = 'seller'; // 預設顯示他收到的評價
+          this.productApiService.getSellerProfile(this.userId!).subscribe({
+            next: (profile) => {
+              if (profile) this.ownerName = profile.storeName || profile.displayName;
+            },
+            error: () => {
+              // 如果抓不到 profile，通常是因為 userId 是帳號名稱而非 ID，
+              // 這種情況下 getSellerReviews 應該也能處理，或者我們就保持「賣家」字樣
+            }
+          });
+          this.loadReviews();
+        }
+      } else if (currentUser) {
+        // 沒有 userId，看自己的評價
+        this.userId = currentUser.userId ?? null;
+        this.ownerName = '我';
+        this.viewMode = 'seller';
+        this.loadReviews();
+      }
+    });
+  }
+
+  loadReviews(): void {
+    if (!this.userId) return;
+
+    // 根據 viewMode 決定載入收到的還是發出的評價
+    if (this.viewMode === 'seller') {
+      // 我身為賣家收到的評價 (買家給我的)
+      this.productApiService.getSellerReviews(this.userId, this.itemsPerPage, (this.currentPage - 1) * this.itemsPerPage)
+        .subscribe({
+          next: (reviews) => {
+            this.processApiResponse(reviews);
+          },
+          error: (err) => {
+            console.error('Failed to load seller reviews:', err);
+            this.processApiResponse([]); // 重置為空
+          }
+        });
+    } else {
+      // 我身為買家發出的評價 (給別人的)
+      this.productApiService.getUserSentReviews(this.userId, this.itemsPerPage, (this.currentPage - 1) * this.itemsPerPage)
+        .subscribe({
+          next: (reviews) => {
+            this.processApiResponse(reviews);
+          },
+          error: (err) => {
+            console.error('Failed to load user sent reviews:', err);
+            this.processApiResponse([]); // 重置為空
+          }
+        });
+    }
+  }
+
+  processApiResponse(reviews: any[]): void {
+    this.allReviews = reviews.map(r => ({
+      id: r.reviewId,
+      reviewer: {
+        name: r.reviewerName,
+        avatar: r.reviewerAvatar
+      },
+      rating: r.rating,
+      date: new Date(r.createdAt).toLocaleDateString(),
+      comment: r.content,
+      reply: r.reply,
+      productName: r.targetName,
+      productImage: r.targetImageUrl || 'https://api.dicebear.com/7.x/shapes/svg?seed=product',
+      seller: this.viewMode === 'buyer' ? r.revieweeName : r.reviewerName,
+      type: this.viewMode
+    }));
+
+    // 假設目前不實作後端的分頁計數，先簡單模擬分頁
+    this.displayedReviews = this.allReviews;
+    this.calculateAverageRating(this.allReviews);
+    this.updatePageNumbers();
   }
 
   generateReviews(): void {
@@ -120,9 +232,7 @@ export class ShoppingReviewsComponent {
   switchViewMode(mode: 'buyer' | 'seller'): void {
     this.viewMode = mode;
     this.currentPage = 1;
-    const filteredReviews = this.allReviews.filter(review => review.type === mode);
-    this.calculatePaginationForFiltered(filteredReviews);
-    this.calculateAverageRating(filteredReviews);
+    this.loadReviews();
   }
 
   calculateAverageRating(reviews: Review[]): void {
@@ -211,5 +321,10 @@ export class ShoppingReviewsComponent {
     });
 
     return distribution;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
