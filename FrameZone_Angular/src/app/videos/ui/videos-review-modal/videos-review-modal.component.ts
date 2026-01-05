@@ -1,30 +1,54 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { NgClass, NgIf, NgForOf } from "@angular/common";
-import { DecimalPipe } from "@angular/common";
+import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { NgClass, NgIf, NgForOf, DecimalPipe } from "@angular/common";
 
 @Component({
   selector: 'app-videos-review-modal',
+  standalone: true,
   imports: [NgClass, NgIf, NgForOf, DecimalPipe],
   templateUrl: './videos-review-modal.component.html',
   styleUrl: './videos-review-modal.component.css'
 })
-export class VideosReviewModalComponent {
-  @Input() reviewData: any; // 接收影片審核結果
+export class VideosReviewModalComponent implements OnChanges {
+
+  @Input() isLoading = false;
+
+  // ⛔ 從父層來的是「string JSON」
+  @Input() reviewData: string | null = null;
+
+  // ✅ 真正給 template 用的「物件」
+  parsedReviewData: any = null;
+
   @Output() close = new EventEmitter<void>();
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['reviewData'] && this.reviewData) {
+      try {
+        this.parsedReviewData = JSON.parse(this.reviewData);
+        console.log('parsedReviewData', this.parsedReviewData);
+      } catch (e) {
+        console.error('reviewData JSON parse 失敗', e);
+        this.parsedReviewData = null;
+      }
+    }
+  }
 
   onBackdropClick() {
     this.close.emit();
   }
-  nudityKeys() {
-    return this.reviewData?.sightengine?.nudity
-      ? Object.keys(this.reviewData.sightengine.nudity).filter(k => typeof this.reviewData.sightengine.nudity[k] === 'number')
-      : [];
+
+  nudityKeys(): string[] {
+    const nudity = this.parsedReviewData?.sightengine?.nudity;
+    if (!nudity) return [];
+
+    return Object.keys(nudity).filter(
+      k => typeof nudity[k] === 'number'
+    );
   }
 
-  contextKeys() {
-    return this.reviewData?.sightengine?.nudity?.context
-      ? Object.keys(this.reviewData.sightengine.nudity.context)
-      : [];
-  }
+  contextKeys(): string[] {
+    const context = this.parsedReviewData?.sightengine?.nudity?.context;
+    if (!context) return [];
 
+    return Object.keys(context);
+  }
 }

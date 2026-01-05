@@ -82,3 +82,8 @@ export interface PerformanceChartDto {
   views: number;
   engagement: number;
 }
+
+export interface VideoAIAuditResultDto {
+  videoGuid: string;
+  aiAuditResult: string;
+}

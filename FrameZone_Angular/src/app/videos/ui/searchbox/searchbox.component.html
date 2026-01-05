@@ -19,7 +19,7 @@
     </div>
 
     <!-- 排序選項 -->
-    <div class="sort-options">
+    <div class="sort-options" *ngIf="isSearchPage">
       <div class="sort-label">排序方式：</div>
 
       <div class="btn-group" role="group" aria-label="排序選項">
@@ -57,5 +57,5 @@
         </button>
       </div>
     </div>
+
   </div>
-</div>

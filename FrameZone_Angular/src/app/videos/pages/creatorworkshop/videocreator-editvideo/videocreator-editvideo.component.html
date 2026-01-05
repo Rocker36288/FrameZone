@@ -1,5 +1,6 @@
-<app-videos-review-modal *ngIf="showModal" [reviewData]="videoReviewResult"
-  (close)="showModal = false"></app-videos-review-modal>
+<app-videos-review-modal *ngIf="showModal" [reviewData]="videoReviewResult" [isLoading]="isLoadingAIResult"
+  (close)="closeReviewModal()">
+</app-videos-review-modal>
 <div class="page-wrapper">
 
   <!-- ===== 載入中狀態 ===== -->

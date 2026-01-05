@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CreatorAnalyticsDto, VideoDetailData } from '../models/videocreator-model';
+import { CreatorAnalyticsDto, VideoAIAuditResultDto, VideoDetailData } from '../models/videocreator-model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -66,5 +66,12 @@ export class VideoCreatorService {
       { params }
     );
   }
-
+  // ===============================
+  // 取得影片 AI 審核結果
+  // ===============================
+  getVideoAIAuditResult(guid: string): Observable<VideoAIAuditResultDto> {
+    return this.http.get<VideoAIAuditResultDto>(
+      `${this.apiBase}/VideoCreator/${guid}/ai-result`
+    );
+  }
 }

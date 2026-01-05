@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
   styleUrl: './searchbox.component.css'
 })
 export class SearchboxComponent {
+
   keyword = '';
   sortBy: 'likes' | 'views' | 'date' = 'date';
   sortOrder: 'asc' | 'desc' = 'desc';
@@ -27,6 +28,11 @@ export class SearchboxComponent {
         sortOrder: this.sortOrder
       }
     });
+  }
+
+  /** ⭐ 是否在搜尋頁 */
+  get isSearchPage(): boolean {
+    return this.router.url.startsWith('/videos/search');
   }
 
   clearSearch() {

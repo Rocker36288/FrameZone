@@ -36,4 +36,9 @@ export class CommentInputComponent {
     this.buttonClicked.emit();
     this.commentText = '';
   }
+
+  onAvatarlError(event: ErrorEvent) {
+    const img = event.target as HTMLImageElement;
+    img.src = 'favicon2.png';
+  }
 }

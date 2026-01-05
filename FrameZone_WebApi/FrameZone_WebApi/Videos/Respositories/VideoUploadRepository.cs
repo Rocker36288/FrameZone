@@ -63,7 +63,7 @@ namespace FrameZone_WebApi.Videos.Repositories
                 throw new InvalidOperationException("Video is not ready to be published");
 
             video.ProcessStatus = ProcessStatus.PUBLISHED.ToString();
-            video.PublishDate = DateTime.Now;
+            video.PublishDate = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 

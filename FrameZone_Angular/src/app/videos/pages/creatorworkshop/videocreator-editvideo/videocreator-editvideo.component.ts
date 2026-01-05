@@ -308,30 +308,53 @@ export class VideocreatorEditvideoComponent {
     });
   }
   // 父元件 TS
-  videoReviewResult = {
-    "passed": true,
-    "reason": "Content approved",
-    "reviewedAt": "2026-01-03T09:29:40.408415Z",
-    "sightengine": {
-      "status": "success",
-      "nudity": {
-        "sexual_activity": 0.001,
-        "sexual_display": 0.001,
-        "erotica": 0.001,
-        "very_suggestive": 0.001,
-        "suggestive": 0.001,
-        "mildly_suggestive": 0.001,
-        "context": { "sea_lake_pool": 0.001, "outdoor_other": 0.99, "indoor_other": 0.001 }
-      },
-      "media": {
-        "uri": "thumbnail_0_compressed.jpg"
-      }
-    }
-  };
-  showModal = false;
+  // videoReviewResult = {
+  //   "passed": true,
+  //   "reason": "Content approved",
+  //   "reviewedAt": "2026-01-03T09:29:40.408415Z",
+  //   "sightengine": {
+  //     "status": "success",
+  //     "nudity": {
+  //       "sexual_activity": 0.001,
+  //       "sexual_display": 0.001,
+  //       "erotica": 0.001,
+  //       "very_suggestive": 0.001,
+  //       "suggestive": 0.001,
+  //       "mildly_suggestive": 0.001,
+  //       "context": { "sea_lake_pool": 0.001, "outdoor_other": 0.99, "indoor_other": 0.001 }
+  //     },
+  //     "media": {
+  //       "uri": "thumbnail_0_compressed.jpg"
+  //     }
+  //   }
+  // };
+
 
   // 開啟 modal 方法
+  showModal = false;
+  videoReviewResult: string = "";
+  isLoadingAIResult = false;
+
   openReviewModal() {
-    this.showModal = true;
+    this.isLoadingAIResult = true;
+    this.videoService.getVideoAIAuditResult(this.video!.videoUrl)
+      .subscribe({
+        next: res => {
+          this.videoReviewResult = res.aiAuditResult;
+          console.log(this.videoReviewResult)
+          this.isLoadingAIResult = false;
+          this.showModal = true;
+        },
+        error: err => {
+          console.error('取得 AI 審核結果失敗', err);
+          this.videoReviewResult = 'ERROR';
+          this.isLoadingAIResult = false;
+        }
+      });
+  }
+
+  closeReviewModal() {
+    this.showModal = false;
+    // this.videoReviewResult = undefined;
   }
 }

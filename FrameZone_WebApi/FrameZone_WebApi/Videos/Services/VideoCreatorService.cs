@@ -205,5 +205,15 @@ namespace FrameZone_WebApi.Videos.Services
             var span = to - from;
             return (from, to, from - span, from);
         }
+
+        //拿取AIresult
+        public async Task<string?> GetVideoAIResultAsync(string guid,int userId)
+        {
+            //會有權限限制
+            if (string.IsNullOrWhiteSpace(guid))
+                return null;
+
+            return await _videoRepo.GetVideoAIResult(guid);
+        }
     } 
 }

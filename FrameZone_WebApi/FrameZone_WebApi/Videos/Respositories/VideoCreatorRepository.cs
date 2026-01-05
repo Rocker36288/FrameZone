@@ -166,7 +166,7 @@ namespace FrameZone_WebApi.Videos.Respositories
                 .AsNoTracking()
                 .Where(v =>
                     v.ChannelId == channelId &&
-                    !v.IsDeleted)
+                    !v.IsDeleted && v.PublishDate != null)
                 .OrderByDescending(v => v.PublishDate)
                 .Take(take)
                 .Select(v => new RecentVideoStatDto
@@ -186,6 +186,11 @@ namespace FrameZone_WebApi.Videos.Respositories
                         .Count()
                 })
                 .ToListAsync();
+        }
+
+        public async Task<String> GetVideoAIResult(string guid)
+        {
+            return await _context.Videos.Where(v=> v.VideoUrl == guid).Select(v=> v.AiAuditResult).FirstOrDefaultAsync();
         }
     }
 }

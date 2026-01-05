@@ -92,8 +92,10 @@ namespace FrameZone_WebApi.Videos.Controllers
             if (!IsValidPeriod(period))
                 return BadRequest("Invalid period. Allowed values: 7days, 30days, 90days");
 
+            var userId = GetUserId();
+
             var result = await _videoCreatorService
-                .GetAnalyticsAsync(GetUserId(), period);
+                .GetAnalyticsAsync(userId, period);
 
             return Ok(result);
         }
@@ -101,6 +103,24 @@ namespace FrameZone_WebApi.Videos.Controllers
         private static bool IsValidPeriod(string period)
         {
             return period is "7days" or "30days" or "90days";
+        }
+
+        //=============================================
+        [HttpGet("{guid}/ai-result")]
+        public async Task<IActionResult> GetVideoAIResult(string guid)
+        {
+            var userId = GetUserId();
+
+            var result = await _videoCreatorService.GetVideoAIResultAsync(guid, userId);
+
+            if (result == null)
+                return NotFound(new { message = "找不到影片或尚未有 AI 審核結果" });
+
+            return Ok(new
+            {
+                videoGuid = guid,
+                aiAuditResult = result
+            });
         }
 
 
