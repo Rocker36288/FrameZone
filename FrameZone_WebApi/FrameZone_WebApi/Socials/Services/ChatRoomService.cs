@@ -21,6 +21,9 @@ namespace FrameZone_WebApi.Socials.Services
             long targetUserId,
             string roomCategory)
         {
+            if (userId == targetUserId)
+                throw new InvalidOperationException("不能自己私訊自己");
+
             // 嘗試查詢是否已有對應分類的私聊聊天室
             var roomId = _roomRepo.GetPrivateRoomId(userId, targetUserId, roomCategory);
 

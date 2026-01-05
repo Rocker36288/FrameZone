@@ -30,6 +30,8 @@ namespace FrameZone_WebApi.Socials.Controllers
         {
             if (!TryGetUserId(out var userId))
                 return Unauthorized();
+            if (userId == dto.TargetUserId)
+                return BadRequest("不能自己私訊自己");
             return _roomService.GetOrCreateSocialPrivateRoom(userId, dto.TargetUserId);
         }
 
@@ -42,6 +44,8 @@ namespace FrameZone_WebApi.Socials.Controllers
         {
             if (!TryGetUserId(out var userId))
                 return Unauthorized();
+            if (userId == dto.TargetUserId)
+                return BadRequest("不能自己私訊自己");
             return _roomService.GetOrCreateShoppingPrivateRoom(userId, dto.TargetUserId);
         }
 
