@@ -1,3 +1,6 @@
+<app-videos-review-modal *ngIf="showModal" [reviewData]="videoReviewResult" [isLoading]="isLoadingAIResult"
+  (close)="closeReviewModal()">
+</app-videos-review-modal>
 <div class="page-wrapper">
 
   <!-- ===== 載入中狀態 ===== -->
@@ -68,12 +71,12 @@
         <!-- 影片修改警示 -->
         <div *ngIf="hasUnsavedChanges"
           class="alert alert-warning alert-important d-flex justify-content-between align-items-center mb-4">
-          <div>
+          <div class="text-dark">
             <i class="ti ti-alert-circle me-2"></i>
             <strong>影片已修改，尚未儲存</strong>
           </div>
           <button class="btn btn-sm btn-primary" (click)="saveAllChanges()">
-            <i class="ti ti-device-floppy me-1"></i>確認修改
+            <i class="ti ti-device-floppy me-1 "></i>確認修改
           </button>
         </div>
 
@@ -205,7 +208,7 @@
                 <div class="mb-4">
                   <label class="form-label">影片縮圖</label>
                   <div class="position-relative thumbnail-container">
-                    <img [src]="video.thumbnail || '/assets/placeholder-thumbnail.jpg'"
+                    <img [src]="thumbnailPreview || video.thumbnail || '/assets/placeholder-thumbnail.jpg'"
                       class="img-fluid rounded w-100 thumbnail-preview" (click)="editThumbnail()">
 
                     <div class="thumbnail-overlay rounded" (click)="editThumbnail()">
@@ -216,6 +219,9 @@
                     </div>
                   </div>
                 </div>
+
+
+
 
                 <!-- 隱私設定 -->
                 <div class="mb-3">
@@ -229,9 +235,9 @@
 
                   <div *ngIf="editingPrivacy" class="input-group">
                     <select class="form-select" [(ngModel)]="editPrivacy">
-                      <option value="Public">公開</option>
-                      <option value="Unlisted">不公開列出</option>
-                      <option value="Private">私人</option>
+                      <option [ngValue]="PrivacyStatus.PUBLIC">公開</option>
+                      <option [ngValue]="PrivacyStatus.UNLISTED">不公開列出</option>
+                      <option [ngValue]="PrivacyStatus.PRIVATE">私人</option>
                     </select>
                     <button class="btn btn-primary" (click)="savePrivacy()">
                       <i class="ti ti-check"></i>
@@ -260,12 +266,7 @@
                     <label class="form-label text-muted small">時長</label>
                     <div class="fw-bold">{{ getDuration(video.duration) }}</div>
                   </div>
-                  <div class="col-6">
-                    <label class="form-label text-muted small">解析度</label>
-                    <div>
-                      <span class="badge bg-azure-lt">{{ video.duration }}</span>
-                    </div>
-                  </div>
+
                 </div>
 
               </div>
@@ -281,10 +282,17 @@
               <div class="card-body">
                 <div class="datagrid">
                   <div class="datagrid-item">
+                    <div class="datagrid-title">發布時間</div>
+                    <div class="datagrid-content">
+                      <i class="ti ti-clock text-muted me-1"></i>
+                      {{ video.publishDate| date:'yyyy-MM-dd HH:mm' }}
+                    </div>
+                  </div>
+                  <div class="datagrid-item">
                     <div class="datagrid-title">建立時間</div>
                     <div class="datagrid-content">
                       <i class="ti ti-clock text-muted me-1"></i>
-                      {{ video.createdtime| date:'yyyy-MM-dd HH:mm' }}
+                      {{ video.createdDate| date:'yyyy-MM-dd HH:mm' }}
                     </div>
                   </div>
 
@@ -292,7 +300,7 @@
                     <div class="datagrid-title">更新時間</div>
                     <div class="datagrid-content">
                       <i class="ti ti-refresh text-muted me-1"></i>
-                      {{ video.updatetime | date:'yyyy-MM-dd HH:mm' }}
+                      {{ video.updateDate | date:'yyyy-MM-dd HH:mm' }}
                     </div>
                   </div>
                 </div>
@@ -301,19 +309,22 @@
 
             <!-- ===== 技術細節 ===== -->
             <div class="card shadow-sm">
-              <div class="card-header">
+              <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="card-title">
                   <i class="ti ti-file-info me-2"></i>技術細節
                 </h3>
+
+
               </div>
+
               <div class="card-body">
                 <div class="datagrid">
                   <!-- <div class="datagrid-item">
-                    <div class="datagrid-title">檔案大小</div>
-                    <div class="datagrid-content">
-                      <strong>{{ getReadableSize(video.id) }}</strong>
-                    </div>
-                  </div> -->
+        <div class="datagrid-title">檔案大小</div>
+        <div class="datagrid-content">
+          <strong>{{ getReadableSize(video.id) }}</strong>
+        </div>
+      </div> -->
 
                   <div class="datagrid-item">
                     <div class="datagrid-title">解析度</div>
@@ -321,9 +332,22 @@
                       <span class="badge bg-blue-lt">{{ video.resolution }}</span>
                     </div>
                   </div>
+
+                  <div class="datagrid-item">
+                    <div class="datagrid-title">審核結果(管理員專屬)</div>
+                    <div class="datagrid-content">
+                      <!-- 新增按鈕 -->
+                      <button class="btn btn-sm btn-primary" (click)="openReviewModal()">
+                        <i class="ti ti-eye"></i> 查看審核結果
+                      </button>
+                    </div>
+                  </div>
+
+
                 </div>
               </div>
             </div>
+
 
           </div>
 
@@ -333,3 +357,5 @@
 
   </div>
 </div>
+<!-- 隱藏檔案選擇 -->
+<input type="file" #thumbnailInput accept="image/*" hidden (change)="onThumbnailSelected($event)">

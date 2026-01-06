@@ -11,6 +11,8 @@
   overflow-y: auto;
   z-index: 1030;
   box-shadow: 0 0 2rem 0 rgba(0, 0, 0, 0.1);
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 /* 收合狀態 */
@@ -21,6 +23,7 @@
 /* 容器樣式 */
 .navbar-vertical .container-fluid {
   padding: 1.5rem 0;
+  margin: 0 !important;
   flex-direction: column;
   align-items: stretch;
 }
@@ -31,7 +34,6 @@
   margin-bottom: -1.5rem;
   margin-top: -1.5rem;
   margin-left: 1rem;
-
   transition: transform 0.3s ease;
 }
 
@@ -125,25 +127,19 @@
 /* Toggle Button - 極簡風格 */
 .sidebar-toggle {
   position: relative;
-  /* top: 8rem; */
   left: 50%;
   transform: translateX(-50%);
-
   width: 80%;
   height: 2rem;
-
   border-radius: 0.5rem;
   background: transparent;
   border: 2px solid rgba(255, 255, 255, 0.2);
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   cursor: pointer;
   z-index: 1031;
   padding: 0;
-
   transition:
     left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     background 0.2s ease,
@@ -153,23 +149,17 @@
 /* Toggle Button - 極簡風格 */
 .sidebar-log-toggle {
   position: relative;
-  /* top: 8rem; */
   left: 50%;
   transform: translateX(-50%);
-
   width: 80%;
   height: 2rem;
-
   background: transparent;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   cursor: pointer;
   z-index: 1031;
   padding: 0;
-
   transition:
     left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     background 0.2s ease,
@@ -340,19 +330,25 @@
   }
 }
 
-/* Main content adjustment */
+/* 🔥 修正：Main content adjustment - 移除上方空白 */
 :host-context(body) {
   padding-left: 15rem;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
   transition: padding-left 0.3s ease;
 }
 
 :host-context(body.sidebar-collapsed) {
   padding-left: 5rem;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
 }
 
 @media (max-width: 991.98px) {
   :host-context(body) {
     padding-left: 0;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
   }
 }
 
@@ -362,21 +358,17 @@
   justify-content: center;
   align-items: center;
   transition: all 0.3s ease;
-  /* 平滑過渡 */
   margin-bottom: 2rem;
 }
 
 .sidebar-avatar-wrapper app-user-avatar img {
   width: 80px;
-  /* 展開時尺寸 */
   height: 80px;
   transition: all 0.3s ease;
-  /* 平滑縮放 */
 }
 
 .sidebar-avatar-wrapper.collapsed app-user-avatar img {
   width: 40px;
-  /* 收縮時尺寸 */
   height: 40px;
 }
 

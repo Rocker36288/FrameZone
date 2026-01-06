@@ -38,8 +38,8 @@ export class VideoDetailData {
   commentCount: number = 0;
 
   // ─── 資源 / 技術 ──────────────
-  createdtime: Date = new Date();
-  updatetime: Date = new Date();
+  createdDate: Date = new Date();
+  updateDate: Date = new Date();
   resolution: string = '';
 
   videoUrl: string = '';
@@ -51,4 +51,58 @@ export class VideoDetailData {
       Object.assign(this, data);
     }
   }
+}
+
+// ===== 創作者分析總 DTO =====
+export interface CreatorAnalyticsDto {
+  totalViews: number;
+  totalSubscribers: number;
+  totalVideos: number;
+  avgEngagement: number;
+  viewsGrowth: number;
+  subscribersGrowth: number;
+  recentVideos: RecentVideoDto[];
+  performanceChart: PerformanceChartDto[];
+}
+
+// ===== 近期影片 =====
+export interface RecentVideoDto {
+  videoId: number;
+  title: string;
+  views: number;
+  likes: number;
+  comments: number;
+  publishDate: string;
+  thumbnailUrl: string;
+}
+
+// ===== 圖表資料 =====
+export interface PerformanceChartDto {
+  date: string;
+  views: number;
+  engagement: number;
+}
+
+export interface VideoAIAuditResultDto {
+  videoGuid: string;
+  aiAuditResult: string;
+}
+
+
+// video-creator.service.ts
+
+// 定義後端實際回傳的介面（如果後端用大寫）
+export interface BackendVideoResponse {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;  // 新增
+  videos: VideoDetailData[];
+}
+
+// 前端使用的介面
+export interface VideoListResponse {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;  // 新增
+  videos: VideoDetailData[];
 }

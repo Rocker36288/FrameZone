@@ -6,14 +6,19 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { VideoCreatorService } from '../../../service/video-creator.service';
 import { VideoDetailData } from '../../../models/videocreator-model';
 import { VideoPlayerComponent } from "../../../ui/video/video-player/video-player.component";
+import { PrivacyStatus } from '../../../models/video.enum';
+import { ViewChild, ElementRef } from '@angular/core';
+import { VideosReviewModalComponent } from "../../../ui/videos-review-modal/videos-review-modal.component";
+
 
 @Component({
   selector: 'app-videocreator-editvideo',
-  imports: [DatePipe, NgClass, NgIf, NgForOf, FormsModule, VideoPlayerComponent],
+  imports: [DatePipe, NgClass, NgIf, NgForOf, FormsModule, VideoPlayerComponent, VideosReviewModalComponent],
   templateUrl: './videocreator-editvideo.component.html',
   styleUrl: './videocreator-editvideo.component.css'
 })
 export class VideocreatorEditvideoComponent {
+  PrivacyStatus = PrivacyStatus;
 
   video?: VideoDetailData;
   guid!: string;
@@ -31,7 +36,14 @@ export class VideocreatorEditvideoComponent {
 
   editTitle = '';
   editDescription = '';
-  editPrivacy = '';
+  editPrivacy!: PrivacyStatus;
+
+  //=======縮圖
+  thumbnailFile?: File;
+  thumbnailPreview?: string;
+  @ViewChild('thumbnailInput') thumbnailInput!: ElementRef<HTMLInputElement>;
+
+
 
   constructor(
     private route: ActivatedRoute,
@@ -56,8 +68,6 @@ export class VideocreatorEditvideoComponent {
         this.videoUrl = 'https://localhost:7213/api/videoplayer/' + data.videoUrl
         this.video!.thumbnail =
           'https://localhost:7213/api/Videos/video-thumbnail/' + this.video!.videoUrl;
-        console.log(data)
-        console.log(this.video)
       },
       error: (err) => {
         this.isLoading = false;
@@ -82,10 +92,11 @@ export class VideocreatorEditvideoComponent {
   }
 
   getPrivacyStatusClass(status: string): string {
-    switch (status?.toLowerCase()) {
-      case 'public': return 'bg-success-lt';
-      case 'private': return 'bg-danger-lt';
-      case 'unlisted': return 'bg-warning-lt';
+    switch (status?.toUpperCase()) {
+      case 'PUBLIC': return 'bg-success-lt';
+      case 'UNLISTED': return 'bg-warning-lt';
+      case 'PRIVATE': return 'bg-danger-lt';
+      case 'DRAFT': return 'bg-secondary-lt';
       default: return 'bg-secondary-lt';
     }
   }
@@ -116,9 +127,50 @@ export class VideocreatorEditvideoComponent {
   }
 
   editThumbnail() {
-    // TODO: 實作縮圖編輯功能
-    alert('編輯縮圖功能開發中');
+    this.thumbnailInput.nativeElement.click();
   }
+
+  onThumbnailSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+
+    if (!file.type.startsWith('image/')) {
+      alert('請選擇圖片檔案');
+      return;
+    }
+
+    this.thumbnailFile = file;
+    this.hasUnsavedChanges = true;
+
+    // 即時預覽
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.thumbnailPreview = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  saveThumbnail() {
+    if (!this.video || !this.thumbnailFile) return;
+
+    this.videoService.uploadThumbnail(this.video.videoUrl, this.thumbnailFile).subscribe({
+      next: () => {
+        // 上傳成功後，把 preview 清空，更新 video.thumbnail 為最新
+        this.video!.thumbnail = this.thumbnailPreview!;
+        this.thumbnailPreview = undefined;
+        this.thumbnailFile = undefined;
+        this.hasUnsavedChanges = false;
+        alert('縮圖已更新');
+      },
+      error: (err) => {
+        console.error(err);
+        alert('縮圖上傳失敗，請稍後再試');
+      }
+    });
+  }
+
 
   // ===== Title =====
   startEditTitle() {
@@ -137,7 +189,6 @@ export class VideocreatorEditvideoComponent {
     }
 
     if (this.editTitle !== this.video.title) {
-      // TODO: PATCH /videos/{id}/metadata
       this.video.title = this.editTitle;
     }
     this.editingTitle = false;
@@ -163,7 +214,6 @@ export class VideocreatorEditvideoComponent {
     if (!this.video) return;
 
     if (this.editDescription !== this.video.description) {
-      // TODO: PATCH /videos/{id}/metadata
       this.video.description = this.editDescription;
     }
     this.editingDescription = false;
@@ -181,8 +231,8 @@ export class VideocreatorEditvideoComponent {
     if (!this.video) return;
 
     if (this.editPrivacy !== this.video.privacyStatus) {
-      // TODO: PATCH /videos/{id}/metadata
-      // this.video.privacyStatus = this.editPrivacy;
+      this.video.privacyStatus = this.editPrivacy; // ✅ 不再報錯
+      this.hasUnsavedChanges = true;
     }
     this.editingPrivacy = false;
   }
@@ -208,31 +258,101 @@ export class VideocreatorEditvideoComponent {
   saveAllChanges() {
     if (!this.video) return;
 
+    // 先更新 metadata
     const payload = {
       title: this.editTitle || this.video.title,
       description: this.editDescription || this.video.description,
       privacyStatus: this.editPrivacy || this.video.privacyStatus
     };
 
-    // this.videoService.updateVideo(this.video.guid, payload).subscribe({
-    //   next: (res) => {
-    //     this.video = res;
-    //     this.hasUnsavedChanges = false;
-    //     this.editingTitle = false;
-    //     this.editingDescription = false;
-    //     this.editingPrivacy = false;
-    //   },
-    //   error: (err) => {
-    //     console.error(err);
-    //     alert('儲存失敗，請稍後再試');
-    //   }
-    // });
+    this.videoService.updateVideo(this.video.videoUrl, payload).subscribe({
+      next: () => {
 
-    // 示意：更新成功
-    this.hasUnsavedChanges = false;
-    this.editingTitle = false;
-    this.editingDescription = false;
-    this.editingPrivacy = false;
-    alert('已儲存所有變更（示意）');
+        // 如果有新縮圖，才呼叫縮圖上傳
+        if (this.thumbnailFile) {
+          this.videoService.uploadThumbnail(this.video!.videoUrl, this.thumbnailFile).subscribe({
+            next: () => {
+              // 縮圖更新成功後清除暫存
+              // this.thumbnailPreview = undefined;
+              this.thumbnailFile = undefined;
+
+              // 完成所有操作
+              this.hasUnsavedChanges = false;
+              this.editingTitle = false;
+              this.editingDescription = false;
+              this.editingPrivacy = false;
+
+              alert('影片及縮圖已更新');
+            },
+            error: (err) => {
+              console.error(err);
+              alert('影片已更新，但縮圖上傳失敗');
+            }
+          });
+        } else {
+          // 沒有縮圖變動
+          this.hasUnsavedChanges = false;
+          this.editingTitle = false;
+          this.editingDescription = false;
+          this.editingPrivacy = false;
+          alert('影片已更新');
+        }
+
+      },
+      error: (err) => {
+        console.error(err);
+        alert('影片更新失敗，請稍後再試');
+      }
+    });
+  }
+  // 父元件 TS
+  // videoReviewResult = {
+  //   "passed": true,
+  //   "reason": "Content approved",
+  //   "reviewedAt": "2026-01-03T09:29:40.408415Z",
+  //   "sightengine": {
+  //     "status": "success",
+  //     "nudity": {
+  //       "sexual_activity": 0.001,
+  //       "sexual_display": 0.001,
+  //       "erotica": 0.001,
+  //       "very_suggestive": 0.001,
+  //       "suggestive": 0.001,
+  //       "mildly_suggestive": 0.001,
+  //       "context": { "sea_lake_pool": 0.001, "outdoor_other": 0.99, "indoor_other": 0.001 }
+  //     },
+  //     "media": {
+  //       "uri": "thumbnail_0_compressed.jpg"
+  //     }
+  //   }
+  // };
+
+
+  // 開啟 modal 方法
+  showModal = false;
+  videoReviewResult: string = "";
+  isLoadingAIResult = false;
+
+  openReviewModal() {
+    this.isLoadingAIResult = true;
+    this.videoService.getVideoAIAuditResult(this.video!.videoUrl)
+      .subscribe({
+        next: res => {
+          this.videoReviewResult = res.aiAuditResult;
+          console.log(this.videoReviewResult)
+          this.isLoadingAIResult = false;
+          this.showModal = true;
+        },
+        error: err => {
+          console.error('取得 AI 審核結果失敗', err);
+          this.videoReviewResult = 'ERROR';
+          this.isLoadingAIResult = false;
+        }
+      });
+  }
+
+  closeReviewModal() {
+    this.showModal = false;
+    // this.videoReviewResult = undefined;
   }
 }

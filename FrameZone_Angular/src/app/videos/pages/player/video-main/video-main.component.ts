@@ -362,4 +362,13 @@ export class VideoMainComponent {
       return false
     }
   }
+
+  //======觀看紀錄=========
+  onTimeUpdate(currentTime: number) {
+    if (this.authService.getCurrentUser()) {
+      this.videoService
+        .updateWatchHistory(this.video?.videoId!, Math.floor(currentTime))
+        .subscribe();
+    }
+  }
 }

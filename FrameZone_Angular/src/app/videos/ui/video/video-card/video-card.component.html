@@ -7,7 +7,7 @@
         <div class="row g-0 align-items-center">
           <div class=" video-thumb-container video-thumb-small m-2">
             <div class="">
-              <img [src]="video.thumbnail" alt="影片縮圖">
+              <img [src]="thumbnailUrl" alt="影片縮圖">
               <span class="duration-tag">{{ video.duration! | videoDuration }}</span>
             </div>
           </div>
@@ -31,7 +31,7 @@
     <a [href]="'/videos/watch/' + video.videoUri" target="_blank" class="text-decoration-none">
       <div class="card video-card mb-3" style="width: 18rem;">
         <div class="position-relative video-thumb-container video-thumb-big">
-          <img [src]="video.thumbnail" alt="影片縮圖" (error)="onthumbnailError($event)">
+          <img [src]="thumbnailUrl" alt="影片縮圖" (error)="onthumbnailError($event)">
           <span class="duration-tag">{{ video.duration! | videoDuration }}</span>
         </div>
         <div class="card-body p-2">
@@ -57,8 +57,7 @@
       <div class="card video-card mb-3 p-3">
         <div class="d-flex flex-row align-items-start gap-3">
           <div class="video-thumb-container position-relative flex-shrink-0" style="width: 200px; height: 112px;">
-            <img [src]="video.thumbnail" alt="影片縮圖" class="rounded"
-              style="width: 100%; height: 100%; object-fit: cover;">
+            <img [src]="thumbnailUrl" alt="影片縮圖" class="rounded" style="width: 100%; height: 100%; object-fit: cover;">
             <span class="duration-tag position-absolute bottom-0 end-0 m-2 px-2 py-1 bg-dark text-white rounded small">
               {{ video.duration! | videoDuration }}
             </span>
@@ -89,9 +88,9 @@
     <a [href]="'/videos/watch/' + video.videoUri" target="_blank" class="text-decoration-none">
       <div class="card video-card mb-3">
         <div class="row g-0">
-          <div class="col-auto video-thumb-container video-thumb-medium m-2">
+          <div class="video-thumb-container video-thumb-medium m-2">
             <div class="thumbnail-container">
-              <img [src]="video.thumbnail" alt="影片縮圖" style="width: 10rem; height: 6rem;">
+              <img [src]="thumbnailUrl" alt="影片縮圖" (error)="onthumbnailError($event)">
               <span class="duration-tag">{{ video.duration! | videoDuration }}</span>
             </div>
           </div>
@@ -101,9 +100,45 @@
               <p class="card-text text-muted small mb-1">
                 <span class="me-2">{{ video.channelName }}</span> ·
                 <span class="ms-2">{{ video.views }} 次觀看</span> ·
+                <span class="ms-2">{{ video.likes }} 次喜歡</span> ·
                 <span class="ms-2">{{ video.publishDate! | date:'yyyy-MM-dd':'UTC' }}</span>
               </p>
               <p class="card-text text-muted small line-clamp-2">{{ video.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="'history'">
+    <a [href]="'/videos/watch/' + video.videoUri" target="_blank" class="text-decoration-none">
+      <div class="card video-card mb-3">
+        <div class="row g-0">
+          <!-- 左側縮圖 -->
+          <div class="video-thumb-container video-thumb-medium m-2">
+            <div class="thumbnail-container">
+              <img [src]="thumbnailUrl" alt="影片縮圖" (error)="onthumbnailError($event)" class="img-cover">
+              <span class="duration-tag">{{ video.duration! | videoDuration }}</span>
+            </div>
+          </div>
+
+          <!-- 右側說明區 -->
+          <div class="col ms-3 d-flex flex-column">
+            <div class="card-body py-2 px-0 flex-grow-1">
+              <h5 class="card-title fw-semibold mb-1 line-clamp-2">{{ video.title }}</h5>
+              <p class="card-text text-muted small mb-1">
+                <span class="me-2">{{ video.channelName }}</span> ·
+                <span class="ms-2">{{ video.views }} 次觀看</span> ·
+                <span class="ms-2">{{ video.publishDate! | date:'yyyy-MM-dd':'UTC' }}</span>
+              </p>
+              <p class="card-text text-muted small line-clamp-2">{{ video.description }}</p>
+            </div>
+
+            <!-- 水平進度條 -->
+            <div class="progress mt-auto mb-2" style="height: 6px;width: 95%;">
+              <div class="progress-bar" role="progressbar" [style.width.%]="(lastPosition / video.duration) * 100">
+              </div>
             </div>
           </div>
         </div>

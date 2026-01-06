@@ -1,7 +1,7 @@
 <ng-container [ngSwitch]="variant">
   <ng-container *ngSwitchCase="'small'">
     <div class="card channel-card text-decoration-none p-1 d-flex flex-row align-items-center mb-3"
-      style="max-width: 22rem;" (click)="goToChannelHome()">
+      style="max-width: 23rem;" (click)="goToChannelHome()">
 
       <!-- 頭像 -->
       <div class="d-flex align-items-center pointer me-3">
@@ -18,7 +18,7 @@
           {{ channel.follows }} 跟隨者
         </div>
       </div>
-      <div class="me-3" (click)="$event.stopPropagation()">
+      <div class="me-3 ms-2" (click)="$event.stopPropagation()">
         <app-subscribe-button [isFollowing]="userIsFollowing"
           (followToggle)="onFollowToggled($event)"></app-subscribe-button>
       </div>

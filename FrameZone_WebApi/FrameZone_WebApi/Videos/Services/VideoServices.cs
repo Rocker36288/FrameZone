@@ -3,6 +3,7 @@ using FrameZone_WebApi.Videos.DTOs;
 using FrameZone_WebApi.Videos.Enums;
 using FrameZone_WebApi.Videos.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 namespace FrameZone_WebApi.Videos.Services
 {
 
@@ -14,19 +15,6 @@ namespace FrameZone_WebApi.Videos.Services
         {
             _videoRepo = videoRepo;
         }
-
-
-        //public async Task<VideoCommentDto?> GetVideoCommentByCommentidAsync(int videoid)
-        //{
-        //    var dto = await _videoRepo.GetVideoCommentByCommentid(videoid);
-
-        //    if (dto == null)
-        //    {
-        //        return null;
-        //    }
-
-        //    return dto;
-        //}
         public async Task<List<VideoCardDto>> GetVideoRecommendAsync()
         {
             var dto = await _videoRepo.GetRecommendVideosAsync();
@@ -137,8 +125,8 @@ namespace FrameZone_WebApi.Videos.Services
                 CommentTargetId = commentTarget.CommentTargetId,
                 UserId = userId,
                 ParentCommentId = req.ParentCommentId,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
             };
 
             var createdComment = await _videoRepo.CreateCommentAsync(comment);
@@ -169,6 +157,60 @@ namespace FrameZone_WebApi.Videos.Services
         public async Task<bool> ChannelFollowToggle(int userId, int channelId)
         {
             return await _videoRepo.FollowingToggleAsync(userId, channelId);
+        }
+
+        /* =====================================================
+       * Watch History
+       * ===================================================== */
+        public async Task WatchVideoUpdateAsync(int userId, int videoId, int lastPosition)
+        {
+            var watchRecord = await _videoRepo
+                .GetByUserAndVideoViewsAsync(userId, videoId);
+
+            if (watchRecord != null)
+            {
+                watchRecord.LastPosition = lastPosition;
+                watchRecord.UpdateAt = DateTime.UtcNow;
+
+                _videoRepo.ViewsUpdate(watchRecord);
+            }
+            else
+            {
+                var newRecord = new View
+                {
+                    UserId = userId,
+                    VideoId = videoId,
+                    LastPosition = lastPosition,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdateAt = DateTime.UtcNow
+                };
+
+                await _videoRepo.ViewsAddAsync(newRecord);
+            }
+
+            await _videoRepo.ViewsSaveChangesAsync();
+        }
+
+
+
+        /// <summary>
+        /// 取得觀看紀錄（含影片資訊 + 已看秒數）
+        /// </summary>
+        public async Task<List<WatchHistoryDto>> GetWatchHistoryAsync(int userId)
+        {
+            return await _videoRepo.GetWatchHistoryByUserIdAsync(userId);
+        }
+
+        /// <summary>
+        /// 搜尋影片
+        /// </summary>
+        public async Task<List<VideoCardDto>> SearchVideosAsync(
+            string? keyword = null,
+            string sortBy = "date",
+            string sortOrder = "desc",
+            int take = 10)
+        {
+            return await _videoRepo.SearchVideosAsync(keyword, sortBy, sortOrder, take);
         }
     }
 }

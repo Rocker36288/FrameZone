@@ -299,73 +299,8 @@ export class MockChannelService {
     lastUpdateAt: new Date('2002-02-07')
   }
 
-  VideoDetailData: VideoDetailData = {
-    id: 0,
-    title: '',
-    description: '',
-    thumbnail: '',
-    duration: 0,
-    publishDate: new Date(),
-    viewsCount: 0,
-    likesCount: 0,
-    commentCount: 0,
-    videoUrl: '',
-    processStatus: ProcessStatus.UPLOADING,
-    privacyStatus: PrivacyStatus.PUBLIC,
-    createdtime: new Date(),
-    updatetime: new Date(),
-    resolution: ''
-  }
 
-  VideoDetailsData: VideoDetailData[] = [{
-    id: 0,
-    title: '',
-    description: '',
-    thumbnail: '',
-    duration: 0,
-    publishDate: new Date(),
-    viewsCount: 15,
-    likesCount: 0,
-    commentCount: 0,
-    videoUrl: '',
-    processStatus: ProcessStatus.UPLOADING,
-    privacyStatus: PrivacyStatus.PUBLIC,
-    createdtime: new Date(),
-    updatetime: new Date(),
-    resolution: ''
-  }, {
-    id: 0,
-    title: '',
-    description: '',
-    thumbnail: '',
-    duration: 0,
-    publishDate: new Date(),
-    viewsCount: 15,
-    likesCount: 0,
-    commentCount: 0,
-    videoUrl: '',
-    processStatus: ProcessStatus.UPLOADING,
-    privacyStatus: PrivacyStatus.PUBLIC,
-    createdtime: new Date(),
-    updatetime: new Date(),
-    resolution: ''
-  }, {
-    id: 0,
-    title: '',
-    description: '',
-    thumbnail: '',
-    duration: 0,
-    publishDate: new Date(),
-    viewsCount: 15,
-    likesCount: 0,
-    commentCount: 0,
-    videoUrl: '',
-    processStatus: ProcessStatus.UPLOADING,
-    privacyStatus: PrivacyStatus.PUBLIC,
-    createdtime: new Date(),
-    updatetime: new Date(),
-    resolution: ''
-  }]
+  VideoDetailsData: VideoDetailData[] | undefined
 
   getvideos2() {
     return of(this.Videos2)

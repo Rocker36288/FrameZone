@@ -267,7 +267,7 @@ namespace FrameZone_WebApi.Videos.Repositories
         {
             var videos = await _context.Videos
                 .AsNoTracking()
-                .Where(v=> v.IsDeleted == false)
+                .Where(v => v.IsDeleted == false)
                 .Include(v => v.Channel)
                     .ThenInclude(c => c.UserProfile)
                 .OrderByDescending(v => v.CreatedAt)
@@ -404,90 +404,116 @@ namespace FrameZone_WebApi.Videos.Repositories
         /* =====================================================
         * Watch History
         * ===================================================== */
-        public async Task WatchVideoUpdateAsync(int userId, int videoId, int lastPosition)
+        public async Task<View?> GetByUserAndVideoViewsAsync(int userId, int videoId)
         {
-            // 嘗試取得既有紀錄
-            var watchRecord = await _context.Views
+            return await _context.Views
                 .FirstOrDefaultAsync(v => v.UserId == userId && v.VideoId == videoId);
+        }
 
-            if (watchRecord != null)
-            {
-                // 更新最後觀看位置與時間
-                watchRecord.LastPosition = lastPosition;
-                watchRecord.UpdateAt = DateTime.UtcNow;
-                _context.Views.Update(watchRecord);
-            }
-            else
-            {
-                // 新增紀錄
-                var newRecord = new View
-                {
-                    UserId = userId,
-                    VideoId = videoId,
-                    LastPosition = lastPosition,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdateAt = DateTime.UtcNow
-                };
-                await _context.Views.AddAsync(newRecord);
-            }
+        public async Task ViewsAddAsync(View view)
+        {
+            await _context.Views.AddAsync(view);
+        }
 
-            // 儲存變更
+        public void ViewsUpdate(View view)
+        {
+            _context.Views.Update(view);
+        }
+
+        public async Task ViewsSaveChangesAsync()
+        {
             await _context.SaveChangesAsync();
         }
 
-        /* =====================================================
-        * 搜尋
-        * ===================================================== */
-        // 推薦影片
-        public async Task<List<VideoCardDto>> VideoSearchAsync(
-         string? keyword = null,
-         int? channelId = null,
-         int? categoryId = null,
-         string sortBy = "date",
-         string sortOrder = "desc",
-         int take = 10)
+        public async Task<List<WatchHistoryDto>> GetWatchHistoryByUserIdAsync(int userId)
         {
-            // 1️ 基礎 Query
-            IQueryable<Video> query = _context.Videos
+            var views = await _context.Views
+                .Include(v => v.Video)
+                    .ThenInclude(video => video.Channel)
+                        .ThenInclude(c => c.UserProfile)
+                .Where(v => v.UserId == userId)
+                .OrderBy(v => v.UpdateAt)
+                .ToListAsync();
+
+            var videos = views.Select(v => v.Video!).ToList();
+
+            var videoDtos = await MapVideosToDtoAsync(videos);
+
+            var result = views.Select(v => new WatchHistoryDto
+            {
+                Video = videoDtos.First(dto => dto.VideoId == v.VideoId),
+                LastPosition = v.LastPosition,
+                LastWatchedAt = v.UpdateAt
+            }).ToList();
+
+            return result;
+        }
+
+
+
+        /* =====================================================
+         * 搜尋影片 + DTO 映射
+         * ===================================================== */
+
+        public async Task<List<VideoCardDto>> SearchVideosAsync(
+     string? keyword = null,
+     string sortBy = "date",
+     string sortOrder = "desc",
+     int take = 10)
+        {
+            var query = _context.Videos
                 .AsNoTracking()
                 .Include(v => v.Channel)
                     .ThenInclude(c => c.UserProfile)
-                .Where(v => v.ProcessStatus == "published");
+                .AsQueryable();
 
-            // 2️ 搜尋條件
+            // 關鍵字搜尋
             if (!string.IsNullOrWhiteSpace(keyword))
             {
                 query = query.Where(v =>
-                    v.Title.Contains(keyword) ||
-                    v.Description.Contains(keyword));
+                    (v.Title != null && v.Title.Contains(keyword)) ||
+                    (v.Description != null && v.Description.Contains(keyword))
+                );
             }
 
-            if (channelId.HasValue)
+            // 投影並計算統計
+            var projectedQuery = query.Select(v => new
             {
-                query = query.Where(v => v.ChannelId == channelId.Value);
-            }
+                Video = v,
+                LikeCount = v.Likes.Count,      // 使用導航屬性
+                ViewCount = v.Views.Count       // 使用導航屬性
+            });
 
-
-            // 3️ 排序條件
-            query = (sortBy.ToLower(), sortOrder.ToLower()) switch
+            // 排序
+            projectedQuery = (sortBy.ToLower(), sortOrder.ToLower()) switch
             {
-                //("views", "asc") => query.OrderBy(v => v.ViewCount),
-                //("views", "desc") => query.OrderByDescending(v => v.ViewCount),
-
-                //("likes", "asc") => query.OrderBy(v => v.LikeCount),
-                //("likes", "desc") => query.OrderByDescending(v => v.LikeCount),
-
-                ("date", "asc") => query.OrderBy(v => v.CreatedAt),
-                _ => query.OrderByDescending(v => v.CreatedAt) // default
+                ("likes", "asc") => projectedQuery.OrderBy(x => x.LikeCount),
+                ("likes", "desc") => projectedQuery.OrderByDescending(x => x.LikeCount),
+                ("views", "asc") => projectedQuery.OrderBy(x => x.ViewCount),
+                ("views", "desc") => projectedQuery.OrderByDescending(x => x.ViewCount),
+                ("date", "asc") => projectedQuery.OrderBy(x => x.Video.CreatedAt),
+                _ => projectedQuery.OrderByDescending(x => x.Video.CreatedAt)
             };
 
-            // 4️ 限制筆數
-            var videos = await query
-                .Take(take)
-                .ToListAsync();
+            var videoStats = await projectedQuery.Take(take).ToListAsync();
 
-            // 5️⃣ 映射 DTO
-            return await MapVideosToDtoAsync(videos);
+            return videoStats.Select(x => new VideoCardDto
+            {
+                VideoId = x.Video.VideoId,
+                Title = x.Video.Title ?? "",
+                VideoUri = x.Video.VideoUrl ?? "",
+                Thumbnail = x.Video.ThumbnailUrl ?? "",
+                Duration = x.Video.Duration ?? 0,
+                Views = x.ViewCount,
+                Likes = x.LikeCount,
+                PublishDate = x.Video.PublishDate ?? DateTime.MinValue,
+                Description = x.Video.Description ?? "",
+                ChannelId = x.Video.ChannelId,
+                ChannelName = x.Video.Channel?.ChannelName ?? "",
+                Avatar = x.Video.Channel?.UserProfile?.Avatar ?? ""
+            }).ToList();
         }
+
     }
-}
+
+ }

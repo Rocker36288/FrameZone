@@ -7,68 +7,72 @@
       <div class="text-secondary">歡迎回來，開始管理你的頻道</div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="btn-list">
-      <a class="btn btn-primary">
-        <i class="ti ti-upload me-1"></i>
-        上傳影片
-      </a>
-      <a class="btn btn-outline-primary">
-        <i class="ti ti-chart-bar me-1"></i>
-        查看分析
-      </a>
-    </div>
+
   </div>
 
   <!-- Overview Cards -->
   <div class="row row-cards mb-4">
+
+    <!-- 總觀看數 -->
     <div class="col-sm-6 col-lg-3">
       <div class="card">
         <div class="card-body">
-          <div class="d-flex align-items-center">
-            <div class="subheader">總觀看數</div>
+          <div class="subheader">總觀看數</div>
+          <div class="h1 mb-0">
+            {{ totalViews | number }}
           </div>
-          <div class="h1 mb-0">128,430</div>
-          <div class="text-success mt-2">
-            <i class="ti ti-arrow-up"></i> 12% 本週
+          <div class="text-muted mt-2">
+            來自目前影片
           </div>
         </div>
       </div>
     </div>
 
-    <div class="col-sm-6 col-lg-3">
-      <div class="card">
-        <div class="card-body">
-          <div class="subheader">訂閱人數</div>
-          <div class="h1 mb-0">3,420</div>
-          <div class="text-success mt-2">
-            <i class="ti ti-arrow-up"></i> +32
-          </div>
-        </div>
-      </div>
-    </div>
-
+    <!-- 影片數量 -->
     <div class="col-sm-6 col-lg-3">
       <div class="card">
         <div class="card-body">
           <div class="subheader">影片數量</div>
-          <div class="h1 mb-0">54</div>
-          <div class="text-muted mt-2">含草稿</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-sm-6 col-lg-3">
-      <div class="card">
-        <div class="card-body">
-          <div class="subheader">本週觀看</div>
-          <div class="h1 mb-0">8,934</div>
-          <div class="text-danger mt-2">
-            <i class="ti ti-arrow-down"></i> -4%
+          <div class="h1 mb-0">
+            {{ totalVideos }}
+          </div>
+          <div class="text-muted mt-2">
+            含草稿
           </div>
         </div>
       </div>
     </div>
+
+    <!-- 總讚數 -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="subheader">總讚數</div>
+          <div class="h1 mb-0">
+            {{ totalLikes | number }}
+          </div>
+          <div class="text-muted mt-2">
+            所有影片累積
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 總留言數 -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="subheader">留言總數</div>
+          <div class="h1 mb-0">
+            {{ totalComments | number }}
+          </div>
+          <div class="text-muted mt-2">
+            創作者互動
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Main Content -->

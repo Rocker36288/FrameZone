@@ -19,15 +19,30 @@ namespace FrameZone_WebApi.Videos.Controllers
             _videoCreatorService = videoCreatorService;
         }
 
+
         //api/VideoCreator/RecentUpload
         [HttpGet("RecentUpload")]
         [Authorize]
-        public async Task<ActionResult<List<VideoDetailDto>>> GetVideo([FromQuery] int count = 5)
+        public async Task<ActionResult> GetVideo([FromQuery] int page = 1)
         {
+            if (page < 1) page = 1;
             int channelId = GetUserId();
-            var videos = await _videoCreatorService.GetVideoDetailsByChannelIdAsync(channelId, count);
 
-            return Ok(videos);
+            // 🔧 同時取得影片列表和總數
+            var videos = await _videoCreatorService.GetVideoDetailsByChannelIdAsync(channelId, page);
+            var totalVideos = await _videoCreatorService.GetTotalVideosByChannelAsync(channelId);
+
+            const int pageSize = 5;
+            var totalPages = (int)Math.Ceiling((double)totalVideos / pageSize);
+
+            var response = new
+            {
+                currentPage = page,
+                totalPages = totalPages,
+                totalItems = totalVideos,  // 🔧 新增：實際總影片數
+                videos = videos
+            };
+            return Ok(response);
         }
 
         //============創作者影片詳細編輯 =====================
@@ -46,6 +61,83 @@ namespace FrameZone_WebApi.Videos.Controllers
 
             return Ok(video);
         }
+
+        //===================編輯影片===================
+        [HttpPatch("edit/{guid}/update")]
+        [Authorize]
+        public async Task<IActionResult> UpdateVideo(
+    string guid,
+    [FromBody] UpdateVideoMetadataDto dto)
+        {
+            var userId = GetUserId();
+
+            var result = await _videoCreatorService.UpdateVideoAsync(userId, guid, dto);
+
+            if (!result)
+                return Forbid();
+
+            return NoContent(); // 204
+        }
+
+        [HttpPost("edit/{guid}/thumbnail")]
+        [Authorize]
+        public async Task<IActionResult> UploadThumbnail(string guid, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("檔案不存在");
+
+            try
+            {
+                await _videoCreatorService.UpdateThumbnailAsync(guid, file);
+                return NoContent(); // 204，僅表示成功
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// 取得創作者頻道數據分析
+        /// </summary>
+        /// <param name="period">分析區間（7days / 30days / 90days）</param>
+        [HttpGet("analytics")]  // 完整路徑：api/VideoCreator/analytics
+        public async Task<IActionResult> GetCreatorAnalytics([FromQuery] string period = "7days")
+        {
+            if (!IsValidPeriod(period))
+                return BadRequest("Invalid period. Allowed values: 7days, 30days, 90days");
+
+            var userId = GetUserId();
+
+            var result = await _videoCreatorService
+                .GetAnalyticsAsync(userId, period);
+
+            return Ok(result);
+        }
+
+        private static bool IsValidPeriod(string period)
+        {
+            return period is "7days" or "30days" or "90days";
+        }
+
+        //=============================================
+        [HttpGet("{guid}/ai-result")]
+        public async Task<IActionResult> GetVideoAIResult(string guid)
+        {
+            var userId = GetUserId();
+
+            var result = await _videoCreatorService.GetVideoAIResultAsync(guid, userId);
+
+            if (result == null)
+                return NotFound(new { message = "找不到影片或尚未有 AI 審核結果" });
+
+            return Ok(new
+            {
+                videoGuid = guid,
+                aiAuditResult = result
+            });
+        }
+
 
         //=============獲取userid=======================================
         private int GetUserId()

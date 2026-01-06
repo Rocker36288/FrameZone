@@ -22,13 +22,6 @@ namespace FrameZone_WebApi.Videos.Controllers
             _env = env; // 注入成功
         }
 
-        //VideoUpload/calltest
-        [HttpGet("calltest")]
-        public IActionResult G(int id)
-        {
-            Console.WriteLine("FF");
-            return StatusCode(500, "測試成功");
-        }
 
         //videoupload/upload
         [HttpPost("upload")]

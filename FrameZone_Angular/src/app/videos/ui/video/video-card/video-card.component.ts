@@ -22,19 +22,24 @@ export class VideoCardComponent {
     | 'large'
     | 'creator-long'
     | 'search'
+    | 'history'
     = 'small';
   @Input() showChannel: boolean = true;
   @Input() showDescription: boolean = true;
+  @Input() lastPosition: number = 0;
+
 
   @Output() videoClick = new EventEmitter<string>();
 
   constructor(private router: Router) { }
 
   ngOnInit(): void {
-    if (!this.video.thumbnail) {
-      this.video.thumbnail =
-        'https://localhost:7213/api/Videos/video-thumbnail/' + this.video.videoUri;
-    }
+    // 可以移除 thumbnail 相關邏輯
+  }
+
+  get thumbnailUrl(): string {
+    return this.video?.thumbnail ||
+      `https://localhost:7213/api/Videos/video-thumbnail/${this.video?.videoUri}`;
   }
 
   onVideoClick() {
