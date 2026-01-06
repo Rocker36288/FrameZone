@@ -39,17 +39,22 @@ namespace FrameZone_WebApi.Services
             _logger = logger;
             _httpClient = httpClient;
 
-            // 從 Key Vault 讀取 Google OAuth credentials
-            _googleClientId = _configuration["GoogleClientId"];
-            _googleClientSecret = _configuration["GoogleClientSecret"];
+            // 從 appsettings 讀取 Google OAuth credentials（建議放在 GoogleAuth:ClientId / GoogleAuth:ClientSecret）
+            // 保留對舊 Key 的相容（GoogleClientId / GoogleClientSecret），避免尚未完全移除舊流程時造成中斷
+            _googleClientId = !string.IsNullOrWhiteSpace(_googleSettings.ClientId)
+                ? _googleSettings.ClientId
+                : _configuration["GoogleClientId"];
 
+            _googleClientSecret = !string.IsNullOrWhiteSpace(_googleSettings.ClientSecret)
+                ? _googleSettings.ClientSecret
+                : _configuration["GoogleClientSecret"];
             if (string.IsNullOrEmpty(_googleClientId))
             {
                 _logger.LogWarning("⚠️ Google Client ID 未設定，Google 登入功能將無法使用");
             }
             else
             {
-                _logger.LogInformation("✅ Google Client ID 已從 Key Vault 載入，長度: {Length}", _googleClientId.Length);
+                _logger.LogInformation("✅ Google Client ID 已從 appsettings 載入，長度: {Length}", _googleClientId.Length);
             }
 
             if (string.IsNullOrEmpty(_googleClientSecret))
@@ -58,7 +63,7 @@ namespace FrameZone_WebApi.Services
             }
             else
             {
-                _logger.LogInformation("✅ Google Client Secret 已從 Key Vault 載入，長度: {Length}", _googleClientSecret.Length);
+                _logger.LogInformation("✅ Google Client Secret 已從 appsettings 載入，長度: {Length}", _googleClientSecret.Length);
             }
         }
 
