@@ -12,6 +12,8 @@ interface ViewMessage {
   time: string;
   createdAt?: string;
   senderId?: number;
+  displayName: string;
+  avatar: string;
 }
 
 @Component({
@@ -21,7 +23,7 @@ interface ViewMessage {
   styleUrl: './social-chat.component.css'
 })
 export class SocialChatComponent implements OnDestroy {
-  @Input() selectedFriend: { id: number; name: string } | null = null;
+  @Input() selectedFriend: { id: number; name: string; avatar?: string } | null = null;
   @Output() closed = new EventEmitter<void>();
 
   private chatService = inject(ChatService);
@@ -126,17 +128,37 @@ export class SocialChatComponent implements OnDestroy {
 
   private toViewMessage(message: MessageDto) {
     const isOwn = this.currentUserId != null && message.senderUserId === this.currentUserId;
+    const profile = this.getSenderProfile(isOwn);
     return {
       id: message.messageId,
       content: message.messageContent,
       isOwn,
       time: new Date(message.createdAt).toLocaleTimeString(),
       createdAt: message.createdAt,
-      senderId: message.senderUserId
+      senderId: message.senderUserId,
+      displayName: profile.name,
+      avatar: profile.avatar
     };
   }
 
   ngOnDestroy(): void {
     this.teardownRealtime();
+  }
+
+  private getSenderProfile(isOwn: boolean) {
+    const user = this.authService.getCurrentUser();
+    const defaultAvatar = 'https://i.pravatar.cc/100?u=default';
+
+    if (isOwn) {
+      return {
+        name: user?.displayName || user?.account || '我',
+        avatar: user?.avatar || defaultAvatar
+      };
+    }
+
+    return {
+      name: this.selectedFriend?.name || '好友',
+      avatar: this.selectedFriend?.avatar || defaultAvatar
+    };
   }
 }
