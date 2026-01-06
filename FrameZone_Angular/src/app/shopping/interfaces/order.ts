@@ -3,6 +3,12 @@ export interface OrderDto {
   totalAmount: number;
   paymentMethod: string;
   returnURL: string;
+
+  recipientName?: string;
+  phoneNumber?: string;
+  shippingAddress?: string;
+  shippingMethod?: string;
+
   optionParams: {};
 }
 

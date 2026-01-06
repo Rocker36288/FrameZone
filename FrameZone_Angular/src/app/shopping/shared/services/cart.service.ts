@@ -232,8 +232,26 @@ export class CartService {
 
   orderCompletedSignal = signal(false);
 
+  /** 結帳完成：清空「已選」的商品並標記成功狀態 */
   markOrderCompleted(): void {
+    this.clearSelectedItems();
     this.orderCompletedSignal.set(true);
+  }
+
+  /** 僅清空目前購物車中被勾選的商品 */
+  clearSelectedItems() {
+    this.cartItemsSignal.update(items => items.filter(i => !i.selected));
+
+    // 同步到資料庫
+    if (this.authService.isAuthenticated()) {
+      const syncData = this.cartItemsSignal()
+        .filter(i => i.specificationId !== undefined)
+        .map(i => ({
+          specificationId: i.specificationId as number,
+          quantity: i.quantity
+        }));
+      this.cartApiService.syncCart(syncData).subscribe();
+    }
   }
 
   resetOrderCompleted(): void {
