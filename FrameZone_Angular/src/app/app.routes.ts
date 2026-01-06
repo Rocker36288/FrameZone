@@ -1,5 +1,6 @@
 import { Title } from '@angular/platform-browser';
 import { Routes } from '@angular/router';
+import { videoGuard } from './videos/guard/video.guard';
 
 export const routes: Routes = [
   {
@@ -419,6 +420,7 @@ export const routes: Routes = [
   },
   {
     path: 'social',
+    // canActivateChild: [videoGuard], 之後會綁登入
     loadComponent: () =>
       import('./layouts/social-layout/social-layout.component').then(
         (m) => m.SocialLayoutComponent
