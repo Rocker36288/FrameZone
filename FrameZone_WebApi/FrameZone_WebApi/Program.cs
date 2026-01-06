@@ -18,6 +18,8 @@ using FrameZone_WebApi.Videos.Helpers;
 using FrameZone_WebApi.Videos.Repositories;
 using FrameZone_WebApi.Videos.Respositories;
 using FrameZone_WebApi.Videos.Services;
+using FrameZone_WebApi.PhotographerBooking.Repositories;
+using FrameZone_WebApi.PhotographerBooking.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Features;
@@ -235,6 +237,12 @@ builder.Services.AddScoped<IUserLogService, UserLogService>();
 builder.Services.AddScoped<IMemberSecurityService, MemberSecurityService>();
 builder.Services.AddScoped<IMemberNotificationService, MemberNotificationService>();
 builder.Services.AddScoped<IMemberPrivacyService, MemberPrivacyService>();
+
+builder.Services.AddScoped<IPhotographerRepository, PhotographerRepository>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IAvailableSlotRepository, AvailableSlotRepository>();
+builder.Services.AddScoped<IPhotographerService, FrameZone_WebApi.PhotographerBooking.Services.PhotographerService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
 
 
 builder.Services.AddHttpClient<IGeocodingService, GeocodingService>();

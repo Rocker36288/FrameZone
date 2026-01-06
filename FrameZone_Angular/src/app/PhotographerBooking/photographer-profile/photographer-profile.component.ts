@@ -1,19 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-interface Photographer {
-  photographerId: number;
-  studioName: string;
-  displayName: string;
-  description: string;
-  yearsOfExperience: number;
-  avatarUrl: string;
-  totalBookings: number;
-}
+import { PhotographerDto } from '../models/photographer-booking.models';
 
-interface Specialty {
-  specialtyId: number;
-  specialtyName: string;
-}
 @Component({
   selector: 'app-photographer-profile',
   imports: [CommonModule],
@@ -21,12 +9,12 @@ interface Specialty {
   styleUrl: './photographer-profile.component.css',
 })
 export class PhotographerProfileComponent {
-  @Input() photographer: Photographer | null = null;
-  @Input() specialties: Specialty[] = [];
+  @Input() photographer: PhotographerDto | null = null;
+  @Input() specialties: string[] = [];
   @Input() portfolioImages: string[] = [];
   @Output() showAllPhotos = new EventEmitter<void>();
 
- // 燈箱狀態控制
+  // 燈箱狀態控制
   isLightboxOpen = false;
   currentImageIndex = 0;
 

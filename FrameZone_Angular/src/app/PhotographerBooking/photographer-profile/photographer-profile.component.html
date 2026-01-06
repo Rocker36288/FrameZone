@@ -6,10 +6,8 @@
   <div class="grid-item" *ngFor="let image of portfolioImages.slice(1, 5)">
     <img [src]="image" alt="作品集圖片" />
   </div>
-  <button
-    class="btn btn-white position-absolute bottom-0 end-0 m-3 border-dark fw-bold shadow-sm rounded-2 btn-sm"
-    (click)="onShowAllPhotos()"
-  >
+  <button class="btn btn-white position-absolute bottom-0 end-0 m-3 border-dark fw-bold shadow-sm rounded-2 btn-sm"
+    (click)="onShowAllPhotos()">
     <i class="fa-solid fa-grip-dots me-2"></i>顯示所有照片
   </button>
 </section>
@@ -27,20 +25,14 @@
       </p>
       <div class="d-flex gap-2">
         <span class="tag-pill" *ngFor="let specialty of specialties">
-          {{ specialty.specialtyName }}
+          {{ specialty }}
         </span>
       </div>
     </div>
-    <img
-      [src]="photographer.avatarUrl"
-      [alt]="photographer.displayName"
-      class="rounded-circle shadow-sm"
-      style="width: 64px; height: 64px; object-fit: cover"
-    />
+    <img [src]="photographer.avatarUrl" [alt]="photographer.displayName" class="rounded-circle shadow-sm"
+      style="width: 64px; height: 64px; object-fit: cover" />
   </div>
   <p class="text-muted fst-italic border-start border-3 ps-3 py-1">
     「{{ photographer.description }}」
   </p>
 </section>
-
-

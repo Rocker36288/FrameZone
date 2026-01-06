@@ -6,30 +6,20 @@
     </div>
 
     <div class="border rounded-3 overflow-hidden mb-4">
-      <div
-        class="p-3 border-bottom bg-white cursor-pointer hover-bg-light"
-        (click)="onSelectDate()"
-      >
-        <label
-          class="d-block text-uppercase fw-bold text-muted mb-1"
-          style="font-size: 10px; cursor: pointer"
-        >
+      <div class="p-3 border-bottom bg-white">
+        <label class="d-block text-uppercase fw-bold text-muted mb-1" style="font-size: 10px;">
           日期與時段
         </label>
-        <div class="small fw-semibold">
-          {{
-            selectedDate
-              ? (selectedDate | date : "yyyy/MM/dd")
-              : "請選擇拍攝時段"
-          }}
-        </div>
+        <select class="form-select form-select-sm" (change)="onSlotChange($event)">
+          <option value="">請選擇時段</option>
+          <option *ngFor="let slot of availableSlots" [value]="slot.availableSlotId">
+            {{ slot.startDateTime | date:'yyyy/MM/dd HH:mm' }} - {{ slot.endDateTime | date:'HH:mm' }}
+          </option>
+        </select>
       </div>
 
       <div class="p-3 bg-light">
-        <label
-          class="d-block text-uppercase fw-bold text-muted mb-1"
-          style="font-size: 10px"
-        >
+        <label class="d-block text-uppercase fw-bold text-muted mb-1" style="font-size: 10px">
           選取方案
         </label>
         <div class="small fw-bold text-danger">
@@ -49,18 +39,12 @@
         <span>TWD {{ basePrice | number }}</span>
       </div>
 
-      <div
-        class="d-flex justify-content-between text-secondary mb-2"
-        *ngIf="additionalFees > 0"
-      >
+      <div class="d-flex justify-content-between text-secondary mb-2" *ngIf="additionalFees > 0">
         <span class="text-decoration-underline">額外費用</span>
         <span>TWD {{ additionalFees | number }}</span>
       </div>
 
-      <div
-        class="d-flex justify-content-between text-success mb-2"
-        *ngIf="discountAmount > 0"
-      >
+      <div class="d-flex justify-content-between text-success mb-2" *ngIf="discountAmount > 0">
         <span class="text-decoration-underline">折扣</span>
         <span>-TWD {{ discountAmount | number }}</span>
       </div>

@@ -1,17 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-interface Service {
-  serviceId: number;
-  serviceName: string;
-  description: string;
-  basePrice: number;
-  duration: number;
-  maxRevisions: number;
-  deliveryDays: number;
-  includedPhotos: number;
-  isPopular?: boolean;
-  originalPrice?: number;
-}
+import { ServiceDto } from '../models/photographer-booking.models';
+
 interface FAQ {
   question: string;
   answer: string;
@@ -23,14 +13,14 @@ interface FAQ {
   styleUrl: './photographer-serviceinfo.component.css',
 })
 export class PhotographerServiceinfoComponent {
-  @Input() services: Service[] = [];
+  @Input() services: ServiceDto[] = [];
   @Input() faqs: FAQ[] = [];
-  @Input() selectedService: Service | null = null;
-  @Output() serviceSelected = new EventEmitter<Service>();
+  @Input() selectedService: ServiceDto | null = null;
+  @Output() serviceSelected = new EventEmitter<ServiceDto>();
 
   expandedServiceId: number | null = null;
 
-  onSelectService(service: Service): void {
+  onSelectService(service: ServiceDto): void {
     this.serviceSelected.emit(service);
   }
 

@@ -4,16 +4,10 @@
       <i class="fa-solid fa-chevron-left me-2"></i>返回
     </button>
     <div class="d-flex gap-3">
-      <button
-        class="btn btn-link text-dark text-decoration-underline fw-bold small p-0"
-        (click)="sharePage()"
-      >
+      <button class="btn btn-link text-dark text-decoration-underline fw-bold small p-0" (click)="sharePage()">
         分享
       </button>
-      <button
-        class="btn btn-link text-dark text-decoration-underline fw-bold small p-0"
-        (click)="toggleFavorite()"
-      >
+      <button class="btn btn-link text-dark text-decoration-underline fw-bold small p-0" (click)="toggleFavorite()">
         收藏
       </button>
     </div>
@@ -22,37 +16,27 @@
 
 <main class="container-xl py-5">
   <!-- 攝影師簡介區 -->
-  <app-photographer-profile
-    [photographer]="photographer"
-    [specialties]="specialties"
-    [portfolioImages]="portfolioImages"
-    (showAllPhotos)="showAllPhotos()"
-  >
+  <app-photographer-profile [photographer]="photographer" [specialties]="specialties"
+    [portfolioImages]="portfolioImages" (showAllPhotos)="showAllPhotos()">
   </app-photographer-profile>
 
   <div class="row g-5">
     <div class="col-lg-8">
       <!-- 方案與 FAQ 區 -->
-      <app-photographer-serviceinfo
-        [services]="services"
-        [faqs]="faqs"
-        [selectedService]="selectedService"
-        (serviceSelected)="onServiceSelected($event)"
-      >
+      <app-photographer-serviceinfo [services]="services" [faqs]="faqs" [selectedService]="selectedService"
+        (serviceSelected)="onServiceSelected($event)">
       </app-photographer-serviceinfo>
 
       <!-- 評價區 -->
-      <app-photographer-review
-        [reviews]="reviews"
-        [rating]="photographer?.rating || 0"
-        [reviewCount]="photographer?.reviewCount || 0"
-      >
+      <app-photographer-review [reviews]="reviews" [rating]="photographer?.rating || 0"
+        [reviewCount]="photographer?.reviewCount || 0">
       </app-photographer-review>
     </div>
 
     <div class="col-lg-4">
       <!-- 側邊預約卡片 -->
-      <app-photographer-bookingsidebar [selectedService]="selectedService">
+      <app-photographer-bookingsidebar [selectedService]="selectedService"
+        [photographerId]="photographer?.photographerId || 0">
       </app-photographer-bookingsidebar>
     </div>
   </div>
