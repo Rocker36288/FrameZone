@@ -1,110 +1,26 @@
 import { Injectable } from '@angular/core';
-import { Category, Photographer, SearchFilters, SpecialtyTag } from '../models/photographer-booking.models';
-import { BehaviorSubject } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { BehaviorSubject, Observable, map } from 'rxjs';
+import {
+  Category,
+  PhotographerDto,
+  SearchFilters,
+  SpecialtyTag,
+  AvailableSlotDto,
+  BookingDto,
+  CreateBookingDto,
+  PhotographerSearchDto
+} from '../models/photographer-booking.models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PhotographerBookingService {
-  // 模擬資料
-  private readonly serviceTypes = [
-    '人像寫真',
-    '婚禮紀錄',
-    '活動攝影',
-    '商業廣告',
-  ];
-  private readonly locationList = [
-    '台北',
-    '新北',
-    '桃園',
-    '台中',
-    '台南',
-    '高雄',
-    '基隆',
-    '宜蘭',
-    '新竹',
-  ];
+  private apiUrl = `${environment.apiUrl}/api/Photographer`; // Adjust base URL as needed
+  private bookingUrl = `${environment.apiUrl}/api/Booking`;
 
-  private readonly categories: Category[] = [
-    { id: 2, name: '拍攝風格' },
-    { id: 3, name: '技術專長' },
-  ];
-
-  private readonly specialtyTags: SpecialtyTag[] = [
-    { id: 201, catId: 2, name: '黑白風格' },
-    { id: 202, catId: 2, name: '日系清新' },
-    { id: 203, catId: 2, name: '底片感' },
-    { id: 204, catId: 2, name: '美式寫實' },
-    { id: 205, catId: 2, name: '韓系簡約' },
-    { id: 301, catId: 3, name: '微距拍攝' },
-    { id: 302, catId: 3, name: '空拍/航拍' },
-    { id: 303, catId: 3, name: '水下攝影' },
-    { id: 304, catId: 3, name: '夜景專家' },
-  ];
-
-  private readonly photographers: Photographer[] = [
-    {
-      name: 'Mia Wedding',
-      loc: '台北',
-      type: '婚禮紀錄',
-      tags: ['黑白風格', '微距拍攝'],
-      price: 5000,
-      rating: 4.8,
-      reviews: 92,
-      img: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400',
-    },
-    {
-      name: 'Sunny Studio',
-      loc: '台中',
-      type: '商業廣告',
-      tags: ['極簡主義'],
-      price: 4200,
-      rating: 5.0,
-      reviews: 210,
-      img: 'https://images.unsplash.com/photo-1554080353-a576cf803bda?w=400',
-    },
-    {
-      name: 'Alex Photo',
-      loc: '台北',
-      type: '人像寫真',
-      tags: ['日系清新', '底片感'],
-      price: 3500,
-      rating: 4.9,
-      reviews: 156,
-      img: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=400',
-    },
-    {
-      name: 'Emily Chen',
-      loc: '新北',
-      type: '人像寫真',
-      tags: ['韓系簡約', '底片感'],
-      price: 3800,
-      rating: 4.7,
-      reviews: 88,
-      img: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=400',
-    },
-    {
-      name: 'David Lee',
-      loc: '高雄',
-      type: '活動攝影',
-      tags: ['夜景專家', '空拍/航拍'],
-      price: 6500,
-      rating: 4.9,
-      reviews: 134,
-      img: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400',
-    },
-    {
-      name: 'Rachel Wang',
-      loc: '台南',
-      type: '婚禮紀錄',
-      tags: ['美式寫實', '微距拍攝'],
-      price: 5500,
-      rating: 5.0,
-      reviews: 167,
-      img: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400',
-    },
-  ];
-
+  // Filters state
   private filtersSubject = new BehaviorSubject<SearchFilters>({
     serviceType: '',
     keyword: '',
@@ -117,7 +33,81 @@ export class PhotographerBookingService {
 
   filters$ = this.filtersSubject.asObservable();
 
-  constructor() {}
+  // Mock data for UI helpers
+  private readonly locationList = ['台北', '新北', '桃園', '台中', '台南', '高雄', '基隆', '宜蘭', '新竹'];
+  private readonly categories: Category[] = [
+    { id: 2, name: '拍攝風格' },
+    { id: 3, name: '技術專長' },
+  ];
+  private readonly specialtyTags: SpecialtyTag[] = [
+    { id: 201, catId: 2, name: '黑白風格' },
+    { id: 202, catId: 2, name: '日系清新' },
+    { id: 203, catId: 2, name: '底片感' },
+    { id: 204, catId: 2, name: '美式寫實' },
+    { id: 205, catId: 2, name: '韓系簡約' },
+    { id: 301, catId: 3, name: '微距拍攝' },
+    { id: 302, catId: 3, name: '空拍/航拍' },
+    { id: 303, catId: 3, name: '水下攝影' },
+    { id: 304, catId: 3, name: '夜景專家' },
+  ];
+  private readonly serviceTypes = ['人像寫真', '婚禮紀錄', '活動攝影', '商業廣告'];
+
+  constructor(private http: HttpClient) { }
+
+  // --- API Calls ---
+
+  getAllPhotographers(): Observable<PhotographerDto[]> {
+    return this.http.get<PhotographerDto[]>(this.apiUrl);
+  }
+
+  getPhotographerById(id: number): Observable<PhotographerDto> {
+    return this.http.get<PhotographerDto>(`${this.apiUrl}/${id}`);
+  }
+
+  // Search using our backend search DTO or query params
+  searchPhotographers(searchDto: PhotographerSearchDto): Observable<PhotographerDto[]> {
+    let params = new HttpParams();
+    if (searchDto.keyword) params = params.set('keyword', searchDto.keyword);
+    if (searchDto.location) params = params.set('location', searchDto.location);
+    if (searchDto.studioType) params = params.set('studioType', searchDto.studioType);
+
+    return this.http.get<PhotographerDto[]>(this.apiUrl, { params });
+  }
+
+  // Search using frontend filters - converting to backend call + client side filtering if needed
+  // For now, let's try to map some filters to backend params and do the rest client side if backend is limited
+  searchWithFilters(filters: SearchFilters): Observable<PhotographerDto[]> {
+    let params = new HttpParams();
+    if (filters.keyword) params = params.set('keyword', filters.keyword);
+    if (filters.serviceType) params = params.set('studioType', filters.serviceType); // Assuming studioType maps to serviceType
+    // locations logic can be complex if multiple, backend supports single location param currently.
+    // We might need to filter client side for multiple locations or update backend.
+
+    return this.http.get<PhotographerDto[]>(this.apiUrl, { params }).pipe(
+      map(photographers => {
+        // Apply client-side filters for things backend doesn't handle yet
+        return photographers.filter(p => {
+          const matchLoc = filters.locations.length === 0 || filters.locations.some(l => p.studioAddress.includes(l));
+          // const matchPrice... (Need to check service prices)
+          return matchLoc;
+        });
+      })
+    );
+  }
+
+
+  getAvailableSlots(photographerId: number, start: Date, end: Date): Observable<AvailableSlotDto[]> {
+    let params = new HttpParams()
+      .set('start', start.toISOString())
+      .set('end', end.toISOString());
+    return this.http.get<AvailableSlotDto[]>(`${this.apiUrl}/${photographerId}/slots`, { params });
+  }
+
+  createBooking(bookingDto: CreateBookingDto): Observable<BookingDto> {
+    return this.http.post<BookingDto>(this.bookingUrl, bookingDto);
+  }
+
+  // --- Helper Methods ---
 
   getServiceTypes(): string[] {
     return this.serviceTypes;
@@ -160,49 +150,5 @@ export class PhotographerBookingService {
       minRating: 0,
       sortOrder: 'default',
     });
-  }
-
-  searchPhotographers(filters: SearchFilters): Photographer[] {
-    let filtered = this.photographers.filter((p) => {
-      const matchLoc =
-        filters.locations.length === 0 || filters.locations.includes(p.loc);
-      const matchSvc = !filters.serviceType || p.type === filters.serviceType;
-      const matchPrice = p.price <= filters.maxPrice;
-      const matchRating = p.rating >= filters.minRating;
-      const matchKey =
-        !filters.keyword ||
-        p.name.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-        p.tags.some((t) =>
-          t.toLowerCase().includes(filters.keyword.toLowerCase())
-        );
-      const matchTags =
-        filters.tags.length === 0 ||
-        filters.tags.every((t) => p.tags.includes(t));
-
-      return (
-        matchLoc &&
-        matchSvc &&
-        matchPrice &&
-        matchRating &&
-        matchKey &&
-        matchTags
-      );
-    });
-
-    // 排序
-    switch (filters.sortOrder) {
-      case 'priceAsc':
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case 'priceDesc':
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case 'ratingDesc':
-        filtered.sort((a, b) => b.rating - a.rating);
-        break;
-    }
-
-    // 限制最多顯示 12 位
-    return filtered.slice(0, 12);
   }
 }

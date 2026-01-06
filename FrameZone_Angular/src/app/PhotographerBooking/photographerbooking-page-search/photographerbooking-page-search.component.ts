@@ -27,14 +27,13 @@ import {
   styleUrl: './photographerbooking-page-search.component.css',
 })
 export class PhotographerbookingPageSearchComponent
-  implements OnInit, OnDestroy
-{
+  implements OnInit, OnDestroy {
   photographers: Photographer[] = [];
   sortOrder: 'default' | 'priceAsc' | 'priceDesc' | 'ratingDesc' = 'default';
 
   private destroy$ = new Subject<void>();
 
-  constructor(private bookingService: PhotographerBookingService) {}
+  constructor(private bookingService: PhotographerBookingService) { }
 
   ngOnInit(): void {
     // 訂閱篩選條件變更
@@ -55,8 +54,14 @@ export class PhotographerbookingPageSearchComponent
 
   performSearch(filters: SearchFilters): void {
     const updatedFilters = { ...filters, sortOrder: this.sortOrder };
-    this.photographers =
-      this.bookingService.searchPhotographers(updatedFilters);
+    this.bookingService.searchWithFilters(updatedFilters).subscribe({
+      next: (data) => {
+        this.photographers = data;
+        // Client side sorting if backend doesn't handle it yet (DTO-based sorting)
+        // this.sortPhotographers(); 
+      },
+      error: (err) => console.error('Error searching', err)
+    });
   }
 
   onSortChange(): void {

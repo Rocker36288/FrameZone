@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
+import { Router } from '@angular/router';
 import { Photographer } from '../models/photographer-booking.models';
 
 @Component({
@@ -9,14 +10,19 @@ import { Photographer } from '../models/photographer-booking.models';
   styleUrl: './photographerbooking-card.component.css',
 })
 export class PhotographerbookingCardComponent {
+  constructor(private router: Router) { }
   @Input() photographer!: Photographer;
 
-  onViewDetails(): void {
-    console.log('View details for:', this.photographer.name);
-    // 這裡可以導航到詳細頁面或開啟 modal
+  get formattedPrice(): string {
+    // If we have services, show min price
+    if (this.photographer.services && this.photographer.services.length > 0) {
+      const min = Math.min(...this.photographer.services.map(s => s.basePrice));
+      return `NT$ ${min.toLocaleString()} 起`;
+    }
+    return '價格詳談';
   }
 
-  get formattedPrice(): string {
-    return `NT$ ${this.photographer.price.toLocaleString()}`;
+  onViewDetails(): void {
+    this.router.navigate(['/photographer-detail'], { queryParams: { id: this.photographer.photographerId } });
   }
 }

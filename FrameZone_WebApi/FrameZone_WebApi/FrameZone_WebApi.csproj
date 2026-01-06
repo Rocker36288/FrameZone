@@ -31,6 +31,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Openize.HEIC" Version="25.12.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+    
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="10.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.0.1" />
     <PackageReference Include="Xabe.FFmpeg" Version="6.0.2" />
@@ -39,7 +40,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
+    <Folder Include="PhotographerBooking\Controllers\" />
+    <Folder Include="PhotographerBooking\DTOs\" />
+    <Folder Include="PhotographerBooking\Services\" />
+    <Folder Include="PhotographerBooking\Repositories\" />
   </ItemGroup>
 
 </Project>

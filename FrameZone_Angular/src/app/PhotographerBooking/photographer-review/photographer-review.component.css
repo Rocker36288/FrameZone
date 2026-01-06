@@ -1,0 +1,163 @@
+/* photographer-review.component.css */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.review-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .review-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.reviewer-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+  color: white;
+  font-weight: bold;
+}
+
+.review-photo {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 0.5rem;
+  object-fit: cover;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.review-photo:hover {
+  opacity: 0.8;
+}
+
+/* photographer-bookingsidebar.component.css */
+.sticky-sidebar {
+  position: sticky;
+  top: 100px;
+}
+
+.booking-card {
+  border: 1px solid #f3f4f6;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+.selection-panel {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.selection-item {
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.selection-item:hover {
+  background-color: #f9fafb;
+}
+
+.selection-item:not(:last-child) {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.btn-booking {
+  width: 100%;
+  background-color: #e11d48;
+  color: white;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  font-weight: bold;
+  font-size: 1.125rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-booking:hover {
+  background-color: #be123c;
+}
+
+.btn-booking:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  max-width: 28rem;
+  width: 100%;
+  margin: 0 1rem;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.slot-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.slot-item:hover {
+  border-color: #e11d48;
+}
+
+.slot-item.selected {
+  border-color: #e11d48;
+}
+
+/* 響應式 - 平板和手機 */
+@media (max-width: 1024px) {
+  .sticky-sidebar {
+    position: relative;
+    top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .sticky-sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .booking-card {
+    border-radius: 1rem 1rem 0 0;
+  }
+}
