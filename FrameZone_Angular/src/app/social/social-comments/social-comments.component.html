@@ -1,7 +1,7 @@
 @for (comment of comments; track comment.commentId) {
 <div class="comment-wrapper mt-3">
   <div class="d-flex align-items-start">
-    <img [src]="comment.avatar || 'images/social/default-avatar.png'" class="rounded-circle me-2"
+    <img [src]="getCommentUserAvatar(comment)" class="rounded-circle me-2"
       style="width:32px; height:32px; object-fit: cover;">
 
     <div class="bg-light rounded p-2 flex-grow-1 shadow-sm position-relative">

@@ -45,6 +45,12 @@ export class SocialCommentsComponent {
     this.activeReplyId = null;
   }
 
+  getCommentUserAvatar(comment: CommentDto): string {
+    if (comment.avatar) return comment.avatar;
+    const initial = (comment.displayName || 'U').charAt(0).toUpperCase();
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+  }
+
   toggleMenu(commentId: number, event: MouseEvent) {
     event.stopPropagation();
     this.activeMenuId =

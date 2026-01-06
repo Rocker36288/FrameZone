@@ -26,7 +26,7 @@
     <!-- 頭貼 + UserId + 時間 -->
     <div class="d-flex align-items-center mb-2">
       <div class="avatar-wrapper me-2">
-        <img [src]="post.avatar || 'images/social/default-avatar.png'" [alt]="post.userName" />
+        <img [src]="getPostUserAvatar()" [alt]="post.userName" />
       </div>
 
       <div>
@@ -99,8 +99,7 @@
     <!-- 發布留言區 -->
     <div class="mt-3">
       <div class="d-flex align-items-center">
-        <img [src]="currentUserAvatar || 'images/social/default-avatar.png'" class="rounded-circle me-2"
-          style="width:35px; height:35px; object-fit: cover;" />
+        <img [src]="getUserAvatar()" class="rounded-circle me-2" style="width:35px; height:35px; object-fit: cover;" />
 
         <div class="position-relative flex-grow-1">
           <input type="text" [(ngModel)]="newCommentContent" (keyup.enter)="sendComment()"

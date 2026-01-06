@@ -20,6 +20,7 @@ export class SocialPostsComponent {
 
   private authService = inject(AuthService);
   currentUserAvatar = this.authService.getCurrentUser()?.avatar || null;
+  currentUserName = this.authService.getCurrentUser()?.displayName || null;
 
   // --- 貼文狀態 ---
   isEditing = false;
@@ -48,6 +49,19 @@ export class SocialPostsComponent {
     if (!this.eRef.nativeElement.contains(event.target)) {
       this.isMenuOpen = false;
     }
+  }
+
+  //頭像
+  getUserAvatar(): string {
+    if (this.currentUserAvatar) return this.currentUserAvatar;
+    const initial = (this.currentUserName || 'U').charAt(0).toUpperCase();
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+  }
+
+  getPostUserAvatar(): string {
+    if (this.post.avatar) return this.post.avatar;
+    const initial = (this.post.userName || 'U').charAt(0).toUpperCase();
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
   }
 
   // --- 貼文邏輯 ---
