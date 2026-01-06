@@ -1,7 +1,9 @@
 using FrameZone_WebApi.Socials.DTOs;
+using FrameZone_WebApi.Socials.Hubs;
 using FrameZone_WebApi.Socials.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -14,18 +16,18 @@ namespace FrameZone_WebApi.Socials.Controllers
     {
         private readonly ChatRoomService _roomService;
         private readonly MessageService _messageService;
+        private readonly IHubContext<SocialChatHub> _chatHubContext;
 
         public ChatRoomController(
             ChatRoomService roomService,
-            MessageService messageService)
+            MessageService messageService,
+            IHubContext<SocialChatHub> chatHubContext)
         {
             _roomService = roomService;
             _messageService = messageService;
+            _chatHubContext = chatHubContext;
         }
 
-        // =======================
-        // 社交私聊
-        // =======================
         [Authorize]
         [HttpPost("private/social")]
         public ActionResult<ChatRoomDto> CreateSocialPrivateRoom(CreatePrivateRoomDto dto)
@@ -37,9 +39,6 @@ namespace FrameZone_WebApi.Socials.Controllers
             return _roomService.GetOrCreateSocialPrivateRoom(userId, dto.TargetUserId);
         }
 
-        // =======================
-        // 商城私聊
-        // =======================
         [Authorize]
         [HttpPost("private/shopping")]
         public ActionResult<ChatRoomDto> CreateShoppingPrivateRoom(CreatePrivateRoomDto dto)
@@ -51,9 +50,6 @@ namespace FrameZone_WebApi.Socials.Controllers
             return _roomService.GetOrCreateShoppingPrivateRoom(userId, dto.TargetUserId);
         }
 
-        // =======================
-        // 多人聊天室
-        // =======================
         [Authorize]
         [HttpPost("group")]
         public ActionResult<ChatRoomDto> CreateGroupRoom(CreateGroupRoomDto dto)
@@ -63,9 +59,6 @@ namespace FrameZone_WebApi.Socials.Controllers
             return _roomService.CreateGroupRoom(userId, dto);
         }
 
-        // =======================
-        // 取得使用者聊天室清單（私聊 + 群聊）
-        // =======================
         [Authorize]
         [HttpGet("rooms")]
         public ActionResult<List<ChatRoomDto>> GetMyRooms()
@@ -75,43 +68,40 @@ namespace FrameZone_WebApi.Socials.Controllers
             return _roomService.GetUserRooms(userId);
         }
 
-        // =======================
-        // 取得聊天室訊息
-        // =======================
         [HttpGet("{roomId}/messages")]
         public ActionResult<List<MessageDto>> GetMessages(int roomId)
         {
             return _messageService.GetMessages(roomId);
         }
 
-        // =======================
-        // 發送聊天室文字訊息
-        // =======================
         [Authorize]
         [HttpPost("{roomId}/messages")]
-        public ActionResult<MessageDto> SendMessage(int roomId, SendMessageDto dto)
+        public async Task<ActionResult<MessageDto>> SendMessage(int roomId, SendMessageDto dto)
         {
             if (!TryGetUserId(out var userId))
                 return Unauthorized();
             var content = dto?.MessageContent?.Trim();
             if (string.IsNullOrWhiteSpace(content))
                 return BadRequest("訊息內容不可為空");
-            return _messageService.SendTextMessage(roomId, userId, content);
+            var message = _messageService.SendTextMessage(roomId, userId, content);
+            await _chatHubContext.Clients.Group(SocialChatHub.GetGroupName(roomId))
+                .SendAsync(SocialChatHub.ReceiveMessageEvent, message);
+            return message;
         }
 
-        // =======================
-        // 發送商城相關訊息（商品、訂單、連結、貼圖、圖片、影片）
-        // =======================
         [Authorize]
         [HttpPost("{roomId}/messages/shop")]
-        public ActionResult<MessageDto> SendShopMessage(int roomId, SendShopMessageDto dto)
+        public async Task<ActionResult<MessageDto>> SendShopMessage(int roomId, SendShopMessageDto dto)
         {
             if (!TryGetUserId(out var userId))
                 return Unauthorized();
 
             try
             {
-                return _messageService.SendShopMessage(roomId, userId, dto);
+                var message = _messageService.SendShopMessage(roomId, userId, dto);
+                await _chatHubContext.Clients.Group(SocialChatHub.GetGroupName(roomId))
+                    .SendAsync(SocialChatHub.ReceiveMessageEvent, message);
+                return message;
             }
             catch (ArgumentException ex)
             {

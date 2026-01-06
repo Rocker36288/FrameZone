@@ -96,5 +96,16 @@ namespace FrameZone_WebApi.Socials.Repositories
                 .OrderByDescending(r => r.UpdatedAt ?? r.CreatedAt)
                 .ToList();
         }
+
+        /// <summary>
+        /// 檢查使用者是否在指定聊天室中（未離開）
+        /// </summary>
+        public bool IsUserInRoom(int roomId, long userId)
+        {
+            return _context.ChatMembers.Any(cm =>
+                cm.RoomId == roomId &&
+                cm.UserId == userId &&
+                cm.LeaveAt == null);
+        }
     }
 }

@@ -1,8 +1,18 @@
-﻿import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Output, inject } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { ChatService } from '../services/chat.service';
 import { ChatRoomDto } from '../models/ChatRoomDto';
 import { MessageDto } from '../models/MessageDto';
+
+interface ViewMessage {
+  id?: number;
+  content: string;
+  isOwn: boolean;
+  time: string;
+  createdAt?: string;
+  senderId?: number;
+}
 
 @Component({
   selector: 'app-social-chat',
@@ -10,7 +20,7 @@ import { MessageDto } from '../models/MessageDto';
   templateUrl: './social-chat.component.html',
   styleUrl: './social-chat.component.css'
 })
-export class SocialChatComponent {
+export class SocialChatComponent implements OnDestroy {
   @Input() selectedFriend: { id: number; name: string } | null = null;
   @Output() closed = new EventEmitter<void>();
 
@@ -21,8 +31,9 @@ export class SocialChatComponent {
   room: ChatRoomDto | null = null;
   loading = false;
   error: string | null = null;
-  messages: { content: string; isOwn: boolean; time: string }[] = [];
+  messages: ViewMessage[] = [];
   private currentUserId: number | null = null;
+  private messageSub = new Subscription();
 
   ngOnChanges() {
     if (this.selectedFriend) {
@@ -32,10 +43,14 @@ export class SocialChatComponent {
 
   toggleChat() {
     this.isOpen = !this.isOpen;
-    if (!this.isOpen) this.closed.emit();
+    if (!this.isOpen) {
+      this.teardownRealtime();
+      this.closed.emit();
+    }
   }
 
   private openForFriend(friend: { id: number; name: string }) {
+    this.teardownRealtime();
     this.isOpen = true;
     this.loading = true;
     this.error = null;
@@ -45,6 +60,8 @@ export class SocialChatComponent {
       next: room => {
         this.room = room;
         this.loadMessages(room.roomId);
+        this.chatService.connectToRoom(room.roomId);
+        this.listenRealtime();
         this.loading = false;
       },
       error: () => {
@@ -75,12 +92,51 @@ export class SocialChatComponent {
     });
   }
 
+  private listenRealtime() {
+    this.messageSub.unsubscribe();
+    this.messageSub = new Subscription();
+    this.messageSub.add(
+      this.chatService.messages$.subscribe(message => {
+        if (!message) return;
+        if (this.isDuplicate(message)) return;
+        this.messages = [...this.messages, this.toViewMessage(message)];
+      })
+    );
+  }
+
+  private teardownRealtime() {
+    this.messageSub.unsubscribe();
+    this.messageSub = new Subscription();
+    this.chatService.disconnect();
+  }
+
+  private isDuplicate(message: MessageDto): boolean {
+    const messageId = message.messageId?.toString();
+    const createdAt = message.createdAt;
+    const senderId = message.senderUserId;
+    return this.messages.some(m => {
+      const sameId = m.id !== undefined && messageId !== undefined && m.id?.toString() === messageId;
+      const samePayload =
+        m.senderId === senderId &&
+        m.createdAt === createdAt &&
+        m.content === message.messageContent;
+      return sameId || samePayload;
+    });
+  }
+
   private toViewMessage(message: MessageDto) {
     const isOwn = this.currentUserId != null && message.senderUserId === this.currentUserId;
     return {
+      id: message.messageId,
       content: message.messageContent,
       isOwn,
-      time: new Date(message.createdAt).toLocaleTimeString()
+      time: new Date(message.createdAt).toLocaleTimeString(),
+      createdAt: message.createdAt,
+      senderId: message.senderUserId
     };
+  }
+
+  ngOnDestroy(): void {
+    this.teardownRealtime();
   }
 }
