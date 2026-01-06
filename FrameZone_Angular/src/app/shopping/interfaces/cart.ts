@@ -5,6 +5,10 @@ export interface CartItem {
   quantity: number;
   selected: boolean; // <-- 關鍵: 用來追蹤是否被勾選
   imageUrl?: string;
+  specificationId?: number;
+  sellerId: string | number;
+  sellerName: string;
+  sellerAvatar?: string;
 }
 
 export interface Coupon {

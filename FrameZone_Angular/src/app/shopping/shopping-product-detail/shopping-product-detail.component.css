@@ -249,10 +249,55 @@
   flex-shrink: 0;
 }
 
+.seller-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .seller-name {
   font-weight: bold;
   font-size: 1.1rem;
   color: #333;
+}
+
+.seller-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+}
+
+.seller-rating-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.seller-rating-right:hover {
+  background-color: #f0f0f0;
+  color: #565fdb;
+}
+
+.seller-rating-right .star {
+  color: #fbba00;
+  font-size: 1.1rem;
+}
+
+.seller-rating-right .rating-val {
+  font-weight: 700;
+  color: #333;
+}
+
+.seller-rating-right .review-count {
+  font-size: 0.85rem;
+  color: #999;
 }
 
 .seller-status {
@@ -560,9 +605,11 @@
   color: #333;
   text-decoration: none;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
+  line-clamp: 3;
 }
 
 .similar-products-section .card-description-override {
@@ -903,4 +950,168 @@
   background-color: #5988ee;
   border: none;
   color: white;
+}
+
+
+/* 價與評分相關樣式 (RATINGS & REVIEWS) */
+.product-rating-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+}
+
+.product-rating-summary .stars {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: #fbba00;
+}
+
+.product-rating-summary .star {
+  font-size: 1.2rem;
+  color: #ddd;
+}
+
+.product-rating-summary .star.filled {
+  color: #fbba00;
+}
+
+.product-rating-summary .rating-number {
+  margin-left: 5px;
+  font-weight: 700;
+  color: #333;
+}
+
+.product-rating-summary .divider {
+  color: #ddd;
+}
+
+.product-rating-summary .review-count {
+  color: #666;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.seller-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+.seller-rating .star {
+  color: #fbba00;
+}
+
+.seller-rating .rating-val {
+  font-weight: 600;
+  color: #333;
+}
+
+/* 評價清單樣式 */
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.review-item {
+  padding-bottom: 25px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.review-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.review-header {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.reviewer-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.reviewer-info .reviewer-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.review-rating {
+  color: #fbba00;
+  font-size: 0.8rem;
+  margin: 2px 0;
+}
+
+.review-rating .star {
+  color: #ddd;
+}
+
+.review-rating .star.filled {
+  color: #fbba00;
+}
+
+.review-date {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.review-content {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.review-photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.review-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 4px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 1px solid #eee;
+}
+
+.seller-reply {
+  background-color: #f8f8fc;
+  border-radius: 4px;
+  padding: 12px 15px;
+  margin-top: 10px;
+}
+
+.reply-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #5c4aff;
+  margin-bottom: 5px;
+}
+
+.reply-content {
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+.no-reviews {
+  text-align: center;
+  color: #999;
+  padding: 30px 0;
 }

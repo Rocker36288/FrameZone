@@ -59,35 +59,37 @@
 
   <div class="row" *ngIf="cartService.items().length > 0; else emptyCart">
     <div class="col-lg-8">
-      <div class="card mb-4 seller-group">
+      <div *ngFor="let group of groupedItems()" class="card mb-4 seller-group">
         <div class="card-header">
           <div class="col-auto ps-1 pt-1">
             <label class="form-check m-0">
-              <input class="form-check-input" type="checkbox" #masterCheckbox
-                (change)="toggleAllItems(masterCheckbox.checked)" [checked]="areAllItemsChecked()">
+              <input class="form-check-input" type="checkbox" #sellerCheckbox
+                (change)="toggleSellerItems(group.sellerId, sellerCheckbox.checked)"
+                [checked]="isSellerChecked(group.sellerId)">
             </label>
           </div>
           <h3 class="card-title">
             <div class="d-flex align-items-center pt-1 mt-auto">
-              <span class="avatar" style="background-image: url(https://i.pravatar.cc/150?u=seller)"></span>
+              <span class="avatar"
+                [style.background-image]="'url(' + (group.sellerAvatar || 'https://i.pravatar.cc/150?u=' + group.sellerId) + ')'"></span>
               <div class="ms-3">
-                <a href="#" class="text-body">官方賣場</a>
+                <a [routerLink]="['/shopping/sellershop', group.sellerId]" class="text-body">{{ group.sellerName }}</a>
               </div>
             </div>
           </h3>
         </div>
         <div class="card-body">
-          <div *ngFor="let item of cartService.items()" class="card mb-3">
+          <div *ngFor="let item of group.items" class="card mb-3">
             <div class="row row-0 flex-fill align-items-center">
               <div class="col-auto ps-3">
                 <label class="form-check m-0">
                   <input class="form-check-input" type="checkbox" [checked]="item.selected"
-                    (change)="cartService.toggleItemSelection(item.id)">
+                    (change)="cartService.toggleItemSelection(item.id, item.specificationId)">
                 </label>
               </div>
 
               <div class="col-md-3">
-                <a href="#">
+                <a [routerLink]="['/shopping/product-detail', item.id]">
                   <img [src]="item.imageUrl || 'images/products/4.jpg'" class="w-100 h-100 object-cover"
                     alt="Product image" />
                 </a>
@@ -95,7 +97,7 @@
               <div class="col">
                 <div class="card-body h-full d-flex flex-column">
                   <h3 class="card-title">
-                    <h2><a href="#">{{item.name}}</a></h2>
+                    <h2><a [routerLink]="['/shopping/product-detail', item.id]">{{item.name}}</a></h2>
                   </h3>
                   <div class="text-secondary">
                     <h3>${{item.price}}</h3>
@@ -103,19 +105,19 @@
                   <div class="mt-2 d-flex align-items-center">
                     <div class="input-group input-group-sm" style="width: 120px;">
                       <button class="btn btn-outline-secondary" type="button"
-                        (click)="cartService.updateItemQuantity(item.id, item.quantity - 1)">
+                        (click)="cartService.updateItemQuantity(item.id, item.quantity - 1, item.specificationId)">
                         -
                       </button>
                       <input type="text" class="form-control text-center" [value]="item.quantity" readonly>
                       <button class="btn btn-outline-secondary" type="button"
-                        (click)="cartService.updateItemQuantity(item.id, item.quantity + 1)">
+                        (click)="cartService.updateItemQuantity(item.id, item.quantity + 1, item.specificationId)">
                         +
                       </button>
                     </div>
                     <small class="text-secondary ms-3"></small>
                     <div class="ms-auto">
                       <a href="javascript:void(0)" class="icon d-none d-md-inline-block ms-3 text-red"
-                        (click)="cartService.removeFromCart(item.id)">
+                        (click)="cartService.removeFromCart(item.id, item.specificationId)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                           stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                           class="icon icon-tabler icons-tabler-outline icon-tabler-trash">

@@ -1,4 +1,5 @@
-<div class="card d-flex flex-column h-100 product-card" [routerLink]="['/shopping/product-detail', product().id]">
+<div class="card d-flex flex-column h-100 product-card"
+  [routerLink]="['/shopping/product-detail', product().productId]">
 
   <img class="card-img-top" [src]="product().image" [alt]="product().name" />
 
@@ -7,7 +8,7 @@
       {{ product().name }}
     </h4>
     <div class="text-secondary small mb-3">
-      {{ product().description }}
+      <p class="truncate-description">{{ product().description }}</p>
     </div>
 
     <div class="mt-auto d-flex align-items-center justify-content-between">
@@ -16,7 +17,7 @@
       </div>
 
       <app-favorite-button [isFavorite]="product().isFavorite" [itemName]="product().name"
-        (favoriteChange)="onFavoriteToggle($event)">
+        [productId]="product().productId" (favoriteChange)="onFavoriteToggle($event)">
       </app-favorite-button>
     </div>
   </div>

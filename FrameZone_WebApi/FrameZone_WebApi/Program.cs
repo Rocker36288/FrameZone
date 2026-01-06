@@ -15,6 +15,9 @@ using FrameZone_WebApi.Services;
 using FrameZone_WebApi.Services.Interfaces;
 using FrameZone_WebApi.Services.Member;
 using FrameZone_WebApi.Socials.Hubs;
+using FrameZone_WebApi.Shopping.Configuration;
+using FrameZone_WebApi.Shopping.Repositories;
+using FrameZone_WebApi.Shopping.Services;
 using FrameZone_WebApi.Socials.Repositories;
 using FrameZone_WebApi.Socials.Services;
 using FrameZone_WebApi.Videos.Helpers;
@@ -121,32 +124,48 @@ builder.Services.Configure<VerificationSettings>(
     builder.Configuration.GetSection("VerificationSettings")
 );
 
-
-//========== CORS 設定 ==========
-
-builder.Services.Configure<EmailSettings>(
-    builder.Configuration.GetSection("EmailSettings")
+//========== 金流設定 ==========
+builder.Services.Configure<ECPaySettings>(
+    builder.Configuration.GetSection("ECPaySettings")
 );
 
-builder.Services.Configure<VerificationSettings>(
-    builder.Configuration.GetSection("VerificationSettings")
-);
+
+//========== CORS 設定 ==========(重複的)
+
+//builder.Services.Configure<EmailSettings>(
+//    builder.Configuration.GetSection("EmailSettings")
+//);
+
+//builder.Services.Configure<VerificationSettings>(
+//    builder.Configuration.GetSection("VerificationSettings")
+//);
 
 
 // ========== CORS 設定 ==========
 
 var policyName = "Angular";
 builder.Services.AddCors(options =>
+{
+    /*
+    options.AddPolicy(policyName, policy =>
     {
-        options.AddPolicy(policyName, policy =>
-        {
-            policy.WithOrigins("http://localhost:4200")
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials();
+        policy.WithOrigins("http://localhost:4200")
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
 
-        });
     });
+    */
+
+    //上面只允許開放localhost:4200會擋綠界，所以先開放全域
+    options.AddPolicy(policyName, policy =>
+    {
+        policy.AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+    });
+
+});
 
 // ========== JWT 設定 ==========
 
@@ -283,6 +302,19 @@ builder.Services.AddScoped<IVideoUploadService, VideoUploadService>();
 builder.Services.AddScoped<VideoServices>();
 builder.Services.AddScoped<VideoCreatorService>();
 builder.Services.AddScoped<VideoPlayerService>();
+
+//========== 購物中心 (DI注入) ==========
+builder.Services.AddScoped<ProductRepository>();
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+builder.Services.AddScoped<FavoriteService>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+builder.Services.AddScoped<IAddressService, AddressService>();
+builder.Services.AddScoped<ECPayService>();  //綠界注入
 
 
 

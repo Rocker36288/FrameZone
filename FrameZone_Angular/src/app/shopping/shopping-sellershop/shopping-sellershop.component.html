@@ -24,10 +24,10 @@
                         上線中
                       </span>
                     </div>
-                    <div class="text-white-80">
+                    <div class="text-white-80 clickable-info" (click)="goToReviews()">
                       評價：{{ sellerInfo.rating }} ({{ sellerInfo.reviewCount }}則)
                     </div>
-                    <div class="text-white-80">
+                    <div class="text-white-80 clickable-info" (click)="scrollToProducts()">
                       商品數：{{ sellerInfo.productCount }}
                     </div>
                   </div>
@@ -84,7 +84,6 @@
                     </div>
                     <div>
                       <p class="text-secondary mb-2">{{ sellerInfo.description }}</p>
-                      <p class="text-secondary mb-0">我相信好東西就該被分享！如果你也喜歡生活中的小確幸，歡迎逛逛我的賣場，也許能找到讓你心動的寶物 💕</p>
                     </div>
                   </div>
                 </div>
@@ -200,7 +199,7 @@
         </div>
 
         <!-- 右側商品區 -->
-        <div class="col-lg-10 col-md-9">
+        <div class="col-lg-10 col-md-9" id="all-products">
           <!-- 排序與搜尋 -->
           <div class="card mb-3">
             <div class="card-body py-2">

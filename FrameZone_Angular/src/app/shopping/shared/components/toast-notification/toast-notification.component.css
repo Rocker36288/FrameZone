@@ -1,24 +1,33 @@
 .toast-container {
   position: fixed;
-  bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1050;
   max-width: 500px;
 }
 
-.toast {
-  /* 黑色 (0,0,0) 加上 0.75 的透明度 */
-  background: rgba(0, 0, 0, 0.75) !important;
+.toast-container.top {
+  top: 80px;
+  /* 避開導覽列 */
+}
 
-  /* 讓背景有模糊感 (類似 iPhone 控制中心的效果) */
-  /* backdrop-filter: blur(8px); */
+.toast-container.bottom {
+  bottom: 50px;
+}
+
+.toast {
+  /* 半透明背景 (0,0,0) 加上 0.35 的透明度 */
+  background: rgba(0, 0, 0, 0.35) !important;
+
+  /* 讓背景有模糊感 (毛玻璃效果) */
+  /* backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); */
 
   border: 1px solid rgba(255, 255, 255, 0.1);
   /* 極細微的白邊，增加質感 */
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 
-  animation: slideInUp 0.3s ease-out;
+  animation: slideIn 0.3s ease-out;
   display: block;
   /* 確保 div 正常顯示 */
 }
@@ -31,9 +40,9 @@
   text-align: center;
 }
 
-@keyframes slideInUp {
+@keyframes slideIn {
   from {
-    transform: translateY(100%);
+    transform: translateY(20px);
     opacity: 0;
   }
 

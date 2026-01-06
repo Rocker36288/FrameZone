@@ -1,28 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HeaderComponent } from "../../shared/components/header/header.component";
 import { CartItem, Coupon } from '../interfaces/cart';
-import { RouterLink } from '@angular/router';
 import { CartService } from '../shared/services/cart.service';
-
-// interface CartItem {
-//   id: number;
-//   name: string;
-//   price: number;
-//   quantity: number;
-//   selected: boolean; // <-- 關鍵: 用來追蹤是否被勾選
-//   // 您可以加入其他屬性，例如: quantity: number;
-// }
-
-// interface Coupon {
-//   id: number;
-//   name: string;
-//   discount: number; // 折扣金額
-//   code: string;
-//   expiryDate: Date;
-//   isSelected: boolean; // 是否被使用者選中
-// }
+import { AuthService } from '../../core/services/auth.service';
+import { ToastService } from '../shared/services/toast.service';
+import { Router, RouterLink } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-shoppingcart',
@@ -40,13 +25,35 @@ export class ShoppingcartComponent {
 
   @ViewChild('couponModalElement') couponModalElement!: ElementRef;
 
+  private authService = inject(AuthService);
+  private toastService = inject(ToastService);
+  private router = inject(Router);
+  private destroy$ = new Subject<void>();
+
   currentStep: number = 1;
 
   // 2. 屬性(Property): 模擬購物車資料已移轉到 Service
   // 組件端透過 getter 或是直接在 HTML 使用 cartService.items()
-  get cartItems(): CartItem[] {
-    return this.cartService.items();
-  }
+  groupedItems = computed(() => {
+    const items = this.cartService.items();
+    const groups: { sellerId: string | number; sellerName: string; sellerAvatar?: string; items: CartItem[] }[] = [];
+
+    items.forEach(item => {
+      let group = groups.find(g => g.sellerId === item.sellerId);
+      if (!group) {
+        group = {
+          sellerId: item.sellerId,
+          sellerName: item.sellerName || '官方賣場',
+          sellerAvatar: item.sellerAvatar || `https://i.pravatar.cc/150?u=${item.sellerId}`,
+          items: []
+        };
+        groups.push(group);
+      }
+      group.items.push(item);
+    });
+
+    return groups;
+  });
 
   constructor() {
     effect(() => {
@@ -69,6 +76,13 @@ export class ShoppingcartComponent {
   }
 
   ngOnInit(): void {
+    if (!this.authService.isAuthenticated()) {
+      this.toastService.show('請先登入會員', 'top');
+      setTimeout(() => {
+        this.router.navigate(['/login'], { queryParams: { returnUrl: '/shoppingcart' } });
+      }, 1000);
+      return;
+    }
     // 可以在這裡執行元件初始化時的邏輯，例如從服務中載入資料
 
     // 從 CartService 讀取「已套用的優惠券」
@@ -78,11 +92,36 @@ export class ShoppingcartComponent {
       // 沒有使用優惠券 → 全部取消勾選
       this.availableCoupons.forEach(c => c.isSelected = false);
       this.finalAppliedDiscount = 0;
-      return;
     }
+
+    // 訂閱會員資料
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        if (user) {
+          this.memberName = user.account || user.displayName || '會員';
+          if (user.avatar) {
+            this.memberAvatarUrl = user.avatar;
+          } else {
+            const initial = (this.memberName || 'U').charAt(0).toUpperCase();
+            this.memberAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+          }
+        }
+      });
   }
 
-  // 3. 方法 (Method): 實現「賣家點擊 -> 所有商品連動」邏輯
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * 某個賣家的勾選框被點擊時，連動該賣家的所有商品
+   */
+  toggleSellerItems(sellerId: string | number, isChecked: boolean): void {
+    this.cartService.toggleSellerItems(sellerId, isChecked);
+  }
+
   /**
    * 賣家勾選框被點擊時，連動所有商品
    * @param isChecked 賣家勾選框的狀態 (true/false)
@@ -101,13 +140,21 @@ export class ShoppingcartComponent {
     console.log('商品狀態已變動，觸發檢查主勾選框狀態。');
   }
 
-  // 5. 方法 (Method): 用於主勾選框的 [checked] 屬性綁定
+  /**
+   * 判斷某個賣家的所有商品是否都被勾選
+   */
+  isSellerChecked(sellerId: string | number): boolean {
+    const sellerItems = this.cartService.items().filter(i => i.sellerId === sellerId);
+    return sellerItems.length > 0 && sellerItems.every(i => i.selected);
+  }
+
   /**
    * 判斷是否所有商品都被勾選。
    * * @returns boolean
    */
   areAllItemsChecked(): boolean {
-    return this.cartItems.length > 0 && this.cartItems.every(item => item.selected);
+    const items = this.cartService.items();
+    return items.length > 0 && items.every(item => item.selected);
   }
 
   getTotalQuantity(): number {
@@ -182,7 +229,7 @@ export class ShoppingcartComponent {
     const selectedCoupon =
       this.availableCoupons.find(c => c.isSelected) || null;
 
-    // ⭐ 關鍵：寫回 CartService
+    // 關鍵：寫回 CartService
     this.cartService.applyCoupon(selectedCoupon);
 
     // 本地只做顯示用（可留可不留）
@@ -220,9 +267,9 @@ export class ShoppingcartComponent {
   }
 
   // 範例頭像 URL，請替換為實際的會員服務獲取邏輯
-  memberAvatarUrl: string = 'images/avatar/11.jpg';
+  memberAvatarUrl: string = '';
 
   // 範例會員名稱
-  memberName: string = 'ruka711';
+  memberName: string = '';
 
 }

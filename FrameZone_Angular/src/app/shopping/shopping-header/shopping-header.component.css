@@ -245,7 +245,7 @@
 }
 
 .top-nav-right {
-  margin-right: -140px;
+  margin-right: -180px;
 }
 
 /* 防止內容被固定導覽列遮住，您可以根據實際 header 高度調整這個數值 */

@@ -1,15 +1,25 @@
 import { HeaderComponent } from './../../shared/components/header/header.component';
 import { Component, computed, ElementRef, inject, ViewChild } from '@angular/core';
 import { CartItem, Coupon } from '../interfaces/cart';
+import { OrderDto } from '../interfaces/order';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { CartService } from '../shared/services/cart.service';
+import { OrderService } from '../shared/services/order.service';
+import { EcpayFormComponent } from '../shared/components/ecpay-form/ecpay-form.component';
+import { frontendPublicUrl, backendPublicUrl } from '../shared/configuration/url';
+import { AuthService } from '../../core/services/auth.service';
+import { ToastService } from '../shared/services/toast.service';
+import { Subject, takeUntil } from 'rxjs';
+import { MemberService } from '../../core/services/member.service';
+import { AddressService } from '../shared/services/address.service';
+import { ReceivingAddress } from '../interfaces/address';
 
 @Component({
   selector: 'app-shopping-checkout',
   standalone: true,
-  imports: [FormsModule, CommonModule, ReactiveFormsModule, HeaderComponent, RouterLink],
+  imports: [FormsModule, CommonModule, ReactiveFormsModule, HeaderComponent, RouterLink, EcpayFormComponent],
   templateUrl: './shopping-checkout.component.html',
   styleUrl: './shopping-checkout.component.css'
 })
@@ -18,8 +28,15 @@ export class ShoppingCheckoutComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    public cartService: CartService // 改為 public 方便 HTML 直接讀取 Service 的 Signal
+    public cartService: CartService, // 改為 public 方便 HTML 直接讀取 Service 的 Signal
+    private orderService: OrderService,
+    private authService: AuthService,
+    private toastService: ToastService,
+    private memberService: MemberService,
+    private addressService: AddressService
   ) { }
+
+  private destroy$ = new Subject<void>();
 
 
   currentStep: number = 2;
@@ -38,26 +55,52 @@ export class ShoppingCheckoutComponent {
     'fami_pay': 60
   };
 
-  // 定義收件人資料陣列
-  savedAddresses = [
-    {
-      id: 1,
-      name: '王小明',
-      phone: '0912-345-678',
-      address: '110 台北市信義區信義路五段7號 (台北 101)'
-    },
-    {
-      id: 2,
-      name: '家裡 (李大華)',
-      phone: '0988-123-456',
-      address: '220 新北市板橋區中山路一段1號'
-    }
-  ];
+  // 定義收件人資料與門市
+  savedAddresses: any[] = [];
+  pickupStores: any[] = [];
 
-  // 使用 Signal 的 Computed 屬性：從 Service 篩選出「已勾選」商品
-  selectedItems = computed(() =>
-    this.cartService.items().filter(item => item.selected)
-  );
+  // 新地址輸入欄位
+  useNewAddress: boolean = false;
+  newRecipientName: string = '';
+  newPhoneNumber: string = '';
+  newFullAddress: string = '';
+  saveAddress: boolean = false;
+  // savedAddresses = [
+  //   {
+  //     id: 1,
+  //     name: '王小明',
+  //     phone: '0912-345-678',
+  //     address: '110 台北市信義區信義路五段7號 (台北 101)'
+  //   },
+  //   {
+  //     id: 2,
+  //     name: '家裡 (李大華)',
+  //     phone: '0988-123-456',
+  //     address: '220 新北市板橋區中山路一段1號'
+  //   }
+  // ];
+
+  // 使用 Signal 的 Computed 屬性：從 Service 篩選出「已勾選」商品並進行分組
+  groupedSelectedItems = computed(() => {
+    const items = this.cartService.items().filter(item => item.selected);
+    const groups: { sellerId: string | number; sellerName: string; sellerAvatar?: string; items: CartItem[] }[] = [];
+
+    items.forEach(item => {
+      let group = groups.find(g => g.sellerId === item.sellerId);
+      if (!group) {
+        group = {
+          sellerId: item.sellerId,
+          sellerName: item.sellerName || '官方賣場',
+          sellerAvatar: item.sellerAvatar || `https://i.pravatar.cc/150?u=${item.sellerId}`,
+          items: []
+        };
+        groups.push(group);
+      }
+      group.items.push(item);
+    });
+
+    return groups;
+  });
 
   // 2. 屬性 (Property): 模擬購物車資料
   // cartItems: CartItem[] = [
@@ -84,14 +127,26 @@ export class ShoppingCheckoutComponent {
   ];
 
   // 會員資料
-  memberAvatarUrl: string = 'https://i.pravatar.cc/30?img=68';
-  memberName: string = 'Angular用戶001';
+  memberAvatarUrl: string = '';
+  memberName: string = '';
+
+
+  // 使用綠界 API 需要的相關參數
+  ecpayParams: any = null;
 
   ngOnInit(): void {
-    // 初始化表單
+    if (!this.authService.isAuthenticated()) {
+      this.toastService.show('請先登入會員', 'top');
+      setTimeout(() => {
+        this.router.navigate(['/login'], { queryParams: { returnUrl: '/checkout' } });
+      }, 1000);
+      return;
+    }
+
+    // 1. 初始化表單
     this.checkoutForm = this.fb.group({
-      paymentMethod: ['credit', Validators.required],
-      shippingMethod: ['', Validators.required], // 預設改為空，讓用戶必須點選
+      paymentMethod: ['Credit', Validators.required],
+      shippingMethod: ['post', Validators.required],
       selectedAddressId: ['', Validators.required] // 必選收件人
     });
 
@@ -107,9 +162,93 @@ export class ShoppingCheckoutComponent {
     });
 
     // 安全檢查：若無勾選商品，退回購物車
-    if (this.selectedItems().length === 0) {
+    if (this.groupedSelectedItems().length === 0) {
       this.router.navigate(['/shoppingcart']);
     }
+
+    // 訂閱會員資料
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        if (user) {
+          this.memberName = user.account || user.displayName || '會員';
+          if (user.avatar) {
+            this.memberAvatarUrl = user.avatar;
+          } else {
+            const initial = (this.memberName || 'U').charAt(0).toUpperCase();
+            this.memberAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+          }
+        }
+      });
+
+    // 取得資料庫收件地址（使用新的 AddressService）
+    this.addressService.getUserAddresses().subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.savedAddresses = res.data.map((addr: ReceivingAddress) => ({
+            id: addr.addressId,
+            name: addr.recipientName,
+            phone: addr.phoneNumber,
+            address: addr.fullAddress,
+            isDefault: addr.isDefault
+          }));
+
+          // 如果有地址，預設選取第一個（已依 isDefault 排序）
+          if (this.savedAddresses.length > 0) {
+            this.checkoutForm.get('selectedAddressId')?.setValue(this.savedAddresses[0].id);
+          } else {
+            // 如果沒有地址，顯示新增地址表單
+            this.useNewAddress = true;
+          }
+        }
+      },
+      error: (err) => {
+        console.error('取得收件地址失敗：', err);
+        // 如果取得失敗，顯示新增地址表單
+        this.useNewAddress = true;
+      }
+    });
+
+    // 監聽運送方式變動：如果是 7-11，位址 ID 依然必填，但我們會切換成門市列表供選取
+    this.checkoutForm.get('shippingMethod')?.valueChanges.subscribe(method => {
+      // 重置選取，強迫使用者重新選取門市或地址，避免跨模式選取錯誤
+      this.checkoutForm.get('selectedAddressId')?.setValue('');
+    });
+
+    // 監聽付款方式變動：如果是貨到付款，強制切換運送方式
+    this.checkoutForm.get('paymentMethod')?.valueChanges.subscribe(method => {
+      if (method === 'COD') {
+        const currentShipping = this.checkoutForm.get('shippingMethod')?.value;
+        if (currentShipping === 'post' || currentShipping === '711' || !currentShipping.endsWith('_pay')) {
+          this.checkoutForm.get('shippingMethod')?.setValue('711_pay');
+        }
+      } else {
+        // 如果切換回信用卡/ATM，且目前是 _pay 結尾的，切換回普通運送
+        const currentShipping = this.checkoutForm.get('shippingMethod')?.value;
+        if (currentShipping.endsWith('_pay')) {
+          this.checkoutForm.get('shippingMethod')?.setValue(currentShipping.replace('_pay', ''));
+        }
+      }
+    });
+
+    // 取得資料庫門市
+    this.orderService.getPickupStores().subscribe({
+      next: (res) => {
+        this.pickupStores = res.map(s => ({
+          id: s.id,
+          name: s.storeName,
+          code: s.storeCode,
+          address: s.address || `店號: ${s.storeCode}`,
+          phone: s.phoneNumber,
+          recipient: s.recipientName
+        }));
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // 取得目前選取的運費金額
@@ -197,14 +336,168 @@ export class ShoppingCheckoutComponent {
       return;
     }
 
-    // 這裡未來可以換成呼叫 API 建立訂單
-    // this.orderService.createOrder(...)
+    // 呼叫 API 建立訂單
+    var orderItems = this.cartService.items().filter((item) => item.selected).map((item) => {
+      return {
+        id: item.specificationId ?? item.id, // 使用規格 ID，若無則降級使用產品 ID
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity
+      }
+    });
 
-    // 訂單完成：清空購物車 + 優惠券
-    this.cartService.markOrderCompleted();
+    var clientBackURL = "";
+    if (this.checkoutForm.value.paymentMethod == "Credit") {
+      clientBackURL = `${frontendPublicUrl}/shopping/home`;
+    }
+    else {
+      clientBackURL = `${frontendPublicUrl}/order-success`;
+    }
+
+    const method = this.checkoutForm.value.shippingMethod;
+    const isStore = (method === '711' || method === '711_pay' || method === 'fami' || method === 'fami_pay');
+    const selectedId = this.checkoutForm.value.selectedAddressId;
+
+    let recipientName = '';
+    let phoneNumber = '';
+    let shippingAddress = '';
+
+    if (isStore) {
+      // 門市取貨
+      const selectedStore = this.pickupStores.find(a => a.id === selectedId);
+      recipientName = selectedStore?.name + "門市" || '';
+      phoneNumber = selectedStore?.phone || '';
+      shippingAddress = selectedStore?.address || '';
+    } else {
+      // 郵寄：檢查是使用新地址還是已儲存的地址
+      if (this.useNewAddress) {
+        // 使用新輸入的地址
+        recipientName = this.newRecipientName.trim();
+        phoneNumber = this.newPhoneNumber.trim();
+        shippingAddress = this.newFullAddress.trim();
+
+        // 驗證新地址資料
+        if (!recipientName || !phoneNumber || !shippingAddress) {
+          this.toastService.show('請填寫完整的收件人資訊');
+          return;
+        }
+      } else {
+        // 使用已儲存的地址
+        const selectedAddr = this.savedAddresses.find(a => a.id === selectedId);
+        recipientName = selectedAddr?.name || '';
+        phoneNumber = selectedAddr?.phone || '';
+        shippingAddress = selectedAddr?.address || '';
+      }
+    }
+
+    const orderData: OrderDto = {
+      orderItems: orderItems,
+      totalAmount: this.getFinalTotal(),
+      paymentMethod: this.checkoutForm.value.paymentMethod,
+      returnURL: `${backendPublicUrl}/api/order/pay-result`,
+      recipientName: recipientName,
+      phoneNumber: phoneNumber,
+      shippingAddress: shippingAddress,
+      shippingMethod: method,
+      optionParams: {
+        ClientBackURL: clientBackURL,
+        OrderResultURL: `${backendPublicUrl}/api/order/success-redirect`
+      }
+    };
+
+    // 如果是貨到付款，直接建立訂單並導向完成頁
+    if (this.checkoutForm.value.paymentMethod === 'COD') {
+      this.orderService.createOrder(orderData).subscribe({
+        next: (res) => {
+          this.cartService.markOrderCompleted();
+          this.router.navigate(['/order-success']);
+        },
+        error: (err) => {
+          this.toastService.show('結帳失敗，請稍後再試', 'top');
+        }
+      });
+      return;
+    }
+
+    this.orderService.createOrder(orderData).subscribe({
+      next: (res: any) => {
+        console.log("Success", res);
+
+        // 訂單完成：清空購物車 + 優惠券
+        this.cartService.markOrderCompleted();
+
+        // 用參數填到表單並用綠界 API 發送訂單
+        this.ecpayParams = res;
+      },
+      error: (err) => {
+        console.log("Error", err);
+      }
+    });
 
     // 前往成功頁
-    this.router.navigate(['/order-success']);
+    //this.router.navigate(['/order-success']);
+  }
+
+  /**
+   * 建立新的收件地址
+   */
+  onCreateAddress(): void {
+    // 驗證必填欄位
+    if (!this.newRecipientName.trim() || !this.newPhoneNumber.trim() || !this.newFullAddress.trim()) {
+      this.toastService.show('請填寫完整的收件人資訊');
+      return;
+    }
+
+    // 如果勾選儲存地址，呼叫 API 儲存
+    if (this.saveAddress) {
+      const createDto = {
+        recipientName: this.newRecipientName.trim(),
+        phoneNumber: this.newPhoneNumber.trim(),
+        fullAddress: this.newFullAddress.trim(),
+        isDefault: this.savedAddresses.length === 0 // 如果是第一個地址，設為預設
+      };
+
+      this.addressService.createAddress(createDto).subscribe({
+        next: (res) => {
+          if (res.success && res.data) {
+            this.toastService.show('收件地址已儲存');
+            // 將新地址加入列表
+            this.savedAddresses.push({
+              id: res.data.addressId,
+              name: res.data.recipientName,
+              phone: res.data.phoneNumber,
+              address: res.data.fullAddress,
+              isDefault: res.data.isDefault
+            });
+            // 選取新建立的地址
+            this.checkoutForm.get('selectedAddressId')?.setValue(res.data.addressId);
+            this.useNewAddress = false;
+          }
+        },
+        error: (err) => {
+          console.error('儲存地址失敗：', err);
+          this.toastService.show('儲存地址失敗，但仍可繼續結帳');
+          // 即使儲存失敗，也設定臨時 ID 讓使用者可以繼續結帳
+          this.checkoutForm.get('selectedAddressId')?.setValue('temp_new_address');
+        }
+      });
+    } else {
+      // 不儲存地址，僅用於本次結帳
+      // 設定一個臨時 ID 來滿足表單驗證
+      this.checkoutForm.get('selectedAddressId')?.setValue('temp_new_address');
+      this.toastService.show('已設定收件資訊');
+    }
+  }
+
+  /**
+   * 切換使用新地址
+   */
+  toggleNewAddress(): void {
+    this.useNewAddress = !this.useNewAddress;
+    if (this.useNewAddress) {
+      // 清空已選地址
+      this.checkoutForm.get('selectedAddressId')?.setValue('');
+    }
   }
 
 }
