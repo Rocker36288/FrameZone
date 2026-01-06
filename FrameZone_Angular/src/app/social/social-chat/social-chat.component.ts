@@ -87,9 +87,7 @@ export class SocialChatComponent implements OnDestroy {
     const text = content.trim();
     if (!text) return;
     this.chatService.sendMessage(this.room.roomId, text).subscribe({
-      next: message => {
-        this.messages = [...this.messages, this.toViewMessage(message)];
-      },
+      next: () => { },
       error: () => { }
     });
   }
@@ -100,7 +98,6 @@ export class SocialChatComponent implements OnDestroy {
     this.messageSub.add(
       this.chatService.messages$.subscribe(message => {
         if (!message) return;
-        if (this.isDuplicate(message)) return;
         this.messages = [...this.messages, this.toViewMessage(message)];
       })
     );
@@ -112,22 +109,8 @@ export class SocialChatComponent implements OnDestroy {
     this.chatService.disconnect();
   }
 
-  private isDuplicate(message: MessageDto): boolean {
-    const messageId = message.messageId?.toString();
-    const createdAt = message.createdAt;
-    const senderId = message.senderUserId;
-    return this.messages.some(m => {
-      const sameId = m.id !== undefined && messageId !== undefined && m.id?.toString() === messageId;
-      const samePayload =
-        m.senderId === senderId &&
-        m.createdAt === createdAt &&
-        m.content === message.messageContent;
-      return sameId || samePayload;
-    });
-  }
-
   private toViewMessage(message: MessageDto) {
-    const isOwn = this.currentUserId != null && message.senderUserId === this.currentUserId;
+    const isOwn = !!message.isOwner;
     const profile = this.getSenderProfile(isOwn);
     return {
       id: message.messageId,
@@ -148,7 +131,7 @@ export class SocialChatComponent implements OnDestroy {
   private getSenderProfile(isOwn: boolean) {
     const user = this.authService.getCurrentUser();
     const defaultAvatar = 'https://i.pravatar.cc/100?u=default';
-
+    console.log(isOwn);
     if (isOwn) {
       return {
         name: user?.displayName || user?.account || '我',
@@ -161,4 +144,5 @@ export class SocialChatComponent implements OnDestroy {
       avatar: this.selectedFriend?.avatar || defaultAvatar
     };
   }
+
 }

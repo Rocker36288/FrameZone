@@ -17,15 +17,18 @@ namespace FrameZone_WebApi.Socials.Controllers
         private readonly ChatRoomService _roomService;
         private readonly MessageService _messageService;
         private readonly IHubContext<SocialChatHub> _chatHubContext;
+        private readonly SocialChatConnectionManager _connectionManager;
 
         public ChatRoomController(
             ChatRoomService roomService,
             MessageService messageService,
-            IHubContext<SocialChatHub> chatHubContext)
+            IHubContext<SocialChatHub> chatHubContext,
+            SocialChatConnectionManager connectionManager)
         {
             _roomService = roomService;
             _messageService = messageService;
             _chatHubContext = chatHubContext;
+            _connectionManager = connectionManager;
         }
 
         [Authorize]
@@ -71,7 +74,8 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpGet("{roomId}/messages")]
         public ActionResult<List<MessageDto>> GetMessages(int roomId)
         {
-            return _messageService.GetMessages(roomId);
+            long? currentUserId = TryGetUserId(out var userId) ? userId : (long?)null;
+            return _messageService.GetMessages(roomId, currentUserId);
         }
 
         [Authorize]
@@ -83,9 +87,14 @@ namespace FrameZone_WebApi.Socials.Controllers
             var content = dto?.MessageContent?.Trim();
             if (string.IsNullOrWhiteSpace(content))
                 return BadRequest("訊息內容不可為空");
-            var message = _messageService.SendTextMessage(roomId, userId, content);
-            await _chatHubContext.Clients.Group(SocialChatHub.GetGroupName(roomId))
+            var message = _messageService.SendTextMessage(roomId, userId, content, userId);
+            var messageForOthers = CloneWithOwner(message, false);
+
+            var senderConnections = _connectionManager.GetConnections(userId);
+            await _chatHubContext.Clients.Clients(senderConnections)
                 .SendAsync(SocialChatHub.ReceiveMessageEvent, message);
+            await _chatHubContext.Clients.GroupExcept(SocialChatHub.GetGroupName(roomId), senderConnections)
+                .SendAsync(SocialChatHub.ReceiveMessageEvent, messageForOthers);
             return message;
         }
 
@@ -98,9 +107,14 @@ namespace FrameZone_WebApi.Socials.Controllers
 
             try
             {
-                var message = _messageService.SendShopMessage(roomId, userId, dto);
-                await _chatHubContext.Clients.Group(SocialChatHub.GetGroupName(roomId))
+                var message = _messageService.SendShopMessage(roomId, userId, dto, userId);
+                var messageForOthers = CloneWithOwner(message, false);
+
+                var senderConnections = _connectionManager.GetConnections(userId);
+                await _chatHubContext.Clients.Clients(senderConnections)
                     .SendAsync(SocialChatHub.ReceiveMessageEvent, message);
+                await _chatHubContext.Clients.GroupExcept(SocialChatHub.GetGroupName(roomId), senderConnections)
+                    .SendAsync(SocialChatHub.ReceiveMessageEvent, messageForOthers);
                 return message;
             }
             catch (ArgumentException ex)
@@ -114,6 +128,26 @@ namespace FrameZone_WebApi.Socials.Controllers
             userId = 0;
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return !string.IsNullOrEmpty(userIdClaim) && long.TryParse(userIdClaim, out userId);
+        }
+
+        private static MessageDto CloneWithOwner(MessageDto source, bool isOwner)
+        {
+            return new MessageDto
+            {
+                MessageId = source.MessageId,
+                SenderUserId = source.SenderUserId,
+                MessageContent = source.MessageContent,
+                MessageType = source.MessageType,
+                StickerId = source.StickerId,
+                MediaUrl = source.MediaUrl,
+                ThumbnailUrl = source.ThumbnailUrl,
+                ProductId = source.ProductId,
+                OrderId = source.OrderId,
+                LinkTitle = source.LinkTitle,
+                LinkDescription = source.LinkDescription,
+                CreatedAt = source.CreatedAt,
+                IsOwner = isOwner
+            };
         }
     }
 

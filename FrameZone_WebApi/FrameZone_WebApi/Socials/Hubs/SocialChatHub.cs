@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using FrameZone_WebApi.Socials.DTOs;
 using FrameZone_WebApi.Socials.Repositories;
 using FrameZone_WebApi.Socials.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -13,11 +14,13 @@ namespace FrameZone_WebApi.Socials.Hubs
 
         private readonly ChatRoomRepository _roomRepo;
         private readonly MessageService _messageService;
+        private readonly SocialChatConnectionManager _connectionManager;
 
-        public SocialChatHub(ChatRoomRepository roomRepo, MessageService messageService)
+        public SocialChatHub(ChatRoomRepository roomRepo, MessageService messageService, SocialChatConnectionManager connectionManager)
         {
             _roomRepo = roomRepo;
             _messageService = messageService;
+            _connectionManager = connectionManager;
         }
 
         public static string GetGroupName(int roomId) => $"room:{roomId}";
@@ -37,6 +40,7 @@ namespace FrameZone_WebApi.Socials.Hubs
                 throw new HubException("User not in room");
 
             await Groups.AddToGroupAsync(Context.ConnectionId, GetGroupName(roomId));
+            _connectionManager.Add(userId, Context.ConnectionId);
             await base.OnConnectedAsync();
         }
 
@@ -46,6 +50,10 @@ namespace FrameZone_WebApi.Socials.Hubs
             if (int.TryParse(roomIdRaw, out var roomId))
             {
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, GetGroupName(roomId));
+            }
+            if (TryGetUserId(out var userId))
+            {
+                _connectionManager.Remove(userId, Context.ConnectionId);
             }
             await base.OnDisconnectedAsync(exception);
         }
@@ -65,8 +73,31 @@ namespace FrameZone_WebApi.Socials.Hubs
             if (!_roomRepo.IsUserInRoom(roomId, userId))
                 throw new HubException("User not in room");
 
-            var saved = _messageService.SendTextMessage(roomId, userId, content);
-            await Clients.Group(GetGroupName(roomId)).SendAsync(ReceiveMessageEvent, saved);
+            var saved = _messageService.SendTextMessage(roomId, userId, content, userId);
+            var messageForOthers = CloneWithOwner(saved, false);
+
+            await Clients.Caller.SendAsync(ReceiveMessageEvent, saved);
+            await Clients.OthersInGroup(GetGroupName(roomId)).SendAsync(ReceiveMessageEvent, messageForOthers);
+        }
+
+        private static MessageDto CloneWithOwner(MessageDto source, bool isOwner)
+        {
+            return new MessageDto
+            {
+                MessageId = source.MessageId,
+                SenderUserId = source.SenderUserId,
+                MessageContent = source.MessageContent,
+                MessageType = source.MessageType,
+                StickerId = source.StickerId,
+                MediaUrl = source.MediaUrl,
+                ThumbnailUrl = source.ThumbnailUrl,
+                ProductId = source.ProductId,
+                OrderId = source.OrderId,
+                LinkTitle = source.LinkTitle,
+                LinkDescription = source.LinkDescription,
+                CreatedAt = source.CreatedAt,
+                IsOwner = isOwner
+            };
         }
 
         private bool TryGetUserId(out long userId)

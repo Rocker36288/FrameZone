@@ -17,6 +17,7 @@ namespace FrameZone_WebApi.Socials.DTOs
         public string LinkTitle { get; set; }
         public string LinkDescription { get; set; }
         public DateTime CreatedAt { get; set; }
+        public bool IsOwner { get; set; }
     }
 
     public class SendMessageDto

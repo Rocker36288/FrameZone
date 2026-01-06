@@ -29,7 +29,7 @@
   position: fixed;
   bottom: 20px;
   right: 100px;
-  width: 320px;
+  width: 360px;
   height: 420px;
   background: #fff;
   border-radius: 14px;
@@ -90,6 +90,7 @@
 
 .message-row.own {
   flex-direction: row-reverse;
+  justify-content: flex-end;
 }
 
 .message-row .avatar {
@@ -102,7 +103,7 @@
 }
 
 .bubble {
-  max-width: 75%;
+  max-width: 80%;
   background: #f2f4f7;
   border-radius: 14px;
   padding: 8px 12px;
@@ -112,6 +113,7 @@
 .message-row.own .bubble {
   background: linear-gradient(135deg, #738fee 0%, #806afc 100%);
   color: #fff;
+  margin-left: auto;
 }
 
 .meta {

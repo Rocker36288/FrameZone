@@ -12,38 +12,44 @@
 
   <div class="chat-body">
     @if (loading) {
-      <div>載入聊天室中...</div>
+    <div>載入聊天室中...</div>
     }
     @else if (error) {
-      <div class="text-danger">{{ error }}</div>
+    <div class="text-danger">{{ error }}</div>
     }
     @else if (room) {
-      <div class="message-list">
-        @if (messages.length === 0) {
-          <div class="text-muted">還沒有訊息</div>
+    <div class="message-list">
+      @if (messages.length === 0) {
+      <div class="text-muted">還沒有訊息</div>
+      }
+      @else {
+      @for (message of messages; track message.id ?? $index) {
+      <div class="message-row" [class.own]="message.isOwn">
+        @if (!message.isOwn) {
+        <img class="avatar" [src]="message.avatar" [alt]="message.displayName" />
         }
         @else {
-          @for (message of messages; track message.id ?? $index) {
-            <div class="message-row" [class.own]="message.isOwn">
-              <img class="avatar" [src]="message.avatar" [alt]="message.displayName" />
-              <div class="bubble">
-                <div class="meta">
-                  <span class="name">{{ message.displayName }}</span>
-                  <span class="time">{{ message.time }}</span>
-                </div>
-                <div class="text">{{ message.content }}</div>
-              </div>
-            </div>
-          }
+        <div class="avatar-spacer"></div>
         }
+        <div class="bubble">
+          <div class="meta">
+            <span class="name">{{ message.displayName }}</span>
+            <span class="time">{{ message.time }}</span>
+          </div>
+          <div class="text">{{ message.content }}</div>
+        </div>
       </div>
+      }
+      }
+    </div>
     }
   </div>
 
   @if (room) {
-    <div class="chat-typing">
-      <input #messageInput type="text" placeholder="輸入訊息..." (keyup.enter)="sendMessage(messageInput.value); messageInput.value='';" />
-      <button class="send-btn" (click)="sendMessage(messageInput.value); messageInput.value='';">送</button>
-    </div>
+  <div class="chat-typing">
+    <input #messageInput type="text" placeholder="輸入訊息..."
+      (keyup.enter)="sendMessage(messageInput.value); messageInput.value='';" />
+    <button class="send-btn" (click)="sendMessage(messageInput.value); messageInput.value='';">></button>
+  </div>
   }
 </div>

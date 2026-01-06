@@ -27,29 +27,29 @@ namespace FrameZone_WebApi.Socials.Services
         }
 
         /// <summary>
-        /// 取得聊天室訊息（轉成 DTO）
+        /// 取得聊天室訊息並轉 DTO，包含 IsOwner 判斷
         /// </summary>
-        public List<MessageDto> GetMessages(int roomId)
+        public List<MessageDto> GetMessages(int roomId, long? currentUserId)
         {
             return _messageRepo.GetRoomMessages(roomId)
-                .Select(ToDto)
+                .Select(m => ToDto(m, currentUserId))
                 .ToList();
         }
 
         /// <summary>
-        /// 發送文字訊息
+        /// 送文字訊息
         /// </summary>
-        public MessageDto SendTextMessage(int roomId, long senderUserId, string content)
+        public MessageDto SendTextMessage(int roomId, long senderUserId, string content, long? currentUserId = null)
         {
             var msg = _messageRepo.AddTextMessage(roomId, senderUserId, content);
 
-            return ToDto(msg);
+            return ToDto(msg, currentUserId ?? senderUserId);
         }
 
         /// <summary>
-        /// 發送商城/多媒體訊息（商品、訂單、連結、貼圖、圖片、影片）
+        /// 送多媒體/商品/訂單/貼圖/連結/影片訊息
         /// </summary>
-        public MessageDto SendShopMessage(int roomId, long senderUserId, SendShopMessageDto dto)
+        public MessageDto SendShopMessage(int roomId, long senderUserId, SendShopMessageDto dto, long? currentUserId = null)
         {
             var messageType = dto.MessageType?.Trim().ToLowerInvariant();
             if (string.IsNullOrWhiteSpace(messageType))
@@ -77,10 +77,10 @@ namespace FrameZone_WebApi.Socials.Services
             };
 
             var saved = _messageRepo.AddMessage(message);
-            return ToDto(saved);
+            return ToDto(saved, currentUserId ?? senderUserId);
         }
 
-        private static MessageDto ToDto(Message m)
+        private static MessageDto ToDto(Message m, long? currentUserId)
         {
             return new MessageDto
             {
@@ -95,7 +95,8 @@ namespace FrameZone_WebApi.Socials.Services
                 OrderId = m.OrderId,
                 LinkTitle = m.LinkTitle,
                 LinkDescription = m.LinkDescription,
-                CreatedAt = m.CreatedAt
+                CreatedAt = m.CreatedAt,
+                IsOwner = currentUserId.HasValue && m.SenderUserId == currentUserId.Value
             };
         }
 
@@ -122,13 +123,11 @@ namespace FrameZone_WebApi.Socials.Services
                     break;
                 case "link":
                     if (string.IsNullOrWhiteSpace(dto.LinkTitle) && string.IsNullOrWhiteSpace(dto.MessageContent))
-                        throw new ArgumentException("連結訊息至少需要標題或內容", nameof(dto.LinkTitle));
+                        throw new ArgumentException("連結訊息需要標題或內容", nameof(dto.LinkTitle));
                     break;
                 default:
-                    // text 無額外欄位
                     break;
             }
         }
     }
-
 }

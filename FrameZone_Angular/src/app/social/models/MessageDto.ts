@@ -11,6 +11,7 @@ export interface MessageDto {
   linkTitle?: string;
   linkDescription?: string;
   createdAt: string;
+  isOwner?: boolean;
 }
 
 export interface SendShopMessageDto {

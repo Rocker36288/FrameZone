@@ -264,6 +264,7 @@ builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<CommentService>();
 builder.Services.AddScoped<ChatRoomService>();
 builder.Services.AddScoped<MessageService>();
+builder.Services.AddSingleton<SocialChatConnectionManager>();
 
 // ========== 影片服務 (DI注入) ==========
 builder.Services.AddMemoryCache();
