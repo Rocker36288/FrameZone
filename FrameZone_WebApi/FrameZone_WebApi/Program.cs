@@ -132,40 +132,22 @@ builder.Services.Configure<ECPaySettings>(
 );
 
 
-//========== CORS 設定 ==========(重複的)
-
-//builder.Services.Configure<EmailSettings>(
-//    builder.Configuration.GetSection("EmailSettings")
-//);
-
-//builder.Services.Configure<VerificationSettings>(
-//    builder.Configuration.GetSection("VerificationSettings")
-//);
-
 
 // ========== CORS 設定 ==========
 
 var policyName = "Angular";
 builder.Services.AddCors(options =>
 {
-    /*
+    
     options.AddPolicy(policyName, policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins("https://localhost:4200", "http://localhost:4200")
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials();
 
     });
-    */
-
-    //上面只允許開放localhost:4200會擋綠界，所以先開放全域
-    options.AddPolicy(policyName, policy =>
-    {
-        policy.AllowAnyOrigin()
-        .AllowAnyMethod()
-        .AllowAnyHeader();
-    });
+        
 
 });
 

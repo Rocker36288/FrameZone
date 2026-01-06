@@ -11,14 +11,14 @@ import {
   CreateBookingDto,
   PhotographerSearchDto
 } from '../models/photographer-booking.models';
-import { environment } from '../../../environments/environment';
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class PhotographerBookingService {
-  private apiUrl = `${environment.apiUrl}/api/Photographer`; // Adjust base URL as needed
-  private bookingUrl = `${environment.apiUrl}/api/Booking`;
+  private apiUrl = `https://localhost:7213/api/Photographer`; // Adjust base URL as needed
+  private bookingUrl = `https://localhost:7213/api/Booking`;
 
   // Filters state
   private filtersSubject = new BehaviorSubject<SearchFilters>({
