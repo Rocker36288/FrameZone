@@ -21,7 +21,7 @@ namespace FrameZone_WebApi.Services
     /// 照片服務實作
     /// 負責處理照片上傳、EXIF 解析、自動分類、標籤生成等業務邏輯
     /// </summary>
-    public class PhotoService : IPhotoService
+    public partial class PhotoService : IPhotoService
     {
         #region 依賴注入
 
@@ -31,6 +31,7 @@ namespace FrameZone_WebApi.Services
         private readonly IMemoryCache _cache;
         private readonly ILogger<PhotoService> _logger;
         private readonly IBackgroundGeocodingService _backgroundGeocodingService;
+        private readonly IBackgroundAIAnalysisService _backgroundAIAnalysisService;
         private readonly IBlobStorageService _blobStorageService;
 
 
@@ -41,7 +42,11 @@ namespace FrameZone_WebApi.Services
             IMemoryCache cache,
             ILogger<PhotoService> logger,
             IBackgroundGeocodingService backgroundGeocodingService,
-            IBlobStorageService blobStorageService)
+            IBackgroundAIAnalysisService backgroundAIAnalysisService,
+            IBlobStorageService blobStorageService,
+            IAzureComputerVisionService azureVisionService,
+            IGooglePlacesService googlePlacesService,
+            IClaudeApiService claudeApiService)
         {
             _exifService = exifService;
             _geocodingService = geocodingService;
@@ -49,8 +54,14 @@ namespace FrameZone_WebApi.Services
             _cache = cache;
             _logger = logger;
             _backgroundGeocodingService = backgroundGeocodingService;
+            _backgroundAIAnalysisService = backgroundAIAnalysisService;
             _blobStorageService = blobStorageService;
+
+            _azureVisionService = azureVisionService;
+            _googlePlacesService = googlePlacesService;
+            _claudeApiService = claudeApiService;
         }
+
 
         #endregion
 
@@ -187,7 +198,7 @@ namespace FrameZone_WebApi.Services
                     try
                     {
                         thumbnailData = await GenerateThumbnailAsync(
-                            fileBytes, 
+                            fileBytes,
                             PhotoConstants.THUMBNAIL_WIDTH,
                             PhotoConstants.THUMBNAIL_HEIGHT
                         );
@@ -403,6 +414,22 @@ namespace FrameZone_WebApi.Services
                         }
                     });
                 }
+
+
+                // 觸發背景 AI 分析（避免在請求完成後使用已釋放的 DbContext）
+                _logger.LogInformation("🤖 觸發背景 AI 分析任務，PhotoId: {PhotoId}, UserId: {UserId}", uploadedPhoto.PhotoId, userId);
+
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _backgroundAIAnalysisService.ProcessAIAnalysisAsync(uploadedPhoto.PhotoId, userId);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "背景 AI 分析任務執行失敗，PhotoId: {PhotoId}", uploadedPhoto.PhotoId);
+                    }
+                });
 
                 // 返回結果
                 return new PhotoUploadResponseDTO
@@ -1050,7 +1077,7 @@ namespace FrameZone_WebApi.Services
 
                 // 儲存為 JPEG
                 using var outputStream = new MemoryStream();
-                var encoder = new JpegEncoder { Quality = 85 };
+                var encoder = new JpegEncoder { Quality = 95 };
                 await image.SaveAsync(outputStream, encoder);
 
                 _logger.LogInformation("✅ 預設縮圖生成成功");
@@ -1974,7 +2001,7 @@ namespace FrameZone_WebApi.Services
             }
 
             // 驗證排序欄位
-            var validSortBy = new[] {  "DateTaken", "UploadedAt", "FileName", "FileSize" };
+            var validSortBy = new[] { "DateTaken", "UploadedAt", "FileName", "FileSize" };
             if (!validSortBy.Contains(request.SortBy, StringComparer.OrdinalIgnoreCase))
             {
                 return $"無效的排序欄位，允許的值: {string.Join(", ", validSortBy)}";

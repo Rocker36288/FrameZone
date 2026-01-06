@@ -3,7 +3,7 @@ using FrameZone_WebApi.Models;
 
 namespace FrameZone_WebApi.Repositories
 {
-    public interface IPhotoRepository
+    public partial interface IPhotoRepository
     {
         #region Photo 表操作
 

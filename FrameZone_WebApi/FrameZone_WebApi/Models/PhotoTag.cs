@@ -31,5 +31,7 @@ public partial class PhotoTag
 
     public virtual PhotoTag ParentTag { get; set; }
 
+    public virtual ICollection<PhotoAiclassificationSuggestion> PhotoAiclassificationSuggestions { get; set; } = new List<PhotoAiclassificationSuggestion>();
+
     public virtual ICollection<PhotoPhotoTag> PhotoPhotoTags { get; set; } = new List<PhotoPhotoTag>();
 }

@@ -29,8 +29,6 @@ namespace FrameZone_WebApi.DTOs
         /// - 否則自動放入「用戶自定義」分類
         /// </summary>
         public int? CategoryId { get; set; }
-
-        
     }
 
     /// <summary>

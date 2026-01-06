@@ -6,7 +6,7 @@ namespace FrameZone_WebApi.Services
     /// <summary>
     /// 照片服務介面
     /// </summary>
-    public interface IPhotoService
+    public partial interface IPhotoService
     {
         /// <summary>
         /// 上傳單張照片

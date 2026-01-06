@@ -115,6 +115,24 @@ export class PhotoSidebarComponent implements OnInit {
   }
 
   /**
+   * 🆕 根據分類名稱展開分類（用於 AI 標籤自動展開）
+   */
+  expandCategoryByName(categoryName: string): void {
+    const categories = this.tagHierarchy();
+    const category = categories.find(c => c.categoryName === categoryName);
+
+    if (category) {
+      if (!category.isExpanded) {
+        category.isExpanded = true;
+        this.tagHierarchy.set([...categories]); // 觸發更新
+        console.log(`✅ 已展開分類: ${categoryName}`);
+      }
+    } else {
+      console.warn(`⚠️ 找不到分類: ${categoryName}`);
+    }
+  }
+
+  /**
    * 切換標籤的展開狀態（遞迴查找）
    */
   toggleTag(tagId: number): void {

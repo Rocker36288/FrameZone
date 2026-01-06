@@ -54,24 +54,24 @@
         /// 縮圖寬度 (像素)
         /// 前端卡片顯示建議使用相同尺寸
         /// </summary>
-        public const int THUMBNAIL_WIDTH = 600;
+        public const int THUMBNAIL_WIDTH = 1024;
 
         /// <summary>
         /// 縮圖高度 (像素)
         /// </summary>
-        public const int THUMBNAIL_HEIGHT = 450;
+        public const int THUMBNAIL_HEIGHT = 1024;
 
         /// <summary>
         /// 縮圖 JPEG 品質 (0-100)
         /// 建議值: 85-95
         /// </summary>
-        public const int THUMBNAIL_JPEG_QUALITY = 92;
+        public const int THUMBNAIL_JPEG_QUALITY = 100;
 
         /// <summary>
         /// 縮圖銳化強度 (0.0-3.0)
         /// 建議值: 0.5-1.5
         /// </summary>
-        public const float THUMBNAIL_SHARPEN_STRENGTH = 1.0f;
+        public const float THUMBNAIL_SHARPEN_STRENGTH = 1.5f;
 
         /// <summary>
         /// 預覽圖寬度 (中等尺寸，用於燈箱預覽)
@@ -86,7 +86,7 @@
         /// <summary>
         /// 預覽圖 JPEG 品質
         /// </summary>
-        public const int PREVIEW_JPEG_QUALITY = 90;
+        public const int PREVIEW_JPEG_QUALITY = 100;
 
         #endregion
 

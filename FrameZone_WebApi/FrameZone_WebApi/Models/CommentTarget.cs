@@ -11,11 +11,13 @@ public partial class CommentTarget
 
     public int TargetTypeId { get; set; }
 
-    public int? CommentId { get; set; }
+    public int? PostId { get; set; }
 
     public int? VideoId { get; set; }
 
-    public virtual Comment Comment { get; set; }
+    public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
+
+    public virtual Post Post { get; set; }
 
     public virtual TargetType TargetType { get; set; }
 

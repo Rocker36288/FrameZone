@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FrameZone_WebApi.Repositories
 {
-    public class PhotoRepository : IPhotoRepository
+    public partial class PhotoRepository : IPhotoRepository
     {
         #region 依賴注入
 

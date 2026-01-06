@@ -30,7 +30,7 @@ namespace FrameZone_WebApi.Services
             _cache = cache;
 
             // 從 appsettings.json 讀取 Google API Key
-            _googleApiKey = _configuration["GoogleMaps"];
+            _googleApiKey = _configuration["GoogleMaps:ApiKey"];
 
             if (string.IsNullOrEmpty(_googleApiKey))
             {

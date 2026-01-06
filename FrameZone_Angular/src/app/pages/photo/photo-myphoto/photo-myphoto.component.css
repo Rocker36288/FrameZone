@@ -2,7 +2,8 @@
 
 .photo-page-layout {
   display: flex;
-  min-height: calc(100vh - 56px); /* 扣除 navbar 高度 */
+  min-height: calc(100vh - 56px);
+  /* 扣除 navbar 高度 */
   position: relative;
 }
 
@@ -309,6 +310,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -327,12 +329,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent);
   animation: shimmer 2s infinite;
   display: none;
 }
@@ -345,6 +345,7 @@
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }
@@ -361,7 +362,8 @@
     position: fixed;
     inset: 0;
     background: rgba(15, 23, 42, 0.35);
-    z-index: 1030; /* navbar 1000，遮罩不蓋 navbar */
+    z-index: 1030;
+    /* navbar 1000，遮罩不蓋 navbar */
     inset: var(--navbar-height) 0 0 0;
   }
 }
@@ -371,6 +373,7 @@
 .photo-actions {
   display: none;
 }
+
 .edit-mode .photo-checkbox,
 .edit-mode .photo-actions {
   display: block;
@@ -400,7 +403,7 @@
   border-radius: 1rem;
   overflow: hidden;
   z-index: 2001;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
 }
@@ -420,7 +423,10 @@
   font-weight: 700;
   min-width: 0;
 }
-.photo-detail-header .title i { font-size: 1.25rem; }
+
+.photo-detail-header .title i {
+  font-size: 1.25rem;
+}
 
 .photo-detail-body {
   padding: 1rem;
@@ -436,6 +442,7 @@
   overflow: hidden;
   aspect-ratio: 4/3;
 }
+
 .detail-image img {
   width: 100%;
   height: 100%;
@@ -454,10 +461,12 @@
   gap: 0.75rem;
   align-items: start;
 }
+
 .info-row .label {
   color: var(--tblr-secondary);
   font-size: 0.85rem;
 }
+
 .info-row .value {
   font-weight: 500;
   min-width: 0;
@@ -477,26 +486,417 @@
   }
 }
 
-.photo-page-shell{
-  padding-top: 8px; /* myphoto 額外再離 navbar 遠一點（可調 0~16px） */
+.photo-page-shell {
+  padding-top: 8px;
+  /* myphoto 額外再離 navbar 遠一點（可調 0~16px） */
 }
 
-.photo-page-layout{
+.photo-page-layout {
   display: flex;
   min-height: calc(100vh - var(--navbar-height, 56px));
   position: relative;
 }
 
-.photo-main-content{
+.photo-main-content {
   flex: 1;
   overflow-x: hidden;
   background-color: var(--tblr-bg-surface-tertiary);
-  padding-left: 1.5rem; /* sidebar 與內容間距，避免貼太近 */
+  padding-left: 1.5rem;
+  /* sidebar 與內容間距，避免貼太近 */
 }
 
 /* 平板以下：sidebar 會抽屜式，內容不需要左 padding */
-@media (max-width: 991px){
-  .photo-main-content{ padding-left: 0; }
+@media (max-width: 991px) {
+  .photo-main-content {
+    padding-left: 0;
+  }
 }
 
 
+/* ==================== 🆕 AI 功能樣式 - 添加到檔案最後 ==================== */
+
+/* AI 狀態徽章 */
+.ai-status-badge {
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 2;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* AI 按鈕樣式 */
+.photo-actions .btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* ==================== AI 建議面板 ==================== */
+
+.ai-suggestions-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 2100;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+.panel-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(2px);
+  pointer-events: auto;
+}
+
+.panel-content {
+  position: relative;
+  width: min(500px, 100vw);
+  height: 100vh;
+  background: white;
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  animation: slideInRight 0.3s ease;
+  pointer-events: auto;
+  z-index: 1;
+  isolation: isolate;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.panel-header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--tblr-border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--tblr-bg-surface);
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.panel-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.panel-footer {
+  padding: 1rem;
+  border-top: 1px solid var(--tblr-border-color);
+  background: var(--tblr-bg-surface);
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+/* 建議列表 */
+.suggestion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.suggestion-item {
+  padding: 0.75rem;
+  border: 1px solid var(--tblr-border-color);
+  border-radius: var(--tblr-border-radius);
+  transition: all 0.2s ease;
+  background: white;
+  position: relative;
+  z-index: 1;
+}
+
+.suggestion-item:hover {
+  background-color: var(--tblr-bg-surface-secondary);
+  border-color: var(--tblr-primary);
+  transform: translateX(-2px);
+}
+
+.suggestion-item.selected {
+  background-color: rgba(var(--tblr-primary-rgb), 0.05);
+  border-color: var(--tblr-primary);
+}
+
+.suggestion-item .form-check {
+  display: flex;
+  align-items: start;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.suggestion-item .form-check-input {
+  margin-top: 0.25rem;
+  flex-shrink: 0;
+}
+
+.suggestion-item .form-check-label {
+  flex: 1;
+  cursor: pointer;
+}
+
+/* 信心分數範圍選擇器 */
+.form-range {
+  cursor: pointer;
+}
+
+.form-range::-webkit-slider-thumb {
+  background: var(--tblr-primary);
+}
+
+.form-range::-moz-range-thumb {
+  background: var(--tblr-primary);
+}
+
+/* 進度條樣式 */
+.progress {
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* 載入動畫 */
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.15em;
+}
+
+/* 平滑滾動 */
+.panel-body {
+  scroll-behavior: smooth;
+}
+
+/* 自訂滾動條（僅限 WebKit 瀏覽器） */
+.panel-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.panel-body::-webkit-scrollbar-track {
+  background: var(--tblr-bg-surface-secondary);
+}
+
+.panel-body::-webkit-scrollbar-thumb {
+  background: var(--tblr-border-color);
+  border-radius: 4px;
+}
+
+.panel-body::-webkit-scrollbar-thumb:hover {
+  background: var(--tblr-secondary);
+}
+
+/* ==================== 深色模式 ==================== */
+
+@media (prefers-color-scheme: dark) {
+  .panel-content {
+    background: var(--tblr-bg-surface-dark);
+  }
+
+  .panel-header {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: var(--tblr-border-color-dark);
+  }
+
+  .panel-footer {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: var(--tblr-border-color-dark);
+  }
+
+  .suggestion-item {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: var(--tblr-border-color-dark);
+  }
+
+  .suggestion-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .suggestion-item.selected {
+    background-color: rgba(var(--tblr-primary-rgb), 0.15);
+  }
+
+  .panel-backdrop {
+    background: rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* ==================== 響應式設計 ==================== */
+
+/* 手機版 */
+@media (max-width: 575px) {
+  .panel-content {
+    width: 100vw;
+  }
+
+  .suggestion-item {
+    padding: 0.5rem;
+  }
+
+  .panel-header h3 {
+    font-size: 1.125rem;
+  }
+
+  /* 手機版的 AI 按鈕樣式調整 */
+  .photo-actions .btn-sm {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* 平板版 */
+@media (min-width: 576px) and (max-width: 991px) {
+  .panel-content {
+    width: min(400px, 100vw);
+  }
+}
+
+/* 桌面版 */
+@media (min-width: 992px) {
+  .panel-content {
+    width: 500px;
+  }
+}
+
+/* ==================== 額外的視覺效果 ==================== */
+
+/* AI 分析中的按鈕樣式 */
+.btn[disabled] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* AI 徽章動畫 */
+.ai-status-badge {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 建議項目的 hover 效果 */
+.suggestion-item {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.suggestion-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 信心分數進度條動畫 */
+.progress-bar {
+  transition: width 0.3s ease;
+}
+
+/* 面板關閉動畫 */
+.ai-suggestions-panel.closing .panel-content {
+  animation: slideOutRight 0.3s ease;
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* ==================== 可訪問性改進 ==================== */
+
+/* 焦點樣式 */
+.panel-content:focus,
+.suggestion-item:focus-within {
+  outline: 2px solid var(--tblr-primary);
+  outline-offset: 2px;
+}
+
+/* 鍵盤導航支援 */
+.suggestion-item .form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(var(--tblr-primary-rgb), 0.25);
+}
+
+/* 高對比模式支援 */
+@media (prefers-contrast: high) {
+  .suggestion-item {
+    border-width: 2px;
+  }
+
+  .ai-status-badge {
+    border: 1px solid currentColor;
+  }
+}
+
+/* ==================== 列表視圖的 AI 狀態列樣式 ==================== */
+
+/* 確保列表視圖中的 AI 按鈕不會太大 */
+.table .btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+/* 列表視圖中的 AI 狀態列 */
+.table td {
+  vertical-align: middle;
+}
+
+/* ==================== 照片詳情 Modal 中的 AI 資訊 ==================== */
+
+.photo-detail-modal .info-row {
+  display: flex;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--tblr-border-color-translucent);
+}
+
+.photo-detail-modal .info-row:last-child {
+  border-bottom: none;
+}
+
+.photo-detail-modal .info-row .label {
+  width: 100px;
+  flex-shrink: 0;
+  font-weight: 600;
+  color: var(--tblr-secondary);
+}
+
+.photo-detail-modal .info-row .value {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ==================== 結束 ==================== */

@@ -1,4 +1,5 @@
 ﻿using FrameZone_WebApi.DTOs;
+using FrameZone_WebApi.DTOs.AI;
 using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Repositories;
 using FrameZone_WebApi.Services;
@@ -979,6 +980,258 @@ namespace FrameZone_WebApi.Controllers
                     message = "移除標籤失敗",
                     error = ex.Message
                 });
+            }
+        }
+
+        #endregion
+
+        #region AI 功能
+
+        // ==================== AI 照片分析 ====================
+
+        /// <summary>
+        /// 分析單張照片
+        /// </summary>
+        /// <param name="request">分析請求參數</param>
+        /// <returns>完整的 AI 分析結果</returns>
+        /// <remarks>
+        /// 執行照片的完整 AI 分析，包含三個階段：
+        /// 1. Azure Vision 物件識別和場景分析
+        /// 2. Google Places 景點識別（如果有 GPS）
+        /// 3. Claude 語義整合和標籤建議
+        /// </remarks>
+        [HttpPost("ai/analyze")]
+        public async Task<IActionResult> AnalyzePhoto([FromBody] PhotoAIAnalysisRequestDto request)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                request.UserId = userId;
+
+                _logger.LogInformation("📸 收到照片 AI 分析請求 PhotoId={PhotoId}, UserId={UserId}",
+                    request.PhotoId, userId);
+
+                var result = await _photoService.AnalyzePhotoWithAIAsync(request);
+
+                if (result.Status == "Success")
+                {
+                    return Ok(result);
+                }
+                else if (result.ErrorMessage?.Contains("不存在") == true)
+                {
+                    return NotFound(result);
+                }
+                else if (result.ErrorMessage?.Contains("無權限") == true)
+                {
+                    return StatusCode(403, result);
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "💥 照片 AI 分析發生錯誤 PhotoId={PhotoId}", request.PhotoId);
+                return StatusCode(500, new { success = false, message = "系統錯誤", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// 批次分析多張照片
+        /// </summary>
+        /// <param name="request">批次分析請求</param>
+        /// <returns>批次分析結果</returns>
+        /// <remarks>
+        /// 一次分析多張照片，支援兩種模式：
+        /// - 同步模式：等待所有照片分析完成後返回（適合少量照片，1-10 張）
+        /// - 非同步模式：立即返回任務 ID，背景執行（適合大量照片，>10 張）
+        /// </remarks>
+        [HttpPost("ai/batch-analyze")]
+        public async Task<IActionResult> BatchAnalyzePhotos([FromBody] BatchPhotoAIAnalysisRequestDto request)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                request.UserId = userId;
+
+                _logger.LogInformation("📦 收到批次 AI 分析請求 PhotoCount={Count}, UserId={UserId}",
+                    request.PhotoIds.Count, userId);
+
+                var result = await _photoService.BatchAnalyzePhotosAsync(request);
+
+                if (result.Errors.Any())
+                {
+                    return BadRequest(result);
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "💥 批次 AI 分析發生錯誤");
+                return StatusCode(500, new { success = false, message = "系統錯誤", error = ex.Message });
+            }
+        }
+
+        // ==================== 查詢 AI 分析結果 ====================
+
+        /// <summary>
+        /// 取得照片的 AI 分析狀態（輕量級查詢）
+        /// </summary>
+        /// <param name="photoId">照片 ID</param>
+        /// <returns>分析狀態摘要</returns>
+        /// <remarks>
+        /// 快速查詢照片是否已分析過，以及 AI 建議的摘要資訊。
+        /// 這是一個輕量級的查詢，不會返回完整的分析結果。
+        /// </remarks>
+        [HttpGet("{photoId}/ai/status")]
+        public async Task<IActionResult> GetPhotoAIStatus(long photoId)
+        {
+            try
+            {
+                _logger.LogInformation("🔍 查詢照片 AI 狀態 PhotoId={PhotoId}", photoId);
+
+                var result = await _photoService.GetPhotoAIStatusAsync(photoId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "💥 查詢 AI 狀態失敗 PhotoId={PhotoId}", photoId);
+                return StatusCode(500, new { success = false, message = "系統錯誤", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// 取得照片的完整 AI 分析結果
+        /// </summary>
+        /// <param name="photoId">照片 ID</param>
+        /// <returns>完整的分析結果</returns>
+        /// <remarks>
+        /// 返回照片的完整 AI 分析結果，包含：
+        /// - Azure Vision 分析摘要
+        /// - Google Places 景點資訊
+        /// - Claude 語義分析結果
+        /// - 所有 AI 標籤建議（包含已採用和待處理）
+        /// </remarks>
+        [HttpGet("{photoId}/ai/analysis")]
+        public async Task<IActionResult> GetPhotoAIAnalysis(long photoId)
+        {
+            try
+            {
+                _logger.LogInformation("🔍 查詢照片完整 AI 分析 PhotoId={PhotoId}", photoId);
+
+                var result = await _photoService.GetPhotoAIAnalysisAsync(photoId);
+
+                if (result == null)
+                {
+                    return NotFound(new { success = false, message = "照片沒有 AI 分析記錄" });
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "💥 查詢 AI 分析失敗 PhotoId={PhotoId}", photoId);
+                return StatusCode(500, new { success = false, message = "系統錯誤", error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// 取得照片的待處理 AI 建議
+        /// </summary>
+        /// <param name="photoId">照片 ID</param>
+        /// <param name="minConfidence">最低信心分數過濾（可選）</param>
+        /// <returns>待處理的標籤建議列表</returns>
+        /// <remarks>
+        /// 返回照片的所有待處理 AI 建議（尚未被使用者採用的標籤）。
+        /// 可以使用 minConfidence 參數過濾低信心分數的建議。
+        /// </remarks>
+        [HttpGet("{photoId}/ai/suggestions")]
+        public async Task<IActionResult> GetPendingAISuggestions(
+            long photoId,
+            [FromQuery] double? minConfidence = null)
+        {
+            try
+            {
+                _logger.LogInformation("💡 查詢待處理 AI 建議 PhotoId={PhotoId}, MinConfidence={MinConfidence}",
+                    photoId, minConfidence);
+
+                var result = await _photoService.GetPendingAISuggestionsAsync(photoId, minConfidence);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "💥 查詢待處理建議失敗 PhotoId={PhotoId}", photoId);
+                return StatusCode(500, new { success = false, message = "系統錯誤", error = ex.Message });
+            }
+        }
+
+        // ==================== 套用 AI 建議 ====================
+
+        /// <summary>
+        /// 套用 AI 標籤建議到照片
+        /// </summary>
+        /// <param name="photoId">照片 ID</param>
+        /// <param name="request">套用請求（包含要套用的建議 ID）</param>
+        /// <returns>套用結果</returns>
+        /// <remarks>
+        /// 將 AI 建議的標籤實際套用到照片上。使用者可以選擇：
+        /// - 套用所有建議（不指定 suggestionIds）
+        /// - 套用特定建議（指定 suggestionIds）
+        /// - 按信心分數過濾（設定 minConfidence）
+        /// </remarks>
+        [HttpPost("{photoId}/ai/apply-tags")]
+        public async Task<IActionResult> ApplyAITags(
+            long photoId,
+            [FromBody] ApplyAITagsRequestDto request)
+        {
+            try
+            {
+                request.PhotoId = photoId;
+
+                _logger.LogInformation("✏️ 套用 AI 標籤 PhotoId={PhotoId}, SuggestionCount={Count}",
+                    photoId, request.SuggestionIds.Count);
+
+                var result = await _photoService.ApplyAITagsAsync(request);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "💥 套用 AI 標籤失敗 PhotoId={PhotoId}", photoId);
+                return StatusCode(500, new { success = false, message = "系統錯誤", error = ex.Message });
+            }
+        }
+
+        // ==================== AI 使用統計 ====================
+
+        /// <summary>
+        /// 取得使用者的 AI 使用統計
+        /// </summary>
+        /// <returns>AI 使用統計資訊</returns>
+        /// <remarks>
+        /// 返回目前登入使用者的 AI 功能使用統計，包含：
+        /// - 總分析次數
+        /// - 成功/失敗次數
+        /// - 使用的配額
+        /// - 平均處理時間
+        /// </remarks>
+        [HttpGet("ai/stats")]
+        public async Task<IActionResult> GetUserAIStats()
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+
+                _logger.LogInformation("📊 查詢使用者 AI 統計 UserId={UserId}", userId);
+
+                var result = await _photoService.GetUserAIStatsAsync(userId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "💥 查詢使用者 AI 統計失敗");
+                return StatusCode(500, new { success = false, message = "系統錯誤", error = ex.Message });
             }
         }
 

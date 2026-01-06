@@ -49,7 +49,11 @@ public partial class Video
 
     public virtual ICollection<CommentVideo> CommentVideos { get; set; } = new List<CommentVideo>();
 
+    public virtual ICollection<Like> Likes { get; set; } = new List<Like>();
+
     public virtual ICollection<PostVideo> PostVideos { get; set; } = new List<PostVideo>();
 
     public virtual ICollection<ReportTarget2> ReportTarget2s { get; set; } = new List<ReportTarget2>();
+
+    public virtual ICollection<View> Views { get; set; } = new List<View>();
 }

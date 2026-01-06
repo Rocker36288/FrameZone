@@ -27,7 +27,7 @@ public partial class Comment
 
     public virtual ICollection<CommentLike> CommentLikes { get; set; } = new List<CommentLike>();
 
-    public virtual ICollection<CommentTarget> CommentTargets { get; set; } = new List<CommentTarget>();
+    public virtual CommentTarget CommentTarget { get; set; }
 
     public virtual ICollection<CommentVideo> CommentVideos { get; set; } = new List<CommentVideo>();
 

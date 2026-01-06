@@ -807,6 +807,11 @@ public partial class AAContext : DbContext
             entity.Property(e => e.DeletedAt).HasColumnType("datetime");
             entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
 
+            entity.HasOne(d => d.CommentTarget).WithMany(p => p.Comments)
+                .HasForeignKey(d => d.CommentTargetId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Comments_CommentTarget");
+
             entity.HasOne(d => d.ParentComment).WithMany(p => p.InverseParentComment)
                 .HasForeignKey(d => d.ParentCommentId)
                 .HasConstraintName("FK_Comments_Comments");
@@ -867,9 +872,9 @@ public partial class AAContext : DbContext
 
             entity.ToTable("CommentTarget", "Share");
 
-            entity.HasOne(d => d.Comment).WithMany(p => p.CommentTargets)
-                .HasForeignKey(d => d.CommentId)
-                .HasConstraintName("FK_CommentTarget_Comments");
+            entity.HasOne(d => d.Post).WithMany(p => p.CommentTargets)
+                .HasForeignKey(d => d.PostId)
+                .HasConstraintName("FK_CommentTarget_Posts");
 
             entity.HasOne(d => d.TargetType).WithMany(p => p.CommentTargets)
                 .HasForeignKey(d => d.TargetTypeId)
@@ -1041,20 +1046,20 @@ public partial class AAContext : DbContext
 
         modelBuilder.Entity<Following>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("Following", "Video");
+            entity.HasKey(e => new { e.UserId, e.ChannelId });
+
+            entity.ToTable("Following", "Video");
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
 
-            entity.HasOne(d => d.Channel).WithMany()
+            entity.HasOne(d => d.Channel).WithMany(p => p.Followings)
                 .HasForeignKey(d => d.ChannelId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Following_Channels");
 
-            entity.HasOne(d => d.User).WithMany()
+            entity.HasOne(d => d.User).WithMany(p => p.Followings)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Following_User");
@@ -1235,20 +1240,20 @@ public partial class AAContext : DbContext
 
         modelBuilder.Entity<Like>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("Likes", "Video");
+            entity.HasKey(e => new { e.UserId, e.VideoId });
+
+            entity.ToTable("Likes", "Video");
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
 
-            entity.HasOne(d => d.User).WithMany()
+            entity.HasOne(d => d.User).WithMany(p => p.Likes)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Likes_User");
 
-            entity.HasOne(d => d.Video).WithMany()
+            entity.HasOne(d => d.Video).WithMany(p => p.Likes)
                 .HasForeignKey(d => d.VideoId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Likes_Videos");
@@ -1649,6 +1654,7 @@ public partial class AAContext : DbContext
                 .IsRequired()
                 .HasMaxLength(50)
                 .HasColumnName("AIModel");
+            entity.Property(e => e.AnalyzedAt).HasColumnType("datetime");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoAIClassificationLog_CreatedAt")
@@ -1666,6 +1672,11 @@ public partial class AAContext : DbContext
                 .HasForeignKey(d => d.PhotoId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PhotoAIClassificationLog_Photo");
+
+            entity.HasOne(d => d.User).WithMany(p => p.PhotoAiclassificationLogs)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoAIClassificationLog_User");
         });
 
         modelBuilder.Entity<PhotoAiclassificationSuggestion>(entity =>
@@ -1674,12 +1685,19 @@ public partial class AAContext : DbContext
 
             entity.ToTable("PhotoAIClassificationSuggestion");
 
-            entity.Property(e => e.Confidence).HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.AdoptedAt).HasColumnType("datetime");
+            entity.Property(e => e.CategoryName).HasMaxLength(50);
+            entity.Property(e => e.CategoryType).HasMaxLength(20);
+            entity.Property(e => e.ConfidenceScore).HasColumnType("decimal(5, 2)");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoAIClassificationSuggestion_CreatedAt")
                 .HasColumnType("datetime");
             entity.Property(e => e.IsAdopted).HasAnnotation("Relational:DefaultConstraintName", "DF_PhotoAIClassificationSuggestion_IsAdopted");
+            entity.Property(e => e.Source)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.TagName).HasMaxLength(50);
 
             entity.HasOne(d => d.Category).WithMany(p => p.PhotoAiclassificationSuggestions)
                 .HasForeignKey(d => d.CategoryId)
@@ -1690,6 +1708,15 @@ public partial class AAContext : DbContext
                 .HasForeignKey(d => d.LogId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PhotoAIClassificationSuggestion_PhotoAIClassificationLog");
+
+            entity.HasOne(d => d.Photo).WithMany(p => p.PhotoAiclassificationSuggestions)
+                .HasForeignKey(d => d.PhotoId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_PhotoAIClassificationSuggestion_Photo");
+
+            entity.HasOne(d => d.Tag).WithMany(p => p.PhotoAiclassificationSuggestions)
+                .HasForeignKey(d => d.TagId)
+                .HasConstraintName("FK_PhotoAIClassificationSuggestion_PhotoTag");
         });
 
         modelBuilder.Entity<PhotoAlbum>(entity =>
@@ -4470,9 +4497,9 @@ public partial class AAContext : DbContext
 
         modelBuilder.Entity<View>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("View", "Video");
+            entity.HasKey(e => new { e.VideoId, e.UserId });
+
+            entity.ToTable("View", "Video");
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -4483,12 +4510,12 @@ public partial class AAContext : DbContext
                 .HasAnnotation("Relational:DefaultConstraintName", "DF__VideoView__Updat__446B1014")
                 .HasColumnType("datetime");
 
-            entity.HasOne(d => d.User).WithMany()
+            entity.HasOne(d => d.User).WithMany(p => p.Views)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_View_User");
 
-            entity.HasOne(d => d.Video).WithMany()
+            entity.HasOne(d => d.Video).WithMany(p => p.Views)
                 .HasForeignKey(d => d.VideoId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_VideoView_Videos");

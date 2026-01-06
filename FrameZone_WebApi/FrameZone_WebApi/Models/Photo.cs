@@ -37,6 +37,8 @@ public partial class Photo
 
     public virtual ICollection<PhotoAiclassificationLog> PhotoAiclassificationLogs { get; set; } = new List<PhotoAiclassificationLog>();
 
+    public virtual ICollection<PhotoAiclassificationSuggestion> PhotoAiclassificationSuggestions { get; set; } = new List<PhotoAiclassificationSuggestion>();
+
     public virtual ICollection<PhotoLocation> PhotoLocations { get; set; } = new List<PhotoLocation>();
 
     public virtual ICollection<PhotoMetadatum> PhotoMetadata { get; set; } = new List<PhotoMetadatum>();

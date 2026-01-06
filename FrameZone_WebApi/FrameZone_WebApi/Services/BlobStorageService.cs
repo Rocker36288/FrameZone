@@ -26,15 +26,22 @@ namespace FrameZone_WebApi.Services
             _configuration = configuration;
             _logger = logger;
 
-            var connectionString = _configuration["AzureStorageConnectionString"];
+            // 優先從 IOptions<AzureBlobStorageSettings> 讀取（appsettings.json: AzureBlobStorage:ConnectionString）
+            // 保留對舊 Key 的相容（AzureStorageConnectionString），避免其他環節尚未完全移除 Key Vault 時造成中斷
+            var connectionString = _settings.ConnectionString;
 
-            if (string.IsNullOrEmpty(connectionString))
+            if (string.IsNullOrWhiteSpace(connectionString))
             {
-                _logger.LogError("❌ Azure Blob Storage 設定驗證失敗: Azure Storage ConnectionString 未設定");
-                throw new InvalidOperationException("Azure Blob Storage 設定錯誤: Azure Storage ConnectionString 未設定");
+                connectionString = _configuration["AzureStorageConnectionString"];
             }
 
-            _logger.LogInformation("✅ Azure Storage ConnectionString 已從 Key Vault 載入，長度: {Length}", connectionString.Length);
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                _logger.LogError("❌ Azure Blob Storage 設定驗證失敗: ConnectionString 未設定（AzureBlobStorage:ConnectionString）");
+                throw new InvalidOperationException("Azure Blob Storage 設定錯誤: ConnectionString 未設定");
+            }
+
+            _logger.LogInformation("✅ Azure Storage ConnectionString 已從 appsettings 載入，長度: {Length}", connectionString.Length);
 
             // 初始化 BlobServiceClient
             _blobServiceClient = new BlobServiceClient(connectionString);

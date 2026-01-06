@@ -92,6 +92,18 @@
                   添加標籤 ({{ selectedCount() }})
                 </button>
 
+                <!-- 🆕 AI 批次分析按鈕 -->
+                <button class="btn btn-success btn-sm me-2" [disabled]="isAnalyzing()"
+                  (click)="batchAnalyzeSelectedPhotos()">
+                  <i class="ti ti-brain me-2"></i>
+                  @if (isAnalyzing()) {
+                  <span class="spinner-border spinner-border-sm me-1"></span>
+                  分析中...
+                  } @else {
+                  AI 分析 ({{ selectedCount() }})
+                  }
+                </button>
+
                 <!-- 原有：刪除選取按鈕 -->
                 <button class="btn btn-danger btn-sm" (click)="deleteSelectedPhotos()">
                   <i class="ti ti-trash me-2"></i>
@@ -140,6 +152,13 @@
           <div class="photo-card" [class.selected]="isEditMode() && selectedPhotos().has(photo.photoId)"
             (click)="onPhotoClick(photo)">
 
+            @if (aiAnalysisStatus().get(photo.photoId)?.hasAnalysis) {
+            <span class="badge bg-success position-absolute ai-status-badge">
+              <i class="ti ti-check me-1"></i>
+              已分析
+            </span>
+            }
+
             <!-- 編輯模式才顯示勾選 -->
             @if (isEditMode()) {
             <div class="photo-checkbox">
@@ -148,6 +167,23 @@
             </div>
 
             <div class="photo-actions">
+              <!-- 🆕 AI 操作按鈕 -->
+              @if (!aiAnalysisStatus().get(photo.photoId)?.hasAnalysis) {
+              <!-- 未分析：顯示分析按鈕 -->
+              <button class="btn btn-sm btn-primary me-1" [disabled]="isAnalyzing()"
+                (click)="analyzePhoto(photo.photoId, $event)" title="AI 分析">
+                <i class="ti ti-brain"></i>
+              </button>
+              } @else {
+              <!-- 已分析：顯示查看建議按鈕 -->
+              <button class="btn btn-sm btn-info me-1" (click)="viewAISuggestions(photo.photoId, $event)"
+                title="查看 AI 建議">
+                <i class="ti ti-tag me-1"></i>
+                {{ aiAnalysisStatus().get(photo.photoId)?.pendingCount || 0 }}
+              </button>
+              }
+
+              <!-- 刪除按鈕 -->
               <button class="btn btn-sm btn-ghost-danger" (click)="deletePhoto(photo.photoId, $event)" title="刪除">
                 <i class="ti ti-trash"></i>
               </button>
@@ -195,6 +231,7 @@
                   <th>檔案名稱</th>
                   <th>拍攝時間</th>
                   <th>標籤</th>
+                  <th>AI 狀態</th>
                   @if (isEditMode()) { <th class="w-1"></th> }
                 </tr>
               </thead>
@@ -236,6 +273,22 @@
                     </div>
                     } @else {
                     <span class="text-secondary">-</span>
+                    }
+                  </td>
+
+                  <!-- 🆕 AI 狀態列 -->
+                  <td (click)="$event.stopPropagation()">
+                    @if (aiAnalysisStatus().get(photo.photoId)?.hasAnalysis) {
+                    <button class="btn btn-sm btn-info" (click)="viewAISuggestions(photo.photoId, $event)">
+                      <i class="ti ti-tag me-1"></i>
+                      {{ aiAnalysisStatus().get(photo.photoId)?.pendingCount || 0 }} 個建議
+                    </button>
+                    } @else {
+                    <button class="btn btn-sm btn-outline-primary" [disabled]="isAnalyzing()"
+                      (click)="analyzePhoto(photo.photoId, $event)">
+                      <i class="ti ti-brain me-1"></i>
+                      分析
+                    </button>
                     }
                   </td>
 
@@ -370,6 +423,30 @@
               }
             </span>
           </div>
+
+          <!-- 🆕 AI 分析狀態 -->
+          @if (aiAnalysisStatus().get(activePhoto()!.photoId)) {
+          <div class="info-row">
+            <span class="label">AI 分析</span>
+            <span class="value">
+              @if (aiAnalysisStatus().get(activePhoto()!.photoId)?.hasAnalysis) {
+              <span class="badge bg-success me-2">已分析</span>
+              @if (aiAnalysisStatus().get(activePhoto()!.photoId)?.pendingCount! > 0) {
+              <button class="btn btn-sm btn-info" (click)="viewAISuggestions(activePhoto()!.photoId, $event)">
+                查看 {{ aiAnalysisStatus().get(activePhoto()!.photoId)?.pendingCount }} 個建議
+              </button>
+              }
+              } @else {
+              <button class="btn btn-sm btn-primary" [disabled]="isAnalyzing()"
+                (click)="analyzePhoto(activePhoto()!.photoId, $event)">
+                <i class="ti ti-brain me-1"></i>
+                AI 分析
+              </button>
+              }
+            </span>
+          </div>
+          }
+
         </div>
       </div>
 
@@ -395,4 +472,135 @@
     (cancel)="closeBatchAddTagsDialog()">
   </app-batch-add-tags-dialog>
   }
+
+  <!-- 🆕 AI 建議面板 -->
+  @if (showAISuggestionsPanel()) {
+  <div class="ai-suggestions-panel">
+    <!-- 背景遮罩 -->
+    <div class="panel-backdrop" (click)="closeAISuggestionsPanel()"></div>
+
+    <!-- 面板內容 -->
+    <div class="panel-content">
+      <!-- 標題列 -->
+      <div class="panel-header">
+        <h3>
+          <i class="ti ti-brain me-2"></i>
+          AI 標籤建議
+        </h3>
+        <button type="button" class="btn-close" (click)="closeAISuggestionsPanel()">
+        </button>
+      </div>
+
+      <!-- 主體內容 -->
+      <div class="panel-body">
+        <!-- 信心分數過濾 -->
+        <div class="mb-3">
+          <label class="form-label">
+            信心分數過濾：<strong>{{ (minConfidenceFilter() * 100).toFixed(0) }}%</strong>
+          </label>
+          <input type="range" class="form-range" min="0" max="1" step="0.05" [value]="minConfidenceFilter()"
+            (input)="adjustConfidenceFilter(+$any($event.target).value)">
+          <div class="d-flex justify-content-between text-muted small">
+            <span>0%</span>
+            <span>50%</span>
+            <span>100%</span>
+          </div>
+        </div>
+
+        <!-- 快速操作 -->
+        <div class="mb-3">
+          <button class="btn btn-success w-100 mb-2" [disabled]="filteredAISuggestions().length === 0"
+            (click)="applyHighConfidenceSuggestions()">
+            <i class="ti ti-wand me-1"></i>
+            自動套用高信心建議 (≥85%)
+          </button>
+
+          <button class="btn btn-primary w-100" [disabled]="filteredAISuggestions().length === 0"
+            (click)="applyAllVisibleSuggestions()">
+            <i class="ti ti-check me-1"></i>
+            套用所有顯示的建議 ({{ filteredAISuggestions().length }})
+          </button>
+        </div>
+
+        <hr>
+
+        <!-- 統計資訊 -->
+        <div class="alert alert-info mb-3">
+          <div class="d-flex align-items-center">
+            <i class="ti ti-info-circle me-2"></i>
+            <div class="flex-grow-1">
+              共有 <strong>{{ aiSuggestions().length }}</strong> 個建議，
+              顯示 <strong>{{ filteredAISuggestions().length }}</strong> 個
+              （信心分數 ≥ {{ (minConfidenceFilter() * 100).toFixed(0) }}%）
+            </div>
+          </div>
+        </div>
+
+        <!-- 建議列表 -->
+        @if (filteredAISuggestions().length > 0) {
+        <div class="suggestion-list">
+          @for (suggestion of filteredAISuggestions(); track suggestion.suggestionId) {
+          <div class="suggestion-item" [class.selected]="selectedAISuggestions().has(suggestion.suggestionId)">
+            <!-- 勾選框 -->
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox"
+                [checked]="selectedAISuggestions().has(suggestion.suggestionId)"
+                (change)="toggleAISuggestionSelection(suggestion.suggestionId)"
+                [id]="'suggestion-' + suggestion.suggestionId">
+
+              <label class="form-check-label flex-grow-1" [for]="'suggestion-' + suggestion.suggestionId">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div class="flex-grow-1">
+                    <div class="fw-bold">{{ suggestion.tagName }}</div>
+                    @if (suggestion.categoryName) {
+                    <small class="text-muted">
+                      分類：{{ suggestion.categoryName }}
+                    </small>
+                    }
+                  </div>
+
+                  <div class="ms-2">
+                    <!-- 來源標記 -->
+                    <span class="badge bg-{{ photoService.getSourceBadgeColor(suggestion.source) }} me-1">
+                      {{ suggestion.source }}
+                    </span>
+                    <!-- 信心分數 -->
+                    <span class="badge bg-{{ photoService.getConfidenceColor(suggestion.confidence) }}">
+                      {{ (suggestion.confidence * 100).toFixed(0) }}%
+                    </span>
+                  </div>
+                </div>
+
+                <!-- 進度條 -->
+                <div class="progress" style="height: 4px;">
+                  <div class="progress-bar bg-{{ photoService.getConfidenceColor(suggestion.confidence) }}"
+                    [style.width.%]="suggestion.confidence * 100">
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+          }
+        </div>
+        } @else {
+        <div class="text-center text-muted py-4">
+          <i class="ti ti-inbox display-6"></i>
+          <p class="mt-2">沒有符合條件的建議</p>
+          <small>嘗試調整信心分數過濾</small>
+        </div>
+        }
+      </div>
+
+      <!-- 底部操作 -->
+      <div class="panel-footer">
+        <button class="btn btn-primary w-100" [disabled]="selectedAISuggestionsCount() === 0"
+          (click)="applySelectedAISuggestions()">
+          <i class="ti ti-check me-1"></i>
+          套用選中的建議 ({{ selectedAISuggestionsCount() }})
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
 </div>

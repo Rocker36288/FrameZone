@@ -17,9 +17,7 @@ public partial class PhotoAiclassificationLog
 
     public string Status { get; set; }
 
-    public int? ProcessingTime { get; set; }
-
-    public string RawResponse { get; set; }
+    public int? ProcessingTimeMs { get; set; }
 
     public string ErrorMessage { get; set; }
 
@@ -27,7 +25,23 @@ public partial class PhotoAiclassificationLog
 
     public DateTime CreatedAt { get; set; }
 
+    public long UserId { get; set; }
+
+    public DateTime AnalyzedAt { get; set; }
+
+    public string AzureVisionResponse { get; set; }
+
+    public string GooglePlacesResponse { get; set; }
+
+    public string ClaudeResponse { get; set; }
+
+    public int? TokensInput { get; set; }
+
+    public int? TokensOutput { get; set; }
+
     public virtual Photo Photo { get; set; }
 
     public virtual ICollection<PhotoAiclassificationSuggestion> PhotoAiclassificationSuggestions { get; set; } = new List<PhotoAiclassificationSuggestion>();
+
+    public virtual User User { get; set; }
 }

@@ -34,29 +34,29 @@ using static FrameZone_WebApi.Videos.Helpers.AaContextFactoryHelper;
 var builder = WebApplication.CreateBuilder(args);
 
 // ========== Azure Key Vault 設定 ==========
-var keyVaultUri = builder.Configuration["KeyVault:VaultUri"];
-if (!string.IsNullOrEmpty(keyVaultUri))
-{
-    try
-    {
-        Console.WriteLine($"正在連接到 Key Vault: {keyVaultUri}");
+//var keyVaultUri = builder.Configuration["KeyVault:VaultUri"];
+//if (!string.IsNullOrEmpty(keyVaultUri))
+//{
+//    try
+//    {
+//        Console.WriteLine($"正在連接到 Key Vault: {keyVaultUri}");
 
-        builder.Configuration.AddAzureKeyVault(
-            new Uri(keyVaultUri),
-            new DefaultAzureCredential());
+//        builder.Configuration.AddAzureKeyVault(
+//            new Uri(keyVaultUri),
+//            new DefaultAzureCredential());
 
-        Console.WriteLine("✓ Key Vault 連接成功!");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"✗ Key Vault 連接失敗: {ex.Message}");
-        Console.WriteLine("將使用本地配置繼續運行...");
-    }
-}
-else
-{
-    Console.WriteLine("未設定 Key Vault URI，使用本地配置");
-}
+//        Console.WriteLine("✓ Key Vault 連接成功!");
+//    }
+//    catch (Exception ex)
+//    {
+//        Console.WriteLine($"✗ Key Vault 連接失敗: {ex.Message}");
+//        Console.WriteLine("將使用本地配置繼續運行...");
+//    }
+//}
+//else
+//{
+//    Console.WriteLine("未設定 Key Vault URI，使用本地配置");
+//}
 
 
 ////////////--------------------------在應用程式啟動前下載 FFmpeg---------------
@@ -132,16 +132,16 @@ builder.Services.Configure<VerificationSettings>(
 
 var policyName = "Angular";
 builder.Services.AddCors(options =>
+{
+    options.AddPolicy(policyName, policy =>
     {
-        options.AddPolicy(policyName, policy =>
-        {
-            policy.WithOrigins("http://localhost:4200")
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials();
+        policy.WithOrigins("http://localhost:4200")
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
 
-        });
     });
+});
 
 // ========== JWT 設定 ==========
 
@@ -186,7 +186,7 @@ builder.Services.AddAuthentication(options =>
         {
             return Task.CompletedTask;
         }
-    };  
+    };
 });
 
 // 配置記憶體快取
@@ -229,6 +229,7 @@ builder.Services.AddScoped<IExifService, ExifService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<ITagCategorizationService, TagCategorizationService>();
 builder.Services.AddScoped<IBackgroundGeocodingService, BackgroundGeocodingService>();
+builder.Services.AddSingleton<IBackgroundAIAnalysisService, BackgroundAIAnalysisService>();
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<IMemberProfileService, MemberProfileService>();
@@ -237,6 +238,15 @@ builder.Services.AddScoped<IMemberSecurityService, MemberSecurityService>();
 builder.Services.AddScoped<IMemberNotificationService, MemberNotificationService>();
 builder.Services.AddScoped<IMemberPrivacyService, MemberPrivacyService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+
+builder.Services.AddScoped<IAzureComputerVisionService, AzureComputerVisionService>();
+builder.Services.AddHttpClient<IGooglePlacesService, GooglePlacesService>(client =>
+{
+    // 設定 Google Places API 的基本配置
+    client.Timeout = TimeSpan.FromSeconds(20);  // 20 秒超時
+    client.DefaultRequestHeaders.Add("User-Agent", "FrameZone-PhotoApp/1.0");
+});
+builder.Services.AddScoped<IClaudeApiService, ClaudeApiService>();
 
 
 builder.Services.AddHttpClient<IGeocodingService, GeocodingService>();
@@ -285,17 +295,73 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
-     {
-        options.JsonSerializerOptions.PropertyNamingPolicy = 
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy =
             System.Text.Json.JsonNamingPolicy.CamelCase;            // 使用駝峰命名法
-         options.JsonSerializerOptions.WriteIndented = true;        // 格式化 JSON
-     });
+        options.JsonSerializerOptions.WriteIndented = true;        // 格式化 JSON
+    });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
-//// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-//builder.Services.AddOpenApi();
+// ========== Swagger 配置 ==========
+builder.Services.AddSwaggerGen(options =>
+{
+    // API 基本資訊
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "FrameZone WebAPI",
+        Version = "v1",
+        Description = "FrameZone 照片管理平台 API 文件",
+        Contact = new OpenApiContact
+        {
+            Name = "FrameZone Team",
+            Email = "support@framezone.com"
+        }
+    });
+
+    // 加入 JWT Bearer 驗證支援
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "請輸入 JWT Token，格式：Bearer {token}"
+    });
+
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+    });
+
+    // 處理可能的 XML 註釋檔案
+    try
+    {
+        var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        if (File.Exists(xmlPath))
+        {
+            options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+            Console.WriteLine($"✓ 已載入 XML 註釋檔案: {xmlFile}");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"⚠ 無法載入 XML 註釋檔案: {ex.Message}");
+        // XML 註釋檔案不存在也沒關係，繼續執行
+    }
+
+    // 自訂 Schema ID 生成規則，避免重複
+    options.CustomSchemaIds(type => type.FullName);
+
+    // 支援檔案上傳
+    options.MapType<IFormFile>(() => new OpenApiSchema
+    {
+        Type = JsonSchemaType.String,
+        Format = "binary"
+    });
+});
 
 var app = builder.Build();
 
@@ -303,7 +369,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "FrameZone WebAPI v1");
+        options.RoutePrefix = "swagger";
+        options.DocumentTitle = "FrameZone API 文件";
+        options.DisplayRequestDuration();
+    });
 }
 
 // 確保 Blob 容器存在
@@ -339,6 +411,7 @@ Console.WriteLine("====================================");
 Console.WriteLine("FrameZone WebAPI 正在啟動...");
 Console.WriteLine($"環境: {app.Environment.EnvironmentName}");
 Console.WriteLine($"API 端點: https://localhost:7213/api/");
+Console.WriteLine($"Swagger 文件: https://localhost:7213/swagger");
 Console.WriteLine("====================================");
 
 app.Run();

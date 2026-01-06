@@ -13,13 +13,31 @@ public partial class PhotoAiclassificationSuggestion
 
     public int CategoryId { get; set; }
 
-    public decimal Confidence { get; set; }
+    public decimal ConfidenceScore { get; set; }
 
     public bool IsAdopted { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
+    public long PhotoId { get; set; }
+
+    public int? TagId { get; set; }
+
+    public string TagName { get; set; }
+
+    public string CategoryName { get; set; }
+
+    public string CategoryType { get; set; }
+
+    public string Source { get; set; }
+
+    public DateTime? AdoptedAt { get; set; }
+
     public virtual PhotoCategory Category { get; set; }
 
     public virtual PhotoAiclassificationLog Log { get; set; }
+
+    public virtual Photo Photo { get; set; }
+
+    public virtual PhotoTag Tag { get; set; }
 }
