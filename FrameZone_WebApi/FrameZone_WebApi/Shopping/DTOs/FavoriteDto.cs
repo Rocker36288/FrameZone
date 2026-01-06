@@ -10,5 +10,7 @@ namespace FrameZone_WebApi.Shopping.DTOs
         public decimal Price { get; set; }
         public string ImageUrl { get; set; }
         public string Date { get; set; } // 格式化後的日期，例如 "3 天前"
+        public long SellerId { get; set; }
+        public string SellerName { get; set; }
     }
 }

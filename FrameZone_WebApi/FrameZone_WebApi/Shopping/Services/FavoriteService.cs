@@ -34,7 +34,9 @@ namespace FrameZone_WebApi.Shopping.Services
                             .OrderBy(img => img.DisplayOrder)
                             .Select(img => baseUrl + img.ImageUrl)
                             .FirstOrDefault() ?? $"{baseUrl}/image/shopping/products/default.jpg",
-                Date = FormatDate(f.CreatedAt)
+                Date = FormatDate(f.CreatedAt),
+                SellerId = f.Product?.UserId ?? 0,
+                SellerName = f.Product?.User?.UserProfile?.DisplayName ?? "賣家"
             }).ToList();
         }
 

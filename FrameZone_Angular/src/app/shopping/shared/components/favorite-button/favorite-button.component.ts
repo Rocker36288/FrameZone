@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ToastService } from '../../services/toast.service';
 import { FavoriteService } from '../../services/favorite.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-favorite-button',
@@ -18,12 +19,23 @@ export class FavoriteButtonComponent {
 
   constructor(
     private toastService: ToastService,
-    private favoriteService: FavoriteService
+    private favoriteService: FavoriteService,
+    private authService: AuthService
   ) { }
+
+  get isAuthenticated(): boolean {
+    return this.authService.isAuthenticated();
+  }
 
   toggleFavorite(event: Event) {
     event.preventDefault();
     event.stopPropagation();
+
+    // 檢查登入狀態：如果未登入，主動阻斷並提示
+    if (!this.authService.isAuthenticated()) {
+      this.toastService.show('欲收藏商品需要先登入');
+      return;
+    }
 
     if (this.productId <= 0) {
       console.warn('FavoriteButton: productId 未設定');
@@ -43,7 +55,8 @@ export class FavoriteButtonComponent {
       },
       error: (err) => {
         console.error('收藏操作失敗：', err);
-        this.toastService.show('欲收藏商品需要先登入');
+        // 這裡不需要再次提示登入，因為上面已經檢查過了，或者是 401 會由 Interceptor 處理
+        this.toastService.show('操作失敗，請稍後再試');
       }
     });
   }

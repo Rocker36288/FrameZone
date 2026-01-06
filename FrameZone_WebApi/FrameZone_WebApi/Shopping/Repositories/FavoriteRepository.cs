@@ -22,6 +22,9 @@ namespace FrameZone_WebApi.Shopping.Repositories
                     .ThenInclude(p => p.ProductImages)
                 .Include(f => f.Product)
                     .ThenInclude(p => p.ProductSpecifications)
+                .Include(f => f.Product)
+                    .ThenInclude(p => p.User)
+                        .ThenInclude(u => u.UserProfile)
                 .Where(f => f.UserId == userId && f.ProductId != null)
                 .OrderByDescending(f => f.CreatedAt)
                 .ToListAsync();

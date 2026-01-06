@@ -9,6 +9,8 @@ export interface FavoriteItem {
     price: number;
     imageUrl: string;
     date: string;
+    sellerId: number;
+    sellerName: string;
 }
 
 @Injectable({
