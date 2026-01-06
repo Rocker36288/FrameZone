@@ -7,12 +7,15 @@ import { FavoriteService, FavoriteItem } from '../shared/services/favorite.servi
 import { CartService } from '../shared/services/cart.service';
 import { ToastService } from '../shared/services/toast.service';
 import { CartItem } from '../interfaces/cart';
+import { ReviewModalComponent } from '../shared/components/review-modal/review-modal.component';
 import { ToastNotificationComponent } from '../shared/components/toast-notification/toast-notification.component';
+import { OrderService } from '../shared/services/order.service';
+import { MemberService } from '../../core/services/member.service';
 
 @Component({
   selector: 'app-shopping-buyer-center',
   standalone: true,
-  imports: [FormsModule, CommonModule, RouterLink, FooterComponent, ToastNotificationComponent],
+  imports: [FormsModule, CommonModule, RouterLink, FooterComponent, ToastNotificationComponent, ReviewModalComponent],
   templateUrl: './shopping-buyer-center.component.html',
   styleUrl: './shopping-buyer-center.component.css'
 })
@@ -20,19 +23,39 @@ export class ShoppingBuyerCenterComponent {
   activeMenu: string = 'orders';
   searchText: string = '';
   showModal: boolean = false;
+
+  // 評價 Modal 控制
+  showReviewModal: boolean = false;
+  currentReviewOrder: any = null;
+
   currentOrderTab: string = 'all';
   couponCodeInput: string = '';
 
-  // 1. 用戶資料
+  // ... (rest of the file) ...
+
+  openReviewModal(order: any) {
+    this.currentReviewOrder = order;
+    this.showReviewModal = true;
+  }
+
+  onReviewSubmitted() {
+    this.showReviewModal = false;
+    // 重整訂單狀態或顯示已評價 (視需求而定，目前只需關閉)
+    // 可以考慮重新載入訂單以更新狀態如果後端有變更
+  }
+
+  // ... (original methods) ...
+
+  // 1. 用戶資料 (預設空)
   userProfile = {
-    username: 'Angular_User_001',
-    name: '陳小明',
-    password: 'password123',
-    email: 'angular@example.com',
-    phone: '0912-345-678',
-    gender: '男',
-    birthday: '1995-01-01',
-    avatar: 'https://i.pravatar.cc/150?u=angular'
+    username: '',
+    name: '',
+    password: '',
+    email: '',
+    phone: '',
+    gender: '',
+    birthday: '',
+    avatar: 'https://ui-avatars.com/api/?name=U&background=random'
   };
 
   tempProfile = { ...this.userProfile };
@@ -49,33 +72,35 @@ export class ShoppingBuyerCenterComponent {
     { id: 'notifications', label: '通知總覽', icon: 'ti ti-bell' }
   ];
 
-  // 2. 訂單資料
-  allOrders = [
-    {
-      id: 'ORD001',
-      shopName: '好物精選賣場',
-      status: 'ship',
-      statusText: '待出貨',
-      totalAmount: 190,
-      products: [{ name: '質感陶瓷馬克杯', spec: '簡約白', price: 100, quantity: 1, imageUrl: 'https://placehold.co/80x80/6c5ce7/fff?text=Cup' }]
-    },
-    {
-      id: 'ORD002',
-      shopName: '3C 科技生活館',
-      status: 'pay',
-      statusText: '待付款',
-      totalAmount: 1250,
-      products: [{ name: '無線藍牙耳機', spec: '太空灰', price: 1250, quantity: 1, imageUrl: 'https://placehold.co/80x80/6c5ce7/fff?text=Audio' }]
-    },
-    {
-      id: 'ORD003',
-      shopName: '生活百貨',
-      status: 'done',
-      statusText: '已完成',
-      totalAmount: 500,
-      products: [{ name: '香氛蠟燭', spec: '薰衣草', price: 500, quantity: 1, imageUrl: 'https://placehold.co/80x80/a29bfe/fff?text=Candle' }]
-    }
-  ];
+  // 2. 訂單資料 (從後端獲取)
+  allOrders: any[] = [];
+
+  // allOrders = [
+  //   {
+  //     id: 'ORD001',
+  //     shopName: '好物精選賣場',
+  //     status: 'ship',
+  //     statusText: '待出貨',
+  //     totalAmount: 190,
+  //     products: [{ name: '質感陶瓷馬克杯', spec: '簡約白', price: 100, quantity: 1, imageUrl: 'https://placehold.co/80x80/6c5ce7/fff?text=Cup' }]
+  //   },
+  //   {
+  //     id: 'ORD002',
+  //     shopName: '3C 科技生活館',
+  //     status: 'pay',
+  //     statusText: '待付款',
+  //     totalAmount: 1250,
+  //     products: [{ name: '無線藍牙耳機', spec: '太空灰', price: 1250, quantity: 1, imageUrl: 'https://placehold.co/80x80/6c5ce7/fff?text=Audio' }]
+  //   },
+  //   {
+  //     id: 'ORD003',
+  //     shopName: '生活百貨',
+  //     status: 'done',
+  //     statusText: '已完成',
+  //     totalAmount: 500,
+  //     products: [{ name: '香氛蠟燭', spec: '薰衣草', price: 500, quantity: 1, imageUrl: 'https://placehold.co/80x80/a29bfe/fff?text=Candle' }]
+  //   }
+  // ];
 
   // 3. 優惠券資料
   coupons = [
@@ -92,8 +117,8 @@ export class ShoppingBuyerCenterComponent {
 
   // 收藏資料
   allFavorites: FavoriteItem[] = [
-    { favoriteId: 1, productId: 1, name: '無線降噪耳機', price: 2990, imageUrl: 'https://placehold.co/400x300/6c5ce7/fff?text=Audio', date: '3 天前' },
-    { favoriteId: 2, productId: 2, name: '人體工學辦公椅', price: 4500, imageUrl: 'https://placehold.co/400x300/a29bfe/fff?text=Chair', date: '5 天前' }
+    // { favoriteId: 1, productId: 1, name: '無線降噪耳機', price: 2990, imageUrl: 'https://placehold.co/400x300/6c5ce7/fff?text=Audio', date: '3 天前' },
+    // { favoriteId: 2, productId: 2, name: '人體工學辦公椅', price: 4500, imageUrl: 'https://placehold.co/400x300/a29bfe/fff?text=Chair', date: '5 天前' }
   ];
 
   displayOrders: any[] = [];
@@ -102,12 +127,48 @@ export class ShoppingBuyerCenterComponent {
   constructor(
     private favoriteService: FavoriteService,
     private cartService: CartService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private orderService: OrderService,
+    private memberService: MemberService
   ) { }
 
   ngOnInit() {
-    this.resetDisplay();
+    this.loadProfile();
+    this.loadOrders();
     this.loadFavorites();
+  }
+
+  loadProfile() {
+    this.memberService.getProfile().subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          const profile = res.data;
+          this.userProfile = {
+            username: profile.account || '',
+            name: profile.realName || profile.displayName || '',
+            password: '********',
+            email: profile.email || '',
+            phone: profile.phone || '',
+            gender: profile.gender === '1' ? '男' : profile.gender === '2' ? '女' : '未設定',
+            birthday: profile.birthDate || '',
+            avatar: profile.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.displayName || 'U')}&background=random`
+          };
+          this.tempProfile = { ...this.userProfile };
+        }
+      }
+    });
+  }
+
+  loadOrders() {
+    this.orderService.getMyOrders().subscribe({
+      next: (orders) => {
+        this.allOrders = orders;
+        this.resetDisplay();
+      },
+      error: (err) => {
+        console.error('無法取得訂單資料：', err);
+      }
+    });
   }
 
   loadFavorites() {
@@ -129,7 +190,7 @@ export class ShoppingBuyerCenterComponent {
     if (this.activeMenu === 'orders') {
       this.displayOrders = this.allOrders.filter(o =>
         (this.currentOrderTab === 'all' || o.status === this.currentOrderTab) &&
-        (o.shopName.toLowerCase().includes(term) || o.products.some(p => p.name.toLowerCase().includes(term)))
+        (o.shopName?.toLowerCase().includes(term) || o.products.some((p: any) => p.name.toLowerCase().includes(term)))
       );
     } else if (this.activeMenu === 'favorite') {
       this.displayFavorites = this.allFavorites.filter(f =>
@@ -150,7 +211,7 @@ export class ShoppingBuyerCenterComponent {
 
     // 過濾時同步考慮搜尋字串
     this.displayOrders = baseOrders.filter(o =>
-      o.shopName.toLowerCase().includes(term) || o.products.some(p => p.name.toLowerCase().includes(term))
+      (o.shopName?.toLowerCase().includes(term) || o.products.some((p: any) => p.name.toLowerCase().includes(term)))
     );
   }
 
@@ -202,8 +263,8 @@ export class ShoppingBuyerCenterComponent {
       quantity: 1,
       selected: true,
       imageUrl: item.imageUrl,
-      sellerId: 0, // 收藏清單暫無賣家資訊，先給 0
-      sellerName: '收藏商品'
+      sellerId: item.sellerId,
+      sellerName: item.sellerName
     };
     this.cartService.addToCart(cartItem);
     this.toastService.show(`已將「${item.name}」加入購物車！`);

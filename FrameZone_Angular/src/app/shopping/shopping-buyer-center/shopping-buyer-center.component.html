@@ -66,6 +66,8 @@
                 [class.active]="currentOrderTab === 'ship'">待出貨</a></li>
             <li class="nav-item"><a (click)="filterOrders('done')" class="nav-link"
                 [class.active]="currentOrderTab === 'done'">已完成</a></li>
+            <li class="nav-item"><a (click)="filterOrders('cancle')" class="nav-link"
+                [class.active]="currentOrderTab === 'cancle'">已取消</a></li>
           </ul>
           <div class="input-group w-50">
             <input type="text" class="form-control form-control-sm" [(ngModel)]="searchText" (keyup.enter)="onSearch()"
@@ -76,20 +78,38 @@
         <div class="card-body p-0">
           <div *ngFor="let order of displayOrders" class="p-4 border-bottom">
             <div class="d-flex justify-content-between mb-3">
-              <div class="fw-bold"><i class="ti ti-store me-1"></i>{{ order.shopName }}</div>
-              <div class="text-primary">{{ order.statusText }}</div>
+              <div class="fw-bold"><i class="ti ti-store me-1"></i>{{ order.shopName }} <span
+                  class="text-muted ms-2 small">({{ order.id }})</span></div>
+              <div class="text-primary">
+                <span class="text-muted me-3 small">{{ order.createdAt | date:'yyyy/MM/dd HH:mm' }}</span>
+                {{ order.statusText }}
+              </div>
             </div>
             <div *ngFor="let p of order.products" class="d-flex"><img [src]="p.imageUrl" class="rounded border me-3"
                 width="60">
               <div>{{ p.name }}<br><small class="text-muted">{{ p.spec }}</small></div>
-              <div class="ms-auto fw-bold">${{ p.price }}</div>
+              <div class="ms-auto fw-bold">
+                ${{ p.price }}
+                <span class="text-muted ms-2" style="font-size: 0.9rem;">x {{ p.quantity }}</span>
+              </div>
+
             </div>
-            <div class="text-end border-top pt-2 mt-2">總金額：<span class="fs-2 fw-bold text-primary">${{ order.totalAmount
-                }}</span></div>
+            <div class="text-end border-top pt-2 mt-2 d-flex justify-content-end align-items-center">
+              <div class="me-auto">
+                <button *ngIf="order.statusText === '已完成' || order.status === 'done'" class="btn btn-primary btn-sm"
+                  (click)="openReviewModal(order)">
+                  評價
+                </button>
+              </div>
+              <div>總金額：<span class="fs-2 fw-bold text-primary">${{ order.totalAmount }}</span></div>
+            </div>
           </div>
           <div *ngIf="displayOrders.length === 0" class="p-5 text-center text-muted">查無相關訂單</div>
         </div>
       </div>
+
+      <!-- ... (rest of cards) ... -->
+
 
       <div *ngIf="activeMenu === 'address'" class="card shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
@@ -218,49 +238,56 @@
 
     </div>
   </div>
-</div>
 
-<div class="modal-backdrop fade show" *ngIf="showModal"></div>
-<div class="modal fade show d-block" *ngIf="showModal">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="card shadow-lg border-0 w-100">
-      <div class="card-header bg-purple text-white">
-        <h3 class="card-title">編輯基本資料</h3>
-      </div>
-      <div class="card-body">
-        <div class="text-center mb-3">
-          <span class="avatar avatar-xl rounded-circle mb-2"
-            [style.background-image]="'url(' + tempProfile.avatar + ')'"></span>
-          <input type="file" class="form-control form-control-sm" (change)="onAvatarChange($event)">
+  <div class="modal-backdrop fade show" *ngIf="showModal"></div>
+  <div class="modal fade show d-block" *ngIf="showModal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="card shadow-lg border-0 w-100">
+        <div class="card-header bg-purple text-white">
+          <h3 class="card-title">編輯基本資料</h3>
         </div>
-        <div class="row g-3">
-          <div class="col-md-6"><label class="form-label">姓名</label><input type="text" class="form-control"
-              [(ngModel)]="tempProfile.name"></div>
-          <div class="col-md-6"><label class="form-label">性別</label><select class="form-select"
-              [(ngModel)]="tempProfile.gender">
-              <option value="男">男</option>
-              <option value="女">女</option>
-            </select></div>
-          <div class="col-md-6"><label class="form-label">生日</label><input type="date" class="form-control"
-              [(ngModel)]="tempProfile.birthday"></div>
-          <div class="col-md-6"><label class="form-label">密碼</label><input type="password" class="form-control"
-              [(ngModel)]="tempProfile.password"></div>
-          <div class="col-12"><label class="form-label">電子信箱</label><input type="email" class="form-control"
-              [(ngModel)]="tempProfile.email"></div>
-          <div class="col-12"><label class="form-label">聯絡電話</label><input type="text" class="form-control"
-              [(ngModel)]="tempProfile.phone"></div>
+        <div class="card-body">
+          <div class="text-center mb-3">
+            <span class="avatar avatar-xl rounded-circle mb-2"
+              [style.background-image]="'url(' + tempProfile.avatar + ')'"></span>
+            <input type="file" class="form-control form-control-sm" (change)="onAvatarChange($event)">
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">姓名</label><input type="text" class="form-control"
+                [(ngModel)]="tempProfile.name"></div>
+            <div class="col-md-6"><label class="form-label">性別</label><select class="form-select"
+                [(ngModel)]="tempProfile.gender">
+                <option value="男">男</option>
+                <option value="女">女</option>
+              </select></div>
+            <div class="col-md-6"><label class="form-label">生日</label><input type="date" class="form-control"
+                [(ngModel)]="tempProfile.birthday"></div>
+            <div class="col-md-6"><label class="form-label">密碼</label><input type="password" class="form-control"
+                [(ngModel)]="tempProfile.password"></div>
+            <div class="col-12"><label class="form-label">電子信箱</label><input type="email" class="form-control"
+                [(ngModel)]="tempProfile.email"></div>
+            <div class="col-12"><label class="form-label">聯絡電話</label><input type="text" class="form-control"
+                [(ngModel)]="tempProfile.phone"></div>
+          </div>
         </div>
+        <div class="card-footer text-end"><button type="button" class="btn btn-link link-secondary"
+            (click)="cancelEdit()">取消</button><button type="button" class="btn btn-primary"
+            (click)="saveProfile()">確認修改</button></div>
       </div>
-      <div class="card-footer text-end"><button class="btn btn-link link-secondary"
-          (click)="cancelEdit()">取消</button><button class="btn btn-primary" (click)="saveProfile()">確認修改</button></div>
     </div>
   </div>
-</div>
 
-<div>
-  <app-footer></app-footer>
-</div>
+  <!-- 評價視窗 -->
+  <div>
+    <app-review-modal [visible]="showReviewModal" [orderData]="currentReviewOrder"
+      (closeEvent)="showReviewModal = false" (submitSuccess)="onReviewSubmitted()">
+    </app-review-modal>
+  </div>
 
-<div>
-  <app-toast-notification></app-toast-notification>
-</div>
+  <div>
+    <app-footer></app-footer>
+  </div>
+
+  <div>
+    <app-toast-notification></app-toast-notification>
+  </div>
