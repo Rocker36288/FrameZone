@@ -32,17 +32,19 @@ namespace FrameZone_WebApi.Shopping.Services
             _logger = logger;
         }
 
-        //準備綠界要的參數
-        public ECPayOrderParamsDto CreateECPayOrder(OrderDto order)
+        // 準備綠界要的參數
+        // 將 merchantTradeNo 改為外部傳入，是為了讓 Controller 能夠精確控制交易編號（例如包含 OrderId），
+        // 這樣在綠界非同步回傳付款結果時，才能準確地抓到是對應哪一筆本地訂單。
+        public ECPayOrderParamsDto CreateECPayOrder(OrderDto order, string merchantTradeNo)
         {
             ECPayOrderParamsDto orderParams = new ECPayOrderParamsDto();
-            string serialNum = DateTime.Now.Ticks.ToString().Substring(0, 10);
+            // string serialNum = DateTime.Now.Ticks.ToString().Substring(0, 10);
 
             orderParams.Params["MerchantID"] = _configuration["ECPaySettings:MerchantID"];
-            orderParams.Params["MerchantTradeNo"] = "TestOrder" + serialNum;
+            orderParams.Params["MerchantTradeNo"] = merchantTradeNo;
             orderParams.Params["MerchantTradeDate"] = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
             orderParams.Params["TotalAmount"] = order.TotalAmount;
-            orderParams.Params["TradeDesc"] = "TestDesc" + serialNum;
+            orderParams.Params["TradeDesc"] = "FrameZone Order " + merchantTradeNo;
             orderParams.Params["ChoosePayment"] = order.PaymentMethod;
             orderParams.Params["ReturnURL"] = order.ReturnURL;
 
