@@ -87,3 +87,22 @@ export interface VideoAIAuditResultDto {
   videoGuid: string;
   aiAuditResult: string;
 }
+
+
+// video-creator.service.ts
+
+// 定義後端實際回傳的介面（如果後端用大寫）
+export interface BackendVideoResponse {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;  // 新增
+  videos: VideoDetailData[];
+}
+
+// 前端使用的介面
+export interface VideoListResponse {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;  // 新增
+  videos: VideoDetailData[];
+}

@@ -53,14 +53,13 @@ namespace FrameZone_WebApi.Videos.Services
             return result;
         }
 
-        public async Task<int> GetTotalPagesByChannelAsync(int channelId)
+        // 🔧 修改：改名為 GetTotalVideosByChannelAsync，更清楚表達用途
+        public async Task<int> GetTotalVideosByChannelAsync(int channelId)
         {
-            const int pageSize = 5;
-            var totalVideos = await _videoRepo.GetTotalVideosBychannel(channelId);
-
-            // 🔧 正確計算總頁數
-            return (int)Math.Ceiling((double)totalVideos / pageSize);
+            // 回傳實際的影片總數
+            return await _videoRepo.GetTotalVideosByChannel(channelId);
         }
+
 
         public async Task<VideoDetailDto> GetVideoForEdit(string guid, int id)
         {

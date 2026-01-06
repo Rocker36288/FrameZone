@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CreatorAnalyticsDto, VideoAIAuditResultDto, VideoDetailData } from '../models/videocreator-model';
-import { Observable } from 'rxjs';
+import { BackendVideoResponse, CreatorAnalyticsDto, VideoAIAuditResultDto, VideoDetailData, VideoListResponse } from '../models/videocreator-model';
+import { map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,10 +15,17 @@ export class VideoCreatorService {
   constructor(private http: HttpClient) { }
 
   // ===== 取得影片創作者近期影片 =====
-  getRecentUploadVideos(page: number = 1): Observable<{ currentPage: number, totalPages: number, videos: VideoDetailData[] }> {
-    return this.http.get<{ currentPage: number, totalPages: number, videos: VideoDetailData[] }>(
+  getRecentUploadVideos(page: number = 1): Observable<VideoListResponse> {
+    return this.http.get<BackendVideoResponse>(
       `${this.apiBase}/VideoCreator/RecentUpload`,
-      { params: { page: page.toString() } }  // 後端現在用 page
+      { params: { page: page.toString() } }
+    ).pipe(
+      map(response => ({
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        totalItems: response.totalItems,  // 🔧 新增
+        videos: response.videos
+      }))
     );
   }
 

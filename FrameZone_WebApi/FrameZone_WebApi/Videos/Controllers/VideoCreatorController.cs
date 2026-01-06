@@ -19,24 +19,29 @@ namespace FrameZone_WebApi.Videos.Controllers
             _videoCreatorService = videoCreatorService;
         }
 
+
         //api/VideoCreator/RecentUpload
         [HttpGet("RecentUpload")]
         [Authorize]
         public async Task<ActionResult> GetVideo([FromQuery] int page = 1)
         {
             if (page < 1) page = 1;
-
             int channelId = GetUserId();
+
+            // 🔧 同時取得影片列表和總數
             var videos = await _videoCreatorService.GetVideoDetailsByChannelIdAsync(channelId, page);
-            var totalPages = await _videoCreatorService.GetTotalPagesByChannelAsync(channelId);
+            var totalVideos = await _videoCreatorService.GetTotalVideosByChannelAsync(channelId);
+
+            const int pageSize = 5;
+            var totalPages = (int)Math.Ceiling((double)totalVideos / pageSize);
 
             var response = new
             {
                 currentPage = page,
                 totalPages = totalPages,
+                totalItems = totalVideos,  // 🔧 新增：實際總影片數
                 videos = videos
             };
-
             return Ok(response);
         }
 

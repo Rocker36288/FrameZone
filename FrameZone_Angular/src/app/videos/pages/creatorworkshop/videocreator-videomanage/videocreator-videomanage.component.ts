@@ -17,7 +17,7 @@ export class VideocreatorVideomanageComponent implements OnInit {
   currentPage: number = 1;
   totalPages: number = 1;
   itemsPerPage: number = 5;
-  totalItems: number = 0; // 新增：總影片數
+  totalItems: number = 0;  // 🔧 這個現在會從後端取得實際值
 
   // 篩選與排序
   selectedStatus: string = '';
@@ -53,12 +53,23 @@ export class VideocreatorVideomanageComponent implements OnInit {
     if (page < 1 || (this.totalPages && page > this.totalPages)) return;
 
     this.videoCreatorService.getRecentUploadVideos(page)
-      .subscribe(res => {
-        this.VideoDetailsData = res.videos;
-        this.currentPage = res.currentPage;
-        this.totalPages = res.totalPages;
-        // 計算總影片數
-        this.totalItems = this.totalPages * this.itemsPerPage;
+      .subscribe({
+        next: (res) => {
+          this.VideoDetailsData = res.videos;
+          this.currentPage = res.currentPage;
+          this.totalPages = res.totalPages;
+          this.totalItems = res.totalItems;  // 🔧 從後端取得實際總數
+
+          console.log('📊 載入影片資料:', {
+            currentPage: this.currentPage,
+            totalPages: this.totalPages,
+            totalItems: this.totalItems,
+            currentPageItems: this.VideoDetailsData.length
+          });
+        },
+        error: (err) => {
+          console.error('❌ 載入影片失敗:', err);
+        }
       });
   }
 

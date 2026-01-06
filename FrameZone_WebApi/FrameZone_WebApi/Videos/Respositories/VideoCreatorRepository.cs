@@ -39,16 +39,14 @@ namespace FrameZone_WebApi.Videos.Respositories
                 .ToListAsync();
         }
 
-        public async Task<int> GetTotalVideosBychannel(int channelId)
+        // 🔧 修正：這個方法應該回傳影片總數，不是總頁數
+        public async Task<int> GetTotalVideosByChannel(int channelId)
         {
-            var totalCount = await _context.Videos
-    .Where(v => v.ChannelId == channelId)
-    .CountAsync();
-
-            var totalPages = (int)Math.Ceiling(totalCount / 5.0);
-
-            return totalPages;
+            return await _context.Videos
+                .Where(v => v.ChannelId == channelId)
+                .CountAsync();  // 直接回傳總數
         }
+
 
         public async Task<int> GetViewsCountAsync(int videoId)
         {
