@@ -52,7 +52,7 @@ namespace FrameZone_WebApi.Socials.Services
             var created = await _repository.CreateAsync(comment);
 
             // 轉換成回傳用的 DTO
-            return MapToReadDto(created);
+            return MapToReadDto(created, userId);
         }
 
         /// <summary>
@@ -60,14 +60,14 @@ namespace FrameZone_WebApi.Socials.Services
         /// </summary>
         /// <param name="postId">貼文 ID</param>
         /// <returns>樹狀留言清單</returns>
-        public async Task<List<CommentReadDto>> GetByPostIdAsync(int postId)
+        public async Task<List<CommentReadDto>> GetByPostIdAsync(int postId, long? currentUserId)
         {
             // 1. 取得資料庫中的所有留言（扁平結構）
             var comments = await _repository.GetByPostIdAsync(postId);
 
             // 2. 先轉換成扁平的 DTO 清單
             var flatDtos = comments
-                .Select(MapToReadDto)
+                .Select(c => MapToReadDto(c, currentUserId))
                 .ToList();
 
             // 3. 建立樹狀結構（只從頂層留言開始）
@@ -104,7 +104,7 @@ namespace FrameZone_WebApi.Socials.Services
             await _repository.UpdateAsync(comment);
 
             // 5. 回傳更新後結果
-            return MapToReadDto(comment);
+            return MapToReadDto(comment, userId);
         }
 
         /// <summary>
@@ -133,8 +133,9 @@ namespace FrameZone_WebApi.Socials.Services
         /// <summary>
         /// 將 Comment Entity 轉換成 CommentReadDto
         /// 若留言已被刪除，會隱藏使用者資訊與內容
+        /// 判斷是不是本人，如果是本人則IsOwner=true
         /// </summary>
-        private CommentReadDto MapToReadDto(Comment comment)
+        private CommentReadDto MapToReadDto(Comment comment, long? currentUserId)
         {
             bool isDeleted = comment.DeletedAt != null;
 
@@ -154,7 +155,10 @@ namespace FrameZone_WebApi.Socials.Services
                     ? "此留言已刪除"
                     : comment.CommentContent,
                 CreatedAt = comment.CreatedAt,
-                UpdatedAt = comment.UpdatedAt
+                UpdatedAt = comment.UpdatedAt,
+
+                // 判斷是不是本人
+                IsOwner = currentUserId.HasValue && comment.UserId == currentUserId.Value
             };
         }
 

@@ -38,6 +38,8 @@ namespace FrameZone_WebApi.Socials.DTOs
 
         public int LikeCount { get; set; }
 
+        public bool IsOwner { get; set; }   //就是本人
+
         public List<CommentReadDto> Replies { get; set; } = new();
     }
 }

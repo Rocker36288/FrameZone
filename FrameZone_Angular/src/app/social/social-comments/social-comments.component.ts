@@ -1,3 +1,4 @@
+import { AuthService } from './../../core/services/auth.service';
 import { Component, Input, Output, EventEmitter, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -24,7 +25,14 @@ export class SocialCommentsComponent {
 
   activeMenuId: number | null = null;
   editingCommentId: number | null = null;
-  editContent = '';
+  editContent = "";
+
+
+  constructor() { }
+  ngOnInit(): void {
+
+  }
+
 
   @HostListener('document:click')
   onDocumentClick() {
@@ -35,6 +43,12 @@ export class SocialCommentsComponent {
   @HostListener('document:keydown.escape')
   onEsc() {
     this.activeReplyId = null;
+  }
+
+  getCommentUserAvatar(comment: CommentDto): string {
+    if (comment.avatar) return comment.avatar;
+    const initial = (comment.displayName || 'U').charAt(0).toUpperCase();
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
   }
 
   toggleMenu(commentId: number, event: MouseEvent) {

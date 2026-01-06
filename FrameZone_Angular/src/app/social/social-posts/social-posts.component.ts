@@ -1,11 +1,12 @@
 import { PostService } from '../services/post.service';
 import { CommentService } from '../services/comment.service';
-import { Component, ElementRef, EventEmitter, HostListener, Input, Output, signal } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, Output, signal, inject } from '@angular/core';
 import { PostDto } from "../models/PostDto";
 import { CommentDto } from "../models/CommentDto";
 import { DatePipe, SlicePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SocialCommentsComponent } from "../social-comments/social-comments.component";
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-social-posts',
@@ -16,6 +17,10 @@ import { SocialCommentsComponent } from "../social-comments/social-comments.comp
 export class SocialPostsComponent {
   @Input() post!: PostDto;
   @Output() postDeleted = new EventEmitter<number>();
+
+  private authService = inject(AuthService);
+  currentUserAvatar = this.authService.getCurrentUser()?.avatar || null;
+  currentUserName = this.authService.getCurrentUser()?.displayName || null;
 
   // --- 貼文狀態 ---
   isEditing = false;
@@ -46,8 +51,23 @@ export class SocialPostsComponent {
     }
   }
 
-  // --- 貼文邏輯 ---
+  //頭像
+  getUserAvatar(): string {
+    if (this.currentUserAvatar) return this.currentUserAvatar;
+    const initial = (this.currentUserName || 'U').charAt(0).toUpperCase();
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+  }
+  getPostUserAvatar(): string {
+    if (this.post.avatar) return this.post.avatar;
+    const initial = (this.post.userName || 'U').charAt(0).toUpperCase();
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+  }
+
+  //右上角選單
   toggleMenu() { this.isMenuOpen = !this.isMenuOpen; }
+  closeMenu() { this.isMenuOpen = false; }
+
+  // --- 貼文邏輯 ---
   toggleContent() { this.isFullContent = !this.isFullContent; }
   toggleLikes() {
     this.isLiked = !this.isLiked;
@@ -83,8 +103,16 @@ export class SocialPostsComponent {
 
     this.commentService.createComment(dto).subscribe({
       next: (res) => {
-        // 更新 UI：將新留言放到最前面
-        this.comments.update(old => [res, ...old]);
+        // 更新 UI：補上當前使用者資訊，避免一開始顯示為「新使用者」
+        const currentUser = this.authService.getCurrentUser();
+        const enrichedComment: CommentDto = {
+          ...res,
+          displayName: currentUser?.displayName ?? res.displayName,
+          avatar: currentUser?.avatar ?? res.avatar,
+          userId: currentUser?.userId ?? res.userId,
+          isOwner: true
+        };
+        this.comments.update(old => [enrichedComment, ...old]);
         this.newCommentContent = ''; // 清空輸入框
         this.isSubmittingComment = false;
       },

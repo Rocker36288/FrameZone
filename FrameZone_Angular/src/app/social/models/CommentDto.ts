@@ -9,5 +9,6 @@ export interface CommentDto {
   createdAt: string;
   updatedAt?: string;
   likeCount: number;
+  isOwner: boolean;  //就是本人
   replies: CommentDto[]; // 支援無限層級的關鍵
 }

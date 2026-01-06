@@ -14,6 +14,7 @@ using FrameZone_WebApi.Repositories.Member;
 using FrameZone_WebApi.Services;
 using FrameZone_WebApi.Services.Interfaces;
 using FrameZone_WebApi.Services.Member;
+using FrameZone_WebApi.Socials.Hubs;
 using FrameZone_WebApi.Socials.Repositories;
 using FrameZone_WebApi.Socials.Services;
 using FrameZone_WebApi.Videos.Helpers;
@@ -189,6 +190,16 @@ builder.Services.AddAuthentication(options =>
         OnTokenValidated = context =>
         {
             return Task.CompletedTask;
+        },
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/chat"))
+            {
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
         }
     };  
 });
@@ -250,8 +261,14 @@ builder.Services.AddHttpContextAccessor();
 // ========== 社群服務 (DI注入) ==========
 builder.Services.AddScoped<PostRepository>();
 builder.Services.AddScoped<CommentRepository>();
+builder.Services.AddScoped<ChatRoomRepository>();
+builder.Services.AddScoped<MessageRepository>();
+
 builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<CommentService>();
+builder.Services.AddScoped<ChatRoomService>();
+builder.Services.AddScoped<MessageService>();
+builder.Services.AddSingleton<SocialChatConnectionManager>();
 
 // ========== 影片服務 (DI注入) ==========
 builder.Services.AddMemoryCache();
@@ -305,6 +322,8 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSignalR();
+
 //// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
 
@@ -344,6 +363,7 @@ app.UseQueryStringToken();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapHub<SocialChatHub>("/hubs/chat");
 app.MapControllers();
 
 Console.WriteLine("====================================");
