@@ -37,12 +37,12 @@ export class ShoppingOrderSuccessComponent {
 
     // 從綠界頁面重導回來會清掉狀態
     // 先移除以下 code 以免無法呈現交易成功的頁面
-    /*
-    if (!this.cartService.orderCompletedSignal()) {
-      this.router.navigate(['/']);
-      return;
-    }
-    */
+
+    // if (!this.cartService.orderCompletedSignal()) {
+    //   this.router.navigate(['/']);
+    //   return;
+    // }
+
 
     this.cartService.clearCart();
     this.cartService.resetOrderCompleted();
