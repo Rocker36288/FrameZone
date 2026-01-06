@@ -92,6 +92,15 @@
                 </div>
                 <div class="review-comment">{{ review.comment }}</div>
 
+                <!-- 評價圖片 -->
+                <div class="review-images d-flex flex-wrap gap-2 mt-2"
+                  *ngIf="review.images && review.images.length > 0">
+                  <div *ngFor="let img of review.images" class="review-image-wrapper">
+                    <img [src]="img" class="rounded border" width="80" height="80"
+                      style="object-fit: cover; cursor: pointer;" onclick="window.open(this.src, '_blank')">
+                  </div>
+                </div>
+
                 <!-- 賣家回覆區塊 -->
                 <div class="seller-reply mt-3 p-3 bg-light rounded" *ngIf="review.reply">
                   <div class="reply-header d-flex align-items-center mb-1">

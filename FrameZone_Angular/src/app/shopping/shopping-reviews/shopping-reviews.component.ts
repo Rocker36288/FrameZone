@@ -22,6 +22,7 @@ interface Review {
   productImage: string;
   seller: string;
   type: 'buyer' | 'seller'; // 買家評價或賣家收到的評價
+  images: string[];
 }
 
 
@@ -150,7 +151,8 @@ export class ShoppingReviewsComponent implements OnInit, OnDestroy {
       productName: r.targetName,
       productImage: r.targetImageUrl || 'https://api.dicebear.com/7.x/shapes/svg?seed=product',
       seller: this.viewMode === 'buyer' ? r.revieweeName : r.reviewerName,
-      type: this.viewMode
+      type: this.viewMode,
+      images: r.imageUrls || []
     }));
 
     // 假設目前不實作後端的分頁計數，先簡單模擬分頁
@@ -196,7 +198,8 @@ export class ShoppingReviewsComponent implements OnInit, OnDestroy {
         productName: productNames[Math.floor(Math.random() * productNames.length)],
         productImage: `https://images.unsplash.com/photo-${this.getRandomPhotoId()}?w=100`,
         seller: `賣家${i}`,
-        type: 'buyer'
+        type: 'buyer',
+        images: []
       });
     }
 
@@ -214,7 +217,8 @@ export class ShoppingReviewsComponent implements OnInit, OnDestroy {
         productName: productNames[Math.floor(Math.random() * productNames.length)],
         productImage: `https://images.unsplash.com/photo-${this.getRandomPhotoId()}?w=100`,
         seller: '我',
-        type: 'seller'
+        type: 'seller',
+        images: []
       });
     }
   }
