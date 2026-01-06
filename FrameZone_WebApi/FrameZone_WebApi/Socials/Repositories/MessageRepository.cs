@@ -1,5 +1,7 @@
-﻿using FrameZone_WebApi.Models;
+using FrameZone_WebApi.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FrameZone_WebApi.Socials.Repositories
 {
@@ -35,14 +37,20 @@ namespace FrameZone_WebApi.Socials.Repositories
                 RoomId = roomId,
                 SenderUserId = senderUserId,
                 MessageContent = content,
-                MessageType = "text",     // 目前只處理文字訊息
+                MessageType = "text",
                 CreatedAt = DateTime.UtcNow
             };
 
-            // 寫入資料庫
+            return AddMessage(message);
+        }
+
+        /// <summary>
+        /// 新增一筆自訂類型的訊息（含商品/訂單/媒體）
+        /// </summary>
+        public Message AddMessage(Message message)
+        {
             _context.Messages.Add(message);
             _context.SaveChanges();
-
             return message;
         }
     }

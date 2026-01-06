@@ -1,6 +1,8 @@
 ﻿import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
-import { ChatRoomDto, ChatService, MessageDto } from '../services/chat.service';
 import { AuthService } from '../../core/services/auth.service';
+import { ChatService } from '../services/chat.service';
+import { ChatRoomDto } from '../models/ChatRoomDto';
+import { MessageDto } from '../models/MessageDto';
 
 @Component({
   selector: 'app-social-chat',
@@ -57,7 +59,7 @@ export class SocialChatComponent {
       next: messages => {
         this.messages = messages.map(message => this.toViewMessage(message));
       },
-      error: () => {}
+      error: () => { }
     });
   }
 
@@ -69,7 +71,7 @@ export class SocialChatComponent {
       next: message => {
         this.messages = [...this.messages, this.toViewMessage(message)];
       },
-      error: () => {}
+      error: () => { }
     });
   }
 

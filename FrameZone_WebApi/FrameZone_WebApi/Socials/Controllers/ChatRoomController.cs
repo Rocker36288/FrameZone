@@ -1,7 +1,9 @@
-﻿using FrameZone_WebApi.Socials.DTOs;
+using FrameZone_WebApi.Socials.DTOs;
 using FrameZone_WebApi.Socials.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace FrameZone_WebApi.Socials.Controllers
@@ -95,6 +97,26 @@ namespace FrameZone_WebApi.Socials.Controllers
             if (string.IsNullOrWhiteSpace(content))
                 return BadRequest("訊息內容不可為空");
             return _messageService.SendTextMessage(roomId, userId, content);
+        }
+
+        // =======================
+        // 發送商城相關訊息（商品、訂單、連結、貼圖、圖片、影片）
+        // =======================
+        [Authorize]
+        [HttpPost("{roomId}/messages/shop")]
+        public ActionResult<MessageDto> SendShopMessage(int roomId, SendShopMessageDto dto)
+        {
+            if (!TryGetUserId(out var userId))
+                return Unauthorized();
+
+            try
+            {
+                return _messageService.SendShopMessage(roomId, userId, dto);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         private bool TryGetUserId(out long userId)
