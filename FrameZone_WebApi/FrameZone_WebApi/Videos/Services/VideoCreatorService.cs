@@ -17,9 +17,9 @@ namespace FrameZone_WebApi.Videos.Services
             _env = env;
         }
 
-        public async Task<List<VideoDetailDto>> GetVideoDetailsByChannelIdAsync(int channelId, int count)
+        public async Task<List<VideoDetailDto>> GetVideoDetailsByChannelIdAsync(int channelId, int page)
         {
-            var videos = await _videoRepo.GetVideosByChannelIdAsync(channelId, count);
+            var videos = await _videoRepo.GetVideosByChannelIdAsync(channelId, page);
 
             var result = new List<VideoDetailDto>();
 
@@ -51,6 +51,15 @@ namespace FrameZone_WebApi.Videos.Services
             }
 
             return result;
+        }
+
+        public async Task<int> GetTotalPagesByChannelAsync(int channelId)
+        {
+            const int pageSize = 5;
+            var totalVideos = await _videoRepo.GetTotalVideosBychannel(channelId);
+
+            // 🔧 正確計算總頁數
+            return (int)Math.Ceiling((double)totalVideos / pageSize);
         }
 
         public async Task<VideoDetailDto> GetVideoForEdit(string guid, int id)

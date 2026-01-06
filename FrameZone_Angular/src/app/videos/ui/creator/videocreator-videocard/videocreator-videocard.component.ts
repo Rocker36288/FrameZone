@@ -38,10 +38,13 @@ export class VideocreatorVideocardComponent {
   constructor(private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
-    if (!this.Video.thumbnail) {
-      this.Video.thumbnail =
-        'https://localhost:7213/api/Videos/video-thumbnail/' + this.Video.videoUrl;
-    }
+    console.log(this.Video)
+
+  }
+
+  get thumbnailUrl(): string {
+    return this.Video?.thumbnail ||
+      `https://localhost:7213/api/Videos/video-thumbnail/${this.Video?.videoUrl}`;
   }
 
   onVideoClick(): void {

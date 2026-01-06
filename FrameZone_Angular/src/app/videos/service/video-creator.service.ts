@@ -15,10 +15,10 @@ export class VideoCreatorService {
   constructor(private http: HttpClient) { }
 
   // ===== 取得影片創作者近期影片 =====
-  getRecentUploadVideos(count: number = 5): Observable<VideoDetailData[]> {
-    return this.http.get<VideoDetailData[]>(
+  getRecentUploadVideos(page: number = 1): Observable<{ currentPage: number, totalPages: number, videos: VideoDetailData[] }> {
+    return this.http.get<{ currentPage: number, totalPages: number, videos: VideoDetailData[] }>(
       `${this.apiBase}/VideoCreator/RecentUpload`,
-      { params: { count } }
+      { params: { page: page.toString() } }  // 後端現在用 page
     );
   }
 

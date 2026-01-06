@@ -68,8 +68,6 @@ export class VideocreatorEditvideoComponent {
         this.videoUrl = 'https://localhost:7213/api/videoplayer/' + data.videoUrl
         this.video!.thumbnail =
           'https://localhost:7213/api/Videos/video-thumbnail/' + this.video!.videoUrl;
-        console.log(data)
-        console.log(this.video)
       },
       error: (err) => {
         this.isLoading = false;

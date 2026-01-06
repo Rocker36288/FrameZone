@@ -22,12 +22,22 @@ namespace FrameZone_WebApi.Videos.Controllers
         //api/VideoCreator/RecentUpload
         [HttpGet("RecentUpload")]
         [Authorize]
-        public async Task<ActionResult<List<VideoDetailDto>>> GetVideo([FromQuery] int count = 5)
+        public async Task<ActionResult> GetVideo([FromQuery] int page = 1)
         {
-            int channelId = GetUserId();
-            var videos = await _videoCreatorService.GetVideoDetailsByChannelIdAsync(channelId, count);
+            if (page < 1) page = 1;
 
-            return Ok(videos);
+            int channelId = GetUserId();
+            var videos = await _videoCreatorService.GetVideoDetailsByChannelIdAsync(channelId, page);
+            var totalPages = await _videoCreatorService.GetTotalPagesByChannelAsync(channelId);
+
+            var response = new
+            {
+                currentPage = page,
+                totalPages = totalPages,
+                videos = videos
+            };
+
+            return Ok(response);
         }
 
         //============創作者影片詳細編輯 =====================

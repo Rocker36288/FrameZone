@@ -70,7 +70,10 @@ namespace FrameZone_WebApi.Videos.Services
                 IsDeleted = false,
                 IsFeatured = false,
                 Duration = (int)Math.Round(mediaInfo.Duration.TotalSeconds),
-                FileSize = fileSize
+                FileSize = fileSize,
+                CreatedAt = DateTime.UtcNow,
+                UpdateAt = DateTime.UtcNow,
+                Resolution = $"{width}x{height}"
             };
             var createdVideo = await _repository.VideoDraftCreateAsync(video);
 
@@ -152,7 +155,7 @@ namespace FrameZone_WebApi.Videos.Services
             return root;
         }
 
-        //確認上傳至wwwroot/videos/video/...
+        //確認上傳至wwwroot/video/...
         private async Task<string> SaveFileAsync(IFormFile file, string directoryPath)
         {
             var filePath = Path.Combine(directoryPath, "source.mp4");

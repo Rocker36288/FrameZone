@@ -70,6 +70,6 @@ namespace FrameZone_WebApi.Videos.DTOs
         public string VideoGuid { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public string ProcessStatus { get; set; } = string.Empty;
-        public DateTime PublishDate { get; set; }
+        public DateTime PublishDate { get; set; } = DateTime.UtcNow;
     }
 }

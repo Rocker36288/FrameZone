@@ -186,8 +186,8 @@
                     <tr *ngFor="let video of analytics.recentVideos">
                       <td>
                         <div class="d-flex align-items-center">
-                          <img [src]="video.thumbnailUrl" alt="縮圖" class="rounded me-3"
-                            style="width: 80px; height: 45px; object-fit: cover;">
+                          <img [src]='"https://localhost:7213/api/Videos/video-thumbnail/"+video.thumbnailUrl' alt="縮圖"
+                            class="rounded me-3" style="width: 80px; height: 45px; object-fit: cover;">
                           <div>
                             <div class="fw-bold">{{video.title}}</div>
                           </div>
@@ -199,7 +199,7 @@
                       <td>
                         <span class="badge bg-purple-lt">{{getEngagementRate(video).toFixed(2)}}%</span>
                       </td>
-                      <td class="text-muted">{{video.publishDate}}</td>
+                      <td class="text-muted">{{video.publishDate | date:'yyyy-MM-dd':'UTC'}}</td>
                     </tr>
                   </tbody>
                 </table>

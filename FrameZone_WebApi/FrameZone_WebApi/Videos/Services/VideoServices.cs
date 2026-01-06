@@ -125,8 +125,8 @@ namespace FrameZone_WebApi.Videos.Services
                 CommentTargetId = commentTarget.CommentTargetId,
                 UserId = userId,
                 ParentCommentId = req.ParentCommentId,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
             };
 
             var createdComment = await _videoRepo.CreateCommentAsync(comment);
@@ -190,6 +190,8 @@ namespace FrameZone_WebApi.Videos.Services
 
             await _videoRepo.ViewsSaveChangesAsync();
         }
+
+
 
         /// <summary>
         /// 取得觀看紀錄（含影片資訊 + 已看秒數）

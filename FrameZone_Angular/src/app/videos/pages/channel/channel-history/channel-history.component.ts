@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import { NgIf, NgForOf } from "@angular/common";
 import { VideosListComponent } from "../../../ui/video/videos-list/videos-list.component";
 import { VideoCardComponent } from "../../../ui/video/video-card/video-card.component";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-channel-history',
@@ -15,7 +16,7 @@ export class ChannelHistoryComponent {
   watchHistory: VideoWatchHistoryDto[] = [];
   loading = true;
 
-  constructor(private videoService: VideoService) { }
+  constructor(private videoService: VideoService, private router: Router) { }
 
   ngOnInit(): void {
     this.videoService.GetWatchHistory().subscribe(res => {
@@ -59,8 +60,8 @@ export class ChannelHistoryComponent {
 
     const last = this.watchHistory[0];
     // 範例：/videos/:id?start=秒數
-    // this.router.navigate(['/videos', last.video.videoId], {
-    //   queryParams: { start: last.lastPosition }
-    // });
+    this.router.navigate(['/videos/watch', last.video.videoUri], {
+      queryParams: { start: last.lastPosition }
+    });
   }
 }

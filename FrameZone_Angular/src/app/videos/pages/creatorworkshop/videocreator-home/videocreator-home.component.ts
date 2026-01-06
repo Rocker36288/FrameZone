@@ -19,10 +19,21 @@ export class VideocreatorHomeComponent {
 
   constructor(private authService: AuthService, private MockChannelService: MockChannelService, private videoCreatorService: VideoCreatorService) { }
 
+
+  currentPage: number = 1;
+  totalPages: number = 1;
+
   ngOnInit(): void {
-    this.videoCreatorService.getRecentUploadVideos(5)
-      .subscribe(videos => {
-        this.VideoDetailsData = videos;
+    this.loadVideos(0);
+
+  }
+
+  loadVideos(page: number): void {
+    this.videoCreatorService.getRecentUploadVideos(page)
+      .subscribe(res => {
+        this.VideoDetailsData = res.videos;   // 取 Videos 陣列
+        this.currentPage = res.currentPage;
+        this.totalPages = res.totalPages;
       });
   }
 

@@ -3,12 +3,12 @@ import { Component, OnInit } from '@angular/core';
 import { NgForOf, NgIf } from "@angular/common";
 import { CreatorAnalyticsDto } from '../../../models/videocreator-model';
 import { VideoCreatorService } from '../../../service/video-creator.service';
-
+import { DatePipe } from '@angular/common';
 
 
 @Component({
   selector: 'app-videocreator-analysis',
-  imports: [NgForOf, NgIf],
+  imports: [DatePipe, NgForOf, NgIf],
   templateUrl: './videocreator-analysis.component.html',
   styleUrl: './videocreator-analysis.component.css'
 })
@@ -25,6 +25,7 @@ export class VideocreatorAnalysisComponent implements OnInit {
   ngOnInit(): void {
     this.loadAnalytics();
   }
+
 
   loadAnalytics(): void {
     this.isLoading = true;

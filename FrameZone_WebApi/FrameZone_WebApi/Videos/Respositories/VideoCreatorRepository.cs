@@ -1,8 +1,9 @@
-﻿using System;
-using FrameZone_WebApi.Models;
+﻿using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Videos.DTOs;
 using FrameZone_WebApi.Videos.Enums;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Threading.Channels;
 using static FrameZone_WebApi.Videos.DTOs.VideoCreatorDTO;
 using static FrameZone_WebApi.Videos.Respositories.VideoCreatorRepository;
 
@@ -20,16 +21,33 @@ namespace FrameZone_WebApi.Videos.Respositories
          * 🎬 Video Detail Card
          * ===================================================== */
 
-        public async Task<List<Video>> GetVideosByChannelIdAsync(int channelId, int count)
+        public async Task<List<Video>> GetVideosByChannelIdAsync(
+     int channelId,
+     int page
+ )
         {
+            const int pageSize = 5;
+
             return await _context.Videos
                 .AsNoTracking()
                 .Include(v => v.Channel)
                     .ThenInclude(c => c.UserProfile)
                 .Where(v => v.ChannelId == channelId)
                 .OrderByDescending(v => v.PublishDate)
-                .Take(count)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+        }
+
+        public async Task<int> GetTotalVideosBychannel(int channelId)
+        {
+            var totalCount = await _context.Videos
+    .Where(v => v.ChannelId == channelId)
+    .CountAsync();
+
+            var totalPages = (int)Math.Ceiling(totalCount / 5.0);
+
+            return totalPages;
         }
 
         public async Task<int> GetViewsCountAsync(int videoId)
@@ -173,7 +191,7 @@ namespace FrameZone_WebApi.Videos.Respositories
                 {
                     VideoId = v.VideoId,
                     Title = v.Title,
-                    ThumbnailUrl = v.ThumbnailUrl,
+                    ThumbnailUrl = v.VideoUrl,
                     PublishDate = (DateTime)v.PublishDate,
                     Views = _context.Views.Count(x => x.VideoId == v.VideoId),
                     Likes = _context.Likes.Count(x => x.VideoId == v.VideoId),
