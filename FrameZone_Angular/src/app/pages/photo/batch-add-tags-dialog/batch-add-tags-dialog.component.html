@@ -1,0 +1,226 @@
+<!-- 背景遮罩 -->
+<div class="dialog-backdrop" (click)="onBackdropClick()"></div>
+
+<!-- 對話框主體 -->
+<div class="dialog-container" role="dialog" aria-modal="true" aria-labelledby="dialog-title" (click)="onDialogClick($event)">
+
+  <!-- Header -->
+  <div class="dialog-header">
+    <h3 class="dialog-title" id="dialog-title">
+      <i class="ti ti-tag me-2"></i>
+      批次添加標籤
+    </h3>
+
+    <button type="button" class="btn-close" (click)="onCancel()" aria-label="關閉" title="關閉">
+      <i class="ti ti-x"></i>
+    </button>
+  </div>
+
+  <!-- Body -->
+  <div class="dialog-body">
+
+    <!-- 照片數量提示 -->
+    <div class="photo-count-hint">
+      <i class="ti ti-photo me-2"></i>
+      為 <strong>{{ selectedPhotoCount }}</strong> 張照片添加標籤
+    </div>
+
+    <!-- 搜尋框 -->
+    <div class="search-box">
+      <div class="input-icon">
+        <span class="input-icon-addon">
+          <i class="ti ti-search"></i>
+        </span>
+        <input
+          #searchInput
+          type="text"
+          class="form-control"
+          placeholder="搜尋標籤..."
+          [value]="searchKeyword()"
+          (input)="onSearchInput($any($event.target).value)"
+          [disabled]="isSubmitting()">
+      </div>
+    </div>
+
+    <!-- 搜尋中狀態 -->
+    @if (isSearching()) {
+      <div class="search-status">
+        <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+          <span class="visually-hidden">搜尋中...</span>
+        </div>
+        <span class="text-secondary">搜尋中...</span>
+      </div>
+    }
+
+    <!-- 搜尋結果區域 -->
+    @if (hasSearchResults() && !isSearching()) {
+      <div class="search-results-section">
+        <div class="section-header">
+          <span class="section-title">搜尋結果</span>
+          <span class="badge bg-secondary-lt">{{ searchResults().length }}</span>
+        </div>
+
+        <div class="tag-list">
+          @for (tag of searchResults(); track tag.tagId) {
+            <div
+              class="tag-item"
+              [class.selected]="isTagSelected(tag.tagId)"
+              (click)="toggleTagSelection(tag)">
+
+              <!-- 勾選框 -->
+              <div class="tag-checkbox">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  [checked]="isTagSelected(tag.tagId)"
+                  (click)="$event.stopPropagation()"
+                  readonly>
+              </div>
+
+              <!-- 標籤資訊 -->
+              <div class="tag-info">
+                <div class="tag-name">
+                  <span class="tag-icon">{{ getTagIcon(tag) }}</span>
+                  <span class="tag-text">{{ tag.tagName }}</span>
+                </div>
+                <div class="tag-meta">
+                  <span class="tag-type">{{ getTagTypeText(tag) }}</span>
+                  @if (tag.photoCount !== undefined && tag.photoCount > 0) {
+                    <span class="tag-count">
+                      <i class="ti ti-photo"></i>
+                      {{ tag.photoCount }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- 空狀態 - 顯示「建立新標籤」 -->
+    @if (showEmptyState() && showCreateNewTag() && !isSearching()) {
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="ti ti-tag-off"></i>
+        </div>
+        <p class="empty-text">找不到匹配的標籤</p>
+
+        <!-- 🆕 父標籤選擇（建立階層式標籤） -->
+        <div class="parent-tag-select">
+          <label class="form-label">建立到父標籤（可選）</label>
+
+          <select class="form-select" [(ngModel)]="selectedParentTagId" [disabled]="isSubmitting()">
+            <option [ngValue]="null">（無）建立為頂層標籤</option>
+            @for (group of parentTagGroups(); track group.categoryName) {
+              <optgroup [label]="group.categoryName">
+                @for (opt of group.options; track opt.tagId) {
+                  <option [ngValue]="opt.tagId">{{ opt.label }}</option>
+                }
+              </optgroup>
+            }
+          </select>
+
+          <div class="form-hint">
+            例：要把「兔子」放到「寵物」底下，先選「寵物」。
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-primary btn-sm"
+          (click)="createNewTag()"
+          [disabled]="isSubmitting()">
+          <i class="ti ti-plus me-2"></i>
+          建立新標籤 "{{ searchKeyword() }}"
+        </button>
+      </div>
+    }
+
+    <!-- 初始提示（無搜尋時） -->
+    @if (!searchKeyword().trim() && !isSearching()) {
+      <div class="hint-text">
+        <i class="ti ti-info-circle me-2"></i>
+        輸入關鍵字搜尋標籤，或直接建立新標籤
+      </div>
+    }
+
+    <!-- 已選標籤區域 -->
+    @if (totalSelectedCount() > 0) {
+      <div class="selected-tags-section">
+        <div class="section-header">
+          <span class="section-title">已選標籤</span>
+          <span class="badge bg-primary">{{ totalSelectedCount() }}</span>
+        </div>
+
+        <div class="selected-tags-list">
+
+          <!-- 已存在的標籤 -->
+          @for (tag of selectedTags(); track tag.tagId) {
+            <span class="badge-tag badge-existing">
+              <span class="badge-icon">{{ getTagIcon(tag) }}</span>
+              <span class="badge-text">{{ tag.tagName }}</span>
+              <button
+                type="button"
+                class="badge-remove"
+                (click)="removeSelectedTag(tag.tagId)"
+                [disabled]="isSubmitting()"
+                title="移除">
+                <i class="ti ti-x"></i>
+              </button>
+            </span>
+          }
+
+          <!-- 待建立的新標籤 -->
+          @for (newTag of newTagsToCreate(); track $index) {
+            <span class="badge-tag badge-new">
+              <span class="badge-icon">✨</span>
+              <span class="badge-text">{{ newTag.tagName }}</span>
+              <span class="badge-label">(新)</span>
+              <button
+                type="button"
+                class="badge-remove"
+                (click)="removeNewTag($index)"
+                [disabled]="isSubmitting()"
+                title="移除">
+                <i class="ti ti-x"></i>
+              </button>
+            </span>
+          }
+
+        </div>
+      </div>
+    }
+
+  </div>
+
+  <!-- Footer -->
+  <div class="dialog-footer">
+    <button
+      type="button"
+      class="btn btn-outline-secondary"
+      (click)="onCancel()"
+      [disabled]="isSubmitting()">
+      取消
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="onConfirm()"
+      [disabled]="!canSubmit()">
+      @if (isSubmitting()) {
+        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        <span>處理中...</span>
+      } @else {
+        <i class="ti ti-check me-2"></i>
+        <span>確認添加</span>
+        @if (totalSelectedCount() > 0) {
+          <span class="ms-1">({{ totalSelectedCount() }})</span>
+        }
+      }
+    </button>
+  </div>
+
+</div>

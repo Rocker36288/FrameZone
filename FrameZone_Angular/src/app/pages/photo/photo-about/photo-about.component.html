@@ -1,1 +1,267 @@
-<p>photo-about works!</p>
+<!-- ==================== Hero Section ==================== -->
+<section class="hero-section">
+  <div class="hero-background">
+    <div class="hero-gradient"></div>
+    <div class="hero-pattern"></div>
+  </div>
+
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-title animate-fade-in">
+        <span class="brand-name">FrameZone</span>
+      </h1>
+      <p class="hero-subtitle animate-fade-in-delay-1">
+        您的專業照片管理平台
+      </p>
+      <p class="hero-description animate-fade-in-delay-2">
+        輕鬆整理、安全儲存、隨時分享您的珍貴回憶
+      </p>
+      <div class="hero-actions animate-fade-in-delay-3">
+        <button class="btn btn-lg btn-primary" (click)="scrollToContact()">
+          <i class="ti ti-mail"></i>
+          聯絡我們
+        </button>
+        <a href="/photo-classify" class="btn btn-lg btn-outline-primary">
+          <i class="ti ti-photo"></i>
+          開始使用
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== Mission & Vision Section ==================== -->
+<section class="mission-section">
+  <div class="container">
+    <div class="section-header text-center">
+      <h2 class="section-title">我們的使命</h2>
+      <p class="section-subtitle">致力於讓照片管理變得簡單而美好</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="mission-card">
+          <div class="mission-icon">
+            <i class="ti ti-target"></i>
+          </div>
+          <h3>我們的使命</h3>
+          <p>
+            為每一位用戶提供專業、安全、易用的照片管理解決方案，
+            讓珍貴的回憶能夠被妥善保存、輕鬆整理、隨時分享。
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="mission-card">
+          <div class="mission-icon">
+            <i class="ti ti-bulb"></i>
+          </div>
+          <h3>我們的願景</h3>
+          <p>
+            成為全球領先的照片管理平台，透過持續創新的技術，
+            幫助億萬用戶更好地記錄生活、珍藏回憶、分享美好時光。
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="values-grid">
+      <div class="value-item">
+        <i class="ti ti-heart"></i>
+        <h4>用戶至上</h4>
+        <p>始終將用戶需求放在第一位</p>
+      </div>
+      <div class="value-item">
+        <i class="ti ti-shield-check"></i>
+        <h4>安全可靠</h4>
+        <p>確保每一份資料的安全</p>
+      </div>
+      <div class="value-item">
+        <i class="ti ti-rocket"></i>
+        <h4>持續創新</h4>
+        <p>不斷追求技術突破</p>
+      </div>
+      <div class="value-item">
+        <i class="ti ti-users"></i>
+        <h4>團隊協作</h4>
+        <p>發揮團隊的最大效能</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== Features Section ==================== -->
+<section class="features-section">
+  <div class="container">
+    <div class="section-header text-center">
+      <h2 class="section-title">核心特色</h2>
+      <p class="section-subtitle">強大功能，簡單易用</p>
+    </div>
+
+    <div class="row g-4">
+      @for (feature of features(); track feature.title) {
+        <div class="col-md-6 col-lg-4">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i [class]="'ti ti-' + feature.icon"></i>
+            </div>
+            <h3 class="feature-title">{{ feature.title }}</h3>
+            <p class="feature-description">{{ feature.description }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ==================== Stats Section ==================== -->
+<section class="stats-section">
+  <div class="container">
+    <div class="row g-4">
+      @for (stat of stats(); track stat.label) {
+        <div class="col-6 col-md-3">
+          <div class="stat-card">
+            <div class="stat-value">
+              {{ formatNumber(stat.current) }}{{ stat.suffix }}
+            </div>
+            <div class="stat-label">{{ stat.label }}</div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ==================== Tech Stack Section ==================== -->
+<section class="tech-section">
+  <div class="container">
+    <div class="section-header text-center">
+      <h2 class="section-title">技術優勢</h2>
+      <p class="section-subtitle">採用業界領先的技術棧</p>
+    </div>
+
+    <div class="row g-4">
+      @for (tech of techStack(); track tech.title) {
+        <div class="col-md-6 col-lg-3">
+          <div class="tech-card">
+            <div class="tech-icon">
+              <i [class]="'ti ti-' + tech.icon"></i>
+            </div>
+            <h3 class="tech-title">{{ tech.title }}</h3>
+            <p class="tech-description">{{ tech.description }}</p>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="tech-features">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="tech-feature-item">
+            <i class="ti ti-bolt"></i>
+            <h4>高效能</h4>
+            <p>優化的架構設計，確保快速回應</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="tech-feature-item">
+            <i class="ti ti-lock"></i>
+            <h4>高安全</h4>
+            <p>企業級加密技術，保護資料安全</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="tech-feature-item">
+            <i class="ti ti-refresh"></i>
+            <h4>高可用</h4>
+            <p>99.9% 系統穩定性，全年無休</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== Contact Section ==================== -->
+<section class="contact-section" id="contact-section">
+  <div class="container">
+    <div class="section-header text-center">
+      <h2 class="section-title">聯絡我們</h2>
+      <p class="section-subtitle">有任何問題或建議，歡迎與我們聯繫</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-4">
+        <div class="contact-card">
+          <div class="contact-icon">
+            <i class="ti ti-mail"></i>
+          </div>
+          <h3>電子郵件</h3>
+          <p>support&#64;framezone.com</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="contact-card">
+          <div class="contact-icon">
+            <i class="ti ti-phone"></i>
+          </div>
+          <h3>聯絡電話</h3>
+          <p>+886-2-1234-5678</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="contact-card">
+          <div class="contact-icon">
+            <i class="ti ti-map-pin"></i>
+          </div>
+          <h3>公司地址</h3>
+          <p>臺北市大安區復興南路一段390號</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="social-media">
+      <h3>關注我們</h3>
+      <div class="social-links">
+        <a href="#" class="social-btn" title="Facebook">
+          <i class="ti ti-brand-facebook"></i>
+        </a>
+        <a href="#" class="social-btn" title="Instagram">
+          <i class="ti ti-brand-instagram"></i>
+        </a>
+        <a href="#" class="social-btn" title="Twitter">
+          <i class="ti ti-brand-twitter"></i>
+        </a>
+        <a href="#" class="social-btn" title="YouTube">
+          <i class="ti ti-brand-youtube"></i>
+        </a>
+        <a href="#" class="social-btn" title="LinkedIn">
+          <i class="ti ti-brand-linkedin"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CTA Section ==================== -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-content">
+      <h2>準備好開始使用了嗎？</h2>
+      <p>立即註冊，享受專業的照片管理服務</p>
+      <div class="cta-buttons">
+        <a href="/photo-classify" class="btn btn-lg btn-light">
+          <i class="ti ti-photo"></i>
+          開始使用
+        </a>
+        <a href="/photo-price" class="btn btn-lg btn-outline-light">
+          <i class="ti ti-currency-dollar"></i>
+          查看方案
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

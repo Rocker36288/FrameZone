@@ -38,6 +38,9 @@
 
 .sidebar-title i {
   font-size: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ==================== Sidebar Content ==================== */
@@ -93,6 +96,9 @@
   font-size: 3rem;
   opacity: 0.5;
   margin-bottom: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar-empty p {
@@ -137,21 +143,49 @@
   align-items: center;
   gap: 0.5rem;
   flex: 1;
+  min-width: 0; /* 防止 flex 溢出 */
 }
 
-.category-info i {
+/* 修正：分類 icon 樣式 */
+.category-info i.category-icon {
   font-size: 1.125rem;
   color: var(--tblr-primary);
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* 確保 Tabler Icons 能正確顯示 */
+.category-info i.category-icon::before {
+  display: inline-block;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
 }
 
 .category-name {
   font-size: 0.9375rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .category-toggle {
   font-size: 1rem;
   color: var(--tblr-secondary);
   transition: transform 0.2s ease;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 /* ==================== 標籤列表 ==================== */
@@ -197,9 +231,18 @@
   flex-shrink: 0;
   width: 16px;
   height: 16px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
+}
+
+.tag-toggle::before {
+  display: inline-block;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
 }
 
 .tag-spacer {
@@ -253,23 +296,6 @@
 }
 
 /* ==================== RWD 響應式 (手機版) ==================== */
-
-/* 平板以下 */
-@media (max-width: 991px) {
-  .sidebar {
-    position: fixed;
-    top: var(--navbar-height);
-    left: 0;
-    height: calc(100vh - var(--navbar-height));
-    z-index: 1040;
-    transform: translateX(-100%);
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .sidebar.sidebar-open {
-    transform: translateX(0);
-  }
-}
 
 /* 手機版 */
 @media (max-width: 575px) {
@@ -402,4 +428,24 @@
   .sidebar {
     display: none;
   }
+}
+
+/* ==================== Icon Fallback ==================== */
+
+/* 確保所有 icon 元素都能正確顯示 */
+i[class*="ti-"] {
+  font-family: 'tabler-icons' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 如果 icon 無法載入，顯示 fallback 符號 */
+i.category-icon:not([class*="ti-"])::before {
+  content: '📁';
 }

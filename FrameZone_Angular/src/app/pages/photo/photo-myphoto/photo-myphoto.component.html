@@ -86,6 +86,13 @@
 
               @if (selectedCount() > 0) {
               <div class="col-auto">
+                <!-- 🆕 批次添加標籤按鈕 -->
+                <button class="btn btn-primary btn-sm me-2" (click)="openBatchAddTagsDialog()">
+                  <i class="ti ti-tag me-2"></i>
+                  添加標籤 ({{ selectedCount() }})
+                </button>
+
+                <!-- 原有：刪除選取按鈕 -->
                 <button class="btn btn-danger btn-sm" (click)="deleteSelectedPhotos()">
                   <i class="ti ti-trash me-2"></i>
                   刪除選取 ({{ selectedCount() }})
@@ -377,5 +384,15 @@
       </div>
     </div>
     }
+
+
+
   </div>
+  <!-- 🆕 批次添加標籤對話框 -->
+
+  @if (isBatchAddTagsDialogOpen()) {
+  <app-batch-add-tags-dialog [selectedPhotoCount]="selectedCount()" (confirm)="handleBatchAddTags($event)"
+    (cancel)="closeBatchAddTagsDialog()">
+  </app-batch-add-tags-dialog>
+  }
 </div>

@@ -43,7 +43,7 @@ export class PhotoSidebarComponent implements OnInit {
   constructor(
     private photoService: PhotoService,
     private toastr: ToastrService
-  ) {}
+  ) { }
 
   // ==================== Lifecycle ====================
 
@@ -64,13 +64,19 @@ export class PhotoSidebarComponent implements OnInit {
 
       if (response && response.success) {
         // 初始化展開狀態
+        const selected = this.selectedTagIds();
+
         const categories = response.categories.map(category => ({
           ...category,
           isExpanded: category.isDefaultExpanded ?? true,
-          tags: this.initializeTagExpansion(category.tags)
+          tags: this.applySelectionRecursive(
+            this.initializeTagExpansion(category.tags),
+            selected
+          )
         }));
 
         this.tagHierarchy.set(categories);
+
       } else {
         this.toastr.error('標籤階層載入失敗', '錯誤');
       }
@@ -237,6 +243,24 @@ export class PhotoSidebarComponent implements OnInit {
     this.tagSelectionChange.emit(selectedIds);
   }
 
+  private applySelectionRecursive(tags: TagNode[], selected: Set<number>): TagNode[] {
+    return tags.map(tag => {
+      const children = this.applySelectionRecursive(tag.children || [], selected);
+      const isSelected = selected.has(tag.tagId);
+
+      // 如果子層有被選到，順便展開（可選）
+      const hasSelectedChild = children.some(c => c.isSelected);
+
+      return {
+        ...tag,
+        isSelected,
+        isExpanded: tag.isExpanded || hasSelectedChild,
+        children,
+      };
+    });
+  }
+
+
   // ==================== Sidebar 控制 ====================
 
   /**
@@ -250,8 +274,24 @@ export class PhotoSidebarComponent implements OnInit {
 
   /**
    * 取得分類圖示的 Tabler Icon class
+   * 修正：確保 icon 名稱格式正確
    */
-  getCategoryIconClass(icon: string): string {
+  getCategoryIconClass(icon: string | undefined): string {
+    if (!icon) {
+      return 'ti ti-folder'; // 預設 icon
+    }
+
+    // 如果 icon 已經包含 'ti ti-'，直接返回
+    if (icon.startsWith('ti ti-')) {
+      return icon;
+    }
+
+    // 如果 icon 只包含 'ti-'，補上 'ti '
+    if (icon.startsWith('ti-')) {
+      return `ti ${icon}`;
+    }
+
+    // 否則補上完整的 'ti ti-'
     return `ti ti-${icon}`;
   }
 

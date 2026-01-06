@@ -172,9 +172,9 @@
 
   .photo-sidebar-wrapper {
     position: fixed;
-    top: var(--navbar-height);
+    top: var(--navbar-height, 56px);
     left: 0;
-    height: calc(100vh - var(--navbar-height));
+    height: calc(100vh - var(--navbar-height, 56px));
     z-index: 1040;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
@@ -362,6 +362,7 @@
     inset: 0;
     background: rgba(15, 23, 42, 0.35);
     z-index: 1030; /* navbar 1000，遮罩不蓋 navbar */
+    inset: var(--navbar-height) 0 0 0;
   }
 }
 
@@ -482,7 +483,7 @@
 
 .photo-page-layout{
   display: flex;
-  min-height: calc(100vh - var(--navbar-height));
+  min-height: calc(100vh - var(--navbar-height, 56px));
   position: relative;
 }
 

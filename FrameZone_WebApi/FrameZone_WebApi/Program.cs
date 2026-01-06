@@ -9,8 +9,10 @@ using FrameZone_WebApi.Middlewares;
 using FrameZone_WebApi.Middlewares;
 using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Repositories;
+using FrameZone_WebApi.Repositories.Interfaces;
 using FrameZone_WebApi.Repositories.Member;
 using FrameZone_WebApi.Services;
+using FrameZone_WebApi.Services.Interfaces;
 using FrameZone_WebApi.Services.Member;
 using FrameZone_WebApi.Socials.Repositories;
 using FrameZone_WebApi.Socials.Services;
@@ -220,6 +222,7 @@ builder.Services.AddScoped<IUserLogRepository, UserLogRepository>();
 builder.Services.AddScoped<IMemberSecurityRepository, MemberSecurityRepository>();
 builder.Services.AddScoped<IMemberNotificationRepository, MemberNotificationRepository>();
 builder.Services.AddScoped<IMemberPrivacyRepository, MemberPrivacyRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -235,6 +238,7 @@ builder.Services.AddScoped<IUserLogService, UserLogService>();
 builder.Services.AddScoped<IMemberSecurityService, MemberSecurityService>();
 builder.Services.AddScoped<IMemberNotificationService, MemberNotificationService>();
 builder.Services.AddScoped<IMemberPrivacyService, MemberPrivacyService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 
 builder.Services.AddHttpClient<IGeocodingService, GeocodingService>();

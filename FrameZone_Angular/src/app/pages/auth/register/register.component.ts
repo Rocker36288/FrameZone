@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { catchError, throwError, timeout } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
@@ -26,14 +27,14 @@ export class RegisterComponent {
   // 提交狀態
   isSubmitting = false;
 
-  // 錯誤訊息
-  errorMessage = "";
-
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
-  ) { }
+    private router: Router,
+    private toastr: ToastrService
+  ) {
+    console.log('📦 ToastrService 注入狀態:', this.toastr ? '成功' : '失敗');
+  }
 
   ngOnInit(): void {
     this.initForm();
@@ -165,17 +166,11 @@ export class RegisterComponent {
     );
   }
 
-  /**
-   * 關閉錯誤訊息
-   */
-  dismissErrorMessage(): void {
-    this.errorMessage = '';
-  }
-
   onSubmit(): void {
     // 如果表單無效，標記所有欄位為已觸碰並停止提交
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
+      this.toastr.warning('請檢查表單欄位', '⚠ 表單驗證失敗');
       return;
     }
 
@@ -186,7 +181,6 @@ export class RegisterComponent {
 
     // 開始提交
     this.isSubmitting = true;
-    this.errorMessage = '';
 
     const registerData = {
       account: this.registerForm.value.account,
@@ -215,69 +209,31 @@ export class RegisterComponent {
           console.log('註冊回應:', response);
 
           if (response.success) {
-            // 導向登入頁面，並傳遞成功訊息
-            this.router.navigate(['/login'], {
-              state: { message: '註冊成功！請登入您的帳號' }
-            });
+            // 顯示成功訊息
+            this.toastr.success(
+              '帳號建立成功！即將前往登入頁面...',
+              '✔ 註冊成功',
+              { timeOut: 2000 }
+            );
+
+            // 延遲導向登入頁面
+            setTimeout(() => {
+              this.router.navigate(['/login'], {
+                queryParams: { message: '註冊成功！請登入您的帳號' }
+              });
+            }, 1500);
           } else {
             // 後端回傳失敗訊息
-            this.errorMessage = response.message || '註冊失敗';
-            this.isSubmitting = false;  // 重要：重設狀態
+            this.toastr.error(response.message || '註冊失敗', '✗ 註冊失敗');
+            this.isSubmitting = false;
           }
         },
         error: (error) => {
           console.error('註冊錯誤:', error);
           console.log('錯誤類型:', error.name);
           console.log('錯誤狀態:', error.status);
-          console.log('完整錯誤物件:', JSON.stringify(error, null, 2));
 
-          // 處理超時錯誤
-          if (error.name === 'TimeoutError') {
-            this.errorMessage = '請求超時，請檢查網路連線或稍後再試';
-            this.isSubmitting = false;
-            return;
-          }
-
-          // 處理不同類型的錯誤訊息
-          if (error.status === 400) {
-            // 處理驗證錯誤
-            if (error.error?.errors) {
-              // ASP.NET Core 的 ModelState 驗證錯誤格式
-              const validationErrors: string[] = [];
-
-              Object.keys(error.error.errors).forEach(key => {
-                const errors = error.error.errors[key];
-                if (Array.isArray(errors)) {
-                  validationErrors.push(...errors);
-                } else {
-                  validationErrors.push(errors);
-                }
-              });
-
-              this.errorMessage = validationErrors.join('、');
-            } else if (error.error?.message) {
-              // 自訂錯誤訊息
-              this.errorMessage = error.error.message;
-            } else if (error.error?.title) {
-              // 標準錯誤格式
-              this.errorMessage = error.error.title;
-            } else {
-              this.errorMessage = '註冊失敗，請檢查輸入的資料';
-            }
-          } else if (error.status === 0) {
-            // 網路連線錯誤
-            this.errorMessage = '無法連線到伺服器，請檢查後端服務是否正在運行';
-          } else if (error.status === 500) {
-            // 伺服器錯誤
-            this.errorMessage = '伺服器錯誤，請稍後再試';
-          } else if (error.error?.message) {
-            // 其他錯誤
-            this.errorMessage = error.error.message;
-          } else {
-            this.errorMessage = '註冊失敗，請稍後再試';
-          }
-
-          // 重要：確保在所有錯誤情況下都重設狀態
+          this.handleRegistrationError(error);
           this.isSubmitting = false;
         },
         complete: () => {
@@ -288,5 +244,57 @@ export class RegisterComponent {
           }
         }
       });
+  }
+
+  /**
+   * 處理註冊錯誤
+   */
+  private handleRegistrationError(error: any): void {
+    // 處理超時錯誤
+    if (error.name === 'TimeoutError') {
+      this.toastr.error('請求超時，請檢查網路連線或稍後再試', '✗ 超時錯誤');
+      return;
+    }
+
+    // 處理不同類型的錯誤訊息
+    let errorMessage = '註冊失敗，請稍後再試';
+
+    if (error.status === 400) {
+      // 處理驗證錯誤
+      if (error.error?.errors) {
+        // ASP.NET Core 的 ModelState 驗證錯誤格式
+        const validationErrors: string[] = [];
+
+        Object.keys(error.error.errors).forEach(key => {
+          const errors = error.error.errors[key];
+          if (Array.isArray(errors)) {
+            validationErrors.push(...errors);
+          } else {
+            validationErrors.push(errors);
+          }
+        });
+
+        errorMessage = validationErrors.join('、');
+      } else if (error.error?.message) {
+        // 自訂錯誤訊息
+        errorMessage = error.error.message;
+      } else if (error.error?.title) {
+        // 標準錯誤格式
+        errorMessage = error.error.title;
+      } else {
+        errorMessage = '註冊失敗，請檢查輸入的資料';
+      }
+    } else if (error.status === 0) {
+      // 網路連線錯誤
+      errorMessage = '無法連線到伺服器，請檢查後端服務是否正在運行';
+    } else if (error.status === 500) {
+      // 伺服器錯誤
+      errorMessage = '伺服器錯誤，請稍後再試';
+    } else if (error.error?.message) {
+      // 其他錯誤
+      errorMessage = error.error.message;
+    }
+
+    this.toastr.error(errorMessage, '✗ 註冊失敗');
   }
 }

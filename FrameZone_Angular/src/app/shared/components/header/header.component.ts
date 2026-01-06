@@ -4,10 +4,11 @@ import { CommonModule } from '@angular/common';
 import { ThemeToggleComponent } from '../theme-toggle/theme-toggle.component';
 import { UserMenuComponent } from '../user-menu/user-menu.component';
 import { filter } from 'rxjs/operators';
+import { NotificationBellComponent } from "../notification-bell/notification-bell.component";
 
 @Component({
   selector: 'app-header',
-  imports: [RouterModule, CommonModule, ThemeToggleComponent, UserMenuComponent],
+  imports: [RouterModule, CommonModule, ThemeToggleComponent, UserMenuComponent, NotificationBellComponent],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })

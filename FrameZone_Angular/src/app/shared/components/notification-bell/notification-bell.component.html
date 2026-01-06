@@ -1,0 +1,102 @@
+<div class="notification-bell">
+  <!-- 鈴鐺按鈕 -->
+  <button
+    class="notification-icon-btn"
+    (click)="toggleDropdown()"
+    type="button"
+    aria-label="通知">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+    </svg>
+    <span class="notification-badge" *ngIf="unreadCount > 0">
+      {{ getUnreadCountDisplay() }}
+    </span>
+  </button>
+
+  <!-- 下拉選單 -->
+  <div class="notification-dropdown" *ngIf="isDropdownOpen">
+    <!-- 標題區 -->
+    <div class="dropdown-header">
+      <h3>通知中心</h3>
+      <div class="header-actions">
+        <!-- ✅ 移除 disabled 屬性 -->
+        <button class="action-btn" (click)="markAllAsRead()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          全部已讀
+        </button>
+        <!-- ✅ 移除 disabled 屬性 -->
+        <button class="action-btn" (click)="clearAll()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          清空
+        </button>
+      </div>
+    </div>
+
+    <!-- 系統篩選 -->
+    <div class="system-filters">
+      <button
+        class="filter-btn"
+        [class.active]="currentSystemFilter === 'ALL'"
+        (click)="changeSystemFilter('ALL')">
+        全部 <span *ngIf="unreadCount > 0">({{ unreadCount }})</span>
+      </button>
+      <button
+        *ngFor="let system of systemModules"
+        class="filter-btn"
+        [class.active]="currentSystemFilter === system.systemCode"
+        (click)="changeSystemFilter(system.systemCode)">
+        {{ system.systemName }}
+        <span *ngIf="system.unreadCount > 0">({{ system.unreadCount }})</span>
+      </button>
+    </div>
+
+    <!-- 通知清單 -->
+    <div class="notifications-list" (scroll)="onScroll($event)">
+      <!-- 通知項目 -->
+      <div
+        *ngFor="let notification of notifications; trackBy: trackByRecipientId"
+        class="notification-item"
+        [class.unread]="!notification.isRead"
+        (click)="markAsRead(notification.recipientId)">
+
+        <div class="notification-title">
+          <div class="notification-icon">{{ notification.categoryIcon }}</div>
+          <div class="notification-content">
+            <h4>{{ notification.notificationTitle }}</h4>
+            <p>{{ notification.notificationContent }}</p>
+          </div>
+        </div>
+
+        <div class="notification-footer">
+          <div class="notification-meta">
+            <span class="meta-badge">{{ notification.systemName }}</span>
+            <span class="meta-badge">{{ notification.categoryName }}</span>
+            <span class="meta-time">{{ notification.createdAt | date: 'MM/dd HH:mm' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 載入中 -->
+      <div *ngIf="isLoading && notifications.length > 0" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>載入中...</p>
+      </div>
+
+      <!-- 空狀態 -->
+      <div *ngIf="!isLoading && notifications.length === 0" class="empty-state">
+        <div class="empty-icon">🔔</div>
+        <h4>目前沒有通知</h4>
+        <p>當有新通知時會顯示在這裡</p>
+      </div>
+    </div>
+  </div>
+</div>

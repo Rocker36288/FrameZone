@@ -4,15 +4,6 @@
     <div class="logo-image">
       <img src="favicon2.png" alt="FrameZone Logo">
     </div>
-
-    <!-- <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-      class="icon icon-tabler icons-tabler-outline icon-tabler-brand-picsart">
-      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M12 9m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
-      <path d="M12 9m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
-      <path d="M5 9v11a2 2 0 1 0 4 0v-4.5" />
-    </svg> -->
     <h2 class="mb-0 fw-bold">{{ logoName }}</h2>
   </a>
   <!-- END NAVBAR LOGO -->
@@ -21,26 +12,6 @@
 <div class="card card-md">
   <div class="card-body">
     <h2 class="h2 text-center mb-4">{{ titleName }}</h2>
-
-    <!-- 錯誤訊息 -->
-    @if(errorMessage) {
-    <div class="alert alert-danger alert-dismissible" role="alert">
-      <div class="d-flex">
-        <div>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-            class="icon alert-icon">
-            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-            <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
-            <path d="M12 8v4"></path>
-            <path d="M12 16h.01"></path>
-          </svg>
-        </div>
-        <div>{{ errorMessage }}</div>
-      </div>
-      <button type="button" class="btn-close" (click)="dismissErrorMessage()" aria-label="Close"></button>
-    </div>
-    }
 
     <!-- 註冊表單 -->
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" autocomplete="off">

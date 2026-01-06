@@ -1218,36 +1218,58 @@ namespace FrameZone_WebApi.Services
                     };
                 }
 
-                // 如果有父標籤，驗證父標籤是否存在且屬於自訂分類
+                //// 如果有父標籤，驗證父標籤是否存在且屬於自訂分類
+                //if (request.ParentTagId.HasValue)
+                //{
+                //    var parentTag = await _photoRepository.GetTagByIdAsync(request.ParentTagId.Value);
+
+                //    if (parentTag == null)
+                //    {
+                //        _logger.LogWarning("⚠️ 父標籤不存在，ParentTagId: {ParentTagId}", request.ParentTagId.Value);
+                //        return new CreateCustomTagResponseDTO
+                //        {
+                //            Success = false,
+                //            Message = "父標籤不存在"
+                //        };
+                //    }
+
+                //    if (parentTag.CategoryId != customCategory.CategoryId)
+                //    {
+                //        _logger.LogWarning("⚠️ 父標籤不屬於自訂分類");
+                //        return new CreateCustomTagResponseDTO
+                //        {
+                //            Success = false,
+                //            Message = "父標籤必須屬於自訂標籤分類"
+                //        };
+                //    }
+                //}
+
+                // 目標分類：預設自訂分類
+                int targetCategoryId = customCategory.CategoryId;
+
+                // 若有父標籤：分類沿用父標籤的 CategoryId
                 if (request.ParentTagId.HasValue)
                 {
                     var parentTag = await _photoRepository.GetTagByIdAsync(request.ParentTagId.Value);
-
                     if (parentTag == null)
                     {
                         _logger.LogWarning("⚠️ 父標籤不存在，ParentTagId: {ParentTagId}", request.ParentTagId.Value);
-                        return new CreateCustomTagResponseDTO
-                        {
-                            Success = false,
-                            Message = "父標籤不存在"
-                        };
+                        return new CreateCustomTagResponseDTO { Success = false, Message = "父標籤不存在" };
                     }
 
-                    if (parentTag.CategoryId != customCategory.CategoryId)
-                    {
-                        _logger.LogWarning("⚠️ 父標籤不屬於自訂分類");
-                        return new CreateCustomTagResponseDTO
-                        {
-                            Success = false,
-                            Message = "父標籤必須屬於自訂標籤分類"
-                        };
-                    }
+                    targetCategoryId = parentTag.CategoryId;
+                }
+
+                // 若沒有父標籤但有指定分類
+                if (!request.ParentTagId.HasValue && request.CategoryId.HasValue)
+                {
+                    targetCategoryId = request.CategoryId.Value;
                 }
 
                 // 建立標籤
                 var newTag = await _photoRepository.CreateCustomTagAsync(
                     request.TagName,
-                    customCategory.CategoryId,
+                    targetCategoryId,
                     request.ParentTagId,
                     userId
                 );
@@ -1281,6 +1303,589 @@ namespace FrameZone_WebApi.Services
                 {
                     Success = false,
                     Message = $"建立標籤失敗: {ex.Message}"
+                };
+            }
+        }
+
+        /// <summary>
+        /// 取得可用分類列表
+        /// </summary>
+        public async Task<AvailableCategoriesResponseDTO> GetAvailableCategoriesAsync(long userId)
+        {
+            try
+            {
+                _logger.LogInformation("📂 取得可用分類列表，UserId: {UserId}", userId);
+
+                // 直接呼叫 Repository，Repository 已處理所有業務邏輯和錯誤
+                var result = await _photoRepository.GetCategoryListAsync(userId);
+
+                if (result.Success)
+                {
+                    _logger.LogInformation("✅ 成功取得分類列表，系統分類: {SystemCount} 個，用戶分類: {UserCount} 個",
+                        result.SystemCategories.Count, result.UserCategories.Count);
+                }
+                else
+                {
+                    _logger.LogWarning("⚠️ 取得分類列表失敗: {Message}", result.Message);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ 取得可用分類列表時發生未預期錯誤");
+                return new AvailableCategoriesResponseDTO
+                {
+                    Success = false,
+                    Message = $"系統錯誤: {ex.Message}",
+                    SystemCategories = new List<CategoryItemDTO>(),
+                    UserCategories = new List<CategoryItemDTO>()
+                };
+            }
+        }
+
+        /// <summary>
+        /// 搜尋標籤
+        /// </summary>
+        public async Task<SearchTagsResponseDTO> SearchTagsAsync(SearchTagsRequestDTO request, long userId)
+        {
+            try
+            {
+                _logger.LogInformation("🔍 搜尋標籤，Keyword: {Keyword}, UserId: {UserId}",
+                    request?.Keyword, userId);
+
+                // 驗證請求
+                if (request == null)
+                {
+                    _logger.LogWarning("⚠️ 搜尋請求不可為空");
+                    return new SearchTagsResponseDTO
+                    {
+                        Success = false,
+                        Message = "搜尋請求不可為空"
+                    };
+                }
+
+                if (string.IsNullOrWhiteSpace(request.Keyword))
+                {
+                    _logger.LogWarning("⚠️ 搜尋關鍵字不可為空");
+                    return new SearchTagsResponseDTO
+                    {
+                        Success = false,
+                        Message = "搜尋關鍵字不可為空"
+                    };
+                }
+
+                // 移除前後空白
+                request.Keyword = request.Keyword.Trim();
+
+                // 檢查關鍵字長度
+                if (request.Keyword.Length < 1 || request.Keyword.Length > 100)
+                {
+                    _logger.LogWarning("⚠️ 關鍵字長度必須在 1-100 字元之間，當前長度: {Length}", request.Keyword.Length);
+                    return new SearchTagsResponseDTO
+                    {
+                        Success = false,
+                        Message = "搜尋關鍵字長度必須在 1-100 字元之間"
+                    };
+                }
+
+                // 檢查 Limit 範圍
+                if (request.Limit < 1 || request.Limit > 100)
+                {
+                    _logger.LogWarning("⚠️ 返回數量必須在 1-100 之間，當前值: {Limit}", request.Limit);
+                    return new SearchTagsResponseDTO
+                    {
+                        Success = false,
+                        Message = "返回數量必須在 1-100 之間"
+                    };
+                }
+
+                // 呼叫 Repository 搜尋標籤
+                var tags = await _photoRepository.SearchTagsAsync(
+                    keyword: request.Keyword,
+                    userId: userId,
+                    includeSystemTags: request.IncludeSystemTags,
+                    includeUserTags: request.IncludeUserTags,
+                    categoryId: request.CategoryId,
+                    limit: request.Limit
+                );
+
+                _logger.LogInformation("✅ 標籤搜尋完成，找到 {Count} 個標籤", tags.Count);
+
+                return new SearchTagsResponseDTO
+                {
+                    Success = true,
+                    Message = "搜尋成功",
+                    Keyword = request.Keyword,
+                    Tags = tags,
+                    TotalCount = tags.Count
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ 搜尋標籤時發生錯誤");
+                return new SearchTagsResponseDTO
+                {
+                    Success = false,
+                    Message = $"搜尋失敗: {ex.Message}",
+                    Keyword = request?.Keyword ?? "",
+                    Tags = new List<TagItemDTO>(),
+                    TotalCount = 0
+                };
+            }
+        }
+
+        /// <summary>
+        /// 取得照片的所有標籤詳細資訊
+        /// </summary>
+        public async Task<PhotoTagsDetailDTO> GetPhotoTagsAsync(long photoId, long userId)
+        {
+            try
+            {
+                _logger.LogInformation("🏷️ 取得照片標籤，PhotoId: {PhotoId}, UserId: {UserId}", photoId, userId);
+
+                // 驗證照片擁有權
+                var ownerUserId = await _photoRepository.GetPhotoOwnerUserIdAsync(photoId);
+
+                if (ownerUserId == null)
+                {
+                    _logger.LogWarning("⚠️ 照片不存在，PhotoId: {PhotoId}", photoId);
+                    throw new KeyNotFoundException($"照片不存在，PhotoId: {photoId}");
+                }
+
+                if (ownerUserId.Value != userId)
+                {
+                    _logger.LogWarning("⚠️ 無權限查看照片標籤，PhotoId: {PhotoId}, UserId: {UserId}", photoId, userId);
+                    throw new UnauthorizedAccessException("無權限查看此照片的標籤");
+                }
+
+                // 查詢照片標籤詳細資訊
+                var result = await _photoRepository.GetPhotoTagsWithDetailsAsync(photoId);
+
+                _logger.LogInformation("✅ 成功取得照片標籤，PhotoId: {PhotoId}, 標籤數量: {Count}",
+                    photoId, result.TotalCount);
+
+                return result;
+            }
+            catch (KeyNotFoundException)
+            {
+                // 重新拋出，讓上層處理
+                throw;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // 重新拋出，讓上層處理
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ 取得照片標籤時發生錯誤，PhotoId: {PhotoId}", photoId);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 移除照片標籤（僅限手動添加的標籤）
+        /// </summary>
+        public async Task<RemoveTagResponseDTO> RemoveTagFromPhotoAsync(long photoId, int tagId, long userId)
+        {
+            try
+            {
+                _logger.LogInformation("🏷️ 移除照片標籤，PhotoId: {PhotoId}, TagId: {TagId}, UserId: {UserId}",
+                    photoId, tagId, userId);
+
+                // 獲取照片標籤詳細資訊（包含權限驗證）
+                PhotoTagsDetailDTO photoTags;
+                try
+                {
+                    photoTags = await GetPhotoTagsAsync(photoId, userId);
+                }
+                catch (KeyNotFoundException)
+                {
+                    return new RemoveTagResponseDTO
+                    {
+                        Success = false,
+                        Message = "照片不存在",
+                        PhotoId = photoId,
+                        TagId = tagId
+                    };
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    return new RemoveTagResponseDTO
+                    {
+                        Success = false,
+                        Message = "無權限操作此照片",
+                        PhotoId = photoId,
+                        TagId = tagId
+                    };
+                }
+
+                // 查找要移除的標籤
+                var targetTag = photoTags.AllTags.FirstOrDefault(t => t.TagId == tagId);
+
+                if (targetTag == null)
+                {
+                    _logger.LogWarning("⚠️ 標籤不存在於此照片，PhotoId: {PhotoId}, TagId: {TagId}",
+                        photoId, tagId);
+                    return new RemoveTagResponseDTO
+                    {
+                        Success = false,
+                        Message = "此照片不包含該標籤",
+                        PhotoId = photoId,
+                        TagId = tagId
+                    };
+                }
+
+                // 檢查是否可移除（僅限 MANUAL 來源）
+                if (!targetTag.CanRemove)
+                {
+                    _logger.LogWarning("⚠️ 標籤來源不允許移除，PhotoId: {PhotoId}, TagId: {TagId}, Source: {Source}",
+                        photoId, tagId, targetTag.SourceName);
+                    return new RemoveTagResponseDTO
+                    {
+                        Success = false,
+                        Message = $"無法移除 {targetTag.SourceName} 來源的標籤，僅可移除手動添加的標籤",
+                        PhotoId = photoId,
+                        TagId = tagId,
+                        TagName = targetTag.TagName
+                    };
+                }
+
+                // 呼叫 Repository 移除標籤
+                var removed = await _photoRepository.RemovePhotoTagAsync(photoId, tagId);
+
+                if (!removed)
+                {
+                    _logger.LogWarning("⚠️ 標籤移除失敗，PhotoId: {PhotoId}, TagId: {TagId}",
+                        photoId, tagId);
+                    return new RemoveTagResponseDTO
+                    {
+                        Success = false,
+                        Message = "標籤移除失敗",
+                        PhotoId = photoId,
+                        TagId = tagId,
+                        TagName = targetTag.TagName
+                    };
+                }
+
+                _logger.LogInformation("✅ 標籤移除成功，PhotoId: {PhotoId}, TagId: {TagId}, TagName: {TagName}",
+                    photoId, tagId, targetTag.TagName);
+
+                return new RemoveTagResponseDTO
+                {
+                    Success = true,
+                    Message = "標籤移除成功",
+                    PhotoId = photoId,
+                    TagId = tagId,
+                    TagName = targetTag.TagName
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ 移除照片標籤時發生錯誤，PhotoId: {PhotoId}, TagId: {TagId}",
+                    photoId, tagId);
+                return new RemoveTagResponseDTO
+                {
+                    Success = false,
+                    Message = $"系統錯誤: {ex.Message}",
+                    PhotoId = photoId,
+                    TagId = tagId
+                };
+            }
+        }
+
+        /// <summary>
+        /// 批次為多張照片添加標籤
+        /// 支援選擇現有標籤或建立新標籤
+        /// </summary>
+        public async Task<BatchAddTagsResponseDTO> BatchAddTagsToPhotosAsync(BatchAddTagsRequestDTO request, long userId)
+        {
+            try
+            {
+                _logger.LogInformation("🏷️ 批次添加標籤，照片數量: {PhotoCount}, 用戶: {UserId}",
+                    request?.PhotoIds?.Count ?? 0, userId);
+
+                // 1. 輸入驗證
+                if (request == null)
+                {
+                    return new BatchAddTagsResponseDTO
+                    {
+                        Success = false,
+                        Message = "請求參數不可為空"
+                    };
+                }
+
+                if (request.PhotoIds == null || request.PhotoIds.Count == 0)
+                {
+                    return new BatchAddTagsResponseDTO
+                    {
+                        Success = false,
+                        Message = "至少需要選擇一張照片"
+                    };
+                }
+
+                // 至少要有現有標籤或新標籤其中之一
+                bool hasExistingTags = request.ExistingTagIds != null && request.ExistingTagIds.Count > 0;
+                bool hasNewTags = request.NewTags != null && request.NewTags.Count > 0;
+
+                if (!hasExistingTags && !hasNewTags)
+                {
+                    return new BatchAddTagsResponseDTO
+                    {
+                        Success = false,
+                        Message = "請選擇現有標籤或輸入新標籤"
+                    };
+                }
+
+                // 2. 處理新標籤（建立或獲取）
+                var createdTagDTOs = new List<TagItemDTO>();
+                var newTagIds = new List<int>();
+
+                if (hasNewTags)
+                {
+                    // 獲取自訂分類作為預設分類
+                    var customCategory = await _photoRepository.GetCategoryByCodeAsync(PhotoConstants.TAG_TYPE_CUSTOM);
+
+                    if (customCategory == null)
+                    {
+                        _logger.LogError("❌ 找不到自訂標籤分類");
+                        return new BatchAddTagsResponseDTO
+                        {
+                            Success = false,
+                            Message = "系統錯誤：找不到自訂標籤分類"
+                        };
+                    }
+
+                    foreach (var newTag in request.NewTags)
+                    {
+                        // 驗證標籤名稱
+                        if (string.IsNullOrWhiteSpace(newTag.TagName))
+                        {
+                            _logger.LogWarning("⚠️ 跳過空白標籤名稱");
+                            continue;
+                        }
+
+                        string tagName = newTag.TagName.Trim();
+
+                        // 檢查標籤名稱長度
+                        if (tagName.Length > 100)
+                        {
+                            _logger.LogWarning("⚠️ 標籤名稱過長，跳過: {TagName}", tagName);
+                            continue;
+                        }
+
+                        // 確定分類 ID
+                        int categoryId = newTag.CategoryId ?? customCategory.CategoryId;
+
+                        try
+                        {
+                            // 檢查標籤是否已存在（用於判斷是否為新建立）
+                            var existingTag = await _photoRepository.GetTagByNameAsync(tagName, PhotoConstants.TAG_TYPE_USER);
+                            bool isNewlyCreated = (existingTag == null);
+
+                            // 呼叫 GetOrCreateTagAsync
+                            var tag = await _photoRepository.GetOrCreateTagAsync(
+                                tagName,
+                                PhotoConstants.TAG_TYPE_USER,
+                                categoryId,
+                                newTag.ParentTagId,
+                                userId
+                            );
+
+                            newTagIds.Add(tag.TagId);
+
+                            // 只有真正新建立的標籤才加入 createdTagDTOs
+                            if (isNewlyCreated)
+                            {
+                                createdTagDTOs.Add(new TagItemDTO
+                                {
+                                    TagId = tag.TagId,
+                                    TagName = tag.TagName,
+                                    TagType = tag.TagType,
+                                    CategoryId = tag.CategoryId,
+                                    ParentTagId = tag.ParentTagId,
+                                    PhotoCount = 0,
+                                    DisplayOrder = tag.DisplayOrder,
+                                    IsUserCreated = true
+                                });
+
+                                _logger.LogInformation("✅ 新建立標籤: {TagName} (ID: {TagId})", tag.TagName, tag.TagId);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "❌ 處理新標籤失敗: {TagName}", tagName);
+                            // 繼續處理其他標籤
+                        }
+                    }
+                }
+
+                // 3. 合併所有標籤 ID
+                var allTagIds = new List<int>();
+                if (hasExistingTags)
+                {
+                    allTagIds.AddRange(request.ExistingTagIds);
+                }
+                allTagIds.AddRange(newTagIds);
+                allTagIds = allTagIds.Distinct().ToList(); // 去重
+
+                if (allTagIds.Count == 0)
+                {
+                    return new BatchAddTagsResponseDTO
+                    {
+                        Success = false,
+                        Message = "沒有有效的標籤可添加"
+                    };
+                }
+
+                _logger.LogInformation("📋 準備添加 {TagCount} 個標籤到 {PhotoCount} 張照片",
+                    allTagIds.Count, request.PhotoIds.Count);
+
+                // 4. 處理每張照片
+                var results = new List<BatchAddTagResultItem>();
+                int successCount = 0;
+                int failedCount = 0;
+
+                foreach (var photoId in request.PhotoIds)
+                {
+                    try
+                    {
+                        // 驗證照片擁有權
+                        var ownerUserId = await _photoRepository.GetPhotoOwnerUserIdAsync(photoId);
+
+                        if (ownerUserId == null)
+                        {
+                            _logger.LogWarning("⚠️ 照片不存在，PhotoId: {PhotoId}", photoId);
+                            results.Add(new BatchAddTagResultItem
+                            {
+                                PhotoId = photoId,
+                                Success = false,
+                                ErrorMessage = "照片不存在",
+                                TagsAdded = 0
+                            });
+                            failedCount++;
+                            continue;
+                        }
+
+                        if (ownerUserId.Value != userId)
+                        {
+                            _logger.LogWarning("⚠️ 無權限操作照片，PhotoId: {PhotoId}", photoId);
+                            results.Add(new BatchAddTagResultItem
+                            {
+                                PhotoId = photoId,
+                                Success = false,
+                                ErrorMessage = "無權限操作此照片",
+                                TagsAdded = 0
+                            });
+                            failedCount++;
+                            continue;
+                        }
+
+                        // 查詢照片現有的標籤
+                        var existingPhotoTags = await _photoRepository.GetPhotoTagsByPhotoIdAsync(photoId);
+                        var existingTagIds = existingPhotoTags.Select(t => t.TagId).ToHashSet();
+
+                        // 過濾掉已存在的標籤
+                        var tagsToAdd = allTagIds.Where(tagId => !existingTagIds.Contains(tagId)).ToList();
+
+                        if (tagsToAdd.Count == 0)
+                        {
+                            // 所有標籤都已存在，記錄為成功但標籤數為 0
+                            results.Add(new BatchAddTagResultItem
+                            {
+                                PhotoId = photoId,
+                                Success = true,
+                                ErrorMessage = null,
+                                TagsAdded = 0
+                            });
+                            successCount++;
+                            continue;
+                        }
+
+                        // 批次添加標籤
+                        var addedCount = await _photoRepository.AddPhotoTagsBatchAsync(
+                            photoId,
+                            tagsToAdd,
+                            PhotoConstants.SOURCE_ID_MANUAL
+                        );
+
+                        results.Add(new BatchAddTagResultItem
+                        {
+                            PhotoId = photoId,
+                            Success = true,
+                            ErrorMessage = null,
+                            TagsAdded = addedCount
+                        });
+                        successCount++;
+
+                        _logger.LogInformation("✅ 照片 {PhotoId} 添加 {Count} 個標籤", photoId, addedCount);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "❌ 處理照片失敗，PhotoId: {PhotoId}", photoId);
+                        results.Add(new BatchAddTagResultItem
+                        {
+                            PhotoId = photoId,
+                            Success = false,
+                            ErrorMessage = $"處理失敗: {ex.Message}",
+                            TagsAdded = 0
+                        });
+                        failedCount++;
+                    }
+                }
+
+                // 5. 統計和返回結果
+                bool overallSuccess = (failedCount == 0);
+                string message;
+
+                if (overallSuccess)
+                {
+                    message = $"成功為 {successCount} 張照片添加標籤";
+                }
+                else if (successCount > 0)
+                {
+                    message = $"部分成功：{successCount} 張成功，{failedCount} 張失敗";
+                }
+                else
+                {
+                    message = $"所有照片處理失敗";
+                }
+
+                _logger.LogInformation("📊 批次添加完成 - 總計: {Total}, 成功: {Success}, 失敗: {Failed}, 新建標籤: {NewTags}",
+                    request.PhotoIds.Count, successCount, failedCount, createdTagDTOs.Count);
+
+                return new BatchAddTagsResponseDTO
+                {
+                    Success = overallSuccess,
+                    Message = message,
+                    TotalPhotos = request.PhotoIds.Count,
+                    SuccessCount = successCount,
+                    FailedCount = failedCount,
+                    CreatedTags = createdTagDTOs.Select(tag => new TagTreeNodeDTO
+                    {
+                        TagId = tag.TagId,
+                        TagName = tag.TagName,
+                        TagType = tag.TagType,
+                        CategoryId = tag.CategoryId,
+                        ParentTagId = tag.ParentTagId,
+                        PhotoCount = tag.PhotoCount,
+                        DisplayOrder = tag.DisplayOrder,
+                        Children = new List<TagTreeNodeDTO>()
+                    }).ToList(),
+                    Results = results
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ 批次添加標籤時發生系統錯誤");
+                return new BatchAddTagsResponseDTO
+                {
+                    Success = false,
+                    Message = $"系統錯誤: {ex.Message}",
+                    TotalPhotos = request?.PhotoIds?.Count ?? 0,
+                    SuccessCount = 0,
+                    FailedCount = request?.PhotoIds?.Count ?? 0
                 };
             }
         }
