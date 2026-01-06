@@ -56,5 +56,26 @@ namespace FrameZone_WebApi.Shopping.Controllers
             }
             return Unauthorized();
         }
+
+        // 建立評價 (支援批次與圖片上傳)
+        [HttpPost("batch")]
+        public async Task<IActionResult> CreateReviews([FromForm] List<DTOs.CreateReviewDto> reviews)
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!long.TryParse(userIdStr, out long userId))
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                await _reviewService.CreateReviewsAsync(userId, reviews);
+                return Ok(new { success = true, message = "評價已成功建立" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
     }
 }

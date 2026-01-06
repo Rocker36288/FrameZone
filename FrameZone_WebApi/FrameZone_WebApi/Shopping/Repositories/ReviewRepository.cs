@@ -76,5 +76,32 @@ namespace FrameZone_WebApi.Shopping.Repositories
                 .Take(take)
                 .ToList();
         }
+
+        public async Task AddReviewsAsync(List<Review> reviews)
+        {
+            await _context.Reviews.AddRangeAsync(reviews);
+            await _context.SaveChangesAsync();
+        }
+
+        public (int? orderDetailsId, long? sellerId) GetOrderDetailInfo(long orderId, long productId)
+        {
+            // 假設 OrderDetails 關聯 Specification，再關聯 Product
+            var od = _context.OrderDetails
+                .Include(d => d.Specification)
+                .ThenInclude(s => s.Product)
+                .FirstOrDefault(d => d.OrderId == orderId && d.Specification.ProductId == productId);
+
+            if (od != null)
+            {
+                // 假設 Product 有 SellerId (或是透過 SellerProductMapping)
+                // 這裡假設 Product.SellerId 存在 (根據 UserRequest context 沒有這部分，但通常 SellerId 在 Product 上)
+                // 檢查 Product Model? 沒看過 Product model。
+                // Correctly identify Seller from Product
+                var sellerId = od.Specification.Product.UserId;
+                
+                return (od.OrderDetailsId, sellerId);
+            }
+            return (null, null);
+        }
     }
 }

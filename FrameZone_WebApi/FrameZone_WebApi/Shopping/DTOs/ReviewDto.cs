@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 
@@ -41,5 +42,17 @@ namespace FrameZone_WebApi.Shopping.DTOs
         public int Star { get; set; }
         public int Count { get; set; }
         public float Percentage { get; set; }
+    }
+
+    /// <summary>
+    /// 建立評價的傳輸物件
+    /// </summary>
+    public class CreateReviewDto
+    {
+        public long OrderId { get; set; }
+        public long ProductId { get; set; }
+        public byte Rating { get; set; }
+        public string Content { get; set; }
+        public List<IFormFile> Images { get; set; }
     }
 }
