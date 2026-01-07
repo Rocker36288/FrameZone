@@ -1,0 +1,38 @@
+<!-- Airbnb 風格相簿網格 -->
+<section class="airbnb-grid mb-5">
+  <div class="grid-item grid-main">
+    <img [src]="portfolioImages[0]" alt="作品集主圖" />
+  </div>
+  <div class="grid-item" *ngFor="let image of portfolioImages.slice(1, 5)">
+    <img [src]="image" alt="作品集圖片" />
+  </div>
+  <button class="btn btn-white position-absolute bottom-0 end-0 m-3 border-dark fw-bold shadow-sm rounded-2 btn-sm"
+    (click)="onShowAllPhotos()">
+    <i class="fa-solid fa-grip-dots me-2"></i>顯示所有照片
+  </button>
+</section>
+
+<!-- 攝影師簡介 -->
+<section class="border-bottom pb-4 mb-5" *ngIf="photographer">
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+      <h1 class="fw-bold h1 mb-2">
+        {{ photographer.displayName }} · {{ photographer.studioName }}
+      </h1>
+      <p class="text-secondary mb-3">
+        從業年資 {{ photographer.yearsOfExperience }} 年 · 已完成
+        {{ photographer.totalBookings }}+ 場拍攝
+      </p>
+      <div class="d-flex gap-2">
+        <span class="tag-pill" *ngFor="let specialty of specialties">
+          {{ specialty }}
+        </span>
+      </div>
+    </div>
+    <img [src]="photographer.avatarUrl" [alt]="photographer.displayName" class="rounded-circle shadow-sm"
+      style="width: 64px; height: 64px; object-fit: cover" />
+  </div>
+  <p class="text-muted fst-italic border-start border-3 ps-3 py-1">
+    「{{ photographer.description }}」
+  </p>
+</section>

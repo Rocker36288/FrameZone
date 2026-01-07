@@ -1,4 +1,4 @@
-<div class="toast-container" *ngIf="visible">
+<div class="toast-container" [ngClass]="currentPosition" *ngIf="visible">
   <div class="toast show">
     <div class="toast-body">
       {{ message }}

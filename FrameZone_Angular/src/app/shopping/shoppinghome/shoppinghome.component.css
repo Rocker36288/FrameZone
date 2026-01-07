@@ -56,33 +56,39 @@
 
 
 .row {
-  margin: 60px;
+  margin: 120px;
   margin-bottom: 100px;
   margin-top: 50px;
   padding: 50px;
+  /* position: relative; */
 }
 
-.card {
-  width: 90%;
-  margin: auto;
-  background-color: rgb(244, 246, 255);
+/* .card {
   border: none;
-  /* 移除邊框 */
-  border-radius: 12px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
-  /* 設定過渡動畫 */
+  設定過渡動畫
   overflow: hidden;
-  /* 圖片放大時不會溢出圓角邊界 */
+  圖片放大時不會溢出圓角邊界
+  border-radius: 0.5rem;
+  background: white;
+} */
 
-}
-
-.card:hover {
-  /* transform: translateY(-5px); */
+/* .card:hover {
+  transform: translateY(-5px);
   box-shadow: 0 10px 25px rgba(118, 75, 162, 0.2);
-  /* 項目之間水平間距 (例如 1.5rem) */
+  項目之間水平間距 (例如 1.5rem)
   margin: 1.7rem;
   cursor: pointer;
   transition: transform 0.3s ease;
+} */
+
+.popularproduct {
+  padding-top: 30px;
+}
+
+.recentlyviewed {
+  padding-top: 30px;
 }
 
 .category-item {
@@ -101,7 +107,7 @@
   width: 100%;
   margin: 0;
   height: 100%;
-  background: linear-gradient(145deg, #ffffff 0%, #f0f2ff 100%);
+  background: white;
   box-shadow: 0 8px 20px rgba(118, 75, 162, 0.15);
   transition: box-shadow 0.3s ease, background 0.3s ease;
   /* 只變化陰影和背景，不變化 transform */
@@ -190,6 +196,7 @@
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
+
 .recently-viewed {
   background: linear-gradient(135deg, #7999f1 0%, #764ba2 100%);
   ;
@@ -241,9 +248,8 @@
 .col-lg-2 .card,
 .col-md-3 .card,
 .col-6 .card {
-  width: 90%;
   margin: auto;
-  background-color: rgb(244, 246, 255);
+  background: white;
   border: none;
   border-radius: 12px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -322,24 +328,24 @@
 }
 
 /* 收藏按鈕樣式 */
-.similar-fav-btn {
+/* .similar-fav-btn {
   transition: transform 0.2s ease-in-out;
-}
+} */
 
 .similar-fav-btn:active {
-  transform: scale(1.2);
+  /* transform: scale(1.2); */
   /* 點擊時縮放一下 */
 }
 
 /* 紅色實心狀態 */
 .text-danger {
-  color: #ff4d4f !important;
-  fill: #ff4d4f !important;
+  /* color: #ff4d4f !important;
+  fill: #ff4d4f !important; */
   /* 針對 SVG 的填充色 */
 }
 
 /* Toast 簡易動畫 */
-.toast {
+/* .toast {
   display: none;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -348,17 +354,17 @@
 .toast.show {
   display: block;
   opacity: 1;
-}
+} */
 
 .toast-container {
-  pointer-events: none;
+  /* pointer-events: none; */
   /* 避免擋住下方的按鈕點擊 */
 }
 
-.toast-body {
+/* .toast-body {
   font-size: 1rem;
   padding: 1rem 1.5rem;
-}
+} */
 
 @keyframes fadeInUp {
   from {
@@ -390,6 +396,15 @@
   width: 100%;
 }
 
+/* 查看所有商品連結 */
+.view-all-link {
+  color: #6264f1;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+
 /* 響應式設計，讓一個網站的版面和內容能夠根據使用者正在使用的設備螢幕尺寸、方向和解析度來自動調整、優化顯示效果 */
 @media (max-width: 768px) {
   .carousel {
@@ -418,36 +433,6 @@
     height: 70px;
     width: 70px;
   }
-}
-
-/* 查看所有商品連結 */
-.view-all-link {
-  color: #ffffff;
-  text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 500;
-  padding: 6px 14px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.15);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.view-all-link .arrow {
-  transition: transform 0.3s ease;
-}
-
-/* hover 動畫 */
-.view-all-link:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-1px);
-}
-
-.view-all-link:hover .arrow {
-  transform: translateX(4px);
 }
 
 /* 手機版微調 */

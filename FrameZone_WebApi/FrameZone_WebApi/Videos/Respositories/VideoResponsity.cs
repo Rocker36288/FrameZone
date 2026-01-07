@@ -8,11 +8,11 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FrameZone_WebApi.Videos.Repositories
 {
-    public class VideoRespository
+    public class VideoRepository
     {
         private readonly AAContext _context;
 
-        public VideoRespository(AAContext context)
+        public VideoRepository(AAContext context)
         {
             _context = context;
         }
@@ -141,12 +141,54 @@ namespace FrameZone_WebApi.Videos.Repositories
             return target;
         }
 
-        public async Task<Comment> CreateCommentAsync(Comment comment)
+        public async Task<VideoCommentDto> CreateCommentAsync(Comment comment)
         {
             _context.Comments.Add(comment);
             await _context.SaveChangesAsync();
-            return comment;
+
+            var c = await _context.Comments
+      .Include(x => x.User)
+          .ThenInclude(u => u.Channel)
+      .Include(x => x.User)
+          .ThenInclude(u => u.UserProfile)
+      .SingleAsync(x => x.CommentId == comment.CommentId);
+
+            var returnComment = new VideoCommentDto
+            {
+                Id = c.CommentId,
+                UserName = c.User?.Channel?.ChannelName ?? "Unknown",
+                Avatar = c.User?.UserProfile?.Avatar ?? "",
+                Message = c.CommentContent,
+                CreatedAt = c.CreatedAt,
+                Likes = 0,
+                Replies = new List<VideoCommentDto>()
+            };
+
+            return returnComment;
         }
+
+        /// <summary>
+        /// 1️⃣ 檢測是否存在指定 SystemId
+        /// </summary>
+        public async Task<int> GetTargetTypeIdBySystemIdAsync(int systemId)
+        {
+            return await _context.TargetTypes
+                .AsNoTracking()
+                .Where(t => t.SystemId == systemId)
+                .Select(t => t.TargetTypeId)
+                .FirstOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// 2️⃣ 建立 TargetType
+        /// </summary>
+        public async Task<int> CreateAsync(TargetType targetType)
+        {
+            _context.TargetTypes.Add(targetType);
+            await _context.SaveChangesAsync();
+            return targetType.TargetTypeId;
+        }
+
 
         /* =====================================================
          * 📺 Channel
@@ -225,6 +267,7 @@ namespace FrameZone_WebApi.Videos.Repositories
         {
             var videos = await _context.Videos
                 .AsNoTracking()
+                .Where(v => v.IsDeleted == false)
                 .Include(v => v.Channel)
                     .ThenInclude(c => c.UserProfile)
                 .OrderByDescending(v => v.CreatedAt)
@@ -292,8 +335,10 @@ namespace FrameZone_WebApi.Videos.Repositories
         public async Task<VideoLikesDto> VideosLikeToggleAsync(int userId, string guid)
         {
             var video = await _context.Videos
-                .AsNoTracking()
-                .FirstOrDefaultAsync(v => v.VideoUrl == guid);
+      .AsNoTracking()
+      .Where(v => v.VideoUrl == guid)
+      .Select(v => new { v.VideoId })
+      .FirstOrDefaultAsync();
 
             if (video == null)
                 throw new KeyNotFoundException("Video not found.");
@@ -303,34 +348,172 @@ namespace FrameZone_WebApi.Videos.Repositories
 
             if (like == null)
             {
-                // 不追蹤實體，EF 只生成 INSERT
-                var newLike = new Like
+                _context.Likes.Add(new Like
                 {
                     UserId = userId,
                     VideoId = video.VideoId,
                     CreatedAt = DateTime.UtcNow
-                };
-
-                _context.Likes.Attach(newLike); // 告訴 EF 這個實體存在
-                _context.Entry(newLike).State = EntityState.Added; // 明確指定新增
+                });
 
                 await _context.SaveChangesAsync();
                 return new VideoLikesDto { IsLikes = true };
             }
-            else
-            {
-                _context.Likes.Remove(like);
-                await _context.SaveChangesAsync();
-                return new VideoLikesDto { IsLikes = false };
-            }
+
+            _context.Likes.Remove(like);
+            await _context.SaveChangesAsync();
+            return new VideoLikesDto { IsLikes = false };
         }
 
         /* =====================================================
-        * 搜尋
+        * Comment Likes
         * ===================================================== */
-        //public async Task<List<VideoCardDto>> VideoSearchAsync()
-        //{
 
-        //}
+        /* =====================================================
+        * Channel Folow
+        * ===================================================== */
+        public async Task<bool> CheckFollowingAsync(int userId, int channelId)
+        {
+            return await _context.Followings
+                .AsNoTracking()
+                .AnyAsync(f => f.UserId == userId && f.ChannelId == channelId);
+        }
+
+        public async Task<bool> FollowingToggleAsync(int userId, int channelId)
+        {
+            var follow = await _context.Followings
+                .FirstOrDefaultAsync(f => f.UserId == userId && f.ChannelId == channelId);
+
+            if (follow == null)
+            {
+                _context.Followings.Add(new Following
+                {
+                    UserId = userId,
+                    ChannelId = channelId,
+                    CreatedAt = DateTime.UtcNow
+                });
+
+                await _context.SaveChangesAsync();
+                return true; // 已 Follow
+            }
+
+            _context.Followings.Remove(follow);
+            await _context.SaveChangesAsync();
+            return false; // 已 Unfollow
+        }
+
+        /* =====================================================
+        * Watch History
+        * ===================================================== */
+        public async Task<View?> GetByUserAndVideoViewsAsync(int userId, int videoId)
+        {
+            return await _context.Views
+                .FirstOrDefaultAsync(v => v.UserId == userId && v.VideoId == videoId);
+        }
+
+        public async Task ViewsAddAsync(View view)
+        {
+            await _context.Views.AddAsync(view);
+        }
+
+        public void ViewsUpdate(View view)
+        {
+            _context.Views.Update(view);
+        }
+
+        public async Task ViewsSaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<WatchHistoryDto>> GetWatchHistoryByUserIdAsync(int userId)
+        {
+            var views = await _context.Views
+                .Include(v => v.Video)
+                    .ThenInclude(video => video.Channel)
+                        .ThenInclude(c => c.UserProfile)
+                .Where(v => v.UserId == userId)
+                .OrderBy(v => v.UpdateAt)
+                .ToListAsync();
+
+            var videos = views.Select(v => v.Video!).ToList();
+
+            var videoDtos = await MapVideosToDtoAsync(videos);
+
+            var result = views.Select(v => new WatchHistoryDto
+            {
+                Video = videoDtos.First(dto => dto.VideoId == v.VideoId),
+                LastPosition = v.LastPosition,
+                LastWatchedAt = v.UpdateAt
+            }).ToList();
+
+            return result;
+        }
+
+
+
+        /* =====================================================
+         * 搜尋影片 + DTO 映射
+         * ===================================================== */
+
+        public async Task<List<VideoCardDto>> SearchVideosAsync(
+     string? keyword = null,
+     string sortBy = "date",
+     string sortOrder = "desc",
+     int take = 10)
+        {
+            var query = _context.Videos
+                .AsNoTracking()
+                .Include(v => v.Channel)
+                    .ThenInclude(c => c.UserProfile)
+                .AsQueryable();
+
+            // 關鍵字搜尋
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                query = query.Where(v =>
+                    (v.Title != null && v.Title.Contains(keyword)) ||
+                    (v.Description != null && v.Description.Contains(keyword))
+                );
+            }
+
+            // 投影並計算統計
+            var projectedQuery = query.Select(v => new
+            {
+                Video = v,
+                LikeCount = v.Likes.Count,      // 使用導航屬性
+                ViewCount = v.Views.Count       // 使用導航屬性
+            });
+
+            // 排序
+            projectedQuery = (sortBy.ToLower(), sortOrder.ToLower()) switch
+            {
+                ("likes", "asc") => projectedQuery.OrderBy(x => x.LikeCount),
+                ("likes", "desc") => projectedQuery.OrderByDescending(x => x.LikeCount),
+                ("views", "asc") => projectedQuery.OrderBy(x => x.ViewCount),
+                ("views", "desc") => projectedQuery.OrderByDescending(x => x.ViewCount),
+                ("date", "asc") => projectedQuery.OrderBy(x => x.Video.CreatedAt),
+                _ => projectedQuery.OrderByDescending(x => x.Video.CreatedAt)
+            };
+
+            var videoStats = await projectedQuery.Take(take).ToListAsync();
+
+            return videoStats.Select(x => new VideoCardDto
+            {
+                VideoId = x.Video.VideoId,
+                Title = x.Video.Title ?? "",
+                VideoUri = x.Video.VideoUrl ?? "",
+                Thumbnail = x.Video.ThumbnailUrl ?? "",
+                Duration = x.Video.Duration ?? 0,
+                Views = x.ViewCount,
+                Likes = x.LikeCount,
+                PublishDate = x.Video.PublishDate ?? DateTime.MinValue,
+                Description = x.Video.Description ?? "",
+                ChannelId = x.Video.ChannelId,
+                ChannelName = x.Video.Channel?.ChannelName ?? "",
+                Avatar = x.Video.Channel?.UserProfile?.Avatar ?? ""
+            }).ToList();
+        }
+
     }
-}
+
+ }

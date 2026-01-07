@@ -17,6 +17,8 @@ namespace FrameZone_WebApi.Socials.Repositories
             try
             {
                 return await _context.Posts
+                    .Include(p => p.User)
+                        .ThenInclude(u => u.UserProfile)
                     //依照貼文Id查詢 & 不顯示已刪除的貼文
                     .Where(p =>
                         p.Status != "Deleted" &&
@@ -38,6 +40,8 @@ namespace FrameZone_WebApi.Socials.Repositories
             try
             {
                 return await _context.Posts
+                    .Include(p => p.User)
+                        .ThenInclude(u => u.UserProfile)
                     //依照貼文Id查詢 & 不顯示已刪除的貼文
                     .Where(p =>
                         p.PostId == postId &&

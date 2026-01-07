@@ -2,10 +2,11 @@ import { Component, Input } from '@angular/core';
 import { NgIf, NgForOf } from "@angular/common";
 import { VideoDurationPipe } from "../../../pipes/video-duration.pipe";
 import { ChannelCard, VideoCardData } from '../../../models/video-model';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-video-creatorspotlight',
-  imports: [NgIf, NgForOf, VideoDurationPipe],
+  imports: [DatePipe, NgIf, NgForOf, VideoDurationPipe],
   templateUrl: './video-creatorspotlight.component.html',
   styleUrl: './video-creatorspotlight.component.css'
 })

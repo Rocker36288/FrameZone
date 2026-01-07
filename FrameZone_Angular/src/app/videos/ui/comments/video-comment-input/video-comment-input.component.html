@@ -2,7 +2,8 @@
   <div class="d-flex align-items-start gap-3">
 
     <!-- User Avatar -->
-    <img src="https://i.pravatar.cc/48" class="rounded-circle" width="48" height="48" alt="User Avatar" />
+    <img [src]="user?.avatar" class="rounded-circle" width="48" height="48" alt="User Avatar"
+      (error)="onAvatarlError($event)" />
 
     <!-- Input Area -->
     <div class="flex-grow-1">

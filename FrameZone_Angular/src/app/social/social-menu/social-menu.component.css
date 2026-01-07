@@ -1,0 +1,151 @@
+/* --- 1. 卡片外殼與佈局 --- */
+.menu-card {
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #ffffff;
+  border: 1px solid #f0f2ff;
+  border-radius: 12px;
+}
+
+.menu-card .card-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.menu-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding-left: 0.25rem;
+  color: #333;
+}
+
+/* --- 2. 搜尋框樣式 (重點修改) --- */
+.custom-search {
+  border-radius: 12px;
+  /* 稍微圓潤一點 */
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(115, 143, 238, 0.1);
+  /* 使用主色調的淡陰影 */
+  border: 1px solid #e0e4ff;
+  transition: all 0.3s ease;
+}
+
+.search-icon-box {
+  /* 改用你提供的 #738fee 作為搜尋按鈕底色 */
+  background: linear-gradient(135deg, #738fee 0%, #806afc 100%) !important;
+  border: none !important;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.search-icon-box i {
+  color: white !important;
+  font-size: 0.9rem;
+}
+
+.custom-search .form-control {
+  background-color: #ffffff !important;
+  border: none !important;
+  /* 移除內部邊框讓視覺更簡潔 */
+  font-size: 0.95rem;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.custom-search .form-control:focus {
+  background-color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+/* 搜尋框聚焦時：外框發光效果改為紫色系 */
+.custom-search:focus-within {
+  border-color: #738fee !important;
+  box-shadow: 0 0 0 3px rgba(115, 143, 238, 0.15);
+}
+
+/* --- 3. 選單列表與滾動條 --- */
+.menu-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.menu-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.menu-list::-webkit-scrollbar-thumb {
+  background: #b4bef7;
+  /* 統一使用色票中的淡紫色 */
+  border-radius: 10px;
+}
+
+/* --- 4. 選單按鈕項目 --- */
+.menu-item-btn {
+  background-color: transparent;
+  border: none !important;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 12px;
+  /* 稍微增加高度增加呼吸感 */
+  margin-bottom: 4px;
+  border-radius: 8px;
+  text-decoration: none !important;
+  color: #444 !important;
+  cursor: pointer;
+}
+
+.menu-item-btn:hover {
+  background-color: #f0f2ff;
+  /* 懸停時的淡紫色 */
+  transform: translateX(4px);
+  color: #738fee !important;
+  /* 文字稍微變色 */
+}
+
+.menu-item-btn:active {
+  background-color: #e0e4ff;
+  transform: scale(0.97);
+}
+
+/* 圖示圓圈加深 */
+.icon-circle {
+  width: 36px;
+  height: 36px;
+  /* 背景用極淺紫，但圖示顏色加深 */
+  background-color: #f0f2ff;
+  color: #5473f3;
+  /* 這裡加深為色票中的 #5473f3 */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  font-size: 1.15rem;
+  /* 稍微放大一點點 */
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  border: 1px solid #e0e4ff;
+  /* 增加一個極細邊框讓邊緣更銳利 */
+}
+
+/* 懸停時圖示的變化 */
+.menu-item-btn:hover .icon-circle {
+  background: linear-gradient(135deg, #738fee 0%, #5473f3 100%);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+/* 選單文字加深 */
+.menu-item-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  /* 加粗一點點 */
+  color: #2d2d2d;
+  /* 改用更深的灰黑色 */
+}

@@ -1,10 +1,37 @@
-<div class="card shadow-sm">
+<div class="card shadow-sm friend-list-card">
   <div class="card-body">
-    <h3 class="mb-3">線上朋友</h3>
-    <div class="d-flex align-items-center mb-2">
-      <img src="https://via.placeholder.com/35" class="rounded-circle me-2" />
-      <span>好友</span>
-      <span class="badge bg-success ms-auto" style="width:10px;height:10px;border-radius:50%;"></span>
+    <h3 class="friend-list-title">線上朋友</h3>
+
+    <div class="input-group custom-search">
+      <span class="input-group-text search-icon-box border-end-0">
+        <i class="bi bi-search"></i>
+      </span>
+      <input type="text" class="form-control border-start-0 ps-2" placeholder="搜尋好友...">
+    </div>
+
+    <div class="friend-list-content">
+      @for (f of friends; track f.id) {
+      <button class="friend-btn rounded" type="button" (click)="selectFriend(f)">
+        <img [src]="f.avatar" class="friend-avatar" [alt]="f.name" />
+        <span class="friend-name">{{ f.name }}</span>
+        <span class="status-dot" [ngClass]="f.online ? 'bg-success' : 'bg-secondary'"></span>
+      </button>
+      }
+
+      <hr class="my-3">
+
+      <h3 class="friend-list-title">群組聊天室</h3>
+
+      @for (g of groupChats; track g.id) {
+      <button class="friend-btn rounded" type="button">
+        <div class="icon-circle d-flex align-items-center justify-content-center"
+          style="width: 35px; height: 35px; margin-right: 12px; border-radius: 50%;"
+          [style.backgroundColor]="g.bgColor">
+          <i [ngClass]="g.iconClass" style="font-size: 0.9rem;" [style.color]="g.iconColor"></i>
+        </div>
+        <span class="friend-name">{{ g.name }}</span>
+      </button>
+      }
     </div>
   </div>
 </div>

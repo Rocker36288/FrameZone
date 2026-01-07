@@ -1,0 +1,146 @@
+/* --- 1. 容器與背景設定 --- */
+:host {
+  display: block;
+  min-height: 100vh;
+  padding: 0 !important;
+  background-color: #ffffff;
+  /* 確保整體底色為純白 */
+}
+
+.profile-container {
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* --- 2. 個人檔案標頭 --- */
+.profile-header {
+  background: #ffffff;
+  /* 將原本的灰色邊框改為淡淡的紫色系邊框，增加質感 */
+  border-bottom: 1px solid #e0e4ff;
+  padding: 24px 16px 0 16px;
+  margin-bottom: 12px;
+}
+
+.top-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #ffffff;
+  /* 留白的顏色 */
+  box-sizing: border-box;
+}
+
+.avatar-circle img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  /* 圖片自己也變圓形 */
+  object-fit: cover;
+}
+
+.user-text h1 {
+  font-size: 24px;
+  margin: 0;
+  font-weight: bold;
+  color: #333;
+  /* 深灰色文字確保易讀 */
+}
+
+/* --- 3. 元件滿版設定 --- */
+.content-area {
+  padding: 0;
+}
+
+app-social-posts-submit,
+app-social-posts-list {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- 4. Tab 選單樣式 --- */
+.tab-nav {
+  display: flex;
+  justify-content: center;
+}
+
+.tab-nav button {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 15px 0;
+  font-weight: 600;
+  color: #8e8e8e;
+  /* 未選中時的顏色 */
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tab-nav button:hover {
+  /* 滑鼠經過時，使用極淺的紫色背景 */
+  background-color: #f0f2ff;
+  color: #738fee;
+}
+
+.tab-nav button.active {
+  /* 選中狀態：使用提供的 #738fee */
+  color: #738fee;
+  border-bottom-color: #738fee;
+}
+
+/* --- 5. 按鈕樣式 --- */
+.action-group {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  /* 增加過渡時間到 0.3s 更有質感 */
+}
+
+.btn-primary {
+  /* 使用你喜歡的漸層色 */
+  background: linear-gradient(135deg, #738fee 0%, #806afc 100%);
+  color: #ffffff;
+  /* 解決閃爍： hover 時不改變 background 屬性，改用 filter */
+}
+
+.btn-primary:hover {
+  /* 讓漸層色變深 15%，這樣不會閃爍且保有漸層感 */
+  filter: brightness(0.9);
+
+}
+
+.btn-secondary {
+  background: #f0f2ff;
+  color: #5473f3;
+  /* 這裡也同步加深了文字顏色 */
+  border: 1px solid #b4bef7;
+}
+
+.btn-secondary:hover {
+  background: #e0e4ff;
+  color: #5473f3;
+  border-color: #738fee;
+}

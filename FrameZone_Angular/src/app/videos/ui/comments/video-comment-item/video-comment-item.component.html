@@ -2,16 +2,17 @@
 
   <!-- Avatar -->
   <div>
-    <img [src]='comment?.avatar' class="rounded-circle" width="40" height="40" alt="User Avatar" />
+    <img [src]='comment?.avatar' class="rounded-circle" width="40" height="40" alt="User Avatar"
+      (error)="onAvatarlError($event)" />
   </div>
 
 
-  <div class="flex-grow-1">
+  <div class=" flex-grow-1">
 
     <!-- Username + Time -->
     <div class="d-flex align-items-center gap-2 mb-1">
       <strong>{{ comment?.userName }}</strong>
-      <span class="text-muted small">{{ comment!.createdAt| videoTimeago }}</span>
+      <span class="text-muted small">{{ comment!.createdAt| date:'yyyy-MM-dd':'UTC' }}</span>
     </div>
 
     <!-- Comment Text -->

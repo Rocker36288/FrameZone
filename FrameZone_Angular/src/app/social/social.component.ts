@@ -16,6 +16,17 @@ import { SocialChatComponent } from "./social-chat/social-chat.component";
 })
 export class SocialComponent {
 
+  selectedFriend: { id: number; name: string } | null = null;
+
+  onFriendSelected(friend: { id: number; name: string }) {
+    this.selectedFriend = friend;
+  }
+
+  onChatClosed() {
+    this.selectedFriend = null;
+  }
+
+
   // 偵測頁面捲動
   showBackToTop = false;
   @HostListener("window:scroll", [])

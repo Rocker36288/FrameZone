@@ -1,17 +1,55 @@
-<!-- 聊天室小按鈕 -->
-<button class="mini-btn" (click)="toggleChat()" [class.active]="isOpen">chat</button>
+<!-- 浮動開關 -->
+<button class="mini-btn" (click)="toggleChat()" [class.active]="isOpen">
+  <i class="bi bi-chat-right-dots"></i>
+</button>
 
-<!-- 聊天室視窗 -->
+<!-- 聊天視窗 -->
 <div class="chat-window" [class.open]="isOpen">
   <div class="chat-header">
-    聊天室
-    <span class="close-btn" (click)="toggleChat()">關閉</span>
+    {{ selectedFriend?.name || '好友' }}
+    <span class="close-btn" (click)="toggleChat()">×</span>
   </div>
+
   <div class="chat-body">
-    聊天內容
+    @if (loading) {
+    <div>載入聊天室中...</div>
+    }
+    @else if (error) {
+    <div class="text-danger">{{ error }}</div>
+    }
+    @else if (room) {
+    <div class="message-list">
+      @if (messages.length === 0) {
+      <div class="text-muted">還沒有訊息</div>
+      }
+      @else {
+      @for (message of messages; track message.id ?? $index) {
+      <div class="message-row" [class.own]="message.isOwn">
+        @if (!message.isOwn) {
+        <img class="avatar" [src]="message.avatar" [alt]="message.displayName" />
+        }
+        @else {
+        <div class="avatar-spacer"></div>
+        }
+        <div class="bubble">
+          <div class="meta">
+            <span class="name">{{ message.displayName }}</span>
+            <span class="time">{{ message.time }}</span>
+          </div>
+          <div class="text">{{ message.content }}</div>
+        </div>
+      </div>
+      }
+      }
+    </div>
+    }
   </div>
+
+  @if (room) {
   <div class="chat-typing">
-    <input type="text" placeholder="輸入訊息…" />
-    <button class="send-btn">➤</button>
+    <input #messageInput type="text" placeholder="輸入訊息..."
+      (keyup.enter)="sendMessage(messageInput.value); messageInput.value='';" />
+    <button class="send-btn" (click)="sendMessage(messageInput.value); messageInput.value='';">></button>
   </div>
+  }
 </div>

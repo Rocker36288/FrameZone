@@ -13,5 +13,9 @@ import { SellerSidebarComponent } from './seller-sidebar/seller-sidebar.componen
   styleUrl: './seller-layout.component.css'
 })
 export class SellerLayoutComponent {
+  isSidebarCollapsed = false;
 
+  toggleSidebar() {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+  }
 }

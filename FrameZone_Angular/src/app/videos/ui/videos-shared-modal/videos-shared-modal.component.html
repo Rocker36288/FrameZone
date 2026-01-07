@@ -1,0 +1,57 @@
+<div class="share-backdrop" (click)="close()" [@fadeIn]></div>
+
+<!-- Modal -->
+<div class="share-modal card shadow-lg" [@slideUp]>
+  <!-- Header -->
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h3 class="card-title mb-0">
+      <i class="ti ti-share me-2"></i>分享
+    </h3>
+    <button class="btn-close" (click)="close()" aria-label="關閉"></button>
+  </div>
+
+  <!-- Body -->
+  <div class="card-body">
+    <!-- Share Icons -->
+    <div class="share-icons mb-4">
+      <button class="btn btn-outline-primary share-btn" (click)="shareToFacebook()" title="分享到 Facebook">
+        <i class="ti ti-brand-facebook"></i>
+        <span class="btn-label">Facebook</span>
+      </button>
+      <button class="btn btn-outline-info share-btn" (click)="shareToTwitter()" title="分享到 Twitter">
+        <i class="ti ti-brand-twitter"></i>
+        <span class="btn-label">Twitter</span>
+      </button>
+      <button class="btn btn-outline-success share-btn" (click)="shareToLine()" title="分享到 LINE">
+        <i class="ti ti-brand-line"></i>
+        <span class="btn-label">LINE</span>
+      </button>
+      <button class="btn btn-outline-secondary share-btn" (click)="shareViaEmail()" title="透過電子郵件分享">
+        <i class="ti ti-mail"></i>
+        <span class="btn-label">Email</span>
+      </button>
+    </div>
+
+    <!-- Divider -->
+    <div class="divider-with-text mb-3">
+      <span>或複製連結</span>
+    </div>
+
+    <!-- Copy Link -->
+    <label class="form-label fw-semibold">分享連結</label>
+    <div class="input-group">
+      <input #linkInput type="text" class="form-control" [value]="shareUrl" readonly (focus)="onInputFocus($event)" />
+      <button class="btn btn-primary copy-btn" [class.copied]="isCopied" (click)="copyLink(linkInput)"
+        [disabled]="isCopied">
+        <i class="ti" [ngClass]="isCopied ? 'ti-check' : 'ti-copy'"></i>
+        <span>{{ isCopied ? '已複製' : '複製' }}</span>
+      </button>
+    </div>
+
+    <!-- Success message -->
+    <div class="copy-success" *ngIf="isCopied" [@fadeInOut]>
+      <i class="ti ti-circle-check"></i>
+      連結已複製到剪貼簿
+    </div>
+  </div>
+</div>

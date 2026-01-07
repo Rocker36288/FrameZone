@@ -2,7 +2,6 @@
   <div class="settings-header">
     <div>
       <h1 class="settings-title">金流設定</h1>
-      <p class="settings-subtitle">開啟或關閉您商店的付款方式</p>
     </div>
   </div>
 
@@ -14,20 +13,21 @@
     <div *ngFor="let method of getMethodsByType('credit_card')" class="payment-item">
       <div class="payment-content">
         <div class="payment-icon credit-card">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect width="20" height="14" x="2" y="5" rx="2" />
-            <path d="M2 10h20" />
-          </svg>
+          <i class="ti ti-credit-card"></i>
         </div>
         <div class="payment-info">
           <div class="payment-name">{{ method.name }}</div>
           <div class="payment-description">{{ method.description }}</div>
           <div class="payment-meta">
             <span class="meta-tag">{{ method.provider }}</span>
-            <span class="meta-text">⚡ {{ method.processingTime }}</span>
-            <span class="meta-text">💰 手續費: {{ method.feeType === 'percentage' ? method.transactionFee + '%' : 'NT$' +
-              method.transactionFee }}</span>
+            <span class="meta-text">
+              <i class="ti ti-bolt"></i>
+              {{ method.processingTime }}
+            </span>
+            <span class="meta-text">
+              <i class="ti ti-coin"></i>
+              手續費: {{ method.feeType === 'percentage' ? method.transactionFee + '%' : 'NT$' + method.transactionFee }}
+            </span>
           </div>
         </div>
       </div>
@@ -48,25 +48,21 @@
     <div *ngFor="let method of getMethodsByType('atm')" class="payment-item">
       <div class="payment-content">
         <div class="payment-icon atm">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 21h18" />
-            <path d="M5 21V7l8-4v18" />
-            <path d="M19 21V11l-6-4" />
-            <path d="M9 9v.01" />
-            <path d="M9 12v.01" />
-            <path d="M9 15v.01" />
-            <path d="M9 18v.01" />
-          </svg>
+          <i class="ti ti-building-bank"></i>
         </div>
         <div class="payment-info">
           <div class="payment-name">{{ method.name }}</div>
           <div class="payment-description">{{ method.description }}</div>
           <div class="payment-meta">
             <span class="meta-tag">{{ method.provider }}</span>
-            <span class="meta-text">⏱️ {{ method.processingTime }}</span>
-            <span class="meta-text">💰 手續費: {{ method.feeType === 'percentage' ? method.transactionFee + '%' : 'NT$' +
-              method.transactionFee }}</span>
+            <span class="meta-text">
+              <i class="ti ti-clock"></i>
+              {{ method.processingTime }}
+            </span>
+            <span class="meta-text">
+              <i class="ti ti-coin"></i>
+              手續費: {{ method.feeType === 'percentage' ? method.transactionFee + '%' : 'NT$' + method.transactionFee }}
+            </span>
           </div>
         </div>
       </div>
@@ -87,21 +83,21 @@
     <div *ngFor="let method of getMethodsByType('ewallet')" class="payment-item">
       <div class="payment-content">
         <div class="payment-icon ewallet">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path
-              d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
-            <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
-          </svg>
+          <i class="ti ti-wallet"></i>
         </div>
         <div class="payment-info">
           <div class="payment-name">{{ method.name }}</div>
           <div class="payment-description">{{ method.description }}</div>
           <div class="payment-meta">
             <span class="meta-tag">{{ method.provider }}</span>
-            <span class="meta-text">⚡ {{ method.processingTime }}</span>
-            <span class="meta-text">💰 手續費: {{ method.feeType === 'percentage' ? method.transactionFee + '%' : 'NT$' +
-              method.transactionFee }}</span>
+            <span class="meta-text">
+              <i class="ti ti-bolt"></i>
+              {{ method.processingTime }}
+            </span>
+            <span class="meta-text">
+              <i class="ti ti-coin"></i>
+              手續費: {{ method.feeType === 'percentage' ? method.transactionFee + '%' : 'NT$' + method.transactionFee }}
+            </span>
           </div>
         </div>
       </div>
@@ -122,23 +118,21 @@
     <div *ngFor="let method of getMethodsByType('cod')" class="payment-item">
       <div class="payment-content">
         <div class="payment-icon cod">
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10 17h4V5H2v12h3" />
-            <path d="M20 17h2v-3.34a4 4 0 0 0-1.17-2.83L19 9h-5" />
-            <path d="M14 17h1" />
-            <circle cx="7.5" cy="17.5" r="2.5" />
-            <circle cx="17.5" cy="17.5" r="2.5" />
-          </svg>
+          <i class="ti ti-truck-delivery"></i>
         </div>
         <div class="payment-info">
           <div class="payment-name">{{ method.name }}</div>
           <div class="payment-description">{{ method.description }}</div>
           <div class="payment-meta">
             <span class="meta-tag">{{ method.provider }}</span>
-            <span class="meta-text">📍 {{ method.processingTime }}</span>
-            <span class="meta-text">💰 手續費: {{ method.feeType === 'percentage' ? method.transactionFee + '%' : 'NT$' +
-              method.transactionFee }}</span>
+            <span class="meta-text">
+              <i class="ti ti-map-pin"></i>
+              {{ method.processingTime }}
+            </span>
+            <span class="meta-text">
+              <i class="ti ti-coin"></i>
+              手續費: {{ method.feeType === 'percentage' ? method.transactionFee + '%' : 'NT$' + method.transactionFee }}
+            </span>
           </div>
         </div>
       </div>

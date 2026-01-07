@@ -1,26 +1,52 @@
-/* src/app/shopping/seller/seller-layout/seller-layout.component.css */
-
 .seller-layout {
   min-height: 100vh;
   background: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  padding-top: 50px;
 }
 
 .layout-body {
   display: flex;
-  padding-top: 60px;
-  min-height: 100vh;
+  /* 使用 flex-grow 填滿剩餘高度，而不是設定 min-height */
+  flex: 1;
+  position: relative;
 }
 
 .main-content {
   flex: 1;
+  /* 這裡的 margin-left 必須與 sidebar 的寬度絕對一致 */
   margin-left: 260px;
   padding: 24px;
+  /* 確保內容區塊至少與視窗一樣高，扣除 Navbar 的 60px */
   min-height: calc(100vh - 60px);
+  background: #f5f5f5;
+
+  /* 平滑過渡效果，當 margin 改變時不會閃爍 */
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s;
 }
 
+/* 當側邊欄收合時，內容區往左移 */
+.main-content.collapsed {
+  margin-left: 70px;
+}
+
+/* 響應式 */
 @media (max-width: 768px) {
   .main-content {
+    /* 必須對應 sidebar 縮小後的寬度 70px */
     margin-left: 70px;
     padding: 16px;
+    /* 確保在小螢幕上不會橫向溢出 */
+    width: calc(100% - 70px);
+  }
+}
+
+/* 針對極小螢幕 (如 480px) 的進階修正建議 */
+@media (max-width: 480px) {
+  .main-content {
+    /* 如果手機版 sidebar 是完全隱藏模式，這裡要設為 0 */
+    /* 如果維持 70px 模式則不變 */
+    padding: 12px;
   }
 }

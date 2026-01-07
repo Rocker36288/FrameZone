@@ -1,73 +1,271 @@
-.video-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: box-shadow 0.2s;
-  cursor: pointer;
-}
-
-
-
-.video-thumb {
-  width: 100%;
-  max-width: 320px;
-  aspect-ratio: 16/9;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
+/* 卡片基礎樣式 */
 .video-card {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
   cursor: pointer;
-  transition: box-shadow 0.2s, transform 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* 影片時間 */
-.duration-tag {
-  position: absolute;
-  bottom: 0.3rem;
-  right: 0.3rem;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: bold;
+.video-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
 /* 縮圖容器共用設定 */
 .video-thumb-container {
   flex-shrink: 0;
   overflow: hidden;
-  border-radius: 4px;
+  border-radius: 8px;
+  position: relative;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.thumbnail-container {
+  width: 100%;
+  height: 100%;
   position: relative;
 }
 
-/* 小縮圖列表 */
-.video-thumb-small {
-  width: 120px;
-  /* 可改成 % 或 max-width */
-  aspect-ratio: 16/9;
+.video-thumb-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 1;
 }
 
-/* 大縮圖卡 */
-.video-thumb-big {
-  /* width: 100%; */
-  /* 控制最大寬度 */
-  aspect-ratio: 16/9;
+.video-card:hover .video-thumb-container::before {
+  opacity: 1;
 }
 
 /* 縮圖內圖片 */
-video-thumb-container img,
-video-thumb-container app-video-thumbnail {
+.video-thumb-container img,
+.video-thumb-container app-video-thumbnail {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.2s;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 搜尋結果縮圖尺寸（限制高度） */
-.video-card--search .video-thumb-medium {
-  width: 200px;
-  height: 112px;
-  /* 16:9 */
-  flex-shrink: 0;
+.video-card:hover .video-thumb-container img,
+.video-card:hover .video-thumb-container app-video-thumbnail {
+  transform: scale(1.05);
+}
+
+/* 小縮圖 (推薦列) */
+.video-thumb-small {
+  width: 168px;
+  aspect-ratio: 16/9;
+}
+
+/* 大縮圖 (首頁) */
+.video-thumb-big {
+  aspect-ratio: 16/9;
+}
+
+/* 中等縮圖 (搜尋結果) */
+.video-thumb-medium {
+  width: 246px;
+  aspect-ratio: 16/9;
+}
+
+/* 影片時長標籤 */
+.duration-tag {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 卡片標題 */
+.card-title {
+  color: #1a1a1a;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+  transition: color 0.2s;
+}
+
+.video-card:hover .card-title {
+  color: #667eea;
+}
+
+/* 卡片文字 */
+.card-text {
+  line-height: 1.5;
+}
+
+.card-text.text-muted {
+  color: #6b7280 !important;
+}
+
+/* 頭像樣式 */
+.rounded-circle {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border: 2px solid #f3f4f6;
+  transition: border-color 0.2s;
+}
+
+.video-card:hover .rounded-circle {
+  border-color: #667eea;
+}
+
+/* 小卡片特殊樣式 (推薦列) */
+.video-card[style*="max-width: 25rem"] {
+  border-radius: 10px;
+}
+
+.video-card[style*="max-width: 25rem"]:hover {
+  transform: translateX(4px);
+}
+
+/* 大卡片特殊樣式 (首頁) */
+.video-card[style*="width: 18rem"] .card-body {
+  padding: 1rem !important;
+}
+
+/* Spotlight 卡片樣式 */
+.video-card .d-flex.flex-row {
+  gap: 1rem;
+}
+
+/* 搜尋卡片樣式 */
+.video-card .row .col-auto {
+  padding: 0.75rem;
+}
+
+/* 文字截斷效果 */
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 圖標樣式 */
+.ti {
+  font-size: 1rem;
+  vertical-align: middle;
+}
+
+/* 響應式調整 */
+@media (max-width: 768px) {
+  .video-card[style*="width: 18rem"] {
+    width: 100% !important;
+    max-width: 100%;
+  }
+
+  .video-thumb-small {
+    width: 140px;
+  }
+
+  .video-thumb-medium {
+    width: 180px;
+  }
+}
+
+/* 深色模式支援 (可選) */
+@media (prefers-color-scheme: dark) {
+  .video-card {
+    background: #1f2937;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .video-card:hover {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .card-title {
+    color: #f9fafb;
+  }
+
+  .video-card:hover .card-title {
+    color: #818cf8;
+  }
+
+  .card-text.text-muted {
+    color: #9ca3af !important;
+  }
+
+  .rounded-circle {
+    border-color: #374151;
+  }
+
+  .video-card:hover .rounded-circle {
+    border-color: #818cf8;
+  }
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+}
+
+/* 進度條主題顏色 */
+.video-progress {
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.2);
+  /* 底色淡淡的白色透明 */
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.video-progress .progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  /* 跟縮圖漸層統一 */
+}
+
+.img-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 讓圖片填滿容器且保持比例 */
+  display: block;
+  border-radius: 8px;
+}
+
+/* 載入動畫 (可選) */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.video-card {
+  animation: fadeInUp 0.4s ease-out;
 }

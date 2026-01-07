@@ -44,17 +44,21 @@
 
 <!-- 熱門推薦 -->
 <div class="row">
-  <div class="popularname popular-header d-flex align-items-center justify-content-between">
-    <h2 class="mb-0">熱門推薦</h2>
 
+  <div class="popularname">
+    <h2 class="mb-0 text-center">熱門推薦</h2>
+  </div>
+
+  <div class="d-flex justify-content-end">
     <a class="view-all-link" [routerLink]="['/shopping/products']">
       查看所有商品
       <span class="arrow">→</span>
     </a>
   </div>
 
-  <div class="col-lg-2 col-md-3 col-6" *ngFor="let product of popularProducts">
-    <div class="card d-flex flex-column mt-6">
+  <div class="popularproduct col-lg-2 col-md-3 col-6" *ngFor="let product of popularProducts">
+    <app-product-card [product]="product" (favoriteChange)="product.isFavorite = $event"></app-product-card>
+    <!-- <div class="card d-flex flex-column mt-6">
       <a [routerLink]="['../product-detail', product.id]">
         <img class="card-img-top" [src]="product.image" [alt]="product.name" />
       </a>
@@ -70,8 +74,8 @@
           <div class="ms-3">
             <a (click)="$event.preventDefault()" class="text-body" style="cursor: pointer;">{{ product.seller }}</a>
           </div>
-          <div class="ms-auto">
-            <!-- <a href="javascript:void(0)" class="icon d-none d-md-inline-block ms-3 similar-fav-btn"
+          <div class="ms-auto"> -->
+    <!-- <a href="javascript:void(0)" class="icon d-none d-md-inline-block ms-3 similar-fav-btn"
               [class.favorited]="product.isFavorite" (click)="toggleSimilarFavorite(product)">
 
               <svg *ngIf="product.isFavorite" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -86,13 +90,9 @@
                 <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
               </svg>
             </a> -->
-            <app-favorite-button [isFavorite]="product.isFavorite" [itemName]="product.name"
+    <!-- <app-favorite-button [isFavorite]="product.isFavorite" [itemName]="product.name"
               (favoriteChange)="product.isFavorite = $event">
-            </app-favorite-button>
-          </div>
-        </div>
-      </div>
-    </div>
+            </app-favorite-button> -->
   </div>
 </div>
 
@@ -100,14 +100,11 @@
 <div class="row">
   <div class="recently-viewed">
     <h2 class="text-center">近期瀏覽</h2>
-    <a class="view-all-link" [routerLink]="['/products']">
-      查看所有商品
-      <span class="arrow">→</span>
-    </a>
   </div>
 
-  <div class="col-lg-2 col-md-3 col-6" *ngFor="let product of recentlyViewed">
-    <div class="card d-flex flex-column mt-6">
+  <div class="recentlyviewed col-lg-2 col-md-3 col-6" *ngFor="let product of recentlyViewed">
+    <app-product-card [product]="product" (favoriteChange)="product.isFavorite = $event"></app-product-card>
+    <!-- <div class="card d-flex flex-column mt-6">
       <a [routerLink]="['../product-detail', product.id]">
         <img class="card-img-top" [src]="product.image" [alt]="product.name" />
       </a>
@@ -123,8 +120,8 @@
           <div class="ms-3">
             <a (click)="$event.preventDefault()" class="text-body" style="cursor: pointer;">{{ product.seller }}</a>
           </div>
-          <div class="ms-auto">
-            <!-- <a href="javascript:void(0)" class="icon d-none d-md-inline-block ms-3 similar-fav-btn"
+          <div class="ms-auto"> -->
+    <!-- <a href="javascript:void(0)" class="icon d-none d-md-inline-block ms-3 similar-fav-btn"
               [class.favorited]="product.isFavorite" (click)="toggleSimilarFavorite(product)">
 
               <svg *ngIf="product.isFavorite" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -139,13 +136,9 @@
                 <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />
               </svg>
             </a> -->
-            <app-favorite-button [isFavorite]="product.isFavorite" [itemName]="product.name"
+    <!-- <app-favorite-button [isFavorite]="product.isFavorite" [itemName]="product.name"
               (favoriteChange)="product.isFavorite = $event">
-            </app-favorite-button>
-          </div>
-        </div>
-      </div>
-    </div>
+            </app-favorite-button> -->
   </div>
 </div>
 

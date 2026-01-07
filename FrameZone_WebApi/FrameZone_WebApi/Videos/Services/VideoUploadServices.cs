@@ -11,13 +11,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NuGet.Protocol.Core.Types;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Processing;
 using Xabe.FFmpeg;
+using static FrameZone_WebApi.Videos.Services.VideoUploadService;
 
 namespace FrameZone_WebApi.Videos.Services
 {
     public interface IVideoUploadService
     {
-        Task<VideoUploadResult> UploadAsync(IFormFile file);
+        Task<VideoUploadResult> UploadAsync(IFormFile file,int userId);
         // 新增：生成 Base64 縮圖
         Task<List<string>> GenerateThumbnailsInMemoryAsync(string videoPath);
 
@@ -32,55 +36,51 @@ namespace FrameZone_WebApi.Videos.Services
         private readonly HttpClient _httpClient;
         private readonly VideoTranscodeServices _videoTranscodeServices;
         private readonly AaContextFactoryHelper _aaContextFactoryHelper;
-        public VideoUploadService(VideoUploadRepository repository, HttpClient httpClient, IWebHostEnvironment env, VideoTranscodeServices transcodeService, AaContextFactoryHelper AaContextFactoryHelper)
+        private readonly IConfiguration _configuration;
+        public VideoUploadService(VideoUploadRepository repository, HttpClient httpClient, IWebHostEnvironment env, VideoTranscodeServices transcodeService, AaContextFactoryHelper AaContextFactoryHelper, IConfiguration configuration)
         {
             _repository = repository;
             _httpClient = httpClient;
             _videoTranscodeServices = transcodeService;
             _aaContextFactoryHelper = AaContextFactoryHelper;
+            _configuration = configuration;
         }
-        public async Task<VideoUploadResult> UploadAsync(IFormFile file)
+        public async Task<VideoUploadResult> UploadAsync(IFormFile file, int userId)
         {
-            // 5.1 後端檔案驗證
             ValidateFile(file);
 
-            // 5.2 建立 GUID 資料夾
-            var guid = Guid.NewGuid().ToString("N");
+            var guid = Guid.NewGuid().ToString("N");  // 無連字號格式
             var videoDir = CreateVideoDirectory(guid);
 
-            // 5.3 儲存檔案
             var filePath = await SaveFileAsync(file, videoDir);
 
-            // 🔹 解析影片資訊
             var mediaInfo = await FFmpeg.GetMediaInfo(filePath);
             var duration = mediaInfo.Duration.TotalSeconds;
             var width = mediaInfo.VideoStreams.FirstOrDefault()?.Width ?? 0;
             var height = mediaInfo.VideoStreams.FirstOrDefault()?.Height ?? 0;
             var fileSize = new FileInfo(filePath).Length;
 
-            // 6️ 生成草稿資料表
             var video = new Video
             {
                 Title = file.FileName,
-                ChannelId = 1,
+                ChannelId = userId,
                 VideoUrl = guid,
                 PrivacyStatus = "DRAFT",
                 ProcessStatus = "UPLOADED",
                 IsDeleted = false,
                 IsFeatured = false,
-
-                // 🔹 儲存影片資訊
                 Duration = (int)Math.Round(mediaInfo.Duration.TotalSeconds),
-                FileSize = fileSize
+                FileSize = fileSize,
+                CreatedAt = DateTime.UtcNow,
+                UpdateAt = DateTime.UtcNow,
+                Resolution = $"{width}x{height}"
             };
             var createdVideo = await _repository.VideoDraftCreateAsync(video);
 
-            // 7️ 呼叫審核流程
-            var reviewResult = await ReviewVideoAsync_Simulated(filePath, Guid.Parse(guid));
+            // ✅ 傳字串格式的 guid
+            var reviewResult = await ReviewVideoAsync(filePath, guid);
             createdVideo.ProcessStatus = reviewResult.Passed ? "REVIEWED_APPROVED" : "REVIEWED_REJECTED";
-            //await _repository.VideoUpdateStatusAsync(createdVideo.VideoId, createdVideo.ProcessStatus);
 
-            // 8️ 如果審核通過，立即啟動轉碼（非同步背景 Task）
             if (reviewResult.Passed)
             {
                 _ = Task.Run(async () =>
@@ -110,7 +110,6 @@ namespace FrameZone_WebApi.Videos.Services
                 });
             }
 
-            // 回傳 Upload + 審核結果給前端
             return new VideoUploadResult
             {
                 Success = true,
@@ -156,7 +155,7 @@ namespace FrameZone_WebApi.Videos.Services
             return root;
         }
 
-        //確認上傳至wwwroot/videos/video/...
+        //確認上傳至wwwroot/video/...
         private async Task<string> SaveFileAsync(IFormFile file, string directoryPath)
         {
             var filePath = Path.Combine(directoryPath, "source.mp4");
@@ -233,6 +232,7 @@ namespace FrameZone_WebApi.Videos.Services
             return base64Images;
         }
 
+
         // 審核結果 DTO，可依 API 規格調整
         public class ReviewResult
         {
@@ -240,87 +240,274 @@ namespace FrameZone_WebApi.Videos.Services
             public string Reason { get; set; }
             public string RawJson { get; set; }
         }
-
-        //實際傳送API審核
-        public async Task<ReviewResult> ReviewVideoAsync(string videoPath, Guid videoGuid)
+        // 修改後的方法：返回實際檔案路徑列表
+        public async Task<List<string>> GenerateThumbnailsForModerationAsync(string videoPath)
         {
-            // 1. 生成縮圖 base64
-            var thumbnails = await GenerateThumbnailsInMemoryAsync(videoPath);
+            var thumbnailPaths = new List<string>();
+            var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
-            // 2. 準備 OpenAI Moderation API 請求 payload
-            var inputList = new List<object>
-                {
-                    new { type = "text", text = $"Video ID: {videoGuid}" } // 可以送標題或其他文字
-                };
-
-            // 加入每張縮圖
-            for (int i = 0; i < thumbnails.Count; i++)
+            try
             {
-                inputList.Add(new
+                Directory.CreateDirectory(tempDir);
+                var mediaInfo = await FFmpeg.GetMediaInfo(videoPath);
+                var duration = mediaInfo.Duration.TotalSeconds;
+
+                // 根據影片長度決定取樣數量
+                int sampleCount = duration < 60 ? 1 : 1;
+                var timestamps = GenerateTimestamps(duration, sampleCount);
+
+                for (int i = 0; i < timestamps.Length; i++)
                 {
-                    type = "image_url",
-                    image_url = new { url = $"data:image/jpeg;base64,{thumbnails[i]}" }
-                });
+                    var ts = timestamps[i];
+                    var outputPath = Path.Combine(tempDir, $"thumbnail_{i}.jpg");
+                    var timeStr = TimeSpan.FromSeconds(ts).ToString(@"hh\:mm\:ss\.fff");
+
+                    try
+                    {
+                        // 用 FFmpeg 提取幀
+                        await FFmpeg.Conversions.New()
+                            .AddParameter($"-ss {timeStr}")
+                            .AddParameter($"-i \"{videoPath}\"")
+                            .AddParameter("-vf scale=640:-1") // 縮小到 640px 寬
+                            .AddParameter("-frames:v 1")
+                            .AddParameter("-q:v 5") // 中等品質
+                            .AddParameter($"\"{outputPath}\"")
+                            .Start();
+
+                        if (File.Exists(outputPath))
+                        {
+                            // 可選：進一步壓縮 (使用 ImageSharp)
+                            var compressedPath = Path.Combine(tempDir, $"thumbnail_{i}_compressed.jpg");
+                            await CompressImageWithImageSharpAsync(outputPath, compressedPath);
+
+                            thumbnailPaths.Add(compressedPath);
+
+                            var fileSize = new FileInfo(compressedPath).Length;
+                            Console.WriteLine($"✓ 縮圖 {i}: {fileSize / 1024}KB (時間點: {timeStr})");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"✗ 縮圖 {i} 生成失敗: {ex.Message}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"生成縮圖過程發生錯誤: {ex.Message}");
+                // 清理已生成的檔案
+                CleanupThumbnails(thumbnailPaths);
+                throw;
             }
 
-            var requestBody = new
+            return thumbnailPaths;
+        }
+
+        // 輔助方法：壓縮圖片並儲存到新檔案
+        private async Task CompressImageWithImageSharpAsync(string inputPath, string outputPath)
+        {
+            using var image = await Image.LoadAsync(inputPath);
+            var encoder = new JpegEncoder { Quality = 75 };
+            await image.SaveAsJpegAsync(outputPath, encoder);
+        }
+
+        // 輔助方法：清理縮圖檔案
+        private void CleanupThumbnails(List<string> thumbnailPaths)
+        {
+            foreach (var path in thumbnailPaths)
             {
-                model = "omni-moderation-latest",
-                input = inputList
-            };
+                try
+                {
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
 
-            // 3. 建立 HttpClient 並使用環境變數讀取 API Key
-            using var client = new HttpClient();
-            var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
-            if (string.IsNullOrWhiteSpace(apiKey))
-                throw new InvalidOperationException("OpenAI API key not found in environment variables.");
+                        // 如果目錄為空，也刪除目錄
+                        var directory = Path.GetDirectoryName(path);
+                        if (Directory.Exists(directory) && !Directory.EnumerateFileSystemEntries(directory).Any())
+                        {
+                            Directory.Delete(directory);
+                        }
+                    }
+                }
+                catch { /* 忽略清理錯誤 */ }
+            }
+        }
 
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+        private double[] GenerateTimestamps(double duration, int count)
+        {
+            var timestamps = new double[count];
+            for (int i = 0; i < count; i++)
+            {
+                timestamps[i] = duration * (i + 1) / (count + 1);
+            }
+            return timestamps;
+        }
 
-            // 4. 呼叫 OpenAI Moderation API
-            var response = await client.PostAsJsonAsync("https://api.openai.com/v1/moderations", requestBody);
-            response.EnsureSuccessStatusCode();
 
-            var responseJson = await response.Content.ReadAsStringAsync();
+        //實際傳送API審核
+        // 改用 Sightengine API
+        // Service
+        public async Task<ReviewResult> ReviewVideoAsync(string videoPath, string videoGuid)
+        {
+            List<string> thumbnailPaths = null;
 
+            try
+            {
+                thumbnailPaths = await GenerateThumbnailsForModerationAsync(videoPath);
 
-            // 5. 解析結果
+                if (thumbnailPaths == null || thumbnailPaths.Count == 0)
+                {
+                    return new ReviewResult
+                    {
+                        Passed = false,
+                        Reason = "Failed to generate thumbnails",
+                        RawJson = ""
+                    };
+                }
+
+                var apiUser = _configuration["Sightengine:ApiUser"];
+                var apiSecret = _configuration["Sightengine:ApiSecret"];
+
+                if (string.IsNullOrWhiteSpace(apiUser) || string.IsNullOrWhiteSpace(apiSecret))
+                    throw new InvalidOperationException("Sightengine API credentials not found.");
+
+                using var client = new HttpClient
+                {
+                    Timeout = TimeSpan.FromMinutes(2)
+                };
+
+                bool overallPassed = true;
+                var allReasons = new List<string>();
+                var allResponses = new List<string>();
+
+                foreach (var thumbnailPath in thumbnailPaths)
+                {
+                    try
+                    {
+                        using var content = new MultipartFormDataContent();
+
+                        var imageBytes = await File.ReadAllBytesAsync(thumbnailPath);
+                        var imageContent = new ByteArrayContent(imageBytes);
+                        imageContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+
+                        content.Add(imageContent, "media", Path.GetFileName(thumbnailPath));
+                        content.Add(new StringContent("nudity-2.1"), "models");
+                        content.Add(new StringContent(apiUser), "api_user");
+                        content.Add(new StringContent(apiSecret), "api_secret");
+
+                        var response = await client.PostAsync("https://api.sightengine.com/1.0/check.json", content);
+                        response.EnsureSuccessStatusCode();
+
+                        var responseJson = await response.Content.ReadAsStringAsync();
+                        allResponses.Add(responseJson);
+                        Console.WriteLine($"Sightengine Response: {responseJson}");
+
+                        var (passed, reasons) = ParseSightengineResponse(responseJson);
+
+                        if (!passed)
+                        {
+                            overallPassed = false;
+                            allReasons.AddRange(reasons);
+                        }
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        Console.WriteLine($"API 請求失敗 ({Path.GetFileName(thumbnailPath)}): {ex.Message}");
+                        overallPassed = false;
+                        allReasons.Add($"API request failed: {ex.Message}");
+                    }
+                }
+
+                var reviewResult = new ReviewResult
+                {
+                    Passed = overallPassed,
+                    Reason = allReasons.Count > 0
+                        ? string.Join(", ", allReasons.Distinct())
+                        : "Content approved",
+                    RawJson = string.Join("\n---\n", allResponses)
+                };
+
+                await _repository.SaveAuditResultAsync(videoGuid, reviewResult);  // ✅ 傳字串
+
+                return reviewResult;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"審核過程發生錯誤: {ex.Message}");
+                return new ReviewResult
+                {
+                    Passed = false,
+                    Reason = $"Review process failed: {ex.Message}",
+                    RawJson = ""
+                };
+            }
+            finally
+            {
+                if (thumbnailPaths != null)
+                {
+                    CleanupThumbnails(thumbnailPaths);
+                }
+            }
+        }
+
+        // 解析 Sightengine 回應
+        private (bool passed, List<string> reasons) ParseSightengineResponse(string responseJson)
+        {
+            var reasons = new List<string>();
             bool passed = true;
-            string reason = "";
 
             try
             {
                 using var doc = JsonDocument.Parse(responseJson);
-                var results = doc.RootElement.GetProperty("results");
-                foreach (var r in results.EnumerateArray())
+                var root = doc.RootElement;
+
+                // 檢查狀態
+                if (root.GetProperty("status").GetString() != "success")
                 {
-                    bool flagged = r.GetProperty("flagged").GetBoolean();
-                    if (flagged)
-                    {
-                        passed = false;
-                        // 可以從 categories 拿違規類型
-                        reason += r.GetProperty("categories").ToString() + "; ";
-                    }
+                    passed = false;
+                    reasons.Add("API returned non-success status");
+                    return (passed, reasons);
+                }
+
+                // 解析 nudity 結果 (根據你的需求設定閾值)
+                if (root.TryGetProperty("nudity", out var nudity))
+                {
+                    var threshold = 0.5; // 可調整閾值
+
+                    CheckCategory(nudity, "sexual_activity", threshold, reasons, ref passed);
+                    CheckCategory(nudity, "sexual_display", threshold, reasons, ref passed);
+                    CheckCategory(nudity, "erotica", threshold, reasons, ref passed);
+                    CheckCategory(nudity, "very_suggestive", threshold, reasons, ref passed);
+                    CheckCategory(nudity, "suggestive", 0.7, reasons, ref passed); // 較高閾值
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // 若解析失敗，直接當成不通過
+                Console.WriteLine($"解析回應失敗: {ex.Message}");
                 passed = false;
-                reason = "Failed to parse OpenAI response.";
+                reasons.Add("Failed to parse Sightengine response");
             }
 
-
-            // 5. 回傳 DTO
-            return new ReviewResult
-            {
-                Passed = passed,
-                Reason = reason,
-                RawJson = responseJson
-            };
+            return (passed, reasons);
         }
 
-        public async Task<ReviewResult> ReviewVideoAsync_Simulated(string videoPath, Guid videoGuid)
+        // 檢查單一分類
+        private void CheckCategory(JsonElement parent, string categoryName, double threshold,
+            List<string> reasons, ref bool passed)
+        {
+            if (parent.TryGetProperty(categoryName, out var categoryElement))
+            {
+                var value = categoryElement.GetDouble();
+                if (value > threshold)
+                {
+                    passed = false;
+                    reasons.Add($"{categoryName}: {value:F3}");
+                }
+            }
+        }
+
+        public async Task<ReviewResult> ReviewVideoAsync_Simulated(string videoPath, string videoGuid)
         {
             Console.WriteLine("審核模擬");
             // 1. 生成縮圖 base64 (保留，確保流程測試)
@@ -371,6 +558,7 @@ namespace FrameZone_WebApi.Videos.Services
 
             video.Title = req.Title;
             video.Description = req.Description;
+            video.PrivacyStatus = req.PrivacyStatus;
 
             var result = await _repository.VideoPublishedAsync(video);
 

@@ -1,0 +1,48 @@
+<app-photographerbooking-header></app-photographerbooking-header>
+<!-- components/photographerbooking-page-search/photographerbooking-page-search.component.html -->
+<div class="page-wrapper">
+  <!-- 搜尋欄 -->
+  <app-photographerbooking-search></app-photographerbooking-search>
+
+  <!-- 主要內容區 -->
+  <div class="container">
+    <!-- 側邊篩選欄 -->
+    <app-photographerbooking-sidebar-search></app-photographerbooking-sidebar-search>
+
+    <!-- 搜尋結果區 -->
+    <section class="results-section">
+      <div class="d-flex justify-content-between align-items-end mb-3">
+        <div class="h3 mb-0">
+          找到 <span class="text-primary">{{ resultsCount }}</span> 位專家
+        </div>
+        <div style="width: 150px">
+          <select
+            class="form-select form-select-sm"
+            [(ngModel)]="sortOrder"
+            (change)="onSortChange()"
+          >
+            <option value="default">預設排序</option>
+            <option value="priceAsc">價格：低到高</option>
+            <option value="priceDesc">價格：高到低</option>
+            <option value="ratingDesc">評分：最高優先</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 結果卡片網格 -->
+      <main class="results-grid">
+        <app-photographerbooking-card
+          *ngFor="let photographer of photographers"
+          [photographer]="photographer"
+        ></app-photographerbooking-card>
+      </main>
+
+      <!-- 無結果提示 -->
+      <div *ngIf="resultsCount === 0" class="no-results">
+        <i class="ti ti-photo-off"></i>
+        <h4>找不到符合條件的攝影師</h4>
+        <p>試試調整篩選條件或關鍵字</p>
+      </div>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,12 @@
+.btn-primary {
+  /* 使用你喜歡的漸層色 */
+  background: linear-gradient(135deg, #738fee 0%, #806afc 100%);
+  color: #ffffff;
+  /* 解決閃爍： hover 時不改變 background 屬性，改用 filter */
+}
+
+.btn-primary:hover {
+  /* 讓漸層色變深 15%，這樣不會閃爍且保有漸層感 */
+  filter: brightness(0.9);
+
+}

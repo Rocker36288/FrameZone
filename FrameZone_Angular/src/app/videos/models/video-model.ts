@@ -17,7 +17,7 @@ export class VideoCardData {
   description: string = '';
   likes: number = 0;
 
-  ChannelId: number = 0;
+  channelId: number = 0;
   channelName: string = '';
   avatar: string = '';
 
@@ -89,14 +89,14 @@ export class ChannelHome {
 }
 
 export interface VideoCommentRequest {
-  UserId: number;          // long → number
+  //UserId: number;          // long → number
   VideoId: number;         // int → number（注意命名）
   TargetTypeId: TargetTypeEnum.Video;    // enum / int
   CommentContent: string;
   ParentCommentId: number | undefined;
 }
 
-
+//likeDto
 export interface VideoLikesRequest {
   isLikes: boolean;
   videoId: number;
@@ -104,4 +104,23 @@ export interface VideoLikesRequest {
 
 export interface VideoLikesDto {
   isLikes: boolean;
+}
+
+//viewHistoryDto
+export interface UpdateWatchHistoryRequest {
+  videoId: number;
+  lastPosition: number;
+}
+
+export interface VideoWatchHistoryDto {
+  video: VideoCardData;
+  lastPosition: number; // 已看秒數
+  lastWatchedAt: string;
+}
+
+export interface VideoSearchParams {
+  keyword?: string;
+  sortBy?: 'likes' | 'views' | 'date';
+  sortOrder?: 'asc' | 'desc';
+  take?: number;
 }

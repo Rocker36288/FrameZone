@@ -6,6 +6,7 @@ using FrameZone.API.Services.Interfaces;
 using FrameZone_WebApi.Configuration;
 using FrameZone_WebApi.Helpers;
 using FrameZone_WebApi.Middlewares;
+using FrameZone_WebApi.Middlewares;
 using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Repositories;
 using FrameZone_WebApi.Repositories.Interfaces;
@@ -13,19 +14,28 @@ using FrameZone_WebApi.Repositories.Member;
 using FrameZone_WebApi.Services;
 using FrameZone_WebApi.Services.Interfaces;
 using FrameZone_WebApi.Services.Member;
+using FrameZone_WebApi.Socials.Hubs;
+using FrameZone_WebApi.Shopping.Configuration;
+using FrameZone_WebApi.Shopping.Repositories;
+using FrameZone_WebApi.Shopping.Services;
 using FrameZone_WebApi.Socials.Repositories;
 using FrameZone_WebApi.Socials.Services;
 using FrameZone_WebApi.Videos.Helpers;
 using FrameZone_WebApi.Videos.Repositories;
+using FrameZone_WebApi.Videos.Respositories;
 using FrameZone_WebApi.Videos.Services;
+using FrameZone_WebApi.PhotographerBooking.Repositories;
+using FrameZone_WebApi.PhotographerBooking.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using SixLabors.ImageSharp;
+using System.Text;
 using System.Text;
 using Xabe.FFmpeg;
 using Xabe.FFmpeg.Downloader;
@@ -34,7 +44,7 @@ using FrameZone_WebApi.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ========== Azure Key Vault 設定 ==========
+//// ========== Azure Key Vault 設定 ==========
 //var keyVaultUri = builder.Configuration["KeyVault:VaultUri"];
 //if (!string.IsNullOrEmpty(keyVaultUri))
 //{
@@ -117,16 +127,11 @@ builder.Services.Configure<VerificationSettings>(
     builder.Configuration.GetSection("VerificationSettings")
 );
 
-
-//========== CORS 設定 ==========
-
-builder.Services.Configure<EmailSettings>(
-    builder.Configuration.GetSection("EmailSettings")
+//========== 金流設定 ==========
+builder.Services.Configure<ECPaySettings>(
+    builder.Configuration.GetSection("ECPaySettings")
 );
 
-builder.Services.Configure<VerificationSettings>(
-    builder.Configuration.GetSection("VerificationSettings")
-);
 
 
 // ========== CORS 設定 ==========
@@ -134,14 +139,17 @@ builder.Services.Configure<VerificationSettings>(
 var policyName = "Angular";
 builder.Services.AddCors(options =>
 {
+    
     options.AddPolicy(policyName, policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins("https://localhost:4200", "http://localhost:4200")
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials();
 
     });
+        
+
 });
 
 // ========== JWT 設定 ==========
@@ -238,7 +246,6 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddScoped<IPhotoRepository, PhotoRepository>();
 builder.Services.AddScoped<UserRepository>();
-builder.Services.AddScoped<PostRepository>();
 builder.Services.AddScoped<IMemberProfileRepository, MemberProfileRepository>();
 builder.Services.AddScoped<IUserLogRepository, UserLogRepository>();
 builder.Services.AddScoped<IMemberSecurityRepository, MemberSecurityRepository>();
@@ -249,7 +256,6 @@ builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
-builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<IExifService, ExifService>();
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<ITagCategorizationService, TagCategorizationService>();
@@ -273,6 +279,12 @@ builder.Services.AddHttpClient<IGooglePlacesService, GooglePlacesService>(client
 });
 builder.Services.AddScoped<IClaudeApiService, ClaudeApiService>();
 
+builder.Services.AddScoped<IPhotographerRepository, PhotographerRepository>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IAvailableSlotRepository, AvailableSlotRepository>();
+builder.Services.AddScoped<IPhotographerService, FrameZone_WebApi.PhotographerBooking.Services.PhotographerService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
+
 
 builder.Services.AddHttpClient<IGeocodingService, GeocodingService>();
 builder.Services.AddScoped<IGeocodingService, GeocodingService>();
@@ -280,16 +292,44 @@ builder.Services.AddScoped<IGeocodingService, GeocodingService>();
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddHttpContextAccessor();
 
+// ========== 社群服務 (DI注入) ==========
+builder.Services.AddScoped<PostRepository>();
+builder.Services.AddScoped<CommentRepository>();
+builder.Services.AddScoped<ChatRoomRepository>();
+builder.Services.AddScoped<MessageRepository>();
+
+builder.Services.AddScoped<PostService>();
+builder.Services.AddScoped<CommentService>();
+builder.Services.AddScoped<ChatRoomService>();
+builder.Services.AddScoped<MessageService>();
+builder.Services.AddSingleton<SocialChatConnectionManager>();
+
 // ========== 影片服務 (DI注入) ==========
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<AaContextFactoryHelper>();
 builder.Services.AddHttpClient(); // 註冊 HttpClient 工廠
-builder.Services.AddScoped<VideoRespository>(); // 註冊 Repository
+builder.Services.AddHostedService<ChannelEnsureHostedService>();
+builder.Services.AddScoped<VideoCreatorRepository>(); // 註冊 Repository
 builder.Services.AddScoped<VideoUploadRepository>();// 註冊 Repository
+builder.Services.AddScoped<VideoRepository>();// 註冊 Repository
 builder.Services.AddScoped<VideoTranscodeServices>();
 builder.Services.AddScoped<IVideoUploadService, VideoUploadService>();
 builder.Services.AddScoped<VideoServices>();
+builder.Services.AddScoped<VideoCreatorService>();
 builder.Services.AddScoped<VideoPlayerService>();
+
+//========== 購物中心 (DI注入) ==========
+builder.Services.AddScoped<ProductRepository>();
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+builder.Services.AddScoped<FavoriteService>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+builder.Services.AddScoped<IAddressService, AddressService>();
+builder.Services.AddScoped<ECPayService>();  //綠界注入
 
 
 
@@ -327,6 +367,8 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSignalR();
 
 // ========== Swagger 配置 ==========
 builder.Services.AddSwaggerGen(options =>
@@ -388,6 +430,10 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+
+//// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+//builder.Services.AddOpenApi();
+
 var app = builder.Build();
 
 // 開發環境啟用 Swagger
@@ -430,6 +476,7 @@ app.UseQueryStringToken();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapHub<SocialChatHub>("/hubs/chat");
 app.MapControllers();
 
 app.MapHub<NotificationHub>("/hubs/notification");

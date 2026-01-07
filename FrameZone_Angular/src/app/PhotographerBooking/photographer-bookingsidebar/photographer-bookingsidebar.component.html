@@ -1,0 +1,58 @@
+<div class="sticky-sidebar card shadow-lg border-0 rounded-4">
+  <div class="card-body p-4">
+    <div class="d-flex justify-content-between align-items-baseline mb-4">
+      <span class="h1 fw-bold mb-0"> TWD {{ basePrice | number }} </span>
+      <span class="text-muted small">/ 方案</span>
+    </div>
+
+    <div class="border rounded-3 overflow-hidden mb-4">
+      <div class="p-3 border-bottom bg-white">
+        <label class="d-block text-uppercase fw-bold text-muted mb-1" style="font-size: 10px;">
+          日期與時段
+        </label>
+        <select class="form-select form-select-sm" (change)="onSlotChange($event)">
+          <option value="">請選擇時段</option>
+          <option *ngFor="let slot of availableSlots" [value]="slot.availableSlotId">
+            {{ slot.startDateTime | date:'yyyy/MM/dd HH:mm' }} - {{ slot.endDateTime | date:'HH:mm' }}
+          </option>
+        </select>
+      </div>
+
+      <div class="p-3 bg-light">
+        <label class="d-block text-uppercase fw-bold text-muted mb-1" style="font-size: 10px">
+          選取方案
+        </label>
+        <div class="small fw-bold text-danger">
+          {{ selectedService?.serviceName || "尚未選擇方案" }}
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-reserve shadow-sm mb-3" (click)="onBookNow()">
+      立即預約
+    </button>
+    <p class="text-center text-muted small mb-4">預約成功前不扣款</p>
+
+    <div class="pt-3 border-top">
+      <div class="d-flex justify-content-between text-secondary mb-2">
+        <span class="text-decoration-underline">服務基本費</span>
+        <span>TWD {{ basePrice | number }}</span>
+      </div>
+
+      <div class="d-flex justify-content-between text-secondary mb-2" *ngIf="additionalFees > 0">
+        <span class="text-decoration-underline">額外費用</span>
+        <span>TWD {{ additionalFees | number }}</span>
+      </div>
+
+      <div class="d-flex justify-content-between text-success mb-2" *ngIf="discountAmount > 0">
+        <span class="text-decoration-underline">折扣</span>
+        <span>-TWD {{ discountAmount | number }}</span>
+      </div>
+
+      <div class="d-flex justify-content-between h3 fw-bold mt-3">
+        <span>總價</span>
+        <span>TWD {{ totalPrice | number }}</span>
+      </div>
+    </div>
+  </div>
+</div>

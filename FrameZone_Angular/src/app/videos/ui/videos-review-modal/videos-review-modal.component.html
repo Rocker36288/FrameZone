@@ -1,0 +1,58 @@
+<!-- Backdrop -->
+<div class="auth-backdrop" (click)="onBackdropClick()"></div>
+
+<!-- Modal -->
+<div class="auth-modal card shadow-lg" (click)="$event.stopPropagation()">
+
+  <!-- Header -->
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h3 class="card-title mb-0">
+      <i class="ti ti-video me-2"></i>影片審核結果
+    </h3>
+    <button class="btn-close" (click)="close.emit()" aria-label="關閉"></button>
+  </div>
+
+  <!-- Body -->
+  <div class="card-body text-center" *ngIf="parsedReviewData; else loading">
+
+    <!-- Approval Status -->
+    <h4 [ngClass]="{
+        'text-success': parsedReviewData.passed,
+        'text-danger': !parsedReviewData.passed
+      }">
+      {{ parsedReviewData.passed ? '審核通過 ✅' : '審核未通過 ❌' }}
+    </h4>
+
+    <p>{{ parsedReviewData.reason }}</p>
+
+    <!-- Nudity Scores -->
+    <div *ngIf="parsedReviewData?.sightengine?.nudity">
+      <h5>Nudity 分數</h5>
+      <ul class="list-group list-group-flush text-start">
+        <li class="list-group-item" *ngFor="let key of nudityKeys()">
+          {{ key }}：
+          {{ parsedReviewData.sightengine.nudity[key] | number:'1.2-3' }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Context -->
+    <div *ngIf="parsedReviewData?.sightengine?.nudity?.context">
+      <h5 class="mt-3">場景 Context</h5>
+      <ul class="list-group list-group-flush text-start">
+        <li class="list-group-item" *ngFor="let key of contextKeys()">
+          {{ key }}：
+          {{ parsedReviewData.sightengine.nudity.context[key] | number:'1.2-3' }}
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <ng-template #loading>
+    <div class="card-body text-center text-muted">
+      讀取審核結果中...
+    </div>
+  </ng-template>
+
+</div>

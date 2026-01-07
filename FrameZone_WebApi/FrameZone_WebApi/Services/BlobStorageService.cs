@@ -43,8 +43,9 @@ namespace FrameZone_WebApi.Services
 
             _logger.LogInformation("✅ Azure Storage ConnectionString 已從 appsettings 載入，長度: {Length}", connectionString.Length);
 
-            // 初始化 BlobServiceClient
-            _blobServiceClient = new BlobServiceClient(connectionString);
+            //// 初始化 BlobServiceClient
+            //_blobServiceClient = new BlobServiceClient(connectionString);
+            _blobServiceClient = new BlobServiceClient(_settings.ConnectionString);
 
             // 初始化容器 Client
             _photoContainerClient = _blobServiceClient.GetBlobContainerClient(_settings.ContainerName);

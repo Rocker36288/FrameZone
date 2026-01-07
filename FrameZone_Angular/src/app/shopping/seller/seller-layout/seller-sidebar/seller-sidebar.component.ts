@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
@@ -20,6 +20,9 @@ interface MenuItem {
   styleUrl: './seller-sidebar.component.css'
 })
 export class SellerSidebarComponent {
+  // 使用 @Input 裝飾器接收來自父元件的狀態
+  @Input() isCollapsed: boolean = false;
+
   menuItems: MenuItem[] = [
     {
       icon: 'building-store',
@@ -89,9 +92,15 @@ export class SellerSidebarComponent {
     }
   ];
 
-  toggleSubmenu(item: MenuItem): void {
-    if (item.children) {
-      item.expanded = !item.expanded;
-    }
+  // toggleSubmenu(item: MenuItem): void {
+  //   if (item.children) {
+  //     item.expanded = !item.expanded;
+  //   }
+  // }
+
+  toggleSubmenu(item: any) {
+    // 如果目前是收合狀態，點擊時可以考慮先展開側邊欄
+    if (this.isCollapsed) return;
+    item.expanded = !item.expanded;
   }
 }

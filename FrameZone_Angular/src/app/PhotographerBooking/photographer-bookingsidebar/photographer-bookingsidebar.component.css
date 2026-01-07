@@ -1,0 +1,31 @@
+.sticky-sidebar {
+  position: sticky;
+  top: 100px;
+  z-index: 10;
+}
+
+.btn-reserve {
+  background: linear-gradient(135deg, #6b5cff 0%, #764ba2 100%);
+  color: white;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: bold;
+  transition: all 0.3s ease; /* 務必加上這行，效果才平滑 */
+}
+
+.btn-reserve:hover {
+  color: white;
+  filter: brightness(1.05); /* 稍微變亮一點點 */
+  transform: scale(1.02); /* 微微放大 2% */
+  box-shadow: 0 4px 12px rgba(107, 92, 255, 0.3);
+}
+
+.btn-reserve:active {
+  color: white;
+  transform: scale(0.98); /* 點擊時縮小，增加回饋感 */
+}
+
+.btn-reserve:visited {
+  color: white;
+}

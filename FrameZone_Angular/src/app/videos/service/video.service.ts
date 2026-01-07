@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 // import { environment } from '../../environments/environment';
-import { ChannelCard, ChannelHome, VideoCardData, VideoCommentCard, VideoCommentRequest, VideoLikesDto, VideoLikesRequest } from '../models/video-model';
+import { ChannelCard, ChannelHome, UpdateWatchHistoryRequest, VideoCardData, VideoCommentCard, VideoCommentRequest, VideoLikesDto, VideoLikesRequest, VideoSearchParams, VideoWatchHistoryDto } from '../models/video-model';
 
 @Injectable({
   providedIn: 'root'
@@ -63,5 +63,44 @@ export class VideoService {
   // ===== 取得影片上傳狀態 =====
   getVideoStatus(videoGuid: string): Observable<any> {
     return this.http.get(`${this.apiBase}/videoupload/${videoGuid}/status`)
+  }
+
+  // 取得頻道追隨狀態
+  checkChannelFollow(channelId: number): Observable<boolean> {
+    return this.http.get<boolean>(`${this.apiBase}/videos/channels/${channelId}/followcheck`);
+  }
+
+  // 切換頻道追隨狀態
+  toggleChannelFollow(channelId: number): Observable<boolean> {
+    return this.http.post<boolean>(`${this.apiBase}/videos/channels/${channelId}/followtoggle`, {});
+  }
+
+  // 更新觀看紀錄
+  updateWatchHistory(videoId: number, lastPosition: number): Observable<boolean> {
+    const body: UpdateWatchHistoryRequest = { videoId, lastPosition };
+    return this.http.post<boolean>(`${this.apiBase}/videos/views/update`, body);
+  }
+
+  // 更新觀看紀錄
+  GetWatchHistory(): Observable<VideoWatchHistoryDto[]> {
+    return this.http.get<VideoWatchHistoryDto[]>(`${this.apiBase}/videos/views/history`);
+  }
+
+  // ===== 搜尋影片 =====
+  searchVideos(params: VideoSearchParams): Observable<VideoCardData[]> {
+    const queryParams: any = {};
+
+    if (params.keyword) {
+      queryParams.keyword = params.keyword;
+    }
+
+    queryParams.sortBy = params.sortBy ?? 'date';
+    queryParams.sortOrder = params.sortOrder ?? 'desc';
+    queryParams.take = params.take ?? 10;
+
+    return this.http.get<VideoCardData[]>(
+      `${this.apiBase}/videos/search`,
+      { params: queryParams }
+    );
   }
 }

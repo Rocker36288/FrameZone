@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-share-button',
@@ -7,5 +7,9 @@ import { Component, Input } from '@angular/core';
   styleUrl: './share-button.component.css'
 })
 export class ShareButtonComponent {
-  @Input() videoid: number = 0
+  @Output() share = new EventEmitter<void>();
+  onClick() {
+    console.log('✅ ShareButton clicked');
+    this.share.emit();
+  }
 }

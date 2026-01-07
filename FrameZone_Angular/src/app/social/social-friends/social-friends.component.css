@@ -1,0 +1,112 @@
+/* --- 1. 卡片外殼與佈局 --- */
+.friend-list-card {
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #ffffff;
+  /* 確保底色純白 */
+  border-radius: 12px;
+}
+
+.friend-list-card .card-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.25rem;
+}
+
+.friend-list-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding-left: 0.25rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+/* --- 3. 朋友列表區域與滾動條 --- */
+.friend-list-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* 統一捲動條樣式 - 改為淡淡的紫色系 */
+.friend-list-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.friend-list-content::-webkit-scrollbar-thumb {
+  /* 使用 #b4bef7 作為滾動條顏色，讓整體感更一致 */
+  background: #b4bef7;
+  border-radius: 10px;
+}
+
+.friend-list-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* --- 4. 好友按鈕項目 --- */
+.friend-btn {
+  background-color: transparent;
+  border: none !important;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  outline: none !important;
+  text-decoration: none !important;
+  cursor: pointer;
+}
+
+/* 滑鼠懸停：使用淡紫色背景，並保持位移效果 */
+.friend-btn:hover {
+  background-color: #f0f2ff;
+  /* 淡藍紫色背景 */
+  transform: translateX(4px);
+}
+
+/* 點擊時效果：顏色稍深一點 */
+.friend-btn:active {
+  background-color: #e0e4ff;
+  transform: scale(0.97);
+}
+
+/* 好友頭像 */
+.friend-avatar {
+  width: 35px;
+  height: 35px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+/* 好友名稱 */
+.friend-name {
+  font-size: 0.95rem;
+  color: #333;
+  font-weight: 500;
+}
+
+/* 線上狀態燈 - 使用你色票中的主色 */
+.status-dot {
+  width: 8px;
+  /* 稍微大一點點 */
+  height: 8px;
+  border-radius: 50%;
+  margin-left: auto;
+  /* 使用 #738fee 或 #5473f3 作為「在線上」的發光色 */
+  background-color: #738fee;
+  box-shadow: 0 0 5px rgba(115, 143, 238, 0.5);
+  /* 增加一個微光感 */
+}
+
+/* 若想區分在線/離線，可以額外增加： */
+.status-dot.offline {
+  background-color: #e0e0e0;
+  box-shadow: none;
+}

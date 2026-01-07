@@ -1,0 +1,8 @@
+<div class="post-container">
+  @for (post of posts; track post.id) {
+  <div class="post-item" (click)="viewPost(post.id)">
+    <img [src]="post.imageUrl" alt="Post Image" loading="lazy">
+    <div class="overlay"></div>
+  </div>
+  }
+</div>

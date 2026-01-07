@@ -4,14 +4,16 @@ import { VideoTimeagoPipe } from '../../../pipes/video-timeago.pipe';
 import { CommentInputComponent } from "../video-comment-input/video-comment-input.component";
 import { VideoCommentReplyComponent } from "../video-comment-reply/video-comment-reply.component";
 import { VideoCommentCard } from '../../../models/video-model';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-video-comment-item',
-  imports: [VideoTimeagoPipe, NgIf, NgForOf, CommentInputComponent, VideoCommentReplyComponent],
+  imports: [DatePipe, NgIf, NgForOf, CommentInputComponent, VideoCommentReplyComponent],
   templateUrl: './video-comment-item.component.html',
   styleUrl: './video-comment-item.component.css'
 })
 export class VideoCommentItemComponent {
+
   @Input() comment!: VideoCommentCard;
   @Output() replyClicked = new EventEmitter<number>(); // 父留言ID
   @Output() submitReply = new EventEmitter<{ parentId: number, message: string }>();
@@ -30,4 +32,9 @@ export class VideoCommentItemComponent {
     });
     this.showReplyInput = false;
   }
+  onAvatarlError(event: ErrorEvent) {
+    const img = event.target as HTMLImageElement;
+    img.src = 'favicon2.png';
+  }
 }
+

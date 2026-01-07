@@ -1,274 +1,585 @@
-/* bank-account.component.css */
+/* bank-account-management.component.css */
+
 .bank-account {
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 20px;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-.page-header {
+/* ========== 頁面標題 ========== */
+.bank-page-header {
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+  align-items: flex-start;
+  margin-bottom: 32px;
 }
 
-.page-header h1 {
-  font-size: 26px;
+.header-content h1 {
+  font-size: 28px;
   font-weight: 700;
   color: #1f2937;
-  margin: 0 0 4px 0;
+  margin: 0;
 }
 
 .page-subtitle {
-  font-size: 13px;
-  color: #9ca3af;
+  font-size: 15px;
+  color: #6b7280;
   margin: 0;
 }
 
 .btn-add {
-  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 10px;
-  font-size: 13.5px;
+  border-radius: 12px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.35);
+  white-space: nowrap;
 }
 
 .btn-add:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.45);
 }
 
 .btn-add i {
-  font-size: 16px;
+  font-size: 20px;
 }
 
+/* ========== 新增表單卡片 ========== */
 .add-form-card {
   background: white;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 20px;
-  border: 1.5px solid #e5e7eb;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 32px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
 }
 
-.add-form-card h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0 0 20px 0;
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 36px;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.form-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.form-header h3 i {
+  font-size: 26px;
+  color: #667eea;
+}
+
+.btn-close {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: #e5e7eb;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #6b7280;
+}
+
+.btn-close:hover {
+  background: #d1d5db;
+  color: #374151;
+  transform: rotate(90deg);
+}
+
+.btn-close i {
+  font-size: 22px;
+}
+
+.form-body {
+  padding: 36px;
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+  margin-bottom: 28px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
 }
 
 .form-group label {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
   color: #374151;
-  margin-bottom: 6px;
+}
+
+.form-group label i {
+  font-size: 20px;
+  color: #667eea;
+}
+
+.required {
+  color: #ef4444;
+  margin-left: 2px;
+  font-size: 16px;
 }
 
 .form-group input {
-  width: 100%;
-  padding: 9px 12px;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 13.5px;
-  outline: none;
-  transition: all 0.2s;
+  padding: 14px 18px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  background: #fafafa;
+  font-weight: 500;
 }
 
 .form-group input:focus {
+  outline: none;
   border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.08);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.08);
+}
+
+.form-group input::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+.form-note {
+  display: flex;
+  gap: 12px;
+  padding: 18px 20px;
+  background: #eff6ff;
+  border: 1.5px solid #bfdbfe;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #1e40af;
+  line-height: 1.6;
+}
+
+.form-note i {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .form-actions {
   display: flex;
-  gap: 10px;
+  gap: 14px;
+  padding: 28px 36px;
+  background: #fafafa;
+  border-top: 1px solid #e5e7eb;
   justify-content: flex-end;
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1.5px solid #f3f4f6;
 }
 
 .btn-cancel,
 .btn-save {
-  padding: 9px 20px;
-  border-radius: 8px;
-  font-size: 13.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  border: none;
 }
 
 .btn-cancel {
   background: white;
-  border: 1.5px solid #e5e7eb;
   color: #6b7280;
+  border: 2px solid #e5e7eb;
 }
 
 .btn-cancel:hover {
   background: #f9fafb;
+  border-color: #d1d5db;
+  color: #374151;
 }
 
 .btn-save {
-  background: #667eea;
-  border: none;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .btn-save:hover {
-  background: #5568d3;
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-cancel i,
+.btn-save i {
+  font-size: 20px;
+}
+
+/* ========== 帳號列表區塊 ========== */
+.accounts-section {
+  margin-top: 32px;
 }
 
 .accounts-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  display: grid;
+  gap: 24px;
 }
 
 .account-card {
   background: white;
-  border-radius: 12px;
-  border: 1.5px solid #e5e7eb;
+  border-radius: 20px;
+  border: 2px solid #e5e7eb;
   overflow: hidden;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
 }
 
 .account-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  border-color: #d1d5db;
 }
 
-.account-header {
+.account-card.default {
+  border-color: #fbbf24;
+  background: linear-gradient(135deg, #fffbeb 0%, white 50%);
+  box-shadow: 0 4px 20px rgba(251, 191, 36, 0.15);
+}
+
+.account-card.default:hover {
+  box-shadow: 0 12px 40px rgba(251, 191, 36, 0.25);
+}
+
+.account-main {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 20px;
-  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
-  border-bottom: 1.5px solid #f3f4f6;
+  gap: 24px;
+  padding: 28px 32px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.bank-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+.account-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 24px;
+  font-size: 32px;
+  flex-shrink: 0;
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
 }
 
-.bank-info {
+.account-card.default .account-icon {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  box-shadow: 0 6px 20px rgba(251, 191, 36, 0.3);
+}
+
+.account-info {
   flex: 1;
+  min-width: 0;
 }
 
 .bank-name {
-  font-size: 15px;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
 }
 
 .account-number {
-  font-size: 13px;
+  font-size: 16px;
   color: #6b7280;
   font-family: 'Courier New', monospace;
-}
-
-.account-badges {
-  display: flex;
-  gap: 6px;
-}
-
-.badge {
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 11px;
+  letter-spacing: 1px;
   font-weight: 600;
 }
 
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .badge.default {
-  background: #fef3c7;
-  color: #92400e;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #b45309;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.2);
 }
 
-.badge.verified {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.badge.pending {
-  background: #fecaca;
-  color: #991b1b;
-}
-
-.account-body {
-  padding: 16px 20px;
-}
-
-.info-row {
-  display: flex;
-  padding: 6px 0;
+.badge.default i {
   font-size: 13px;
 }
 
-.info-row .label {
-  color: #9ca3af;
-  min-width: 80px;
+.account-status {
+  flex-shrink: 0;
 }
 
-.info-row .value {
-  color: #374151;
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.status-badge.verified {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.status-badge.pending {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #b45309;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.2);
+}
+
+.status-badge i {
+  font-size: 18px;
+}
+
+.account-details {
+  padding: 24px 32px;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+}
+
+.detail-item i {
+  font-size: 20px;
+  color: #667eea;
+}
+
+.detail-item .label {
+  color: #6b7280;
   font-weight: 500;
+}
+
+.detail-item .value {
+  color: #1a1a1a;
+  font-weight: 700;
 }
 
 .account-actions {
   display: flex;
-  gap: 8px;
-  padding: 16px 20px;
-  background: #f9fafb;
-  border-top: 1.5px solid #f3f4f6;
+  gap: 14px;
+  padding: 24px 32px;
 }
 
 .btn-action {
   flex: 1;
-  padding: 8px;
-  background: white;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 12.5px;
-  font-weight: 500;
-  color: #6b7280;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  transition: all 0.2s;
-}
-
-.btn-action:hover {
-  background: #f3f4f6;
-}
-
-.btn-action i {
+  gap: 8px;
+  padding: 14px 24px;
+  border-radius: 12px;
   font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn-action.set-default {
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.btn-action.set-default:hover {
+  background: #667eea;
+  color: white;
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35);
+  transform: translateY(-2px);
+}
+
+.btn-action.delete {
+  background: white;
+  color: #ef4444;
+  border: 2px solid #fecaca;
 }
 
 .btn-action.delete:hover {
-  border-color: #ef4444;
-  color: #ef4444;
   background: #fef2f2;
+  border-color: #fca5a5;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+.btn-action i {
+  font-size: 20px;
+}
+
+/* ========== 空狀態 ========== */
+.empty-state {
+  text-align: center;
+  padding: 100px 20px;
+  background: white;
+  border-radius: 20px;
+  border: 2px dashed #d1d5db;
+}
+
+.empty-state i {
+  font-size: 96px;
+  color: #d1d5db;
+  margin-bottom: 24px;
+}
+
+.empty-state h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #374151;
+  margin: 0 0 10px 0;
+}
+
+.empty-state p {
+  font-size: 15px;
+  color: #6b7280;
+  margin: 0 0 32px 0;
+}
+
+.btn-add-empty {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.35);
+}
+
+.btn-add-empty:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.45);
+}
+
+.btn-add-empty i {
+  font-size: 20px;
+}
+
+/* ========== 響應式設計 ========== */
+@media (max-width: 768px) {
+  .bank-account {
+    padding: 20px 16px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .btn-add {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .form-body {
+    padding: 28px 24px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    padding: 24px;
+  }
+
+  .btn-cancel,
+  .btn-save {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .account-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 24px;
+  }
+
+  .account-status {
+    width: 100%;
+  }
+
+  .status-badge {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .detail-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .account-actions {
+    flex-direction: column;
+    padding: 20px 24px;
+  }
+
+  .btn-action {
+    width: 100%;
+  }
 }

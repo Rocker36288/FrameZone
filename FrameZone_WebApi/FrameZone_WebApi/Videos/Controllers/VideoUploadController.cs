@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Security.Claims;
 using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Videos.DTOs;
 using FrameZone_WebApi.Videos.Services;
@@ -21,13 +22,6 @@ namespace FrameZone_WebApi.Videos.Controllers
             _env = env; // 注入成功
         }
 
-        //VideoUpload/calltest
-        [HttpGet("calltest")]
-        public IActionResult G(int id)
-        {
-            Console.WriteLine("FF");
-            return StatusCode(500, "測試成功");
-        }
 
         //videoupload/upload
         [HttpPost("upload")]
@@ -40,7 +34,11 @@ namespace FrameZone_WebApi.Videos.Controllers
                 if (file == null || file.Length == 0)
                     return BadRequest("未選擇檔案");
 
-                var result = await _videoUploadService.UploadAsync(file);
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId) || userId <= 0)
+                    return Unauthorized("Invalid user");
+
+                var result = await _videoUploadService.UploadAsync(file, userId);
 
                 if (!result.Success)
                     return BadRequest(result.Message);
@@ -147,7 +145,6 @@ namespace FrameZone_WebApi.Videos.Controllers
             try
             {
                 var result = await _videoUploadService.PublishedVideo(req);
-
                 return Ok(result);
             }
             catch (InvalidOperationException ex)

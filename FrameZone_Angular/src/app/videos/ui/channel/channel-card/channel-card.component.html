@@ -1,12 +1,12 @@
 <ng-container [ngSwitch]="variant">
   <ng-container *ngSwitchCase="'small'">
     <div class="card channel-card text-decoration-none p-1 d-flex flex-row align-items-center mb-3"
-      style="max-width: 22rem;" (click)="goToChannelHome()">
+      style="max-width: 23rem;" (click)="goToChannelHome()">
 
       <!-- 頭像 -->
-      <div class="d-flex align-items-center pointer me-3" (click)="FollowerBtn()">
+      <div class="d-flex align-items-center pointer me-3">
         <img src="{{channel.avatar}}" alt="頻道頭像" class="rounded-circle"
-          style="width:64px; height:64px; object-fit:cover;" />
+          style="width:64px; height:64px; object-fit:cover;" (error)="onthumbnailError($event)" />
       </div>
 
       <!-- 中間資訊 -->
@@ -18,8 +18,9 @@
           {{ channel.follows }} 跟隨者
         </div>
       </div>
-      <div class="me-3" (click)="$event.stopPropagation()">
-        <app-subscribe-button></app-subscribe-button>
+      <div class="me-3 ms-2" (click)="$event.stopPropagation()">
+        <app-subscribe-button [isFollowing]="userIsFollowing"
+          (followToggle)="onFollowToggled($event)"></app-subscribe-button>
       </div>
 
     </div>
@@ -27,8 +28,9 @@
 
   <ng-container *ngSwitchCase="'middle'">
     <div class="channel-card channel-card-middle" (click)="goToChannelHome()">
-      <div class="d-flex justify-content-center pointer my-3" (click)="FollowerBtn()">
-        <img src="{{channel.avatar}}" alt="頻道頭像" class="rounded-circle" style="width:9rem; height:9rem;" />
+      <div class="d-flex justify-content-center pointer my-3">
+        <img src="{{channel.avatar}}" alt="頻道頭像" class="rounded-circle" style="width:9rem; height:9rem;"
+          (error)="onthumbnailError($event)" />
       </div>
 
       <div class="d-flex justify-content-center flex-grow-1">
@@ -43,7 +45,8 @@
         </div>
       </div>
 
-      <div class="me-3 d-flex justify-content-center my-3"><app-subscribe-button></app-subscribe-button></div>
+      <div class="me-3 d-flex justify-content-center my-3"><app-subscribe-button [isFollowing]="userIsFollowing"
+          (followToggle)="onFollowToggled($event)"></app-subscribe-button></div>
     </div>
   </ng-container>
 
@@ -55,7 +58,7 @@
 
         <!-- 左側：大頭貼 -->
         <div class="flex-shrink-0">
-          <div class="creator-avatar-big pointer" (click)="FollowerBtn()">
+          <div class="creator-avatar-big pointer">
             <img [src]="channel.avatar" class="rounded-circle shadow-sm"
               style="width: 120px; height: 120px; object-fit: cover;" alt="Creator Avatar" />
           </div>
@@ -85,9 +88,8 @@
       <!-- 底部動作按鈕 -->
       <div class="d-flex gap-2 pt-3 border-top">
 
-        <button class="btn btn-primary d-flex align-items-center gap-2">
-          <i class="ti ti-plus"></i> 追蹤
-        </button>
+        <app-subscribe-button [isFollowing]="userIsFollowing"
+          (followToggle)="onFollowToggled($event)"></app-subscribe-button>
 
         <button class="btn btn-outline-secondary d-flex align-items-center gap-2">
           <i class="ti ti-share"></i> 分享

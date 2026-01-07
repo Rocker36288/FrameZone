@@ -1,0 +1,16 @@
+/* 讓互動字眼看起來像按鈕 */
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.hover-underline:hover {
+  text-decoration: underline;
+}
+
+/* 讓氣泡寬度不要撐滿，更像聊天對話框 */
+.bg-light {
+  background-color: #f0f2f5 !important;
+  max-width: 90%;
+}
+
+/* 如果是深色模式，可以自行微調這裡 */

@@ -55,19 +55,21 @@
   <form [formGroup]="checkoutForm">
     <div class="row">
       <div class="col-lg-8">
-        <div class="card mb-4 seller-group">
+        <div *ngFor="let group of groupedSelectedItems()" class="card mb-4 seller-group">
           <div class="card-header">
             <h3 class="card-title">
               <div class="d-flex align-items-center pt-1 mt-auto">
-                <span class="avatar" style="background-image: url(/static/avatars/029m.jpg)"></span>
+                <span class="avatar"
+                  [style.background-image]="'url(' + (group.sellerAvatar || 'https://i.pravatar.cc/150?u=' + group.sellerId) + ')'"></span>
                 <div class="ms-3">
-                  <a href="#" class="text-body">賣家帳號</a>
+                  <a [routerLink]="['/shopping/sellershop', group.sellerId]" class="text-body">{{ group.sellerName
+                    }}</a>
                 </div>
               </div>
             </h3>
           </div>
           <div class="card-body">
-            <div *ngFor="let item of selectedItems()" class="card mb-2 border-0 border-bottom pb-2">
+            <div *ngFor="let item of group.items" class="card mb-2 border-0 border-bottom pb-2">
               <div class="row align-items-center">
                 <div class="col-3 col-md-2">
                   <img [src]="item.imageUrl || 'images/products/1.jpg'" class="img-fluid rounded" />
@@ -87,8 +89,16 @@
           </div>
           <div class="card-body">
             <div class="form-check mb-2">
-              <input class="form-check-input" type="radio" value="credit" formControlName="paymentMethod" id="p1">
-              <label class="form-check-label" for="p1">信用卡</label>
+              <input class="form-check-input" type="radio" value="Credit" formControlName="paymentMethod"
+                id="payCredit">
+              <label class="form-check-label" for="payCredit">信用卡</label>
+              <br>
+              <input class="form-check-input" type="radio" value="ATM" formControlName="paymentMethod" id="payATM">
+              <label class="form-check-label" for="payATM">ATM轉帳</label>
+              <br>
+              <input class="form-check-input" type="radio" value="COD" formControlName="paymentMethod"
+                id="cash on delivery">
+              <label class="form-check-label" for="cash on delivery">貨到付款</label>
             </div>
           </div>
         </div>
@@ -98,36 +108,96 @@
             <h3 class="card-title">運送方式</h3>
           </div>
           <div class="card-body p-0">
-            <div class="p-3 border-bottom">
+            <!-- 郵寄：僅在非貨到付款時顯示 -->
+            <div class="p-3" *ngIf="checkoutForm.get('paymentMethod')?.value !== 'COD'">
               <div class="form-check">
-                <input class="form-check-input" type="radio" value="post" formControlName="shippingMethod" id="s1"
-                  (change)="checkoutForm.get('selectedAddressId')?.reset()">
-                <label class="form-check-label fw-bold" for="s1">郵寄 ($65)</label>
+                <input class="form-check-input" type="radio" value="post" formControlName="shippingMethod" id="s1">
+                <label class="form-check-label fw-bold" for="s1">郵寄</label>
               </div>
               <div class="mt-3 ms-4 px-3 border-start" *ngIf="checkoutForm.get('shippingMethod')?.value === 'post'">
                 <p class="text-muted small mb-2">請選擇收件地址：</p>
-                <div *ngFor="let addr of savedAddresses" class="form-check mb-2">
+
+                <!-- 已儲存的地址列表 -->
+                <div *ngIf="savedAddresses.length > 0 && !useNewAddress">
+                  <div *ngFor="let addr of savedAddresses" class="form-check mb-2">
+                    <input class="form-check-input" type="radio" [value]="addr.id" formControlName="selectedAddressId"
+                      [id]="'post'+addr.id">
+                    <label class="form-check-label small" [for]="'post'+addr.id">
+                      {{addr.name}} | {{addr.phone}} | {{addr.address}}
+                    </label>
+                  </div>
+                  <button type="button" class="btn btn-sm btn-outline-primary mt-2" (click)="toggleNewAddress()">
+                    使用新地址
+                  </button>
+                </div>
+
+                <!-- 新地址輸入表單 -->
+                <div *ngIf="useNewAddress" class="new-address-form">
+                  <div class="mb-3">
+                    <label class="form-label small">收件人姓名</label>
+                    <input type="text" class="form-control form-control-sm" placeholder="請輸入收件人姓名"
+                      [(ngModel)]="newRecipientName" [ngModelOptions]="{standalone: true}">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label small">電話號碼</label>
+                    <input type="tel" class="form-control form-control-sm" placeholder="請輸入電話號碼"
+                      [(ngModel)]="newPhoneNumber" [ngModelOptions]="{standalone: true}">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label small">完整地址</label>
+                    <input type="text" class="form-control form-control-sm" placeholder="請輸入完整地址"
+                      [(ngModel)]="newFullAddress" [ngModelOptions]="{standalone: true}">
+                  </div>
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="saveAddress" [(ngModel)]="saveAddress"
+                      [ngModelOptions]="{standalone: true}">
+                    <label class="form-check-label small" for="saveAddress">
+                      儲存此地址供下次使用
+                    </label>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-primary" (click)="onCreateAddress()">
+                      確認地址
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleNewAddress()"
+                      *ngIf="savedAddresses.length > 0">
+                      取消
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 7-11 取貨：非貨到付款 -->
+            <div class="p-3" *ngIf="checkoutForm.get('paymentMethod')?.value !== 'COD'">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" value="711" formControlName="shippingMethod" id="s2">
+                <label class="form-check-label fw-bold" for="s2">7-11 取貨</label>
+              </div>
+              <div class="mt-3 ms-4 px-3 border-start" *ngIf="checkoutForm.get('shippingMethod')?.value === '711'">
+                <p class="text-muted small mb-2">請選擇取貨門市：</p>
+                <div *ngFor="let addr of pickupStores" class="form-check mb-2">
                   <input class="form-check-input" type="radio" [value]="addr.id" formControlName="selectedAddressId"
-                    [id]="'post'+addr.id">
-                  <label class="form-check-label small" [for]="'post'+addr.id">
-                    {{addr.name}} | {{addr.address}}
+                    [id]="'s2'+addr.id">
+                  <label class="form-check-label small" [for]="'s2'+addr.id">
+                    {{addr.name}}門市 | {{addr.address}}
                   </label>
                 </div>
               </div>
             </div>
 
-            <div class="p-3">
+            <!-- 7-11 貨到付款：僅在貨到付款時顯示 -->
+            <div class="p-3" *ngIf="checkoutForm.get('paymentMethod')?.value === 'COD'">
               <div class="form-check">
-                <input class="form-check-input" type="radio" value="711" formControlName="shippingMethod" id="s2"
-                  (change)="checkoutForm.get('selectedAddressId')?.reset()">
-                <label class="form-check-label fw-bold" for="s2">7-11 取貨 ($60)</label>
+                <input class="form-check-input" type="radio" value="711_pay" formControlName="shippingMethod" id="s3">
+                <label class="form-check-label fw-bold" for="s3">貨到付款</label>
               </div>
-              <div class="mt-3 ms-4 px-3 border-start" *ngIf="checkoutForm.get('shippingMethod')?.value === '711'">
+              <div class="mt-3 ms-4 px-3 border-start" *ngIf="checkoutForm.get('shippingMethod')?.value === '711_pay'">
                 <p class="text-muted small mb-2">請選擇取貨門市：</p>
-                <div *ngFor="let addr of savedAddresses" class="form-check mb-2">
+                <div *ngFor="let addr of pickupStores" class="form-check mb-2">
                   <input class="form-check-input" type="radio" [value]="addr.id" formControlName="selectedAddressId"
-                    [id]="'s2'+addr.id">
-                  <label class="form-check-label small" [for]="'s2'+addr.id">
+                    [id]="'s3'+addr.id">
+                  <label class="form-check-label small" [for]="'s3'+addr.id">
                     {{addr.name}}門市 | {{addr.address}}
                   </label>
                 </div>
@@ -177,4 +247,9 @@
 </div>
 
 <div class="modal fade" id="couponModal" tabindex="-1" #couponModalElement>
+</div>
+
+<div>
+  <app-ecpay-form *ngIf="ecpayParams" [apiUrl]="ecpayParams.serviceURL"
+    [postData]="ecpayParams.params"></app-ecpay-form>
 </div>

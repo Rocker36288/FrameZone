@@ -1,6 +1,6 @@
 <div class="page-wrapper">
   <div class="page-body">
-    <div class="container-fluid">
+    <div class="container-xl">
       <!-- 頁面標題 -->
       <div class="page-header mb-3">
         <h1 class="page-title">聊天室</h1>
@@ -50,41 +50,13 @@
           <div *ngIf="selectedChat; else noChat" class="chat-content-wrapper">
             <!-- 對話標題 -->
             <div class="chat-header">
-              <div class="chat-header-left">
-                <div class="chat-header-user">
-                  <span class="avatar" [style.background-image]="'url(' + selectedChat.user.avatar + ')'"></span>
-                  <div class="header-user-info">
-                    <div class="header-user-name">{{ selectedChat.user.name }}</div>
-                    <div class="header-user-status" *ngIf="selectedChat.isOnline">
-                      <span class="online-dot"></span> 在線上
-                    </div>
+              <div class="chat-header-user">
+                <span class="avatar" [style.background-image]="'url(' + selectedChat.user.avatar + ')'"></span>
+                <div class="header-user-info">
+                  <div class="header-user-name">{{ selectedChat.user.name }}</div>
+                  <div class="header-user-status" *ngIf="selectedChat.isOnline">
+                    <span class="online-dot"></span> 在線上
                   </div>
-                </div>
-              </div>
-              <div class="chat-header-right">
-                <div class="chat-header-product">
-                  <img [src]="selectedChat.product.image" [alt]="selectedChat.product.name" class="product-thumbnail" />
-                  <div class="product-info">
-                    <div class="product-label">商品</div>
-                    <div class="product-name-text">{{ selectedChat.product.name }}</div>
-                  </div>
-                </div>
-                <div class="header-actions">
-                  <button class="action-btn" title="鎖頭">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                    </svg>
-                  </button>
-                  <button class="action-btn" title="線頭">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="12" cy="12" r="1" />
-                      <circle cx="12" cy="5" r="1" />
-                      <circle cx="12" cy="19" r="1" />
-                    </svg>
-                  </button>
                 </div>
               </div>
             </div>
@@ -131,8 +103,4 @@
       </div>
     </div>
   </div>
-</div>
-
-<div>
-  <app-footer></app-footer>
 </div>

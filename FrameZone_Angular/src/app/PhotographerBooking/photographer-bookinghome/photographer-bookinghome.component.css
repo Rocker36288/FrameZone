@@ -12,18 +12,6 @@
   padding-bottom: 32px;
 }
 
-/* 標題 */
-h2 {
-  font-size: 20px;
-  margin: 20px 0 12px;
-}
 
-/* Grid 四欄 */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
-  max-width: 1120px; /* 限制 Grid 寬度 */
-  margin: 0 auto; /* Grid 置中 */
-}
+
 

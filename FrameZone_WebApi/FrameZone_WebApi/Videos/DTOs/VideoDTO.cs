@@ -1,4 +1,6 @@
-﻿namespace FrameZone_WebApi.Videos.DTOs
+﻿using FrameZone_WebApi.Models;
+
+namespace FrameZone_WebApi.Videos.DTOs
 {
     //用於傳輸資料給前端的影片卡片資料
     public class VideoCardDto
@@ -102,5 +104,36 @@
     public class VideoLikesDto
     {
        public bool IsLikes { get; set; }
+    }
+
+    //頻道 DTO
+    public class ChannelFollowRequset
+    {
+        public bool IsFollow { get; set; }
+        public int ChannelId { get; set; }
+    }
+    public class ChannelFollowDto
+    {
+        public bool IsFollow { get; set; }
+    }
+
+    //觀看歷史紀錄顯示
+    public class WatchHistoryDto
+    {
+        public VideoCardDto Video { get; set; } = new VideoCardDto();
+
+        // 已看過秒數
+        public int LastPosition { get; set; }
+
+        // 可選：最後觀看時間
+        public DateTime LastWatchedAt { get; set; }
+    }
+
+    //搜尋回饋
+    public class VideoSearchResult
+    {
+        public Video Video { get; set; } = null!;
+        public int LikeCount { get; set; }
+        public int ViewCount { get; set; }
     }
 }

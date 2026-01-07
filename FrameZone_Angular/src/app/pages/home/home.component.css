@@ -1,3 +1,461 @@
-.container-xl {
-  padding-top: 50px;
+/* 消除瀏覽器預設的白邊 */
+html,
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100%;
+  height: 100%;
+  /* 防止水平方向因為動畫或引線飄出去產生白邊 */
+  overflow-x: hidden;
+}
+
+.orbit-system {
+  width: 100svw !important;
+  min-height: 120vh;
+  padding: 0;
+  margin-left: calc(-50vw + 50%);
+  /* 如果父層有 padding，這行會強行將元素拉回最左邊 */
+  margin-bottom: -45px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* 改良版漸層：增加中間節點，並使用更相近的色階 */
+  background: linear-gradient(to bottom,
+      #ffffff 0%,
+      #b4bef7 15%,
+      #738fee 40%,
+      #5473f3 70%,
+      #806afc 90%,
+      #8f7cff 100%) !important;
+
+  background-color: transparent !important;
+  /* 確保沒有背景色干擾 */
+}
+
+.orbit-system::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 30%, rgba(89, 62, 238, 0.877) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(42, 24, 139, 0.815) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+
+/* ================= 中心核心 ================= */
+.orbit-core {
+  position: absolute;
+  text-align: center;
+  color: #ffffff;
+  z-index: 10;
+}
+
+.orbit-core img {
+  width: 80px;
+  margin-bottom: 12px;
+}
+
+.orbit-core h1 {
+  font-size: 38px;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.orbit-core p {
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+/* ================= 軌道 ================= */
+.orbit {
+  position: absolute;
+  border-radius: 50%;
+  animation: spin linear infinite;
+  pointer-events: none;
+}
+
+/* 外圈 */
+.orbit.outer {
+  width: 500px;
+  height: 500px;
+  animation-duration: 42s;
+}
+
+/* 中間圈（裝飾） */
+.orbit.mid {
+  width: 400px;
+  height: 400px;
+  animation-duration: 60s;
+  opacity: 0.55;
+}
+
+/* 內圈 */
+.orbit.inner {
+  width: 320px;
+  height: 320px;
+  animation-duration: 26s;
+  animation-direction: reverse;
+}
+
+/* 軌道線＋淡光暈 */
+.orbit::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.521);
+  box-shadow:
+    0 0 12px rgba(120, 120, 255, 0.15),
+    inset 0 0 12px rgba(120, 120, 255, 0.12);
+}
+
+/* ================= 行星 ================= */
+/* 行星本體 */
+.planet {
+  position: absolute;
+  top: -19px;
+  left: 50%;
+  width: 38px;
+  height: 38px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+
+  /* 星體質感 */
+  background: radial-gradient(circle at 30% 30%,
+      rgba(255, 255, 255, 0.9),
+      rgba(255, 255, 255, 0.25) 40%,
+      rgba(120, 120, 255, 0.15) 70%);
+
+  backdrop-filter: blur(2px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow:
+    0 0 12px rgba(120, 120, 255, 0.35),
+    0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* icon 本身 */
+.planet i {
+  font-size: 20px;
+  color: #ffffff;
+  opacity: 0.9;
+}
+
+/* 外圈三顆（半徑 250） */
+.orbit.outer .planet:nth-child(2) {
+  transform: translateX(-50%) rotate(120deg) translateY(250px);
+}
+
+.orbit.outer .planet:nth-child(3) {
+  transform: translateX(-50%) rotate(240deg) translateY(250px);
+}
+
+/* 內圈兩顆（半徑 160） */
+.orbit.inner .planet:nth-child(2) {
+  transform: translateX(-50%) rotate(180deg) translateY(160px);
+}
+
+/* ====== 行星分布（關鍵：只算角度 + 半徑） ====== */
+
+/* 外圈三顆 */
+.orbit.outer .planet:nth-child(2) {
+  transform: translateX(-50%) rotate(120deg) translateY(260px);
+}
+
+.orbit.outer .planet:nth-child(3) {
+  transform: translateX(-50%) rotate(240deg) translateY(260px);
+}
+
+/* 內圈兩顆 */
+.orbit.inner .planet:nth-child(2) {
+  transform: translateX(-50%) rotate(180deg) translateY(160px);
+}
+
+/* ================= 動畫 ================= */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* 中心核心微光 */
+.orbit-core {
+  position: absolute;
+  text-align: center;
+  color: #ffffff;
+  z-index: 10;
+  animation: corePulse 4.5s ease-in-out infinite;
+}
+
+@keyframes corePulse {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 6px rgba(157, 157, 247, 0.2));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 16px rgba(120, 120, 255, 0.45));
+  }
+}
+
+.planet svg.planet-icon {
+  width: 20px;
+  height: 20px;
+  stroke: white;
+  stroke-width: 2;
+  fill: none;
+  opacity: 0.9;
+}
+
+
+/* 照片懸浮動畫 */
+@keyframes photoFloat {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--rotate));
+  }
+
+  50% {
+    transform: translateY(-15px) rotate(var(--rotate));
+  }
+}
+
+/* ================= 照片節點與懸浮 ================= */
+.photo-node {
+  position: absolute;
+  width: 280px;
+  z-index: 10;
+  /* 這裡只負責位置，不負責旋轉，避免影響引線 */
+  animation: photoFloat 5s ease-in-out infinite;
+}
+
+@keyframes photoFloat {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+/* 照片美化：移除白框，改用半透明紫色發光邊界 */
+.photo-card {
+  position: relative;
+  perspective: 1000px;
+}
+
+.img-container {
+  border-radius: 8px;
+  overflow: hidden;
+  /* 移除白框與背景，改用邊界發光 */
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  /* 套用照片旋轉 */
+  transform: rotate(var(--rotate));
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  /* 基礎發光 */
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+.photo-card:hover .img-container {
+  transform: scale(1.05) rotate(0deg);
+  /* 懸停轉正 */
+  border-color: #ffffff;
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.6);
+}
+
+.img-container img {
+  width: 100%;
+  display: block;
+}
+
+/* ================= SVG 引線：直角、獨立旋轉 ================= */
+.scan-line {
+  position: absolute;
+  top: 50%;
+  /* 從照片垂直中心出發 */
+  left: 100%;
+  width: 50px;
+  height: 50px;
+  /* 增加高度以容納長度 */
+  fill: none;
+  stroke: #ffffff;
+  /* 改為白色發光線，在深色背景更明顯 */
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+  pointer-events: none;
+  overflow: visible !important;
+  z-index: -1;
+  /* 關鍵：強制讓引線保持水平，不跟隨照片的 --rotate */
+  transform: translateY(-50%) rotate(0deg) !important;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.is-right .scan-line {
+  left: auto;
+  right: 100%;
+}
+
+.path-anim {
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  transition: stroke-dashoffset 0.8s ease-in-out;
+}
+
+.photo-card:hover .scan-line {
+  opacity: 1;
+}
+
+.photo-card:hover .path-anim {
+  stroke-dashoffset: 0;
+}
+
+/* ================= 文字標籤：對準末端 ================= */
+.info-tag {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  /* 關鍵：讓游標直接穿透它，不觸發 hover */
+  transition: all 0.4s ease 0.5s;
+  /* background: rgba(255, 255, 255, 0.15); */
+  /* backdrop-filter: blur(12px); */
+  padding: 50px 50px;
+  /* border-radius: 50px; */
+  /* 膠囊型更有設計感 */
+  /* border: 1px solid rgba(255, 255, 255, 0.4); */
+  color: #ffffff;
+  /* font-weight: 500; */
+  letter-spacing: 2px;
+  white-space: nowrap;
+  /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); */
+  writing-mode: horizontal-tb;
+  /* 保險用，防止未來被影響 */
+  text-orientation: mixed;
+
+}
+
+/* 左側照片 + 向下折 (Path 終點 L 100 180 附近) */
+.photo-node:not(.is-right):not(.move-up) .info-tag {
+  top: 120px;
+  left: 250px;
+  font-size: 20px;
+}
+
+/* 左側照片 + 向上折 (Path 終點 L 100 20 附近) */
+.photo-node:not(.is-right).move-up .info-tag {
+  top: -60px;
+  left: 250px;
+  font-size: 20px;
+}
+
+/* 右側照片 + 向下折 */
+.photo-node.is-right:not(.move-up) .info-tag {
+  top: 120px;
+  right: 250px;
+  font-size: 20px;
+}
+
+/* 右側照片 + 向上折 */
+.photo-node.is-right.move-up .info-tag {
+  top: -60px;
+  right: 250px;
+  font-size: 20px;
+}
+
+.photo-card:hover .info-tag {
+  opacity: 1;
+  transform: translateY(-5px);
+  pointer-events: auto;
+  /* 顯示後恢復正常觸碰 */
+}
+
+
+/* 星星 */
+.stars-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 5px #fff;
+  animation:
+    starTwinkle 7s infinite alternate,
+    starDrift 90s linear infinite;
+  /* 增加一個極慢的飄移 */
+}
+
+@keyframes starDrift {
+  from {
+    transform: translate(0, 0);
+  }
+
+  to {
+    transform: translate(10px, 10px);
+  }
+
+  /* 緩緩往右下角飄 */
+}
+
+/* 流星 */
+.shooting-star {
+  position: absolute;
+  width: 150px;
+  /* 稍微加長，看起來更有氣勢 */
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+  opacity: 0;
+  pointer-events: none;
+  transform: rotate(var(--rotation));
+  animation: shootingStarAnim linear infinite;
+}
+
+@keyframes shootingStarAnim {
+
+  /* 0% 到 8% 之間完成飛行 (10秒的8%就是0.8秒) */
+  0% {
+    transform: rotate(var(--rotation)) translateX(0) scale(0);
+    opacity: 0;
+  }
+
+  1% {
+    opacity: 1;
+    transform: rotate(var(--rotation)) translateX(0) scale(1);
+  }
+
+  8% {
+    transform: rotate(var(--rotation)) translateX(-1000px) scale(0);
+    opacity: 0;
+  }
+
+  /* 剩餘的 92% 時間 (約 9.2 秒) 都在隱身等待下次循環 */
+  100% {
+    transform: rotate(var(--rotation)) translateX(-1000px) scale(0);
+    opacity: 0;
+  }
 }

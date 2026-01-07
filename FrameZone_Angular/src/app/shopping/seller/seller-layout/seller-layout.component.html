@@ -1,12 +1,10 @@
-<!-- src/app/shopping/seller/seller-layout/seller-layout.component.html -->
-
 <div class="seller-layout">
-  <app-seller-navbar></app-seller-navbar>
+  <app-seller-navbar (toggleSidebar)="isSidebarCollapsed = !isSidebarCollapsed"></app-seller-navbar>
 
   <div class="layout-body">
-    <app-seller-sidebar></app-seller-sidebar>
+    <app-seller-sidebar [isCollapsed]="isSidebarCollapsed"></app-seller-sidebar>
 
-    <main class="main-content">
+    <main class="main-content" [class.collapsed]="isSidebarCollapsed">
       <router-outlet></router-outlet>
     </main>
   </div>

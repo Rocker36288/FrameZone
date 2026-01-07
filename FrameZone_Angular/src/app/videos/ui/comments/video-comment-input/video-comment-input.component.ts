@@ -1,6 +1,8 @@
+import { AuthService } from './../../../../core/services/auth.service';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { FormsModule } from "@angular/forms";
+import { LoginResponseDto } from '../../../../core/models/auth.models';
 
 @Component({
   selector: 'app-video-comment-input',
@@ -13,6 +15,15 @@ export class CommentInputComponent {
 
   @Output() submitComment = new EventEmitter<string>();
   @Output() buttonClicked = new EventEmitter<void>();
+  user: LoginResponseDto | null = null;
+
+  constructor(private authService: AuthService) {
+
+  }
+
+  ngOnInit(): void {
+    this.user = this.authService.getCurrentUser()
+  }
 
   onSubmit() {
     if (this.commentText.trim().length === 0) return;
@@ -24,5 +35,10 @@ export class CommentInputComponent {
   onCancel() {
     this.buttonClicked.emit();
     this.commentText = '';
+  }
+
+  onAvatarlError(event: ErrorEvent) {
+    const img = event.target as HTMLImageElement;
+    img.src = 'favicon2.png';
   }
 }

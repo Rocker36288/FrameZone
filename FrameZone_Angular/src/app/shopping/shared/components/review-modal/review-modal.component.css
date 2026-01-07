@@ -1,0 +1,11 @@
+/* CSS for Review Modal */
+.star {
+  transition: color 0.2s;
+}
+.cursor-pointer {
+  cursor: pointer;
+}
+.upload-box:hover {
+  background-color: #f8f9fa;
+  border-color: #ced4da !important;
+}
