@@ -111,6 +111,11 @@ namespace FrameZone_WebApi.Socials.Services
                 })
                 .ToList();
         }
+
+        public List<RecentChatDto> GetRecentSocialChats(long userId)
+        {
+            return _roomRepo.GetRecentSocialPrivateChats(userId);
+        }
     }
 
 }

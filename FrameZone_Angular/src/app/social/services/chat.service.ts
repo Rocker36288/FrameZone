@@ -9,6 +9,7 @@ import {
 import { ChatRoomDto } from '../models/ChatRoomDto';
 import { MessageDto, SendShopMessageDto } from '../models/MessageDto';
 import { AuthService } from '../../core/services/auth.service';
+import { RecentChat } from '../models/recent-chat.models';
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
@@ -33,6 +34,10 @@ export class ChatService {
 
   createShoppingPrivateRoom(targetUserId: number): Observable<ChatRoomDto> {
     return this.http.post<ChatRoomDto>(`${this.apiUrl}/private/shopping`, { targetUserId });
+  }
+
+  getRecentSocialChats(): Observable<RecentChat[]> {
+    return this.http.get<RecentChat[]>(`${this.apiUrl}/recent/social`);
   }
 
   getMessages(roomId: number): Observable<MessageDto[]> {

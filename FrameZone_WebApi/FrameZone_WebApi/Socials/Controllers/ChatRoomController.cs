@@ -71,6 +71,15 @@ namespace FrameZone_WebApi.Socials.Controllers
             return _roomService.GetUserRooms(userId);
         }
 
+        [Authorize]
+        [HttpGet("recent/social")]
+        public ActionResult<List<RecentChatDto>> GetRecentSocialChats()
+        {
+            if (!TryGetUserId(out var userId))
+                return Unauthorized();
+            return _roomService.GetRecentSocialChats(userId);
+        }
+
         [HttpGet("{roomId}/messages")]
         public ActionResult<List<MessageDto>> GetMessages(int roomId)
         {

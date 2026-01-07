@@ -1,5 +1,9 @@
 ﻿using FrameZone_WebApi.Models;
 
+using FrameZone_WebApi.Socials.Constants;
+using FrameZone_WebApi.Socials.DTOs;
+using Microsoft.EntityFrameworkCore;
+
 namespace FrameZone_WebApi.Socials.Repositories
 {
     public class ChatRoomRepository
@@ -94,6 +98,59 @@ namespace FrameZone_WebApi.Socials.Repositories
                 .Where(cm => cm.UserId == userId && cm.LeaveAt == null)
                 .Select(cm => cm.Room)
                 .OrderByDescending(r => r.UpdatedAt ?? r.CreatedAt)
+                .ToList();
+        }
+
+        public List<RecentChatDto> GetRecentSocialPrivateChats(long userId)
+        {
+            var roomIds = _context.ChatMembers
+                .Where(cm =>
+                    cm.UserId == userId &&
+                    cm.LeaveAt == null &&
+                    cm.Room.RoomType == "Private" &&
+                    cm.Room.RoomCategory == RoomCategoryConst.Social)
+                .Select(cm => cm.RoomId)
+                .Distinct()
+                .ToList();
+
+            var results = new List<RecentChatDto>();
+
+            foreach (var roomId in roomIds)
+            {
+                var room = _context.ChatRooms.FirstOrDefault(r => r.RoomId == roomId);
+                if (room == null) continue;
+
+                var otherUser = _context.ChatMembers
+                    .Include(cm => cm.User)
+                        .ThenInclude(u => u.UserProfile)
+                    .Where(cm => cm.RoomId == roomId && cm.UserId != userId && cm.LeaveAt == null)
+                    .Select(cm => cm.User)
+                    .FirstOrDefault();
+
+                if (otherUser == null) continue;
+
+                var lastMessage = _context.Messages
+                    .Where(m => m.RoomId == roomId && m.DeletedAt == null)
+                    .OrderByDescending(m => m.CreatedAt)
+                    .FirstOrDefault();
+
+                var lastAt = lastMessage?.CreatedAt ?? room.UpdatedAt ?? room.CreatedAt;
+
+                results.Add(new RecentChatDto
+                {
+                    RoomId = roomId,
+                    TargetUserId = otherUser.UserId,
+                    TargetUserName = otherUser.UserProfile?.DisplayName ?? otherUser.Account ?? "使用者",
+                    TargetUserAvatar = otherUser.UserProfile?.Avatar,
+                    LastMessage = lastMessage?.MessageContent ?? string.Empty,
+                    LastMessageType = lastMessage?.MessageType,
+                    LastMessageCreatedAt = lastAt
+                });
+            }
+
+            return results
+                .OrderByDescending(r => r.LastMessageCreatedAt)
+                .Take(5)
                 .ToList();
         }
 

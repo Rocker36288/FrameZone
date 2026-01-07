@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, Output, inject } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, Output, ViewChild, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { ChatService } from '../services/chat.service';
@@ -25,6 +25,9 @@ interface ViewMessage {
 export class SocialChatComponent implements OnDestroy {
   @Input() selectedFriend: { id: number; name: string; avatar?: string } | null = null;
   @Output() closed = new EventEmitter<void>();
+  @ViewChild('chatBody') chatBody?: ElementRef<HTMLElement>;
+  @ViewChild('chatWindow') chatWindow?: ElementRef<HTMLElement>;
+  @ViewChild('chatToggle') chatToggle?: ElementRef<HTMLElement>;
 
   private chatService = inject(ChatService);
   private authService = inject(AuthService);
@@ -49,6 +52,23 @@ export class SocialChatComponent implements OnDestroy {
       this.teardownRealtime();
       this.closed.emit();
     }
+  }
+
+  private closeChat() {
+    if (!this.isOpen) return;
+    this.isOpen = false;
+    this.teardownRealtime();
+    this.closed.emit();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.isOpen) return;
+    const target = event.target as Node | null;
+    const chatEl = this.chatWindow?.nativeElement;
+    const toggleEl = this.chatToggle?.nativeElement;
+    if (chatEl?.contains(target) || toggleEl?.contains(target)) return;
+    this.closeChat();
   }
 
   private openForFriend(friend: { id: number; name: string }) {
@@ -77,6 +97,7 @@ export class SocialChatComponent implements OnDestroy {
     this.chatService.getMessages(roomId).subscribe({
       next: messages => {
         this.messages = messages.map(message => this.toViewMessage(message));
+        this.scrollToBottom();
       },
       error: () => { }
     });
@@ -99,6 +120,7 @@ export class SocialChatComponent implements OnDestroy {
       this.chatService.messages$.subscribe(message => {
         if (!message) return;
         this.messages = [...this.messages, this.toViewMessage(message)];
+        this.scrollToBottom();
       })
     );
   }
@@ -130,19 +152,33 @@ export class SocialChatComponent implements OnDestroy {
 
   private getSenderProfile(isOwn: boolean) {
     const user = this.authService.getCurrentUser();
-    const defaultAvatar = 'https://i.pravatar.cc/100?u=default';
+    const name = isOwn
+      ? (user?.displayName || user?.account || '我')
+      : (this.selectedFriend?.name || '好友');
+    const initial = name.charAt(0).toUpperCase();
+    const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
     console.log(isOwn);
     if (isOwn) {
       return {
-        name: user?.displayName || user?.account || '我',
+        name,
         avatar: user?.avatar || defaultAvatar
       };
     }
 
     return {
-      name: this.selectedFriend?.name || '好友',
+      name,
       avatar: this.selectedFriend?.avatar || defaultAvatar
     };
+  }
+
+  private scrollToBottom() {
+    const el = this.chatBody?.nativeElement;
+    if (!el) return;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.scrollTop = el.scrollHeight;
+      });
+    });
   }
 
 }

@@ -24,6 +24,11 @@
   color: #333;
 }
 
+/* --- 2. 搜尋框間距 --- */
+.custom-search {
+  margin-bottom: 1.25rem;
+}
+
 /* --- 3. 朋友列表區域與滾動條 --- */
 .friend-list-content {
   flex-grow: 1;

@@ -1,16 +1,16 @@
 <!-- 浮動開關 -->
-<button class="mini-btn" (click)="toggleChat()" [class.active]="isOpen">
+<button class="mini-btn" #chatToggle (click)="toggleChat()" [class.active]="isOpen">
   <i class="bi bi-chat-right-dots"></i>
 </button>
 
 <!-- 聊天視窗 -->
-<div class="chat-window" [class.open]="isOpen">
+<div class="chat-window" #chatWindow [class.open]="isOpen">
   <div class="chat-header">
     {{ selectedFriend?.name || '好友' }}
     <span class="close-btn" (click)="toggleChat()">×</span>
   </div>
 
-  <div class="chat-body">
+  <div class="chat-body" #chatBody>
     @if (loading) {
     <div>載入聊天室中...</div>
     }
