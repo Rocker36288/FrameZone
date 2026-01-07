@@ -22,6 +22,12 @@ namespace FrameZone_WebApi.Socials.DTOs
         public int? PostTypeId { get; set; }
     }
 
+    public class SharePostDto
+    {
+        [MaxLength(500, ErrorMessage = "貼文內容不能超過500個字")]
+        public string? PostContent { get; set; }
+    }
+
     public class PostReadDto
     {
         public int PostId { get; set; }
@@ -36,7 +42,11 @@ namespace FrameZone_WebApi.Socials.DTOs
         public bool IsOwner { get; set; }   //就是本人
         public int LikeCount { get; set; }
         public bool IsLiked { get; set; }
+        public int ShareCount { get; set; }
+        public bool IsShared { get; set; }
+        public bool IsSharedPost { get; set; }
         public int CommentCount { get; set; }
+        public PostReadDto? SharedPost { get; set; }
     }
 
     public class UserProfileSummaryDto

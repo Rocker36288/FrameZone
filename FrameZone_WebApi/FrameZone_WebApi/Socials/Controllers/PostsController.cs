@@ -126,6 +126,38 @@ namespace FrameZone_WebApi.Socials.Controllers
             return Ok(posts);
         }
 
+        // POST: api/posts/1/share
+        [Authorize]
+        [HttpPost("{postId}/share")]
+        public async Task<IActionResult> SharePost(int postId, [FromBody] SharePostDto dto)
+        {
+            try
+            {
+                long userId = GetUserId();
+                var created = await _postService.CreateSharePostAsync(userId, postId, dto?.PostContent);
+                if (created == null)
+                {
+                    return BadRequest(new { message = "已分享過" });
+                }
+                return Ok(created);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+        // GET: api/posts/shared?limit=20
+        [Authorize]
+        [HttpGet("shared")]
+        public async Task<IActionResult> GetSharedPosts([FromQuery] int limit = 20)
+        {
+            long userId = GetUserId();
+            limit = Math.Clamp(limit, 1, 50);
+            var posts = await _postService.GetSharedPostsAsync(userId, limit);
+            return Ok(posts);
+        }
+
         // POST: api/posts
         [Authorize]
         [HttpPost]

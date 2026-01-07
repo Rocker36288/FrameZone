@@ -24,6 +24,7 @@ export class SocialPostsListComponent implements OnInit, OnChanges, OnDestroy {
   private isRecentRoute = false;
   private isLikedRoute = false;
   private isCommentedRoute = false;
+  private isSharedRoute = false;
 
   constructor(
     private postService: PostService,
@@ -36,6 +37,7 @@ export class SocialPostsListComponent implements OnInit, OnChanges, OnDestroy {
     this.isRecentRoute = routePath === 'recent';
     this.isLikedRoute = routePath === 'liked';
     this.isCommentedRoute = routePath === 'commented';
+    this.isSharedRoute = routePath === 'shared';
   }
 
   ngOnInit(): void {
@@ -47,7 +49,7 @@ export class SocialPostsListComponent implements OnInit, OnChanges, OnDestroy {
       this.loadPosts();
     });
 
-    if (this.isFollowingRoute || this.isRecentRoute || this.isLikedRoute || this.isCommentedRoute) {
+    if (this.isFollowingRoute || this.isRecentRoute || this.isLikedRoute || this.isCommentedRoute || this.isSharedRoute) {
       this.userSub = this.authService.currentUser$.subscribe(() => {
         this.loadPosts();
       });
@@ -117,6 +119,19 @@ export class SocialPostsListComponent implements OnInit, OnChanges, OnDestroy {
 
     if (this.isCommentedRoute) {
       this.postService.getCommentedPosts(20).subscribe({
+        next: (posts) => {
+          this.posts = posts;
+          console.log(this.posts);
+        },
+        error: () => {
+          this.posts = [];
+        }
+      });
+      return;
+    }
+
+    if (this.isSharedRoute) {
+      this.postService.getSharedPosts(20).subscribe({
         next: (posts) => {
           this.posts = posts;
           console.log(this.posts);

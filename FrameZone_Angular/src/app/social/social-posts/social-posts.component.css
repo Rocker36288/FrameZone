@@ -154,3 +154,132 @@
   text-decoration: none !important;
   box-shadow: none !important;
 }
+
+/* Share modal options */
+.share-option {
+  border: 2px solid #6c757d;
+  background: #ffffff;
+  color: #6c757d;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: filter 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+  min-width: 70px;
+  min-height: 70px;
+  justify-content: center;
+}
+
+.share-option--selected {
+  filter: brightness(0.9);
+}
+
+.share-option--personal {
+  border-color: #b4bef7;
+  color: #5473f3;
+}
+
+.share-option--personal.share-option--selected {
+  background: linear-gradient(135deg, #738fee 0%, #806afc 100%);
+  border-color: #738fee;
+  color: #ffffff;
+}
+
+.share-option--facebook {
+  border-color: #1877f2;
+  color: #1877f2;
+}
+
+.share-option--facebook.share-option--selected {
+  background: #1877f2;
+  color: #ffffff;
+}
+
+.share-option--twitter {
+  border-color: #111111;
+  color: #111111;
+}
+
+.share-option--twitter.share-option--selected {
+  background: #111111;
+  color: #ffffff;
+}
+
+.share-option--line {
+  border-color: #06c755;
+  color: #06c755;
+}
+
+.share-option--line.share-option--selected {
+  background: #06c755;
+  color: #ffffff;
+}
+
+.share-option--facebook i,
+.share-option--twitter i,
+.share-option--line i {
+  font-size: 2.25rem;
+}
+
+.modal-content {
+  border: 1px solid #e0e4ff;
+}
+
+.modal-header,
+.modal-footer {
+  border-color: #e0e4ff;
+  background: #f0f2ff;
+}
+
+.modal-title {
+  color: #333333;
+}
+
+.modal .btn-primary {
+  background: linear-gradient(135deg, #738fee 0%, #806afc 100%);
+  border: none;
+}
+
+.modal .btn-primary:hover {
+  filter: brightness(0.9);
+}
+
+.modal .btn-secondary {
+  background: #f0f2ff;
+  color: #5473f3;
+  border: 1px solid #b4bef7;
+}
+
+.modal .btn-secondary:hover {
+  background: #e0e4ff;
+  color: #5473f3;
+  border-color: #738fee;
+}
+
+.modal .shared-post {
+  border-color: #e0e4ff;
+}
+
+.shared-post {
+  background: #f0f2ff;
+  border-color: #e0e4ff;
+}
+
+.modal .form-control {
+  border: 1px solid #b4bef7;
+}
+
+.modal .form-control:focus {
+  border-color: #738fee;
+  box-shadow: 0 0 0 0.2rem rgba(115, 143, 238, 0.2);
+}
+
+.modal .input-group .btn {
+  background: #f0f2ff;
+  color: #5473f3;
+  border: 1px solid #b4bef7;
+}
+
+.modal .input-group .btn:hover {
+  background: #e0e4ff;
+  color: #5473f3;
+  border-color: #738fee;
+}

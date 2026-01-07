@@ -22,7 +22,7 @@ namespace FrameZone_WebApi.Socials.Services
                 return null;
             }
 
-            return posts.Select(p => MapToReadDto(p, currentUserId)).ToList();
+            return await MapPostsWithSharedAsync(posts, currentUserId);
         }
 
         // ================= 取得指定使用者貼文 =================
@@ -34,7 +34,7 @@ namespace FrameZone_WebApi.Socials.Services
                 return null;
             }
 
-            return posts.Select(p => MapToReadDto(p, currentUserId)).ToList();
+            return await MapPostsWithSharedAsync(posts, currentUserId);
         }
 
         // ================= 取得貼文 =================
@@ -46,7 +46,16 @@ namespace FrameZone_WebApi.Socials.Services
                 return null;
             }
 
-            return MapToReadDto(post, currentUserId);
+            var dto = MapToReadDto(post, currentUserId);
+            if (post.PostType == "share" && post.PostTypeId.HasValue)
+            {
+                var shared = await _postRepository.GetPostByIdAsync(post.PostTypeId.Value);
+                if (shared != null)
+                {
+                    dto.SharedPost = MapToReadDto(shared, currentUserId);
+                }
+            }
+            return dto;
         }
 
         // ================= 取得使用者資料 =================
@@ -184,16 +193,62 @@ namespace FrameZone_WebApi.Socials.Services
             return await _postRepository.RemovePostLikeAsync(existing);
         }
 
+        public async Task<PostReadDto?> CreateSharePostAsync(long userId, int postId, string? postContent)
+        {
+            var post = await _postRepository.GetPostByIdAsync(postId);
+            if (post == null)
+            {
+                throw new KeyNotFoundException("貼文不存在");
+            }
+
+            var existing = await _postRepository.GetPostShareAsync(userId, postId);
+            if (existing != null)
+            {
+                return null;
+            }
+
+            var sharePost = new Post
+            {
+                UserId = userId,
+                PostType = "share",
+                PostTypeId = postId,
+                PostContent = postContent ?? string.Empty
+            };
+
+            var createdPost = await _postRepository.AddPostAsync(sharePost);
+            if (createdPost == null)
+            {
+                return null;
+            }
+
+            var share = new PostShare
+            {
+                UserId = userId,
+                PostId = postId
+            };
+            await _postRepository.AddPostShareAsync(share);
+
+            var createdWithUser = await _postRepository.GetPostByIdAsync(createdPost.PostId);
+            if (createdWithUser == null)
+            {
+                return null;
+            }
+
+            var dto = MapToReadDto(createdWithUser, userId);
+            dto.SharedPost = MapToReadDto(post, userId);
+            return dto;
+        }
+
         public async Task<List<PostReadDto>> GetLikedPostsAsync(long userId, int limit)
         {
             var posts = await _postRepository.GetLikedPostsAsync(userId, limit);
-            return posts.Select(p => MapToReadDto(p, userId)).ToList();
+            return await MapPostsWithSharedAsync(posts, userId);
         }
 
         public async Task<List<PostReadDto>> GetCommentedPostsAsync(long userId, int limit)
         {
             var posts = await _postRepository.GetCommentedPostsAsync(userId, limit);
-            return posts.Select(p => MapToReadDto(p, userId)).ToList();
+            return await MapPostsWithSharedAsync(posts, userId);
         }
 
         public async Task<bool> RecordPostViewAsync(long userId, int postId)
@@ -223,13 +278,50 @@ namespace FrameZone_WebApi.Socials.Services
         public async Task<List<PostReadDto>> GetRecentViewedPostsAsync(long userId, int limit)
         {
             var posts = await _postRepository.GetRecentViewedPostsAsync(userId, limit);
-            return posts.Select(p => MapToReadDto(p, userId)).ToList();
+            return await MapPostsWithSharedAsync(posts, userId);
+        }
+
+        public async Task<List<PostReadDto>> GetSharedPostsAsync(long userId, int limit)
+        {
+            var posts = await _postRepository.GetSharedPostsAsync(userId, limit);
+            return await MapPostsWithSharedAsync(posts, userId);
+        }
+
+        private async Task<List<PostReadDto>> MapPostsWithSharedAsync(List<Post> posts, long? currentUserId)
+        {
+            var dtos = posts.Select(p => MapToReadDto(p, currentUserId)).ToList();
+            var sharedSourceIds = posts
+                .Where(p => p.PostType == "share" && p.PostTypeId.HasValue)
+                .Select(p => p.PostTypeId!.Value)
+                .Distinct()
+                .ToList();
+
+            if (sharedSourceIds.Count == 0)
+            {
+                return dtos;
+            }
+
+            var sharedPosts = await _postRepository.GetPostsByIdsAsync(sharedSourceIds);
+            var sharedMap = sharedPosts.ToDictionary(p => p.PostId, p => MapToReadDto(p, currentUserId));
+
+            foreach (var dto in dtos)
+            {
+                if (dto.PostType == "share" && dto.PostTypeId.HasValue &&
+                    sharedMap.TryGetValue(dto.PostTypeId.Value, out var sharedDto))
+                {
+                    dto.SharedPost = sharedDto;
+                }
+            }
+
+            return dtos;
         }
 
         private static PostReadDto MapToReadDto(Post post, long? currentUserId)
         {
             var likeCount = post.PostLikes?.Count ?? 0;
             var isLiked = currentUserId.HasValue && post.PostLikes.Any(l => l.UserId == currentUserId.Value);
+            var shareCount = post.PostShares?.Count ?? 0;
+            var isShared = currentUserId.HasValue && post.PostShares.Any(s => s.UserId == currentUserId.Value);
             var commentCount = post.CommentTargets?
                 .SelectMany(ct => ct.Comments)
                 .Count(c => c.DeletedAt == null) ?? 0;
@@ -247,7 +339,11 @@ namespace FrameZone_WebApi.Socials.Services
                 IsOwner = currentUserId.HasValue && post.UserId == currentUserId.Value,
                 LikeCount = likeCount,
                 IsLiked = isLiked,
-                CommentCount = commentCount
+                ShareCount = shareCount,
+                IsShared = isShared,
+                IsSharedPost = post.PostType == "share",
+                CommentCount = commentCount,
+                SharedPost = null
             };
         }
     }

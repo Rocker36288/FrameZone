@@ -31,7 +31,12 @@
       </div>
 
       <div>
-        <strong>{{post.userName}}</strong><br />
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <strong>{{post.userName}}</strong>
+          @if (post.isSharedPost) {
+          <span class="badge bg-light text-secondary border">已分享</span>
+          }
+        </div>
         <span class="text-muted" style="font-size: 0.85rem;">
           更新時間:{{post.updatedAt | date:'yyyy-MM-dd HH:mm'}}
         </span>
@@ -47,6 +52,36 @@
           {{ isFullContent ? '' : '顯示全部' }}
         </button>
         }
+    </div>
+    }
+
+    @if (post.postType === 'share') {
+    <div class="shared-post border rounded p-2 mt-2 bg-light-subtle">
+      @if (post.sharedPost) {
+      <a class="d-flex align-items-center mb-2 text-decoration-none text-reset"
+        [routerLink]="['/social/profile', post.sharedPost.userId]">
+        <div class="avatar-wrapper me-2">
+          <img [src]="getSharedUserAvatar(post.sharedPost)" [alt]="post.sharedPost.userName" />
+        </div>
+        <div>
+          <strong>{{post.sharedPost.userName}}</strong><br />
+          <span class="text-muted" style="font-size: 0.85rem;">
+            更新時間:{{post.sharedPost.updatedAt | date:'yyyy-MM-dd HH:mm'}}
+          </span>
+        </div>
+      </a>
+      <div class="post-content">
+        @if(post.sharedPost.postContent.length <= 10){ <span>{{ post.sharedPost.postContent }}</span>
+          } @else {
+          <span>{{ isFullContent ? post.sharedPost.postContent : (post.sharedPost.postContent | slice:0:10) + '...' }}</span>
+          <button class="btn btn-link btn-sm p-0 ms-1" (click)="toggleContent()">
+            {{ isFullContent ? '' : '顯示全部' }}
+          </button>
+          }
+      </div>
+      } @else {
+      <p class="text-muted mb-0">原貼文已刪除</p>
+      }
     </div>
     }
 
@@ -68,8 +103,9 @@
         </button>
       </div>
       <div class="col-4">
-        <button class="btn btn-ghost-dark w-100 py-2 d-flex align-items-center justify-content-center">
-          <i class="bi bi-share me-2"></i>1 次分享
+        <button class="btn btn-ghost-dark w-100 py-2 d-flex align-items-center justify-content-center"
+          (click)="openShareModal()" [class.text-primary]="post.isShared">
+          <i class="bi bi-share me-2"></i>{{ post.shareCount ?? 0 }} 次分享
         </button>
       </div>
     </div>
@@ -124,6 +160,62 @@
       </div>
     </div>
     }
+  </div>
+</div>
+}
+
+@if (isShareModalOpen) {
+<div class="modal-backdrop fade show"></div>
+<div class="modal show d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">分享貼文</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeShareModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <label class="share-option share-option--personal d-flex flex-column align-items-center gap-1 py-2 px-3"
+            [class.share-option--selected]="shareTarget === 'personal'">
+            <input class="visually-hidden" type="radio" name="shareTarget" value="personal" [(ngModel)]="shareTarget" />
+            <i class="bi bi-person-circle fs-2"></i>
+            <span>個人貼文</span>
+          </label>
+          <label class="share-option share-option--facebook d-flex flex-column align-items-center gap-1 py-2 px-3"
+            [class.share-option--selected]="shareTarget === 'facebook'">
+            <input class="visually-hidden" type="radio" name="shareTarget" value="facebook" [(ngModel)]="shareTarget" />
+            <i class="bi bi-facebook fs-2"></i>
+          </label>
+          <label class="share-option share-option--twitter d-flex flex-column align-items-center gap-1 py-2 px-3"
+            [class.share-option--selected]="shareTarget === 'twitter'">
+            <input class="visually-hidden" type="radio" name="shareTarget" value="twitter" [(ngModel)]="shareTarget" />
+            <i class="bi bi-twitter-x fs-2"></i>
+          </label>
+          <label class="share-option share-option--line d-flex flex-column align-items-center gap-1 py-2 px-3"
+            [class.share-option--selected]="shareTarget === 'line'">
+            <input class="visually-hidden" type="radio" name="shareTarget" value="line" [(ngModel)]="shareTarget" />
+            <i class="bi bi-line fs-2"></i>
+          </label>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">分享連結</label>
+          <div class="input-group">
+            <input class="form-control" [value]="shareLink" readonly />
+            <button class="btn btn-outline-secondary" type="button" (click)="copyShareLink()">複製</button>
+          </div>
+        </div>
+        @if (shareTarget === 'personal') {
+        <div class="mb-3">
+          <label class="form-label">分享訊息</label>
+          <textarea class="form-control" rows="3" [(ngModel)]="shareMessage"></textarea>
+        </div>
+        }
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeShareModal()">取消</button>
+        <button type="button" class="btn btn-primary" (click)="submitShare()">分享</button>
+      </div>
+    </div>
   </div>
 </div>
 }

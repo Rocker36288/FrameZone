@@ -36,6 +36,10 @@ export class SocialPostsComponent implements AfterViewInit, OnDestroy {
   isSubmittingComment = false; // 防止重複點擊
   private viewObserver?: IntersectionObserver;
   private hasTrackedView = false;
+  isShareModalOpen = false;
+  shareMessage = '';
+  shareTarget: 'personal' | 'facebook' | 'twitter' | 'line' = 'personal';
+  shareLink = window.location.href;
 
   // 注入 CommentService
   constructor(
@@ -88,6 +92,11 @@ export class SocialPostsComponent implements AfterViewInit, OnDestroy {
     const initial = (this.post.userName || 'U').charAt(0).toUpperCase();
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
   }
+  getSharedUserAvatar(sharedPost: PostDto): string {
+    if (sharedPost.avatar) return sharedPost.avatar;
+    const initial = (sharedPost.userName || 'U').charAt(0).toUpperCase();
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+  }
 
   //右上角選單
   toggleMenu() { this.isMenuOpen = !this.isMenuOpen; }
@@ -112,6 +121,70 @@ export class SocialPostsComponent implements AfterViewInit, OnDestroy {
         this.post.likeCount = currentCount;
       }
     });
+  }
+
+  openShareModal() {
+    this.shareMessage = '';
+    this.shareTarget = 'personal';
+    this.shareLink = window.location.href;
+    this.isShareModalOpen = true;
+  }
+
+  closeShareModal() {
+    this.isShareModalOpen = false;
+  }
+
+  submitShare() {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser?.userId) return;
+    if (this.post.isShared && this.shareTarget === 'personal') return;
+
+    if (this.shareTarget === 'personal') {
+      const currentCount = this.post.shareCount ?? 0;
+      this.post.isShared = true;
+      this.post.shareCount = currentCount + 1;
+
+      this.postService.recordShare(this.post.postId, this.shareMessage).subscribe({
+        next: () => {
+          this.closeShareModal();
+        },
+        error: () => {
+          this.post.isShared = false;
+          this.post.shareCount = currentCount;
+        }
+      });
+      return;
+    }
+
+    const shareUrl = encodeURIComponent(window.location.href);
+    const shareText = encodeURIComponent(this.shareMessage || this.post.postContent || '');
+
+    if (this.shareTarget === 'facebook') {
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`, '_blank');
+    } else if (this.shareTarget === 'twitter') {
+      window.open(`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`, '_blank');
+    } else if (this.shareTarget === 'line') {
+      window.open(`https://social-plugins.line.me/lineit/share?url=${shareUrl}&text=${shareText}`, '_blank');
+    }
+
+    this.closeShareModal();
+  }
+
+  copyShareLink() {
+    const url = window.location.href;
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(url).catch(() => { });
+      return;
+    }
+    const textarea = document.createElement('textarea');
+    textarea.value = url;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
   }
 
   // --- 留言邏輯 ---

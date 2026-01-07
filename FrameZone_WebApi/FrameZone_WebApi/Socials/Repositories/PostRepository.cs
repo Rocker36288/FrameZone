@@ -20,6 +20,7 @@ namespace FrameZone_WebApi.Socials.Repositories
                     .Include(p => p.User)
                         .ThenInclude(u => u.UserProfile)
                     .Include(p => p.PostLikes)
+                    .Include(p => p.PostShares)
                     .Include(p => p.CommentTargets)
                         .ThenInclude(ct => ct.Comments)
                     //依照貼文Id查詢 & 不顯示已刪除的貼文
@@ -46,6 +47,7 @@ namespace FrameZone_WebApi.Socials.Repositories
                     .Include(p => p.User)
                         .ThenInclude(u => u.UserProfile)
                     .Include(p => p.PostLikes)
+                    .Include(p => p.PostShares)
                     .Include(p => p.CommentTargets)
                         .ThenInclude(ct => ct.Comments)
                     .Where(p =>
@@ -62,6 +64,46 @@ namespace FrameZone_WebApi.Socials.Repositories
             }
         }
 
+        public async Task<List<Post>> GetPostsByUserIdWithSharedAsync(long userId)
+        {
+            try
+            {
+                var sharedPostIds = await _context.PostShares
+                    .Where(s => s.UserId == userId)
+                    .Select(s => s.PostId)
+                    .Distinct()
+                    .ToListAsync();
+
+                return await _context.Posts
+                    .Include(p => p.User)
+                        .ThenInclude(u => u.UserProfile)
+                    .Include(p => p.PostLikes)
+                    .Include(p => p.PostShares)
+                    .Include(p => p.CommentTargets)
+                        .ThenInclude(ct => ct.Comments)
+                    .Where(p =>
+                        (p.UserId == userId || sharedPostIds.Contains(p.PostId)) &&
+                        p.Status != "Deleted" &&
+                        p.DeletedAt == null)
+                    .OrderByDescending(p => p.UpdatedAt)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"取得貼文失敗: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<List<int>> GetSharedPostIdsByUserIdAsync(long userId)
+        {
+            return await _context.PostShares
+                .Where(s => s.UserId == userId)
+                .Select(s => s.PostId)
+                .Distinct()
+                .ToListAsync();
+        }
+
         // ================= 取得貼文 =================
         public async Task<Post?> GetPostByIdAsync(int postId)
         {
@@ -71,6 +113,7 @@ namespace FrameZone_WebApi.Socials.Repositories
                     .Include(p => p.User)
                         .ThenInclude(u => u.UserProfile)
                     .Include(p => p.PostLikes)
+                    .Include(p => p.PostShares)
                     .Include(p => p.CommentTargets)
                         .ThenInclude(ct => ct.Comments)
                     //依照貼文Id查詢 & 不顯示已刪除的貼文
@@ -232,6 +275,60 @@ namespace FrameZone_WebApi.Socials.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
+        public async Task<PostShare?> GetPostShareAsync(long userId, int postId)
+        {
+            return await _context.PostShares
+                .FirstOrDefaultAsync(s => s.UserId == userId && s.PostId == postId);
+        }
+
+        public async Task<PostShare?> AddPostShareAsync(PostShare share)
+        {
+            share.CreatedAt = DateTime.UtcNow;
+            await _context.PostShares.AddAsync(share);
+            var result = await _context.SaveChangesAsync();
+            return result > 0 ? share : null;
+        }
+
+        public async Task<List<Post>> GetSharedPostsAsync(long userId, int limit)
+        {
+            return await _context.Posts
+                .Include(p => p.User)
+                    .ThenInclude(u => u.UserProfile)
+                .Include(p => p.PostLikes)
+                .Include(p => p.PostShares)
+                .Include(p => p.CommentTargets)
+                    .ThenInclude(ct => ct.Comments)
+                .Where(p =>
+                    p.UserId == userId &&
+                    p.PostType == "share" &&
+                    p.Status != "Deleted" &&
+                    p.DeletedAt == null)
+                .OrderByDescending(p => p.CreatedAt)
+                .Take(limit)
+                .ToListAsync();
+        }
+
+        public async Task<List<Post>> GetPostsByIdsAsync(List<int> postIds)
+        {
+            if (postIds == null || postIds.Count == 0)
+            {
+                return new List<Post>();
+            }
+
+            return await _context.Posts
+                .Include(p => p.User)
+                    .ThenInclude(u => u.UserProfile)
+                .Include(p => p.PostLikes)
+                .Include(p => p.PostShares)
+                .Include(p => p.CommentTargets)
+                    .ThenInclude(ct => ct.Comments)
+                .Where(p =>
+                    postIds.Contains(p.PostId) &&
+                    p.Status != "Deleted" &&
+                    p.DeletedAt == null)
+                .ToListAsync();
+        }
+
         public async Task<List<Post>> GetLikedPostsAsync(long userId, int limit)
         {
             var liked = await _context.PostLikes
@@ -251,6 +348,7 @@ namespace FrameZone_WebApi.Socials.Repositories
                 .Include(p => p.User)
                     .ThenInclude(u => u.UserProfile)
                 .Include(p => p.PostLikes)
+                .Include(p => p.PostShares)
                 .Include(p => p.CommentTargets)
                     .ThenInclude(ct => ct.Comments)
                 .Where(p =>
@@ -290,6 +388,7 @@ namespace FrameZone_WebApi.Socials.Repositories
                 .Include(p => p.User)
                     .ThenInclude(u => u.UserProfile)
                 .Include(p => p.PostLikes)
+                .Include(p => p.PostShares)
                 .Include(p => p.CommentTargets)
                     .ThenInclude(ct => ct.Comments)
                 .Where(p =>
@@ -351,6 +450,7 @@ namespace FrameZone_WebApi.Socials.Repositories
                 .Include(p => p.User)
                     .ThenInclude(u => u.UserProfile)
                 .Include(p => p.PostLikes)
+                .Include(p => p.PostShares)
                 .Include(p => p.CommentTargets)
                     .ThenInclude(ct => ct.Comments)
                 .Where(p =>

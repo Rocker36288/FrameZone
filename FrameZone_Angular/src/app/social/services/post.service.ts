@@ -74,6 +74,13 @@ export class PostService {
     return this.http.post(`${this.apiUrl}/${postId}/view`, {});
   }
 
+  /** 記錄貼文分享 */
+  recordShare(postId: number, postContent: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${postId}/share`, { postContent }).pipe(tap(() => {
+      this._refreshNeeded$.next();
+    }));
+  }
+
   /** 取得最近瀏覽貼文 */
   getRecentViews(limit: number = 20): Observable<PostDto[]> {
     return this.http.get<PostDto[]>(`${this.apiUrl}/recent-views`, {
@@ -91,6 +98,13 @@ export class PostService {
   /** 取得留言過的貼文 */
   getCommentedPosts(limit: number = 20): Observable<PostDto[]> {
     return this.http.get<PostDto[]>(`${this.apiUrl}/commented`, {
+      params: { limit }
+    });
+  }
+
+  /** 取得分享過的貼文 */
+  getSharedPosts(limit: number = 20): Observable<PostDto[]> {
+    return this.http.get<PostDto[]>(`${this.apiUrl}/shared`, {
       params: { limit }
     });
   }
