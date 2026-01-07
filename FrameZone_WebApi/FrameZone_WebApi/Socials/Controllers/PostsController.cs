@@ -72,6 +72,38 @@ namespace FrameZone_WebApi.Socials.Controllers
             return Ok(post);
         }
 
+        // POST: api/posts/1/view
+        [Authorize]
+        [HttpPost("{postId}/view")]
+        public async Task<IActionResult> RecordView(int postId)
+        {
+            try
+            {
+                long userId = GetUserId();
+                var saved = await _postService.RecordPostViewAsync(userId, postId);
+                if (!saved)
+                {
+                    return BadRequest(new { message = "記錄失敗" });
+                }
+                return Ok(new { message = "已記錄" });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+        // GET: api/posts/recent-views?limit=20
+        [Authorize]
+        [HttpGet("recent-views")]
+        public async Task<IActionResult> GetRecentViews([FromQuery] int limit = 20)
+        {
+            long userId = GetUserId();
+            limit = Math.Clamp(limit, 1, 50);
+            var posts = await _postService.GetRecentViewedPostsAsync(userId, limit);
+            return Ok(posts);
+        }
+
         // POST: api/posts
         [Authorize]
         [HttpPost]

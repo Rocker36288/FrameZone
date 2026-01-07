@@ -1,6 +1,6 @@
 import { PostService } from '../services/post.service';
 import { CommentService } from '../services/comment.service';
-import { Component, ElementRef, EventEmitter, HostListener, Input, Output, signal, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, Output, signal, inject } from '@angular/core';
 import { PostDto } from "../models/PostDto";
 import { CommentDto } from "../models/CommentDto";
 import { DatePipe, SlicePipe } from '@angular/common';
@@ -15,7 +15,7 @@ import { RouterLink } from '@angular/router';
   templateUrl: './social-posts.component.html',
   styleUrl: './social-posts.component.css'
 })
-export class SocialPostsComponent {
+export class SocialPostsComponent implements AfterViewInit, OnDestroy {
   @Input() post!: PostDto;
   @Output() postDeleted = new EventEmitter<number>();
 
@@ -34,6 +34,8 @@ export class SocialPostsComponent {
   comments = signal<CommentDto[]>([]); // 使用 Signal 管理留言列表
   newCommentContent = ""; // 綁定發布框
   isSubmittingComment = false; // 防止重複點擊
+  private viewObserver?: IntersectionObserver;
+  private hasTrackedView = false;
 
   // 注入 CommentService
   constructor(
@@ -48,6 +50,31 @@ export class SocialPostsComponent {
     if (!this.eRef.nativeElement.contains(event.target)) {
       this.isMenuOpen = false;
     }
+  }
+
+  ngAfterViewInit(): void {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser?.userId) return;
+
+    this.viewObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting && !this.hasTrackedView) {
+          this.hasTrackedView = true;
+          this.postService.recordView(this.post.postId).subscribe({
+            next: () => { },
+            error: () => { }
+          });
+          this.viewObserver?.disconnect();
+          break;
+        }
+      }
+    }, { threshold: 0.5 });
+
+    this.viewObserver.observe(this.eRef.nativeElement);
+  }
+
+  ngOnDestroy(): void {
+    this.viewObserver?.disconnect();
   }
 
   //頭像

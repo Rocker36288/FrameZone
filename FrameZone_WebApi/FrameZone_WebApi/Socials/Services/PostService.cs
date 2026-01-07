@@ -184,6 +184,36 @@ namespace FrameZone_WebApi.Socials.Services
             return await _postRepository.RemovePostLikeAsync(existing);
         }
 
+        public async Task<bool> RecordPostViewAsync(long userId, int postId)
+        {
+            var post = await _postRepository.GetPostByIdAsync(postId);
+            if (post == null)
+            {
+                throw new KeyNotFoundException("貼文不存在");
+            }
+
+            var existing = await _postRepository.GetPostViewAsync(userId, postId);
+            if (existing != null)
+            {
+                var updated = await _postRepository.UpdatePostViewAsync(existing);
+                return updated != null;
+            }
+
+            var view = new PostView
+            {
+                UserId = userId,
+                PostId = postId
+            };
+            var created = await _postRepository.AddPostViewAsync(view);
+            return created != null;
+        }
+
+        public async Task<List<PostReadDto>> GetRecentViewedPostsAsync(long userId, int limit)
+        {
+            var posts = await _postRepository.GetRecentViewedPostsAsync(userId, limit);
+            return posts.Select(p => MapToReadDto(p, userId)).ToList();
+        }
+
         private static PostReadDto MapToReadDto(Post post, long? currentUserId)
         {
             var likeCount = post.PostLikes?.Count ?? 0;

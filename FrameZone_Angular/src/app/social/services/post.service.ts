@@ -68,4 +68,16 @@ export class PostService {
   unlikePost(postId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${postId}/like`);
   }
+
+  /** 記錄貼文瀏覽 */
+  recordView(postId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${postId}/view`, {});
+  }
+
+  /** 取得最近瀏覽貼文 */
+  getRecentViews(limit: number = 20): Observable<PostDto[]> {
+    return this.http.get<PostDto[]>(`${this.apiUrl}/recent-views`, {
+      params: { limit }
+    });
+  }
 }

@@ -21,6 +21,7 @@ export class SocialPostsListComponent implements OnInit, OnChanges, OnDestroy {
   private refreshSub?: Subscription;
   private userSub?: Subscription;
   private isFollowingRoute = false;
+  private isRecentRoute = false;
 
   constructor(
     private postService: PostService,
@@ -28,7 +29,9 @@ export class SocialPostsListComponent implements OnInit, OnChanges, OnDestroy {
     private followService: FollowService,
     private route: ActivatedRoute
   ) {
-    this.isFollowingRoute = this.route.snapshot.routeConfig?.path === 'following';
+    const routePath = this.route.snapshot.routeConfig?.path;
+    this.isFollowingRoute = routePath === 'following';
+    this.isRecentRoute = routePath === 'recent';
   }
 
   ngOnInit(): void {
@@ -40,7 +43,7 @@ export class SocialPostsListComponent implements OnInit, OnChanges, OnDestroy {
       this.loadPosts();
     });
 
-    if (this.isFollowingRoute) {
+    if (this.isFollowingRoute || this.isRecentRoute) {
       this.userSub = this.authService.currentUser$.subscribe(() => {
         this.loadPosts();
       });
@@ -78,6 +81,19 @@ export class SocialPostsListComponent implements OnInit, OnChanges, OnDestroy {
       this.postService.getPostsByUser(this.userId).subscribe(posts => {
         this.posts = posts;
         console.log(this.posts);
+      });
+      return;
+    }
+
+    if (this.isRecentRoute) {
+      this.postService.getRecentViews(20).subscribe({
+        next: (posts) => {
+          this.posts = posts;
+          console.log(this.posts);
+        },
+        error: () => {
+          this.posts = [];
+        }
       });
       return;
     }
