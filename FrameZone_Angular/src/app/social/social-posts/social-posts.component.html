@@ -38,14 +38,16 @@
     </div>
     <!-- 顯示貼文文字內容 -->
     @if(!isEditing){
-    <h2>
-      @if(post.postContent.length<=10){ {{post.postContent}} } @else{ {{ isFullContent ? post.postContent :
-        (post.postContent | slice:0:10) + '...' }}<button class="btn btn-link btn-sm p-0 ms-1"
-        (click)="toggleContent()">
-        {{ isFullContent ? '' : '顯示全部' }}
+    <div class="post-content">
+      @if(post.postContent.length <= 10){ <span>{{ post.postContent }}</span>
+        } @else {
+        <span>{{ isFullContent ? post.postContent : (post.postContent | slice:0:10) + '...' }}</span>
+        <button class="btn btn-link btn-sm p-0 ms-1" (click)="toggleContent()">
+          {{ isFullContent ? '' : '顯示全部' }}
         </button>
         }
-    </h2>
+    </div>
+    }
 
     <br>
     <hr class="my-2">
@@ -71,7 +73,7 @@
       </div>
     </div>
 
-    }
+
 
     <!-- 編輯區 -->
     @if(isEditing){

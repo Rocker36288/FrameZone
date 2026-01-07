@@ -21,6 +21,16 @@
   visibility: visible !important;
 }
 
+/* 貼文內容顯示 */
+.post-content {
+  font-size: 1.2rem;
+  white-space: pre-wrap;
+  /* ⭐ 關鍵 */
+  word-break: break-word;
+  /* 避免長字串爆版 */
+}
+
+
 /* 針對編輯區的文字調整 */
 .edit-textarea {
   font-size: 1.2rem;
