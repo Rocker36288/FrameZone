@@ -1,4 +1,4 @@
-<div class="profile-container">
+﻿<div class="profile-container">
   <header class="profile-header card-style">
     <div class="top-section">
       <div class="user-info">
@@ -12,7 +12,7 @@
         </div>
         } @else {
         <div class="avatar-circle">
-          <img src="images/social/Patrick.jpg" alt="未登入" />
+          <img src="" alt="未登入" />
         </div>
         <div class="user-text">
           <h1>未登入</h1>
@@ -61,15 +61,17 @@
     <div class="card-style p-4 text-center">目前沒有追蹤中</div>
     } @else {
     <div class="card-style p-3">
+      <div class="follow-grid">
       @for (user of following; track user.userId) {
-      <a class="d-flex align-items-center py-2 text-decoration-none text-reset"
+      <a class="follow-item text-decoration-none text-reset"
         [routerLink]="['/social/profile', user.userId]">
-        <div class="avatar-circle me-2">
+        <div class="avatar-circle">
           <img [src]="getFollowAvatar(user)" [alt]="user.displayName" />
         </div>
-        <div class="fw-bold">{{ user.displayName }}</div>
+        <div class="follow-name">{{ user.displayName }}</div>
       </a>
       }
+      </div>
     </div>
     }
     }
@@ -81,15 +83,17 @@
     <div class="card-style p-4 text-center">目前沒有粉絲</div>
     } @else {
     <div class="card-style p-3">
+      <div class="follow-grid">
       @for (user of followers; track user.userId) {
-      <a class="d-flex align-items-center py-2 text-decoration-none text-reset"
+      <a class="follow-item text-decoration-none text-reset"
         [routerLink]="['/social/profile', user.userId]">
-        <div class="avatar-circle me-2">
+        <div class="avatar-circle">
           <img [src]="getFollowAvatar(user)" [alt]="user.displayName" />
         </div>
-        <div class="fw-bold">{{ user.displayName }}</div>
+        <div class="follow-name">{{ user.displayName }}</div>
       </a>
       }
+      </div>
     </div>
     }
     }

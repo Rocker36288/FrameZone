@@ -1,4 +1,4 @@
-<div class="card shadow-sm menu-card">
+﻿<div class="card shadow-sm menu-card">
   <div class="card-body">
     <h3 class="menu-title mb-3">選單</h3>
 
@@ -62,29 +62,20 @@
       </a>
 
       <hr class="my-3">
-
-      <a class="nav-link menu-item-btn" routerLink="following">
+      <a class="nav-link menu-item-btn" routerLink="profile" [queryParams]="{ view: 'following' }">
         <div class="icon-circle">
-          <i class="bi bi-person-lines-fill"></i>
+          <i class="bi bi-person-check-fill"></i>
         </div>
-        <span class="menu-item-name">好友清單</span>
+        <span class="menu-item-name">追蹤清單</span>
+      </a>
+      <a class="nav-link menu-item-btn" routerLink="profile" [queryParams]="{ view: 'followers' }">
+        <div class="icon-circle">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <span class="menu-item-name">粉絲清單</span>
       </a>
 
-      <a class="nav-link menu-item-btn" routerLink="following">
-        <div class="icon-circle">
-          <i class="bi bi-three-dots"></i>
-        </div>
-        <span class="menu-item-name">社團</span>
-      </a>
-
-      <a class="nav-link menu-item-btn" routerLink="following">
-        <div class="icon-circle">
-          <i class="bi bi-calendar-event-fill"></i>
-        </div>
-        <span class="menu-item-name">活動</span>
-      </a>
-
-      <a class="nav-link menu-item-btn" routerLink="following">
+      <a class="nav-link menu-item-btn" routerLink="index">
         <div class="icon-circle">
           <i class="bi bi-gear-fill"></i>
         </div>
@@ -94,3 +85,5 @@
     </div>
   </div>
 </div>
+
+

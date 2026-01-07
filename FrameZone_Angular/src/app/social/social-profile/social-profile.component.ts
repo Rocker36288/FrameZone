@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+﻿import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -104,11 +104,29 @@ export class SocialProfileComponent {
   // 使用 Signal 管理目前檢視狀態，預設為 'all'
   currentView = signal<string>('all');
 
+
+  private normalizeView(view: string | null): string {
+    switch (view) {
+      case 'all':
+      case 'photos':
+      case 'following':
+      case 'followers':
+        return view;
+      default:
+        return 'all';
+    }
+  }
   constructor() {
-    this.routeUserId$
+    combineLatest([
+      this.routeUserId$,
+      this.route.queryParamMap.pipe(
+        map((params) => params.get('view')),
+        distinctUntilChanged()
+      )
+    ])
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.currentView.set('all');
+      .subscribe(([_, view]) => {
+        this.currentView.set(this.normalizeView(view));
       });
   }
 
@@ -186,3 +204,7 @@ export class SocialProfileComponent {
     this.currentView.set(viewName);
   }
 }
+
+
+
+
