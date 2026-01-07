@@ -98,7 +98,7 @@ namespace FrameZone_WebApi.Socials.Repositories
             }
         }
 
-        // ================= 取得好友數 =================
+        // ================= 取得粉絲數 =================
         public async Task<int> GetFollowerCountAsync(long userId)
         {
             try
@@ -109,7 +109,23 @@ namespace FrameZone_WebApi.Socials.Repositories
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"取得好友數失敗: {ex.Message}");
+                Console.WriteLine($"取得粉絲數失敗: {ex.Message}");
+                return 0;
+            }
+        }
+
+        // ================= 取得追蹤中數量 =================
+        public async Task<int> GetFollowingCountAsync(long userId)
+        {
+            try
+            {
+                return await _context.Follows
+                    .Where(f => f.FollowerId == userId && f.DeleteAt == null)
+                    .CountAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"取得追蹤中數量失敗: {ex.Message}");
                 return 0;
             }
         }

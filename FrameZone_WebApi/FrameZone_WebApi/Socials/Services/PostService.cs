@@ -58,13 +58,15 @@ namespace FrameZone_WebApi.Socials.Services
                 return null;
             }
 
-            var friendCount = await _postRepository.GetFollowerCountAsync(userId);
+            var followerCount = await _postRepository.GetFollowerCountAsync(userId);
+            var followingCount = await _postRepository.GetFollowingCountAsync(userId);
             return new UserProfileSummaryDto
             {
                 UserId = user.UserId,
                 DisplayName = user.UserProfile?.DisplayName ?? user.Account ?? "使用者",
                 Avatar = user.UserProfile?.Avatar,
-                FriendCount = friendCount
+                FollowerCount = followerCount,
+                FollowingCount = followingCount
             };
         }
 

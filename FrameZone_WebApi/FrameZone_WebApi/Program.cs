@@ -272,11 +272,13 @@ builder.Services.AddScoped<PostRepository>();
 builder.Services.AddScoped<CommentRepository>();
 builder.Services.AddScoped<ChatRoomRepository>();
 builder.Services.AddScoped<MessageRepository>();
+builder.Services.AddScoped<FollowRepository>();
 
 builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<CommentService>();
 builder.Services.AddScoped<ChatRoomService>();
 builder.Services.AddScoped<MessageService>();
+builder.Services.AddScoped<FollowService>();
 builder.Services.AddSingleton<SocialChatConnectionManager>();
 
 // ========== 影片服務 (DI注入) ==========

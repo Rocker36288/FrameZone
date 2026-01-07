@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { SocialPostsListComponent } from '../social-posts-list/social-posts-list.component';
@@ -6,7 +7,9 @@ import { SocialPostsImagesComponent } from '../social-posts-images/social-posts-
 import { AuthService } from '../../core/services/auth.service';
 import { PostService } from '../services/post.service';
 import { SocialProfileSummary } from '../models/social-profile.models';
-import { distinctUntilChanged, map, of, switchMap } from 'rxjs';
+import { FollowService } from '../services/follow.service';
+import { FollowUser } from '../models/follow.models';
+import { combineLatest, distinctUntilChanged, map, of, startWith, switchMap, take, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-social-profile',
@@ -18,7 +21,10 @@ import { distinctUntilChanged, map, of, switchMap } from 'rxjs';
 export class SocialProfileComponent {
   private authService = inject(AuthService);
   private postService = inject(PostService);
+  private followService = inject(FollowService);
   private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
+  private profileRefresh$ = new Subject<void>();
 
   routeUserId$ = this.route.paramMap.pipe(
     map((params) => {
@@ -38,10 +44,36 @@ export class SocialProfileComponent {
     })
   );
 
-  profile$ = this.profileUserId$.pipe(
+  profile$ = combineLatest([
+    this.profileUserId$,
+    this.profileRefresh$.pipe(startWith(null))
+  ]).pipe(
+    map(([userId]) => userId),
     switchMap((userId) => {
       if (!userId) return of(null);
       return this.postService.getUserProfile(userId);
+    })
+  );
+
+  following$ = combineLatest([
+    this.profileUserId$,
+    this.profileRefresh$.pipe(startWith(null))
+  ]).pipe(
+    map(([userId]) => userId),
+    switchMap((userId) => {
+      if (!userId) return of<FollowUser[]>([]);
+      return this.followService.getFollowing(userId);
+    })
+  );
+
+  followers$ = combineLatest([
+    this.profileUserId$,
+    this.profileRefresh$.pipe(startWith(null))
+  ]).pipe(
+    map(([userId]) => userId),
+    switchMap((userId) => {
+      if (!userId) return of<FollowUser[]>([]);
+      return this.followService.getFollowers(userId);
     })
   );
 
@@ -56,8 +88,38 @@ export class SocialProfileComponent {
   // 使用 Signal 管理目前檢視狀態，預設為 'all'
   currentView = signal<string>('all');
 
+  constructor() {
+    this.routeUserId$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.currentView.set('all');
+      });
+  }
+
   addFriend() {
-    console.log('已發送好友申請');
+    this.profileUserId$
+      .pipe(
+        take(1),
+        switchMap((userId) => {
+          if (!userId) return of(null);
+          return this.followService.addFriend(userId);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.profileRefresh$.next();
+          console.log('已發送好友申請');
+        },
+        error: (err) => {
+          console.error('新增好友失敗', err);
+        }
+      });
+  }
+
+  getFollowAvatar(user: FollowUser): string {
+    if (user.avatar) return user.avatar;
+    const initial = (user.displayName || 'U').charAt(0).toUpperCase();
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
   }
 
   sendMessage() {

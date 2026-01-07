@@ -8,7 +8,7 @@
         </div>
         <div class="user-text">
           <h1>{{ getDisplayName(profile) }}</h1>
-          <p>{{ profile.friendCount }}位好友</p>
+          <p>追蹤中 {{ profile.followingCount }} · 粉絲 {{ profile.followerCount }}</p>
         </div>
         } @else {
         <div class="avatar-circle">
@@ -16,7 +16,7 @@
         </div>
         <div class="user-text">
           <h1>未登入</h1>
-          <p>0位好友</p>
+          <p>追蹤中 0 · 粉絲 0</p>
         </div>
         }
       </div>
@@ -32,7 +32,8 @@
     <nav class="tab-nav">
       <button [class.active]="currentView() === 'all'" (click)="setView('all')">全部貼文</button>
       <button [class.active]="currentView() === 'photos'" (click)="setView('photos')">貼文照片</button>
-      <button [class.active]="currentView() === 'friends'" (click)="setView('friends')">好友清單</button>
+      <button [class.active]="currentView() === 'following'" (click)="setView('following')">追蹤中</button>
+      <button [class.active]="currentView() === 'followers'" (click)="setView('followers')">粉絲</button>
     </nav>
   </header>
 
@@ -50,8 +51,44 @@
     <app-social-posts-images></app-social-posts-images>
     }
 
-    @case ('friends') {
-    <div class="card-style p-4 text-center">好友清單</div>
+    @case ('following') {
+    @if (following$ | async; as following) {
+    @if (following.length === 0) {
+    <div class="card-style p-4 text-center">目前沒有追蹤中</div>
+    } @else {
+    <div class="card-style p-3">
+      @for (user of following; track user.userId) {
+      <a class="d-flex align-items-center py-2 text-decoration-none text-reset"
+        [routerLink]="['/social/profile', user.userId]">
+        <div class="avatar-circle me-2">
+          <img [src]="getFollowAvatar(user)" [alt]="user.displayName" />
+        </div>
+        <div class="fw-bold">{{ user.displayName }}</div>
+      </a>
+      }
+    </div>
+    }
+    }
+    }
+
+    @case ('followers') {
+    @if (followers$ | async; as followers) {
+    @if (followers.length === 0) {
+    <div class="card-style p-4 text-center">目前沒有粉絲</div>
+    } @else {
+    <div class="card-style p-3">
+      @for (user of followers; track user.userId) {
+      <a class="d-flex align-items-center py-2 text-decoration-none text-reset"
+        [routerLink]="['/social/profile', user.userId]">
+        <div class="avatar-circle me-2">
+          <img [src]="getFollowAvatar(user)" [alt]="user.displayName" />
+        </div>
+        <div class="fw-bold">{{ user.displayName }}</div>
+      </a>
+      }
+    </div>
+    }
+    }
     }
     }
   </main>
