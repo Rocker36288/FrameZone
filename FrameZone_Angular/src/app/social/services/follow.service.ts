@@ -11,8 +11,16 @@ export class FollowService {
 
   constructor(private http: HttpClient) { }
 
-  addFriend(userId: number): Observable<any> {
+  addFollow(userId: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/${userId}`, {});
+  }
+
+  removeFollow(userId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${userId}`);
+  }
+
+  getFollowStatus(userId: number): Observable<{ isFollowing: boolean }> {
+    return this.http.get<{ isFollowing: boolean }>(`${this.apiUrl}/${userId}/status`);
   }
 
   getFollowing(userId: number): Observable<FollowUser[]> {

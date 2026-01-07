@@ -9,6 +9,7 @@ import { PostService } from '../services/post.service';
 import { SocialProfileSummary } from '../models/social-profile.models';
 import { FollowService } from '../services/follow.service';
 import { FollowUser } from '../models/follow.models';
+import { SocialChatStateService } from '../services/social-chat-state.service';
 import { combineLatest, distinctUntilChanged, map, of, startWith, switchMap, take, Subject } from 'rxjs';
 
 @Component({
@@ -22,6 +23,7 @@ export class SocialProfileComponent {
   private authService = inject(AuthService);
   private postService = inject(PostService);
   private followService = inject(FollowService);
+  private chatState = inject(SocialChatStateService);
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
   private profileRefresh$ = new Subject<void>();
@@ -85,6 +87,20 @@ export class SocialProfileComponent {
     )
   );
 
+  isFollowing$ = combineLatest([
+    this.profileUserId$,
+    this.isOwnProfile$,
+    this.profileRefresh$.pipe(startWith(null))
+  ]).pipe(
+    map(([userId, isOwn]) => ({ userId, isOwn })),
+    switchMap(({ userId, isOwn }) => {
+      if (!userId || isOwn) return of(false);
+      return this.followService.getFollowStatus(userId).pipe(
+        map((res) => res.isFollowing)
+      );
+    })
+  );
+
   // 使用 Signal 管理目前檢視狀態，預設為 'all'
   currentView = signal<string>('all');
 
@@ -96,22 +112,42 @@ export class SocialProfileComponent {
       });
   }
 
-  addFriend() {
+  addFollow() {
     this.profileUserId$
       .pipe(
         take(1),
         switchMap((userId) => {
           if (!userId) return of(null);
-          return this.followService.addFriend(userId);
+          return this.followService.addFollow(userId);
         })
       )
       .subscribe({
         next: () => {
           this.profileRefresh$.next();
-          console.log('已發送好友申請');
+          console.log('已追蹤');
         },
         error: (err) => {
-          console.error('新增好友失敗', err);
+          console.error('追蹤失敗', err);
+        }
+      });
+  }
+
+  removeFollow() {
+    this.profileUserId$
+      .pipe(
+        take(1),
+        switchMap((userId) => {
+          if (!userId) return of(null);
+          return this.followService.removeFollow(userId);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.profileRefresh$.next();
+          console.log('已取消追蹤');
+        },
+        error: (err) => {
+          console.error('取消追蹤失敗', err);
         }
       });
   }
@@ -123,7 +159,16 @@ export class SocialProfileComponent {
   }
 
   sendMessage() {
-    console.log('跳轉至訊息頁面');
+    combineLatest([this.profileUserId$, this.profile$])
+      .pipe(take(1))
+      .subscribe(([userId, profile]) => {
+        if (!userId) return;
+        this.chatState.openChat({
+          id: userId,
+          name: this.getDisplayName(profile),
+          avatar: profile?.avatar ?? null
+        });
+      });
   }
 
   getDisplayName(profile: SocialProfileSummary | null): string {

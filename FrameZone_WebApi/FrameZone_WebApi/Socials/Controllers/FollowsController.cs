@@ -19,15 +19,15 @@ namespace FrameZone_WebApi.Socials.Controllers
         // POST: api/follows/1
         [Authorize]
         [HttpPost("{userId}")]
-        public async Task<IActionResult> AddFriend(long userId)
+        public async Task<IActionResult> AddFollow(long userId)
         {
             try
             {
                 var followerId = GetUserId();
-                var result = await _followService.AddFriendAsync(followerId, userId);
+                var result = await _followService.AddFollowAsync(followerId, userId);
                 if (result == null)
                 {
-                    return BadRequest(new { message = "新增好友失敗" });
+                    return BadRequest(new { message = "新增追蹤失敗" });
                 }
 
                 return Ok(result);
@@ -36,6 +36,31 @@ namespace FrameZone_WebApi.Socials.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+        // DELETE: api/follows/1
+        [Authorize]
+        [HttpDelete("{userId}")]
+        public async Task<IActionResult> RemoveFollow(long userId)
+        {
+            var followerId = GetUserId();
+            var success = await _followService.RemoveFollowAsync(followerId, userId);
+            if (!success)
+            {
+                return NotFound(new { message = "未追蹤此使用者" });
+            }
+
+            return Ok(new { message = "已取消追蹤" });
+        }
+
+        // GET: api/follows/1/status
+        [Authorize]
+        [HttpGet("{userId}/status")]
+        public async Task<IActionResult> GetFollowStatus(long userId)
+        {
+            var followerId = GetUserId();
+            var isFollowing = await _followService.IsFollowingAsync(followerId, userId);
+            return Ok(new { isFollowing });
         }
 
         // GET: api/follows/1/following

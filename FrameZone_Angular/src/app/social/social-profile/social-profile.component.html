@@ -23,7 +23,11 @@
 
       @if (!(isOwnProfile$ | async)) {
       <div class="action-group">
-        <button class="btn btn-primary" (click)="addFriend()">新增好友</button>
+        @if (isFollowing$ | async) {
+        <button class="btn btn-secondary" (click)="removeFollow()">取消追蹤</button>
+        } @else {
+        <button class="btn btn-primary" (click)="addFollow()">追蹤</button>
+        }
         <button class="btn btn-secondary" (click)="sendMessage()">發送訊息</button>
       </div>
       }

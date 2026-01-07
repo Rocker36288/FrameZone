@@ -13,7 +13,7 @@ namespace FrameZone_WebApi.Socials.Services
             _followRepository = followRepository;
         }
 
-        public async Task<FollowResponseDto?> AddFriendAsync(long followerId, long followingId)
+        public async Task<FollowResponseDto?> AddFollowAsync(long followerId, long followingId)
         {
             if (followerId == followingId)
             {
@@ -57,6 +57,25 @@ namespace FrameZone_WebApi.Socials.Services
                 FollowingId = saved.FollowingId,
                 CreatedAt = saved.CreatedAt
             };
+        }
+
+        public async Task<bool> RemoveFollowAsync(long followerId, long followingId)
+        {
+            var existing = await _followRepository.GetFollowAsync(followerId, followingId);
+            if (existing == null || existing.DeleteAt != null)
+            {
+                return false;
+            }
+
+            existing.DeleteAt = DateTime.UtcNow;
+            var saved = await _followRepository.UpdateFollowAsync(existing);
+            return saved != null;
+        }
+
+        public async Task<bool> IsFollowingAsync(long followerId, long followingId)
+        {
+            var existing = await _followRepository.GetFollowAsync(followerId, followingId);
+            return existing != null && existing.DeleteAt == null;
         }
 
         public async Task<List<FollowUserDto>> GetFollowingAsync(long userId)
