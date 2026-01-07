@@ -21,7 +21,14 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpGet]
         public async Task<IActionResult> GetPosts()
         {
-            var currentUserId = TryGetUserId();
+            long? currentUserId = null;
+            try
+            {
+                currentUserId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
             var post = await _postService.GetPostsAsync(currentUserId);
 
             if (post == null)
@@ -35,7 +42,14 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetPostsByUserId(long userId)
         {
-            var currentUserId = TryGetUserId();
+            long? currentUserId = null;
+            try
+            {
+                currentUserId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
             var posts = await _postService.GetPostsByUserIdAsync(userId, currentUserId);
 
             if (posts == null)
@@ -62,7 +76,14 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpGet("{postId}")]
         public async Task<IActionResult> GetPostById(int postId)
         {
-            var currentUserId = TryGetUserId();
+            long? currentUserId = null;
+            try
+            {
+                currentUserId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
             var post = await _postService.GetPostByIdAsync(postId, currentUserId);
 
             if (post == null)
@@ -70,49 +91,6 @@ namespace FrameZone_WebApi.Socials.Controllers
                 return NotFound(new { message = "貼文不存在" });
             }
             return Ok(post);
-        }
-
-        // POST: api/posts/1/view
-        [Authorize]
-        [HttpPost("{postId}/view")]
-        public async Task<IActionResult> RecordView(int postId)
-        {
-            try
-            {
-                long userId = GetUserId();
-                var saved = await _postService.RecordPostViewAsync(userId, postId);
-                if (!saved)
-                {
-                    return BadRequest(new { message = "記錄失敗" });
-                }
-                return Ok(new { message = "已記錄" });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-        }
-
-        // GET: api/posts/recent-views?limit=20
-        [Authorize]
-        [HttpGet("recent-views")]
-        public async Task<IActionResult> GetRecentViews([FromQuery] int limit = 20)
-        {
-            long userId = GetUserId();
-            limit = Math.Clamp(limit, 1, 50);
-            var posts = await _postService.GetRecentViewedPostsAsync(userId, limit);
-            return Ok(posts);
-        }
-
-        // GET: api/posts/liked?limit=20
-        [Authorize]
-        [HttpGet("liked")]
-        public async Task<IActionResult> GetLikedPosts([FromQuery] int limit = 20)
-        {
-            long userId = GetUserId();
-            limit = Math.Clamp(limit, 1, 50);
-            var posts = await _postService.GetLikedPostsAsync(userId, limit);
-            return Ok(posts);
         }
 
         // GET: api/posts/commented?limit=20
@@ -123,38 +101,6 @@ namespace FrameZone_WebApi.Socials.Controllers
             long userId = GetUserId();
             limit = Math.Clamp(limit, 1, 50);
             var posts = await _postService.GetCommentedPostsAsync(userId, limit);
-            return Ok(posts);
-        }
-
-        // POST: api/posts/1/share
-        [Authorize]
-        [HttpPost("{postId}/share")]
-        public async Task<IActionResult> SharePost(int postId, [FromBody] SharePostDto dto)
-        {
-            try
-            {
-                long userId = GetUserId();
-                var created = await _postService.CreateSharePostAsync(userId, postId, dto?.PostContent);
-                if (created == null)
-                {
-                    return BadRequest(new { message = "已分享過" });
-                }
-                return Ok(created);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-        }
-
-        // GET: api/posts/shared?limit=20
-        [Authorize]
-        [HttpGet("shared")]
-        public async Task<IActionResult> GetSharedPosts([FromQuery] int limit = 20)
-        {
-            long userId = GetUserId();
-            limit = Math.Clamp(limit, 1, 50);
-            var posts = await _postService.GetSharedPostsAsync(userId, limit);
             return Ok(posts);
         }
 
@@ -237,48 +183,6 @@ namespace FrameZone_WebApi.Socials.Controllers
             }
         }
 
-        // POST: api/posts/1/like
-        [Authorize]
-        [HttpPost("{postId}/like")]
-        public async Task<IActionResult> LikePost(int postId)
-        {
-            try
-            {
-                long userId = GetUserId();
-                var created = await _postService.AddLikeAsync(userId, postId);
-                if (!created)
-                {
-                    return BadRequest(new { message = "已經按讚過" });
-                }
-                return Ok(new { message = "已按讚" });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-        }
-
-        // DELETE: api/posts/1/like
-        [Authorize]
-        [HttpDelete("{postId}/like")]
-        public async Task<IActionResult> UnlikePost(int postId)
-        {
-            try
-            {
-                long userId = GetUserId();
-                var removed = await _postService.RemoveLikeAsync(userId, postId);
-                if (!removed)
-                {
-                    return NotFound(new { message = "尚未按讚" });
-                }
-                return Ok(new { message = "已取消按讚" });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-        }
-
         private long GetUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -288,13 +192,5 @@ namespace FrameZone_WebApi.Socials.Controllers
             return long.Parse(userIdClaim);
         }
 
-        private long? TryGetUserId()
-        {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userIdClaim == null)
-                return null;
-
-            return long.Parse(userIdClaim);
-        }
     }
 }

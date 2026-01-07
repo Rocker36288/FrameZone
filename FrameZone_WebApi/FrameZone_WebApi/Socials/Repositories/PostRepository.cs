@@ -95,15 +95,6 @@ namespace FrameZone_WebApi.Socials.Repositories
             }
         }
 
-        public async Task<List<int>> GetSharedPostIdsByUserIdAsync(long userId)
-        {
-            return await _context.PostShares
-                .Where(s => s.UserId == userId)
-                .Select(s => s.PostId)
-                .Distinct()
-                .ToListAsync();
-        }
-
         // ================= 取得貼文 =================
         public async Task<Post?> GetPostByIdAsync(int postId)
         {
@@ -225,13 +216,12 @@ namespace FrameZone_WebApi.Socials.Repositories
                 await _context.SaveChangesAsync();
                 return post;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Console.WriteLine($"編輯貼文失敗: {ex.Message}");
                 return null;
             }
-
-        }        
+        }
 
         // ================= 軟刪除貼文 =================
         public async Task<bool> DeletePostAsync(Post post)
@@ -256,58 +246,6 @@ namespace FrameZone_WebApi.Socials.Repositories
             }
         }
 
-        public async Task<PostLike?> GetPostLikeAsync(long userId, int postId)
-        {
-            return await _context.PostLikes
-                .FirstOrDefaultAsync(l => l.UserId == userId && l.PostId == postId);
-        }
-
-        public async Task<PostLike?> AddPostLikeAsync(PostLike like)
-        {
-            await _context.PostLikes.AddAsync(like);
-            var result = await _context.SaveChangesAsync();
-            return result > 0 ? like : null;
-        }
-
-        public async Task<bool> RemovePostLikeAsync(PostLike like)
-        {
-            _context.PostLikes.Remove(like);
-            return await _context.SaveChangesAsync() > 0;
-        }
-
-        public async Task<PostShare?> GetPostShareAsync(long userId, int postId)
-        {
-            return await _context.PostShares
-                .FirstOrDefaultAsync(s => s.UserId == userId && s.PostId == postId);
-        }
-
-        public async Task<PostShare?> AddPostShareAsync(PostShare share)
-        {
-            share.CreatedAt = DateTime.UtcNow;
-            await _context.PostShares.AddAsync(share);
-            var result = await _context.SaveChangesAsync();
-            return result > 0 ? share : null;
-        }
-
-        public async Task<List<Post>> GetSharedPostsAsync(long userId, int limit)
-        {
-            return await _context.Posts
-                .Include(p => p.User)
-                    .ThenInclude(u => u.UserProfile)
-                .Include(p => p.PostLikes)
-                .Include(p => p.PostShares)
-                .Include(p => p.CommentTargets)
-                    .ThenInclude(ct => ct.Comments)
-                .Where(p =>
-                    p.UserId == userId &&
-                    p.PostType == "share" &&
-                    p.Status != "Deleted" &&
-                    p.DeletedAt == null)
-                .OrderByDescending(p => p.CreatedAt)
-                .Take(limit)
-                .ToListAsync();
-        }
-
         public async Task<List<Post>> GetPostsByIdsAsync(List<int> postIds)
         {
             if (postIds == null || postIds.Count == 0)
@@ -327,43 +265,6 @@ namespace FrameZone_WebApi.Socials.Repositories
                     p.Status != "Deleted" &&
                     p.DeletedAt == null)
                 .ToListAsync();
-        }
-
-        public async Task<List<Post>> GetLikedPostsAsync(long userId, int limit)
-        {
-            var liked = await _context.PostLikes
-                .Where(l => l.UserId == userId)
-                .OrderByDescending(l => l.CreatedAt)
-                .Take(limit)
-                .Select(l => new { l.PostId, l.CreatedAt })
-                .ToListAsync();
-
-            if (liked.Count == 0)
-            {
-                return new List<Post>();
-            }
-
-            var postIds = liked.Select(x => x.PostId).ToList();
-            var posts = await _context.Posts
-                .Include(p => p.User)
-                    .ThenInclude(u => u.UserProfile)
-                .Include(p => p.PostLikes)
-                .Include(p => p.PostShares)
-                .Include(p => p.CommentTargets)
-                    .ThenInclude(ct => ct.Comments)
-                .Where(p =>
-                    postIds.Contains(p.PostId) &&
-                    p.Status != "Deleted" &&
-                    p.DeletedAt == null)
-                .ToListAsync();
-
-            var orderMap = liked
-                .Select((item, index) => new { item.PostId, index })
-                .ToDictionary(x => x.PostId, x => x.index);
-
-            return posts
-                .OrderBy(p => orderMap.ContainsKey(p.PostId) ? orderMap[p.PostId] : int.MaxValue)
-                .ToList();
         }
 
         public async Task<List<Post>> GetCommentedPostsAsync(long userId, int limit)
@@ -403,64 +304,6 @@ namespace FrameZone_WebApi.Socials.Repositories
 
             return posts
                 .OrderBy(p => orderMap.ContainsKey(p.PostId) ? orderMap[p.PostId] : int.MaxValue)
-                .ToList();
-        }
-
-        public async Task<PostView?> GetPostViewAsync(long userId, int postId)
-        {
-            return await _context.PostViews
-                .Where(pv => pv.UserId == userId && pv.PostId == postId)
-                .OrderByDescending(pv => pv.CreatedAt)
-                .FirstOrDefaultAsync();
-        }
-
-        public async Task<PostView?> AddPostViewAsync(PostView view)
-        {
-            view.CreatedAt = DateTime.UtcNow;
-            await _context.PostViews.AddAsync(view);
-            var result = await _context.SaveChangesAsync();
-            return result > 0 ? view : null;
-        }
-
-        public async Task<PostView?> UpdatePostViewAsync(PostView view)
-        {
-            view.CreatedAt = DateTime.UtcNow;
-            _context.PostViews.Update(view);
-            var result = await _context.SaveChangesAsync();
-            return result > 0 ? view : null;
-        }
-
-        public async Task<List<Post>> GetRecentViewedPostsAsync(long userId, int limit)
-        {
-            var recent = await _context.PostViews
-                .Where(pv => pv.UserId == userId)
-                .GroupBy(pv => pv.PostId)
-                .Select(g => new { PostId = g.Key, LastViewedAt = g.Max(x => x.CreatedAt) })
-                .OrderByDescending(x => x.LastViewedAt)
-                .Take(limit)
-                .ToListAsync();
-
-            if (recent.Count == 0)
-            {
-                return new List<Post>();
-            }
-
-            var postIds = recent.Select(x => x.PostId).ToList();
-            var posts = await _context.Posts
-                .Include(p => p.User)
-                    .ThenInclude(u => u.UserProfile)
-                .Include(p => p.PostLikes)
-                .Include(p => p.PostShares)
-                .Include(p => p.CommentTargets)
-                    .ThenInclude(ct => ct.Comments)
-                .Where(p =>
-                    postIds.Contains(p.PostId) &&
-                    p.Status != "Deleted" &&
-                    p.DeletedAt == null)
-                .ToListAsync();
-
-            return posts
-                .OrderByDescending(p => p.UpdatedAt)
                 .ToList();
         }
     }

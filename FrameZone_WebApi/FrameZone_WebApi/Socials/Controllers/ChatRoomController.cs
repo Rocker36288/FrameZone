@@ -1,4 +1,4 @@
-using FrameZone_WebApi.Socials.DTOs;
+﻿using FrameZone_WebApi.Socials.DTOs;
 using FrameZone_WebApi.Socials.Hubs;
 using FrameZone_WebApi.Socials.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -35,10 +35,17 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpPost("private/social")]
         public ActionResult<ChatRoomDto> CreateSocialPrivateRoom(CreatePrivateRoomDto dto)
         {
-            if (!TryGetUserId(out var userId))
+            long userId;
+            try
+            {
+                userId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
                 return Unauthorized();
+            }
             if (userId == dto.TargetUserId)
-                return BadRequest("不能自己私訊自己");
+                return BadRequest("銝?芸楛蝘??芸楛");
             return _roomService.GetOrCreateSocialPrivateRoom(userId, dto.TargetUserId);
         }
 
@@ -46,10 +53,17 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpPost("private/shopping")]
         public ActionResult<ChatRoomDto> CreateShoppingPrivateRoom(CreatePrivateRoomDto dto)
         {
-            if (!TryGetUserId(out var userId))
+            long userId;
+            try
+            {
+                userId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
                 return Unauthorized();
+            }
             if (userId == dto.TargetUserId)
-                return BadRequest("不能自己私訊自己");
+                return BadRequest("銝?芸楛蝘??芸楛");
             return _roomService.GetOrCreateShoppingPrivateRoom(userId, dto.TargetUserId);
         }
 
@@ -57,8 +71,15 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpPost("group")]
         public ActionResult<ChatRoomDto> CreateGroupRoom(CreateGroupRoomDto dto)
         {
-            if (!TryGetUserId(out var userId))
+            long userId;
+            try
+            {
+                userId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
                 return Unauthorized();
+            }
             return _roomService.CreateGroupRoom(userId, dto);
         }
 
@@ -66,8 +87,15 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpGet("rooms")]
         public ActionResult<List<ChatRoomDto>> GetMyRooms()
         {
-            if (!TryGetUserId(out var userId))
+            long userId;
+            try
+            {
+                userId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
                 return Unauthorized();
+            }
             return _roomService.GetUserRooms(userId);
         }
 
@@ -75,8 +103,15 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpGet("recent/social")]
         public ActionResult<List<RecentChatDto>> GetRecentSocialChats()
         {
-            if (!TryGetUserId(out var userId))
+            long userId;
+            try
+            {
+                userId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
                 return Unauthorized();
+            }
             return _roomService.GetRecentSocialChats(userId);
         }
 
@@ -84,15 +119,29 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpGet("unread/social")]
         public ActionResult<List<UnreadCountDto>> GetUnreadCounts()
         {
-            if (!TryGetUserId(out var userId))
+            long userId;
+            try
+            {
+                userId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
                 return Unauthorized();
+            }
             return _roomService.GetUnreadCounts(userId);
         }
 
         [HttpGet("{roomId}/messages")]
         public ActionResult<List<MessageDto>> GetMessages(int roomId)
         {
-            long? currentUserId = TryGetUserId(out var userId) ? userId : (long?)null;
+            long? currentUserId = null;
+            try
+            {
+                currentUserId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
             return _messageService.GetMessages(roomId, currentUserId);
         }
 
@@ -100,8 +149,15 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpPost("{roomId}/read")]
         public IActionResult MarkRoomRead(int roomId)
         {
-            if (!TryGetUserId(out var userId))
+            long userId;
+            try
+            {
+                userId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
                 return Unauthorized();
+            }
             if (!_roomService.IsUserInRoom(roomId, userId))
                 return Forbid();
 
@@ -113,11 +169,18 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpPost("{roomId}/messages")]
         public async Task<ActionResult<MessageDto>> SendMessage(int roomId, SendMessageDto dto)
         {
-            if (!TryGetUserId(out var userId))
+            long userId;
+            try
+            {
+                userId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
                 return Unauthorized();
+            }
             var content = dto?.MessageContent?.Trim();
             if (string.IsNullOrWhiteSpace(content))
-                return BadRequest("訊息內容不可為空");
+                return BadRequest("閮?批捆銝?箇征");
             var message = _messageService.SendTextMessage(roomId, userId, content, userId);
             var messageForOthers = CloneWithOwner(message, false);
 
@@ -133,8 +196,15 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpPost("{roomId}/messages/shop")]
         public async Task<ActionResult<MessageDto>> SendShopMessage(int roomId, SendShopMessageDto dto)
         {
-            if (!TryGetUserId(out var userId))
+            long userId;
+            try
+            {
+                userId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
                 return Unauthorized();
+            }
 
             try
             {
@@ -154,11 +224,13 @@ namespace FrameZone_WebApi.Socials.Controllers
             }
         }
 
-        private bool TryGetUserId(out long userId)
+        private long GetUserId()
         {
-            userId = 0;
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return !string.IsNullOrEmpty(userIdClaim) && long.TryParse(userIdClaim, out userId);
+            if (userIdClaim == null)
+                throw new UnauthorizedAccessException("尚未登入");
+
+            return long.Parse(userIdClaim);
         }
 
         private static MessageDto CloneWithOwner(MessageDto source, bool isOwner)
@@ -183,3 +255,4 @@ namespace FrameZone_WebApi.Socials.Controllers
     }
 
 }
+
