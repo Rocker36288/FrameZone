@@ -21,7 +21,7 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
                 .Include(p => p.ServiceAreas)
                 .Include(p => p.PhotographerServices).ThenInclude(ps => ps.ServiceType)
                 .Include(p => p.PhotographerSpecialties).ThenInclude(ps => ps.SpecialtyTag)
-                .Include(p => p.Bookings).ThenInclude(b => b.Reviews)
+                .Include(p => p.Bookings).ThenInclude(b => b.Reviews).ThenInclude(r => r.ReviewPhotos)
                 .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();
         }
@@ -33,7 +33,7 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
                 .Include(p => p.ServiceAreas)
                 .Include(p => p.PhotographerServices).ThenInclude(ps => ps.ServiceType)
                 .Include(p => p.PhotographerSpecialties).ThenInclude(ps => ps.SpecialtyTag)
-                .Include(p => p.Bookings).ThenInclude(b => b.Reviews)
+                .Include(p => p.Bookings).ThenInclude(b => b.Reviews).ThenInclude(r => r.ReviewPhotos)
                 .FirstOrDefaultAsync(p => p.PhotographerId == id);
         }
 
@@ -61,7 +61,7 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
                 .Include(p => p.ServiceAreas)
                 .Include(p => p.PhotographerServices).ThenInclude(ps => ps.ServiceType)
                 .Include(p => p.PhotographerSpecialties).ThenInclude(ps => ps.SpecialtyTag)
-                .Include(p => p.Bookings).ThenInclude(b => b.Reviews)
+                .Include(p => p.Bookings).ThenInclude(b => b.Reviews).ThenInclude(r => r.ReviewPhotos)
                 .ToListAsync();
         }
 

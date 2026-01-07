@@ -97,10 +97,11 @@ namespace FrameZone_WebApi.PhotographerBooking.Services
                 }).ToList() ?? new List<ServiceDto>(),
                 
                 // Calculated fields
-                //Rating = (double)rating,
-                //ReviewCount = reviews.Count,
-                //MinPrice = minPrice,
-                //TotalBookings = p.Bookings?.Count ?? 0
+                // Calculated fields
+                Rating = (double)rating,
+                ReviewCount = reviews.Count,
+                MinPrice = minPrice,
+                TotalBookings = p.Bookings?.Count ?? 0
             };
         }
     }

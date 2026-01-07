@@ -15,6 +15,10 @@ namespace FrameZone_WebApi.PhotographerBooking.DTOs
         public int? YearsOfExperience { get; set; }
         public List<string> Specialties { get; set; } = new List<string>();
         public List<ServiceDto> Services { get; set; } = new List<ServiceDto>();
+        public double Rating { get; set; }
+        public int ReviewCount { get; set; }
+        public decimal MinPrice { get; set; }
+        public int TotalBookings { get; set; }
     }
 
     public class ServiceDto
