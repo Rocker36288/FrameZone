@@ -34,6 +34,28 @@ namespace FrameZone_WebApi.Socials.Repositories
             }
         }
 
+        // ================= 取得指定使用者貼文 =================
+        public async Task<List<Post>> GetPostsByUserIdAsync(long userId)
+        {
+            try
+            {
+                return await _context.Posts
+                    .Include(p => p.User)
+                        .ThenInclude(u => u.UserProfile)
+                    .Where(p =>
+                        p.UserId == userId &&
+                        p.Status != "Deleted" &&
+                        p.DeletedAt == null)
+                    .OrderByDescending(p => p.CreatedAt)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"取得貼文失敗: {ex.Message}");
+                return null;
+            }
+        }
+
         // ================= 取得貼文 =================
         public async Task<Post?> GetPostByIdAsync(int postId)
         {
@@ -53,6 +75,42 @@ namespace FrameZone_WebApi.Socials.Repositories
             {
                 Console.WriteLine($"取得貼文失敗: {ex.Message}");
                 return null;
+            }
+        }
+
+        // ================= 取得使用者基本資料 =================
+        public async Task<User?> GetUserByIdAsync(long userId)
+        {
+            try
+            {
+                return await _context.Users
+                    .Include(u => u.UserProfile)
+                    .Where(u =>
+                        u.UserId == userId &&
+                        !u.IsDeleted &&
+                        u.DeletedAt == null)
+                    .FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"取得使用者失敗: {ex.Message}");
+                return null;
+            }
+        }
+
+        // ================= 取得好友數 =================
+        public async Task<int> GetFollowerCountAsync(long userId)
+        {
+            try
+            {
+                return await _context.Follows
+                    .Where(f => f.FollowingId == userId && f.DeleteAt == null)
+                    .CountAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"取得好友數失敗: {ex.Message}");
+                return 0;
             }
         }
 

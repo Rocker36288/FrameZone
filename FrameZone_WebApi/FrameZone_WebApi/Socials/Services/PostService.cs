@@ -25,6 +25,18 @@ namespace FrameZone_WebApi.Socials.Services
             return posts.Select(p => MapToReadDto(p, currentUserId)).ToList();
         }
 
+        // ================= 取得指定使用者貼文 =================
+        public async Task<List<PostReadDto>> GetPostsByUserIdAsync(long userId, long? currentUserId)
+        {
+            var posts = await _postRepository.GetPostsByUserIdAsync(userId);
+            if (posts == null)
+            {
+                return null;
+            }
+
+            return posts.Select(p => MapToReadDto(p, currentUserId)).ToList();
+        }
+
         // ================= 取得貼文 =================
         public async Task<PostReadDto?> GetPostByIdAsync(int postId, long? currentUserId)
         {
@@ -35,6 +47,25 @@ namespace FrameZone_WebApi.Socials.Services
             }
 
             return MapToReadDto(post, currentUserId);
+        }
+
+        // ================= 取得使用者資料 =================
+        public async Task<UserProfileSummaryDto?> GetUserProfileSummaryAsync(long userId)
+        {
+            var user = await _postRepository.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return null;
+            }
+
+            var friendCount = await _postRepository.GetFollowerCountAsync(userId);
+            return new UserProfileSummaryDto
+            {
+                UserId = user.UserId,
+                DisplayName = user.UserProfile?.DisplayName ?? user.Account ?? "使用者",
+                Avatar = user.UserProfile?.Avatar,
+                FriendCount = friendCount
+            };
         }
 
         // ================= 新增貼文 =================

@@ -447,6 +447,13 @@ export const routes: Routes = [
               ),
           },
           {
+            path: 'profile/:userId',
+            loadComponent: () =>
+              import('./social/social-profile/social-profile.component').then(
+                (m) => m.SocialProfileComponent
+              ),
+          },
+          {
             path: 'friends',
             loadComponent: () =>
               import('./social/social-friends/social-friends.component').then(

@@ -2,13 +2,23 @@
   <header class="profile-header card-style">
     <div class="top-section">
       <div class="user-info">
+        @if (profile$ | async; as profile) {
         <div class="avatar-circle">
-          <img src="images/social/Patrick.jpg" />
+          <img [src]="getAvatarUrl(profile)" [alt]="getDisplayName(profile)" />
         </div>
         <div class="user-text">
-          <h1>派大星</h1>
-          <p>10位好友</p>
+          <h1>{{ getDisplayName(profile) }}</h1>
+          <p>{{ profile.friendCount }}位好友</p>
         </div>
+        } @else {
+        <div class="avatar-circle">
+          <img src="images/social/Patrick.jpg" alt="未登入" />
+        </div>
+        <div class="user-text">
+          <h1>未登入</h1>
+          <p>0位好友</p>
+        </div>
+        }
       </div>
 
       <div class="action-group">
@@ -27,7 +37,11 @@
   <main class="content-area">
     @switch (currentView()) {
     @case ('all') {
-    <app-social-posts-list></app-social-posts-list>
+    @if (profileUserId$ | async; as userId) {
+    <app-social-posts-list [userId]="userId"></app-social-posts-list>
+    } @else {
+    <p class="text-muted text-center">請先登入</p>
+    }
     }
 
     @case ('photos') {

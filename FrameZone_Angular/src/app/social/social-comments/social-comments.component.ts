@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CommentDto } from '../models/CommentDto';
 import { CommentService } from '../services/comment.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-social-comments',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './social-comments.component.html',
   styleUrl: './social-comments.component.css'
 })

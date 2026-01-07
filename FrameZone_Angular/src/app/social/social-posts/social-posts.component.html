@@ -24,7 +24,8 @@
     </div>
     }
     <!-- 頭貼 + UserId + 時間 -->
-    <div class="d-flex align-items-center mb-2">
+    <a class="d-flex align-items-center mb-2 text-decoration-none text-reset"
+      [routerLink]="['/social/profile', post.userId]">
       <div class="avatar-wrapper me-2">
         <img [src]="getPostUserAvatar()" [alt]="post.userName" />
       </div>
@@ -35,7 +36,7 @@
           更新時間:{{post.updatedAt | date:'yyyy-MM-dd HH:mm'}}
         </span>
       </div>
-    </div>
+    </a>
     <!-- 顯示貼文文字內容 -->
     @if(!isEditing){
     <div class="post-content">

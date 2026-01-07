@@ -31,6 +31,33 @@ namespace FrameZone_WebApi.Socials.Controllers
             return Ok(post);
         }
 
+        // GET: api/posts/user/1
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetPostsByUserId(long userId)
+        {
+            var currentUserId = TryGetUserId();
+            var posts = await _postService.GetPostsByUserIdAsync(userId, currentUserId);
+
+            if (posts == null)
+            {
+                return NotFound(new { message = "貼文不存在" });
+            }
+            return Ok(posts);
+        }
+
+        // GET: api/posts/user/1/profile
+        [HttpGet("user/{userId}/profile")]
+        public async Task<IActionResult> GetUserProfile(long userId)
+        {
+            var profile = await _postService.GetUserProfileSummaryAsync(userId);
+            if (profile == null)
+            {
+                return NotFound(new { message = "使用者不存在" });
+            }
+
+            return Ok(profile);
+        }
+
         // GET: api/posts/1
         [HttpGet("{postId}")]
         public async Task<IActionResult> GetPostById(int postId)

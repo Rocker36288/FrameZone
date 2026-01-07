@@ -1,7 +1,8 @@
 import { PostService } from '../services/post.service';
-import { Component } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { PostDto } from "../models/PostDto";
 import { SocialPostsComponent } from '../social-posts/social-posts.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-social-posts-list',
@@ -9,8 +10,11 @@ import { SocialPostsComponent } from '../social-posts/social-posts.component';
   templateUrl: './social-posts-list.component.html',
   styleUrl: './social-posts-list.component.css'
 })
-export class SocialPostsListComponent {
+export class SocialPostsListComponent implements OnInit, OnChanges, OnDestroy {
+  @Input() userId: number | null = null;
+
   posts: PostDto[] = [];
+  private refreshSub?: Subscription;
 
   constructor(private postService: PostService) { }
 
@@ -19,13 +23,27 @@ export class SocialPostsListComponent {
     this.loadPosts();
 
     // 2. 訂閱「重新整理」訊號
-    this.postService.refreshNeeded$.subscribe(() => {
+    this.refreshSub = this.postService.refreshNeeded$.subscribe(() => {
       this.loadPosts();
     });
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['userId'] && !changes['userId'].firstChange) {
+      this.loadPosts();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.refreshSub?.unsubscribe();
+  }
+
   loadPosts() {
-    this.postService.getPosts()
+    const request$ = this.userId
+      ? this.postService.getPostsByUser(this.userId)
+      : this.postService.getPosts();
+
+    request$
       .subscribe(posts => {
         this.posts = posts;
         console.log(this.posts);

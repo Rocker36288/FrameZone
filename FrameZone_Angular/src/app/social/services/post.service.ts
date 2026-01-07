@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subject, tap } from 'rxjs';
 import { PostDto } from "../models/PostDto";
+import { SocialProfileSummary } from '../models/social-profile.models';
 
 
 
@@ -25,9 +26,17 @@ export class PostService {
   getPosts(): Observable<PostDto[]> {
     return this.http.get<PostDto[]>(`${this.apiUrl}`)
   }
+  /**依使用者取得貼文 */
+  getPostsByUser(userId: number): Observable<PostDto[]> {
+    return this.http.get<PostDto[]>(`${this.apiUrl}/user/${userId}`)
+  }
   /**取得貼文 */
   getPost(postId: number): Observable<PostDto> {
     return this.http.get<PostDto>(`${this.apiUrl}/${postId}`)
+  }
+  /**取得使用者資料 */
+  getUserProfile(userId: number): Observable<SocialProfileSummary> {
+    return this.http.get<SocialProfileSummary>(`${this.apiUrl}/user/${userId}/profile`)
   }
 
   /**新增貼文 */

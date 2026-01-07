@@ -7,10 +7,11 @@ import { DatePipe, SlicePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SocialCommentsComponent } from "../social-comments/social-comments.component";
 import { AuthService } from '../../core/services/auth.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-social-posts',
-  imports: [DatePipe, SlicePipe, FormsModule, SocialCommentsComponent],
+  imports: [DatePipe, SlicePipe, FormsModule, SocialCommentsComponent, RouterLink],
   templateUrl: './social-posts.component.html',
   styleUrl: './social-posts.component.css'
 })

@@ -35,4 +35,12 @@ namespace FrameZone_WebApi.Socials.DTOs
         public DateTime UpdatedAt { get; set; }
         public bool IsOwner { get; set; }   //就是本人
     }
+
+    public class UserProfileSummaryDto
+    {
+        public long UserId { get; set; }
+        public string DisplayName { get; set; } = "使用者";
+        public string? Avatar { get; set; }
+        public int FriendCount { get; set; }
+    }
 }

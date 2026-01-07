@@ -145,7 +145,7 @@ namespace FrameZone_WebApi.Services
                     Success = true,
                     Message = "登入成功",
                     Token = token,
-                    UserID = user.UserId,
+                    UserId = user.UserId,
                     Account = user.Account,
                     Email = user.Email,
                     DisplayName = user.UserProfile?.DisplayName ?? user.Account,
