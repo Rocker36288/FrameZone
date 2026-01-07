@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { MemberService } from '../../../core/services/member.service';
+import { AuthService } from '../../../core/services/auth.service';
 import {
   ChangePasswordDto,
   UserSessionDto,
@@ -13,11 +15,11 @@ import {
 @Component({
   selector: 'app-member-security',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './member-security.component.html',
   styleUrl: './member-security.component.css'
 })
-export class MemberSecurityComponent implements OnInit {
+export class MemberSecurityComponent implements OnInit, OnDestroy {
   // 載入狀態
   isLoading = false;
   isLoadingSessions = false;
@@ -60,10 +62,26 @@ export class MemberSecurityComponent implements OnInit {
   // 安全性概覽
   securityOverview: SecurityOverviewDto | null = null;
 
-  constructor(private memberService: MemberService) {}
+  // 模態框相關
+  showPasswordChangedModal = false;
+  countdown = 5;
+  private countdownInterval: any;
+
+  constructor(
+    private memberService: MemberService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadSecurityData();
+  }
+
+  ngOnDestroy(): void {
+    // 清理倒數計時器
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+    }
   }
 
   /**
@@ -86,6 +104,7 @@ export class MemberSecurityComponent implements OnInit {
   changePassword(): void {
     this.passwordErrorMessage = '';
     this.successMessage = '';
+    this.errorMessage = '';
 
     // 前端基本驗證
     if (!this.changePasswordForm.currentPassword) {
@@ -113,13 +132,20 @@ export class MemberSecurityComponent implements OnInit {
       return;
     }
 
+    // 進階密碼驗證
+    if (!this.validatePasswordStrength(this.changePasswordForm.newPassword)) {
+      this.passwordErrorMessage = '密碼強度不足，請包含大小寫字母、數字及特殊字元';
+      return;
+    }
+
     this.isChangingPassword = true;
 
     this.memberService.changePassword(this.changePasswordForm).subscribe({
       next: (response) => {
         if (response.success) {
-          this.successMessage = response.message;
           this.clearPasswordForm();
+          this.showPasswordChangedModal = true;
+          this.startCountdown();
         } else {
           this.passwordErrorMessage = response.message;
         }
@@ -127,10 +153,34 @@ export class MemberSecurityComponent implements OnInit {
       },
       error: (error) => {
         console.error('變更密碼失敗:', error);
-        this.passwordErrorMessage = '變更密碼失敗，請稍後再試';
+
+        // 根據錯誤狀態碼顯示不同訊息
+        if (error.status === 400) {
+          this.passwordErrorMessage = error.error?.message || '密碼格式不正確';
+        } else if (error.status === 401) {
+          this.passwordErrorMessage = '目前密碼不正確';
+        } else if (error.status === 403) {
+          this.errorMessage = '您沒有權限執行此操作';
+        } else {
+          this.errorMessage = '變更密碼失敗，請稍後再試';
+        }
+
         this.isChangingPassword = false;
+        this.scrollToTop();
       }
     });
+  }
+
+  /**
+   * 驗證密碼強度
+   */
+  private validatePasswordStrength(password: string): boolean {
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecialChar = /[^a-zA-Z0-9]/.test(password);
+
+    return hasLowerCase && hasUpperCase && hasNumber && hasSpecialChar;
   }
 
   /**
@@ -173,6 +223,55 @@ export class MemberSecurityComponent implements OnInit {
   }
 
   // ============================================================================
+  // 模態框控制
+  // ============================================================================
+
+  /**
+   * 開始倒數計時
+   */
+  private startCountdown(): void {
+    this.countdown = 5;
+    this.countdownInterval = setInterval(() => {
+      this.countdown--;
+      if (this.countdown <= 0) {
+        this.logoutAndRedirect();
+      }
+    }, 1000);
+  }
+
+  /**
+   * 關閉模態框
+   */
+  closeModal(): void {
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+    }
+    this.showPasswordChangedModal = false;
+    // 即使關閉模態框，仍然登出（為了安全）
+    this.logoutAndRedirect();
+  }
+
+  /**
+   * 登出並跳轉到登入頁面
+   */
+  logoutAndRedirect(): void {
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+    }
+
+    // 清除認證資料
+    this.authService.logout();
+
+    // 跳轉到登入頁面，並傳遞訊息參數
+    this.router.navigate(['/login'], {
+      queryParams: {
+        message: '密碼已變更，請使用新密碼重新登入',
+        type: 'success'
+      }
+    });
+  }
+
+  // ============================================================================
   // 登入裝置管理
   // ============================================================================
 
@@ -211,15 +310,18 @@ export class MemberSecurityComponent implements OnInit {
     this.memberService.logoutSession(sessionId).subscribe({
       next: (response) => {
         if (response.success) {
-          alert(response.message);
+          this.successMessage = response.message;
           this.loadSessions(); // 重新載入列表
+          this.scrollToTop();
         } else {
-          alert(response.message);
+          this.errorMessage = response.message;
+          this.scrollToTop();
         }
       },
       error: (error) => {
         console.error('登出裝置失敗:', error);
-        alert('登出失敗，請稍後再試');
+        this.errorMessage = '登出失敗，請稍後再試';
+        this.scrollToTop();
       }
     });
   }
@@ -235,15 +337,18 @@ export class MemberSecurityComponent implements OnInit {
     this.memberService.logoutOtherSessions().subscribe({
       next: (response) => {
         if (response.success) {
-          alert(response.message);
+          this.successMessage = response.message;
           this.loadSessions(); // 重新載入列表
+          this.scrollToTop();
         } else {
-          alert(response.message);
+          this.errorMessage = response.message;
+          this.scrollToTop();
         }
       },
       error: (error) => {
         console.error('登出其他裝置失敗:', error);
-        alert('登出失敗，請稍後再試');
+        this.errorMessage = '登出失敗，請稍後再試';
+        this.scrollToTop();
       }
     });
   }
@@ -379,5 +484,26 @@ export class MemberSecurityComponent implements OnInit {
    */
   getStatusIcon(status: string): string {
     return status === 'Success' ? '✅' : '❌';
+  }
+
+  /**
+   * 滾動到頁面頂部
+   */
+  private scrollToTop(): void {
+    const container = document.querySelector('.security-container');
+    if (container) {
+      container.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  /**
+   * 清除所有訊息
+   */
+  clearMessages(): void {
+    this.successMessage = '';
+    this.errorMessage = '';
+    this.passwordErrorMessage = '';
+    this.sessionsErrorMessage = '';
+    this.lockStatusErrorMessage = '';
   }
 }
