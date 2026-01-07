@@ -1,8 +1,11 @@
-import { PostService } from '../services/post.service';
+﻿import { PostService } from '../services/post.service';
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { PostDto } from "../models/PostDto";
 import { SocialPostsComponent } from '../social-posts/social-posts.component';
-import { Subscription } from 'rxjs';
+import { Subscription, map, of, switchMap } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { FollowService } from '../services/follow.service';
 
 @Component({
   selector: 'app-social-posts-list',
@@ -12,42 +15,99 @@ import { Subscription } from 'rxjs';
 })
 export class SocialPostsListComponent implements OnInit, OnChanges, OnDestroy {
   @Input() userId: number | null = null;
+  @Input() userIds: number[] | null = null;
 
   posts: PostDto[] = [];
   private refreshSub?: Subscription;
+  private userSub?: Subscription;
+  private isFollowingRoute = false;
 
-  constructor(private postService: PostService) { }
+  constructor(
+    private postService: PostService,
+    private authService: AuthService,
+    private followService: FollowService,
+    private route: ActivatedRoute
+  ) {
+    this.isFollowingRoute = this.route.snapshot.routeConfig?.path === 'following';
+  }
 
   ngOnInit(): void {
-    // 1. 初始載入
+    // 1. ?濆?杓夊叆
     this.loadPosts();
 
-    // 2. 訂閱「重新整理」訊號
+    // 2. 瑷傞柋?岄??版暣?嗐€嶈???
     this.refreshSub = this.postService.refreshNeeded$.subscribe(() => {
       this.loadPosts();
     });
+
+    if (this.isFollowingRoute) {
+      this.userSub = this.authService.currentUser$.subscribe(() => {
+        this.loadPosts();
+      });
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['userId'] && !changes['userId'].firstChange) {
+    if ((changes['userId'] && !changes['userId'].firstChange)
+      || (changes['userIds'] && !changes['userIds'].firstChange)) {
       this.loadPosts();
     }
   }
 
   ngOnDestroy(): void {
     this.refreshSub?.unsubscribe();
+    this.userSub?.unsubscribe();
   }
 
   loadPosts() {
-    const request$ = this.userId
-      ? this.postService.getPostsByUser(this.userId)
-      : this.postService.getPosts();
+    if (this.userIds && this.userIds.length === 0) {
+      this.posts = [];
+      return;
+    }
 
-    request$
-      .subscribe(posts => {
+    if (this.userIds && this.userIds.length > 0) {
+      const idSet = new Set(this.userIds);
+      this.postService.getPosts().subscribe(posts => {
+        this.posts = posts.filter(post => idSet.has(post.userId));
+        console.log(this.posts);
+      });
+      return;
+    }
+
+    if (this.userId) {
+      this.postService.getPostsByUser(this.userId).subscribe(posts => {
         this.posts = posts;
         console.log(this.posts);
       });
+      return;
+    }
+
+    if (this.isFollowingRoute) {
+      const currentUserId = this.authService.getCurrentUser()?.userId ?? null;
+      if (!currentUserId) {
+        this.posts = [];
+        return;
+      }
+      this.followService.getFollowing(currentUserId).pipe(
+        map(users => users.map(user => user.userId)),
+        switchMap(ids => {
+          if (ids.length === 0) return of([] as PostDto[]);
+          const idSet = new Set(ids);
+          return this.postService.getPosts().pipe(
+            map(posts => posts.filter(post => idSet.has(post.userId)))
+          );
+        })
+      ).subscribe(posts => {
+        this.posts = posts;
+        console.log(this.posts);
+      });
+      return;
+    }
+
+    this.postService.getPosts().subscribe(posts => {
+      this.posts = posts;
+      console.log(this.posts);
+    });
   }
 
   onPostDeleted(postId: number) {
