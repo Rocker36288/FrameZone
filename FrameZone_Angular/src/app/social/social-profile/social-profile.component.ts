@@ -45,6 +45,14 @@ export class SocialProfileComponent {
     })
   );
 
+  isOwnProfile$ = this.profileUserId$.pipe(
+    switchMap((userId) =>
+      this.authService.currentUser$.pipe(
+        map((user) => !!userId && user?.userId === userId)
+      )
+    )
+  );
+
   // 使用 Signal 管理目前檢視狀態，預設為 'all'
   currentView = signal<string>('all');
 

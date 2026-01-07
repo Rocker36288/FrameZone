@@ -10,12 +10,21 @@
         <span class="menu-item-name">首頁</span>
       </a>
 
+      @if (currentUser$ | async; as user) {
+      <a class="nav-link menu-item-btn" [routerLink]="['/social/profile', user.userId]">
+        <div class="icon-circle">
+          <i class="bi bi-collection-play-fill"></i>
+        </div>
+        <span class="menu-item-name">我的貼文</span>
+      </a>
+      } @else {
       <a class="nav-link menu-item-btn" routerLink="profile">
         <div class="icon-circle">
           <i class="bi bi-collection-play-fill"></i>
         </div>
         <span class="menu-item-name">我的貼文</span>
       </a>
+      }
 
       <a class="nav-link menu-item-btn" routerLink="friends">
         <div class="icon-circle">

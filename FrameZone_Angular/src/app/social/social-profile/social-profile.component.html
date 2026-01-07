@@ -21,10 +21,12 @@
         }
       </div>
 
+      @if (!(isOwnProfile$ | async)) {
       <div class="action-group">
         <button class="btn btn-primary" (click)="addFriend()">新增好友</button>
         <button class="btn btn-secondary" (click)="sendMessage()">發送訊息</button>
       </div>
+      }
     </div>
 
     <nav class="tab-nav">
