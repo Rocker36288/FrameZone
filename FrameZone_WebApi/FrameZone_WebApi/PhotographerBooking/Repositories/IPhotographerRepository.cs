@@ -1,4 +1,4 @@
-using FrameZone_WebApi.Models;
+﻿using FrameZone_WebApi.Models;
 
 namespace FrameZone_WebApi.PhotographerBooking.Repositories
 {
@@ -12,3 +12,4 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
         Task<bool> DeletePhotographerAsync(int id);
     }
 }
+//負責攝影師資料的 CRUD 與搜尋。

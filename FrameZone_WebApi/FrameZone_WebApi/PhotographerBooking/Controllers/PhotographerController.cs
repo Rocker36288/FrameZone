@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using FrameZone_WebApi.PhotographerBooking.Services;
 using FrameZone_WebApi.PhotographerBooking.DTOs;
 
@@ -70,3 +70,6 @@ namespace FrameZone_WebApi.PhotographerBooking.Controllers
         }
     }
 }
+
+
+//提供 API 供前端取得列表與詳情。

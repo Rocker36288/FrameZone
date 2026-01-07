@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using FrameZone_WebApi.PhotographerBooking.Services;
 using FrameZone_WebApi.PhotographerBooking.DTOs;
@@ -120,3 +120,6 @@ namespace FrameZone_WebApi.PhotographerBooking.Controllers
         }
     }
 }
+
+
+//提供 API 進行預約動作與查詢歷史預約。
