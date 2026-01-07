@@ -1,6 +1,8 @@
 ﻿using FrameZone_WebApi.DTOs;
 using FrameZone_WebApi.Repositories.Interfaces;
 using FrameZone_WebApi.Services.Interfaces;
+using FrameZone_WebApi.Hubs;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
 namespace FrameZone_WebApi.Services
@@ -12,13 +14,16 @@ namespace FrameZone_WebApi.Services
     {
         private readonly INotificationRepository _notificationRepository;
         private readonly ILogger<NotificationService> _logger;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
         public NotificationService(
             INotificationRepository notificationRepository,
-            ILogger<NotificationService> logger)
+            ILogger<NotificationService> logger,
+            IHubContext<NotificationHub> hubContext)
         {
             _notificationRepository = notificationRepository;
             _logger = logger;
+            _hubContext = hubContext;
         }
 
         /// <summary>
@@ -106,6 +111,12 @@ namespace FrameZone_WebApi.Services
                 }
 
                 var count = await _notificationRepository.MarkAsReadAsync(userId, new List<long> { recipientId });
+
+                if (count > 0)
+                {
+                    await SendUnreadCountUpdateAsync(userId);
+                }
+
                 return ServiceResult<bool>.SuccessResult(count > 0, count > 0 ? "標記已讀成功" : "通知已是已讀狀態");
             }
             catch (Exception ex)
@@ -128,6 +139,12 @@ namespace FrameZone_WebApi.Services
                 }
 
                 var count = await _notificationRepository.MarkAsReadAsync(userId, dto.RecipientIds);
+
+                if (count > 0)
+                {
+                    await SendUnreadCountUpdateAsync(userId);
+                }
+
                 return ServiceResult<int>.SuccessResult(count, $"成功標記 {count} 則通知為已讀");
             }
             catch (Exception ex)
@@ -148,6 +165,11 @@ namespace FrameZone_WebApi.Services
                 var message = string.IsNullOrEmpty(systemCode)
                     ? $"成功標記 {count} 則通知為已讀"
                     : $"成功標記 {systemCode} 系統的 {count} 則通知為已讀";
+
+                if (count > 0)
+                {
+                    await SendUnreadCountUpdateAsync(userId);
+                }
 
                 return ServiceResult<int>.SuccessResult(count, message);
             }
@@ -173,6 +195,12 @@ namespace FrameZone_WebApi.Services
                 }
 
                 var count = await _notificationRepository.DeleteNotificationsAsync(userId, new List<long> { recipientId });
+
+                if (count > 0)
+                {
+                    await SendUnreadCountUpdateAsync(userId);
+                }
+
                 return ServiceResult<bool>.SuccessResult(count > 0, count > 0 ? "刪除通知成功" : "通知已被刪除");
             }
             catch (Exception ex)
@@ -195,6 +223,12 @@ namespace FrameZone_WebApi.Services
                 }
 
                 var count = await _notificationRepository.DeleteNotificationsAsync(userId, dto.RecipientIds);
+
+                if (count > 0)
+                {
+                    await SendUnreadCountUpdateAsync(userId);
+                }
+
                 return ServiceResult<int>.SuccessResult(count, $"成功刪除 {count} 則通知");
             }
             catch (Exception ex)
@@ -215,6 +249,11 @@ namespace FrameZone_WebApi.Services
                 var message = string.IsNullOrEmpty(systemCode)
                     ? $"成功清空 {count} 則通知"
                     : $"成功清空 {systemCode} 系統的 {count} 則通知";
+
+                if (count > 0)
+                {
+                    await SendUnreadCountUpdateAsync(userId);
+                }
 
                 return ServiceResult<int>.SuccessResult(count, message);
             }
@@ -270,7 +309,7 @@ namespace FrameZone_WebApi.Services
                 if (string.IsNullOrWhiteSpace(content))
                     return ServiceResult<long>.FailureResult("內容不可為空", "INVALID_INPUT");
 
-                var notificationId = await _notificationRepository.CreateNotificationAsync(
+                var recipientId = await _notificationRepository.CreateNotificationAsync(
                     userId,
                     systemCode,
                     categoryCode,
@@ -280,13 +319,37 @@ namespace FrameZone_WebApi.Services
                     relatedObjectType,
                     relatedObjectId);
 
-                if (notificationId == 0)
+                if (recipientId == 0)
                 {
                     return ServiceResult<long>.FailureResult("使用者不希望接收此類通知", "USER_PREFERENCE_DISABLED");
                 }
 
-                _logger.LogInformation("發送通知成功 - UserId: {UserId}, NotificationId: {NotificationId}", userId, notificationId);
-                return ServiceResult<long>.SuccessResult(notificationId, "發送通知成功");
+                _logger.LogInformation("發送通知成功 - UserId: {UserId}, NotificationId: {NotificationId}", userId, recipientId);
+
+                try
+                {
+                    // 取得完整通知資料
+                    var notification = await _notificationRepository.GetNotificationByRecipientIdAsync(recipientId);
+
+                    if (notification != null)
+                    {
+                        await _hubContext.Clients
+                            .Group($"user_{userId}")
+                            .SendAsync("ReceiveNotification", notification);
+
+                        _logger.LogInformation("🔔 SignalR 推送通知成功 - UserId: {UserId}, RecipientId: {RecipientId}",
+                            userId, recipientId);
+
+                        await SendUnreadCountUpdateAsync(userId);
+                    }
+                }
+                catch (Exception signalREx)
+                {
+                    _logger.LogWarning(signalREx, "SignalR 推送通知失敗 - UserId: {UserId}, RecipientId: {RecipientId}",
+                        userId, recipientId);
+                }
+
+                return ServiceResult<long>.SuccessResult(recipientId, "發送通知成功");
             }
             catch (Exception ex)
             {
@@ -340,6 +403,18 @@ namespace FrameZone_WebApi.Services
                 _logger.LogInformation("批次發送通知成功 - 總使用者數: {TotalUsers}, 成功發送: {SuccessCount}",
                     userIds.Count, count);
 
+                try
+                {
+                    foreach (var userId in userIds)
+                    {
+                        await SendUnreadCountUpdateAsync(userId);
+                    }
+                }
+                catch (Exception signalREx)
+                {
+                    _logger.LogWarning(signalREx, "SignalR 批次推送未讀數更新失敗");
+                }
+
                 return ServiceResult<int>.SuccessResult(count, $"成功發送通知給 {count} 位使用者");
             }
             catch (Exception ex)
@@ -347,6 +422,28 @@ namespace FrameZone_WebApi.Services
                 _logger.LogError(ex, "批次發送通知失敗 - SystemCode: {SystemCode}, CategoryCode: {CategoryCode}",
                     systemCode, categoryCode);
                 return ServiceResult<int>.FailureResult("批次發送通知失敗");
+            }
+        }
+
+        /// <summary>
+        /// 推送未讀數更新給指定使用者
+        /// </summary>
+        private async Task SendUnreadCountUpdateAsync(long userId)
+        {
+            try
+            {
+                var unreadCount = await _notificationRepository.GetUnreadCountAsync(userId);
+
+                await _hubContext.Clients
+                    .Group($"user_{userId}")
+                    .SendAsync("UnreadCountUpdated", unreadCount);
+
+                _logger.LogInformation("🔢 SignalR 推送未讀數更新成功 - UserId: {UserId}, TotalCount: {Count}",
+                    userId, unreadCount.TotalCount);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "SignalR 推送未讀數更新失敗 - UserId: {UserId}", userId);
             }
         }
     }

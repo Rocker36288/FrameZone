@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, BehaviorSubject, interval } from 'rxjs';
-import { tap, switchMap, startWith } from 'rxjs/operators';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import {
   NotificationDto,
   UnreadCountDto,
@@ -19,7 +19,6 @@ import {
 export class NotificationService {
   private apiUrl = 'https://localhost:7213/api/notification';
 
-
   // 未讀數量快取（用於即時更新小鈴鐺）
   private unreadCountSubject = new BehaviorSubject<UnreadCountDto>({
     totalCount: 0,
@@ -27,11 +26,9 @@ export class NotificationService {
   });
   public unreadCount$ = this.unreadCountSubject.asObservable();
 
-  // 輪詢間隔（30 秒）
-  private readonly POLL_INTERVAL = 30000;
-
-  // 輪詢訂閱
-  private pollSubscription: any = null;
+  // ❌ 移除輪詢相關變數
+  // private readonly POLL_INTERVAL = 30000;
+  // private pollSubscription: any = null;
 
   constructor(private http: HttpClient) {}
 
@@ -83,7 +80,6 @@ export class NotificationService {
       .pipe(
         tap(response => {
           if (response.success) {
-            // 更新未讀數量
             this.refreshUnreadCount();
           }
         })
@@ -188,37 +184,9 @@ export class NotificationService {
     });
   }
 
-  /**
-   * 開始輪詢未讀數量（用於首頁或需要即時更新的頁面）
-   */
-  startPolling(): void {
-    // 避免重複啟動
-    if (this.pollSubscription) {
-      return;
-    }
-
-    // 立即執行一次，然後每 30 秒執行一次
-    this.pollSubscription = interval(this.POLL_INTERVAL)
-      .pipe(
-        startWith(0), // 立即執行
-        switchMap(() => this.getUnreadCount())
-      )
-      .subscribe({
-        error: (error) => {
-          console.error('輪詢未讀數量失敗:', error);
-        }
-      });
-  }
-
-  /**
-   * 停止輪詢
-   */
-  stopPolling(): void {
-    if (this.pollSubscription) {
-      this.pollSubscription.unsubscribe();
-      this.pollSubscription = null;
-    }
-  }
+  // ❌ 移除輪詢方法
+  // startPolling(): void { ... }
+  // stopPolling(): void { ... }
 
   /**
    * 取得當前未讀數量（同步）

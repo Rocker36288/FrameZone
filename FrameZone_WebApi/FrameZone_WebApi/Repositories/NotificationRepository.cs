@@ -186,6 +186,53 @@ namespace FrameZone_WebApi.Repositories
         }
 
         /// <summary>
+        /// 根據 RecipientId 取得完整通知資料（用於 SignalR 推送）
+        /// </summary>
+        public async Task<NotificationDto?> GetNotificationByRecipientIdAsync(long recipientId)
+        {
+            return await _context.BellNotificationRecipients
+                .Where(r => r.RecipientId == recipientId && !r.IsDeleted)
+                .Join(_context.BellNotifications,
+                    r => r.NotificationId,
+                    n => n.NotificationId,
+                    (r, n) => new { Recipient = r, Notification = n })
+                .Join(_context.UserSystemModules,
+                    rn => rn.Notification.SystemId,
+                    s => s.SystemId,
+                    (rn, s) => new { rn.Recipient, rn.Notification, System = s })
+                .Join(_context.Categories,
+                    rns => rns.Notification.CategoryId,
+                    c => c.CategoryId,
+                    (rns, c) => new { rns.Recipient, rns.Notification, rns.System, Category = c })
+                .Join(_context.Priorities,
+                    rnsc => rnsc.Notification.PriorityId,
+                    p => p.PriorityId,
+                    (rnsc, p) => new { rnsc.Recipient, rnsc.Notification, rnsc.System, rnsc.Category, Priority = p })
+                .Select(x => new NotificationDto
+                {
+                    RecipientId = x.Recipient.RecipientId,
+                    NotificationId = x.Notification.NotificationId,
+                    UserId = x.Recipient.UserId,
+                    SystemCode = x.System.SystemCode,
+                    SystemName = x.System.SystemName,
+                    CategoryCode = x.Category.CategoryCode,
+                    CategoryName = x.Category.CategoryName,
+                    CategoryIcon = GetCategoryIcon(x.Category.CategoryCode),
+                    PriorityCode = x.Priority.PriorityCode,
+                    PriorityLevel = x.Priority.PriorityLevel,
+                    NotificationTitle = x.Notification.NotificationTitle,
+                    NotificationContent = x.Notification.NotificationContent,
+                    RelatedObjectType = x.Notification.RelatedObjectType,
+                    RelatedObjectId = x.Notification.RelatedObjectId,
+                    IsRead = x.Recipient.IsRead,
+                    ReadAt = x.Recipient.ReadAt,
+                    CreatedAt = x.Notification.CreatedAt,
+                    ExpiresAt = x.Notification.ExpiresAt
+                })
+                .FirstOrDefaultAsync();
+        }
+
+        /// <summary>
         /// 標記通知為已讀
         /// </summary>
         public async Task<int> MarkAsReadAsync(long userId, List<long> recipientIds)
@@ -437,7 +484,7 @@ namespace FrameZone_WebApi.Repositories
             _context.BellNotificationRecipients.Add(recipient);
             await _context.SaveChangesAsync();
 
-            return notification.NotificationId;
+            return recipient.RecipientId;
         }
 
         /// <summary>

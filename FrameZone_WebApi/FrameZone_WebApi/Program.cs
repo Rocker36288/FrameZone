@@ -30,6 +30,7 @@ using System.Text;
 using Xabe.FFmpeg;
 using Xabe.FFmpeg.Downloader;
 using static FrameZone_WebApi.Videos.Helpers.AaContextFactoryHelper;
+using FrameZone_WebApi.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -185,8 +186,32 @@ builder.Services.AddAuthentication(options =>
         OnTokenValidated = context =>
         {
             return Task.CompletedTask;
+        },
+
+        // SignalR 的 Token 驗證（從 Query String 取得 Token）
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+
+            // 如果是 SignalR Hub 請求且有 Token，則使用它
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+            {
+                context.Token = accessToken;
+            }
+
+            return Task.CompletedTask;
         }
     };
+});
+
+// 註冊 SignalR 服務
+builder.Services.AddSignalR(options =>
+{
+    // SignalR 配置選項
+    options.EnableDetailedErrors = builder.Environment.IsDevelopment(); // 開發環境顯示詳細錯誤
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(60); // 客戶端超時時間
+    options.KeepAliveInterval = TimeSpan.FromSeconds(30); // 保持連線間隔
 });
 
 // 配置記憶體快取
@@ -406,6 +431,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<NotificationHub>("/hubs/notification");
 
 Console.WriteLine("====================================");
 Console.WriteLine("FrameZone WebAPI 正在啟動...");

@@ -21,7 +21,7 @@ import {
 export class NotificationBellComponent implements OnInit, OnDestroy {
   isDropdownOpen = false;
   isLoading = false;
-  isProcessing = false; // 新增：防止重複操作
+  isProcessing = false;
   unreadCount = 0;
   unreadCountBySystem: { [key: string]: number } = {};
   notifications: NotificationDto[] = [];
@@ -40,6 +40,7 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    // ⭐ 訂閱未讀數更新（SignalR 會自動更新）
     this.unreadCountSubscription = this.notificationService.unreadCount$.subscribe(
       (count: UnreadCountDto) => {
         this.unreadCount = count.totalCount;
@@ -47,13 +48,21 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
         this.updateSystemModulesUnreadCount();
       }
     );
+
+    // ⭐ 初次載入未讀數
     this.notificationService.refreshUnreadCount();
+
+    // ❌ 移除輪詢啟動（改用 SignalR）
+    // this.notificationService.startPolling();
   }
 
   ngOnDestroy(): void {
     if (this.unreadCountSubscription) {
       this.unreadCountSubscription.unsubscribe();
     }
+
+    // ❌ 移除輪詢停止（改用 SignalR）
+    // this.notificationService.stopPolling();
   }
 
   toggleDropdown(): void {
@@ -183,24 +192,18 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * 標記所有通知為已讀
-   */
   markAllAsRead(): void {
-    // 防止重複操作
     if (this.isProcessing) {
       console.log('操作進行中，請稍候...');
       return;
     }
 
-    // 檢查是否有通知
     if (this.notifications.length === 0) {
       console.log('沒有通知可標記');
       this.showMessage('目前沒有通知');
       return;
     }
 
-    // 檢查是否有未讀通知
     const unreadNotifications = this.notifications.filter(n => !n.isRead);
     if (unreadNotifications.length === 0) {
       console.log('所有通知都已讀');
@@ -218,13 +221,11 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
         console.log('標記已讀 API 回應:', response);
 
         if (response.success) {
-          // 更新本地狀態
           this.notifications.forEach(n => {
             n.isRead = true;
             n.readAt = new Date().toISOString();
           });
 
-          // 重新載入未讀數量
           this.notificationService.refreshUnreadCount();
 
           const message = response.message || `已標記 ${response.data} 則通知為已讀`;
@@ -245,24 +246,18 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * 清空所有通知
-   */
   clearAll(): void {
-    // 防止重複操作
     if (this.isProcessing) {
       console.log('操作進行中，請稍候...');
       return;
     }
 
-    // 檢查是否有通知
     if (this.notifications.length === 0) {
       console.log('沒有通知可清空');
       this.showMessage('目前沒有通知');
       return;
     }
 
-    // 確認操作
     if (!confirm('確定要清空所有通知嗎？此操作無法復原。')) {
       return;
     }
@@ -277,12 +272,10 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
         console.log('清空通知 API 回應:', response);
 
         if (response.success) {
-          // 清空本地通知列表
           this.notifications = [];
           this.currentPage = 1;
           this.hasMore = false;
 
-          // 重新載入未讀數量
           this.notificationService.refreshUnreadCount();
 
           const message = response.message || `已清空 ${response.data} 則通知`;
@@ -303,16 +296,8 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * 顯示訊息提示（簡易版，可替換為 toast 組件）
-   */
   private showMessage(message: string): void {
-    // 這裡可以替換為你的 toast/notification 組件
-    // 暫時使用 alert 作為示範
     console.log('[訊息]', message);
-
-    // 如果你有 toast 服務，可以這樣用：
-    // this.toastService.show(message);
   }
 
   formatRelativeTime(dateString: string): string {
@@ -325,23 +310,14 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     return this.unreadCount.toString();
   }
 
-  /**
-   * 檢查是否有未讀通知（用於 UI 樣式）
-   */
   get hasUnreadNotifications(): boolean {
     return this.notifications.some(n => !n.isRead);
   }
 
-  /**
-   * 檢查所有通知是否都已讀
-   */
   get isAllNotificationsRead(): boolean {
     return this.notifications.length === 0 || this.notifications.every(n => n.isRead);
   }
 
-  /**
-   * 檢查是否有通知
-   */
   get hasNotifications(): boolean {
     return this.notifications.length > 0;
   }

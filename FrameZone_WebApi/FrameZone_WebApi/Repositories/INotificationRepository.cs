@@ -31,6 +31,13 @@ namespace FrameZone_WebApi.Repositories.Interfaces
         Task<NotificationDto?> GetNotificationByIdAsync(long userId, long recipientId);
 
         /// <summary>
+        /// 根據 RecipientId 取得完整通知資料（用於 SignalR 推送）
+        /// </summary>
+        /// <param name="recipientId">通知接收者 ID</param>
+        /// <returns>通知詳細資訊</returns>
+        Task<NotificationDto?> GetNotificationByRecipientIdAsync(long recipientId);
+
+        /// <summary>
         /// 標記通知為已讀
         /// </summary>
         /// <param name="userId">使用者 ID</param>
@@ -96,7 +103,7 @@ namespace FrameZone_WebApi.Repositories.Interfaces
         /// <param name="content">內容</param>
         /// <param name="relatedObjectType">相關物件類型</param>
         /// <param name="relatedObjectId">相關物件 ID</param>
-        /// <returns>通知 ID</returns>
+        /// <returns>RecipientId（接收者 ID）</returns>
         Task<long> CreateNotificationAsync(
             long userId,
             string systemCode,

@@ -27,6 +27,11 @@
             public const string PHOTO_SHARED = "PHOTO_SHARED";
             public const string PHOTO_CLASSIFIED = "PHOTO_CLASSIFIED";
 
+            // AI 分析相關
+            public const string AI_ANALYSIS_COMPLETED = "AI_ANALYSIS_COMPLETED";
+            public const string AI_ANALYSIS_FAILED = "AI_ANALYSIS_FAILED";
+            public const string AI_TAGS_SUGGESTED = "AI_TAGS_SUGGESTED";
+
             // Shopping 系統
             public const string ORDER_CREATED = "ORDER_CREATED";
             public const string ORDER_SHIPPED = "ORDER_SHIPPED";
@@ -104,6 +109,11 @@
             { CategoryCodes.PHOTO_UPLOAD, "📷" },
             { CategoryCodes.PHOTO_SHARED, "🔗" },
             { CategoryCodes.PHOTO_CLASSIFIED, "🏷️" },
+
+            // AI 分析圖示
+            { CategoryCodes.AI_ANALYSIS_COMPLETED, "✨" },
+            { CategoryCodes.AI_ANALYSIS_FAILED, "⚠️" },
+            { CategoryCodes.AI_TAGS_SUGGESTED, "🤖" },
             
             // Shopping
             { CategoryCodes.ORDER_CREATED, "🛒" },
