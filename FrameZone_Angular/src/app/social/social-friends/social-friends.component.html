@@ -5,16 +5,23 @@
       <span class="input-group-text search-icon-box border-end-0">
         <i class="bi bi-search"></i>
       </span>
-      <input type="text" class="form-control border-start-0 ps-2" placeholder="搜尋...">
+      <input type="text" class="form-control border-start-0 ps-2" placeholder="搜尋..."
+        [(ngModel)]="searchTerm">
     </div>
 
     <div class="friend-list-content">
-      <h3 class="friend-list-title">最近聊天</h3>
-      @if (recentChats.length === 0) {
+      <button class="friend-btn rounded" type="button" (click)="toggleSection('recent')">
+        <span class="friend-name">最近聊天</span>
+        <span class="section-arrow">
+          <i class="bi" [ngClass]="openSection.recent ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+        </span>
+      </button>
+      @if (openSection.recent) {
+      @if (getFilteredRecentChats().length === 0) {
       <div class="text-muted text-center py-3">目前沒有最近聊天</div>
       }
       @else {
-      @for (c of recentChats; track c.roomId) {
+      @for (c of getFilteredRecentChats(); track c.roomId) {
       <button class="friend-btn rounded" type="button"
         (click)="selectFriend({ id: c.targetUserId, name: c.targetUserName, avatar: c.targetUserAvatar }); $event.stopPropagation()">
         <img [src]="getRecentAvatar(c)" class="friend-avatar" [alt]="c.targetUserName" />
@@ -25,36 +32,51 @@
       </button>
       }
       }
+      }
 
       <hr class="my-3">
 
-      <h3 class="friend-list-title">追蹤中</h3>
-      @if (following.length === 0) {
+      <button class="friend-btn rounded" type="button" (click)="toggleSection('following')">
+        <span class="friend-name">追蹤中 ({{ following.length }})</span>
+        <span class="section-arrow">
+          <i class="bi" [ngClass]="openSection.following ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+        </span>
+      </button>
+      @if (openSection.following) {
+      @if (getFilteredFollowing().length === 0) {
       <div class="text-muted text-center py-3">目前沒有追蹤中</div>
       }
       @else {
-      @for (f of following; track f.userId) {
+      @for (f of getFilteredFollowing(); track f.userId) {
       <button class="friend-btn rounded" type="button"
         (click)="selectFriend({ id: f.userId, name: f.displayName, avatar: f.avatar }); $event.stopPropagation()">
         <img [src]="getFollowAvatar(f)" class="friend-avatar" [alt]="f.displayName" />
         <span class="friend-name">{{ f.displayName }}</span>
       </button>
+      }
       }
       }
 
       <hr class="my-3">
 
-      <h3 class="friend-list-title">粉絲</h3>
-      @if (followers.length === 0) {
+      <button class="friend-btn rounded" type="button" (click)="toggleSection('followers')">
+        <span class="friend-name">粉絲 ({{ followers.length }})</span>
+        <span class="section-arrow">
+          <i class="bi" [ngClass]="openSection.followers ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+        </span>
+      </button>
+      @if (openSection.followers) {
+      @if (getFilteredFollowers().length === 0) {
       <div class="text-muted text-center py-3">目前沒有粉絲</div>
       }
       @else {
-      @for (f of followers; track f.userId) {
+      @for (f of getFilteredFollowers(); track f.userId) {
       <button class="friend-btn rounded" type="button"
         (click)="selectFriend({ id: f.userId, name: f.displayName, avatar: f.avatar }); $event.stopPropagation()">
         <img [src]="getFollowAvatar(f)" class="friend-avatar" [alt]="f.displayName" />
         <span class="friend-name">{{ f.displayName }}</span>
       </button>
+      }
       }
       }
     </div>

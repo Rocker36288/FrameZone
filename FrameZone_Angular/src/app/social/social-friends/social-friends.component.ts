@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, EventEmitter, Output, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../core/services/auth.service';
 import { FollowUser } from '../models/follow.models';
@@ -13,7 +14,7 @@ interface Friend {
 }
 @Component({
   selector: 'app-social-friends',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './social-friends.component.html',
   styleUrl: './social-friends.component.css'
 })
@@ -29,6 +30,12 @@ export class SocialFriendsComponent {
   following: FollowUser[] = [];
   followers: FollowUser[] = [];
   recentChats: RecentChat[] = [];
+  openSection: { recent: boolean; following: boolean; followers: boolean } = {
+    recent: true,
+    following: false,
+    followers: false
+  };
+  searchTerm = '';
 
   ngOnInit(): void {
     this.authService.currentUser$
@@ -81,5 +88,33 @@ export class SocialFriendsComponent {
     if (chat.targetUserAvatar) return chat.targetUserAvatar;
     const initial = (chat.targetUserName || 'U').charAt(0).toUpperCase();
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+  }
+
+  toggleSection(section: 'recent' | 'following' | 'followers') {
+    this.openSection[section] = !this.openSection[section];
+  }
+
+  getFilteredRecentChats(): RecentChat[] {
+    const keyword = this.searchTerm.trim().toLowerCase();
+    if (!keyword) return this.recentChats;
+    return this.recentChats.filter(chat =>
+      (chat.targetUserName || '').toLowerCase().includes(keyword)
+    );
+  }
+
+  getFilteredFollowing(): FollowUser[] {
+    const keyword = this.searchTerm.trim().toLowerCase();
+    if (!keyword) return this.following;
+    return this.following.filter(user =>
+      (user.displayName || '').toLowerCase().includes(keyword)
+    );
+  }
+
+  getFilteredFollowers(): FollowUser[] {
+    const keyword = this.searchTerm.trim().toLowerCase();
+    if (!keyword) return this.followers;
+    return this.followers.filter(user =>
+      (user.displayName || '').toLowerCase().includes(keyword)
+    );
   }
 }

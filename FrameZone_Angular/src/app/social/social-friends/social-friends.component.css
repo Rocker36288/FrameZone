@@ -97,6 +97,13 @@
   font-weight: 500;
 }
 
+/* 摺疊箭頭 */
+.section-arrow {
+  margin-left: auto;
+  color: #666;
+  font-size: 0.9rem;
+}
+
 /* 線上狀態燈 - 使用你色票中的主色 */
 .status-dot {
   width: 8px;
