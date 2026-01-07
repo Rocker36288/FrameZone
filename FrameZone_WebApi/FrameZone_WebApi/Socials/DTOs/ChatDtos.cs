@@ -33,4 +33,10 @@
         public DateTime LastMessageCreatedAt { get; set; }
     }
 
+    public class UnreadCountDto
+    {
+        public long TargetUserId { get; set; }
+        public int UnreadCount { get; set; }
+    }
+
 }

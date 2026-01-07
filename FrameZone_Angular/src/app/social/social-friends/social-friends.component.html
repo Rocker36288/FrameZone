@@ -29,6 +29,9 @@
           <span class="friend-name">{{ c.targetUserName }}</span>
           <span class="text-muted small">{{ c.lastMessage || '...' }}</span>
         </div>
+        @if (getUnreadCount(c.targetUserId) > 0) {
+        <span class="unread-badge">{{ getUnreadCount(c.targetUserId) }}</span>
+        }
       </button>
       }
       }
@@ -52,6 +55,9 @@
         (click)="selectFriend({ id: f.userId, name: f.displayName, avatar: f.avatar }); $event.stopPropagation()">
         <img [src]="getFollowAvatar(f)" class="friend-avatar" [alt]="f.displayName" />
         <span class="friend-name">{{ f.displayName }}</span>
+        @if (getUnreadCount(f.userId) > 0) {
+        <span class="unread-badge">{{ getUnreadCount(f.userId) }}</span>
+        }
       </button>
       }
       }
@@ -75,6 +81,9 @@
         (click)="selectFriend({ id: f.userId, name: f.displayName, avatar: f.avatar }); $event.stopPropagation()">
         <img [src]="getFollowAvatar(f)" class="friend-avatar" [alt]="f.displayName" />
         <span class="friend-name">{{ f.displayName }}</span>
+        @if (getUnreadCount(f.userId) > 0) {
+        <span class="unread-badge">{{ getUnreadCount(f.userId) }}</span>
+        }
       </button>
       }
       }

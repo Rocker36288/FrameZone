@@ -10,6 +10,7 @@ import { ChatRoomDto } from '../models/ChatRoomDto';
 import { MessageDto, SendShopMessageDto } from '../models/MessageDto';
 import { AuthService } from '../../core/services/auth.service';
 import { RecentChat } from '../models/recent-chat.models';
+import { UnreadCount } from '../models/unread-count.models';
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
@@ -40,8 +41,16 @@ export class ChatService {
     return this.http.get<RecentChat[]>(`${this.apiUrl}/recent/social`);
   }
 
+  getUnreadCounts(): Observable<UnreadCount[]> {
+    return this.http.get<UnreadCount[]>(`${this.apiUrl}/unread/social`);
+  }
+
   getMessages(roomId: number): Observable<MessageDto[]> {
     return this.http.get<MessageDto[]>(`${this.apiUrl}/${roomId}/messages`);
+  }
+
+  markRoomRead(roomId: number): Observable<{ readCount: number }> {
+    return this.http.post<{ readCount: number }>(`${this.apiUrl}/${roomId}/read`, {});
   }
 
   sendMessage(roomId: number, messageContent: string): Observable<MessageDto> {

@@ -154,6 +154,39 @@ namespace FrameZone_WebApi.Socials.Repositories
                 .ToList();
         }
 
+        public List<UnreadCountDto> GetUnreadCountsByTargetUser(long userId)
+        {
+            var rooms = _context.ChatMembers
+                .Where(cm =>
+                    cm.UserId == userId &&
+                    cm.LeaveAt == null &&
+                    cm.Room.RoomType == "Private" &&
+                    cm.Room.RoomCategory == RoomCategoryConst.Social)
+                .Select(cm => cm.RoomId)
+                .Distinct()
+                .ToList();
+
+            var relations = _context.ChatMembers
+                .Where(cm => rooms.Contains(cm.RoomId) && cm.UserId != userId && cm.LeaveAt == null)
+                .Select(cm => new { cm.RoomId, cm.UserId });
+
+            var unread = from rel in relations
+                         join m in _context.Messages on rel.RoomId equals m.RoomId
+                         where m.DeletedAt == null && m.SenderUserId != userId
+                         join mr in _context.MessageReads
+                            on new { m.MessageId, UserId = userId } equals new { mr.MessageId, mr.UserId } into mrj
+                         from mr in mrj.DefaultIfEmpty()
+                         where mr == null
+                         group m by rel.UserId into g
+                         select new UnreadCountDto
+                         {
+                             TargetUserId = g.Key,
+                             UnreadCount = g.Count()
+                         };
+
+            return unread.ToList();
+        }
+
         /// <summary>
         /// 檢查使用者是否在指定聊天室中（未離開）
         /// </summary>

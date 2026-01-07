@@ -4,6 +4,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { ChatService } from '../services/chat.service';
 import { ChatRoomDto } from '../models/ChatRoomDto';
 import { MessageDto } from '../models/MessageDto';
+import { SocialChatStateService } from '../services/social-chat-state.service';
 
 interface ViewMessage {
   id?: number;
@@ -31,6 +32,7 @@ export class SocialChatComponent implements OnDestroy {
 
   private chatService = inject(ChatService);
   private authService = inject(AuthService);
+  private chatState = inject(SocialChatStateService);
 
   isOpen = false;
   room: ChatRoomDto | null = null;
@@ -98,6 +100,7 @@ export class SocialChatComponent implements OnDestroy {
       next: messages => {
         this.messages = messages.map(message => this.toViewMessage(message));
         this.scrollToBottom();
+        this.markRoomRead(roomId);
       },
       error: () => { }
     });
@@ -121,6 +124,9 @@ export class SocialChatComponent implements OnDestroy {
         if (!message) return;
         this.messages = [...this.messages, this.toViewMessage(message)];
         this.scrollToBottom();
+        if (this.room) {
+          this.markRoomRead(this.room.roomId);
+        }
       })
     );
   }
@@ -178,6 +184,13 @@ export class SocialChatComponent implements OnDestroy {
       requestAnimationFrame(() => {
         el.scrollTop = el.scrollHeight;
       });
+    });
+  }
+
+  private markRoomRead(roomId: number) {
+    this.chatService.markRoomRead(roomId).subscribe({
+      next: () => this.chatState.requestUnreadRefresh(),
+      error: () => { }
     });
   }
 

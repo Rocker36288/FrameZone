@@ -5,8 +5,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../core/services/auth.service';
 import { FollowUser } from '../models/follow.models';
 import { RecentChat } from '../models/recent-chat.models';
+import { UnreadCount } from '../models/unread-count.models';
 import { ChatService } from '../services/chat.service';
 import { FollowService } from '../services/follow.service';
+import { SocialChatStateService } from '../services/social-chat-state.service';
 interface Friend {
   id: number;
   name: string;
@@ -25,11 +27,13 @@ export class SocialFriendsComponent {
   private authService = inject(AuthService);
   private followService = inject(FollowService);
   private chatService = inject(ChatService);
+  private chatState = inject(SocialChatStateService);
   private destroyRef = inject(DestroyRef);
 
   following: FollowUser[] = [];
   followers: FollowUser[] = [];
   recentChats: RecentChat[] = [];
+  unreadMap = new Map<number, number>();
   openSection: { recent: boolean; following: boolean; followers: boolean } = {
     recent: true,
     following: false,
@@ -45,6 +49,7 @@ export class SocialFriendsComponent {
           this.following = [];
           this.followers = [];
           this.recentChats = [];
+          this.unreadMap.clear();
           return;
         }
         this.followService.getFollowing(user.userId).subscribe({
@@ -71,6 +76,13 @@ export class SocialFriendsComponent {
             this.recentChats = [];
           }
         });
+        this.refreshUnreadCounts();
+      });
+
+    this.chatState.unreadRefresh$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.refreshUnreadCounts();
       });
   }
 
@@ -88,6 +100,21 @@ export class SocialFriendsComponent {
     if (chat.targetUserAvatar) return chat.targetUserAvatar;
     const initial = (chat.targetUserName || 'U').charAt(0).toUpperCase();
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+  }
+
+  getUnreadCount(userId: number): number {
+    return this.unreadMap.get(userId) ?? 0;
+  }
+
+  private refreshUnreadCounts() {
+    this.chatService.getUnreadCounts().subscribe({
+      next: (items: UnreadCount[]) => {
+        this.unreadMap = new Map(items.map(item => [item.targetUserId, item.unreadCount]));
+      },
+      error: () => {
+        this.unreadMap.clear();
+      }
+    });
   }
 
   toggleSection(section: 'recent' | 'following' | 'followers') {

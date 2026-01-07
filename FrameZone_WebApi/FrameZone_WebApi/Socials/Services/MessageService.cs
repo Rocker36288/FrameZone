@@ -80,6 +80,21 @@ namespace FrameZone_WebApi.Socials.Services
             return ToDto(saved, currentUserId ?? senderUserId);
         }
 
+        public int MarkRoomRead(long userId, int roomId)
+        {
+            var unreadIds = _messageRepo.GetUnreadMessageIds(roomId, userId);
+            if (unreadIds.Count == 0) return 0;
+
+            var reads = unreadIds.Select(id => new MessageRead
+            {
+                MessageId = id,
+                UserId = userId,
+                ReadAt = DateTime.UtcNow
+            }).ToList();
+
+            return _messageRepo.AddMessageReads(reads);
+        }
+
         private static MessageDto ToDto(Message m, long? currentUserId)
         {
             return new MessageDto

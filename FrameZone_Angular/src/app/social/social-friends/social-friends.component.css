@@ -104,6 +104,18 @@
   font-size: 0.9rem;
 }
 
+/* 未讀數量 */
+.unread-badge {
+  margin-left: auto;
+  background: #ff4d4f;
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 999px;
+  min-width: 20px;
+  text-align: center;
+}
+
 /* 線上狀態燈 - 使用你色票中的主色 */
 .status-dot {
   width: 8px;

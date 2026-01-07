@@ -80,11 +80,33 @@ namespace FrameZone_WebApi.Socials.Controllers
             return _roomService.GetRecentSocialChats(userId);
         }
 
+        [Authorize]
+        [HttpGet("unread/social")]
+        public ActionResult<List<UnreadCountDto>> GetUnreadCounts()
+        {
+            if (!TryGetUserId(out var userId))
+                return Unauthorized();
+            return _roomService.GetUnreadCounts(userId);
+        }
+
         [HttpGet("{roomId}/messages")]
         public ActionResult<List<MessageDto>> GetMessages(int roomId)
         {
             long? currentUserId = TryGetUserId(out var userId) ? userId : (long?)null;
             return _messageService.GetMessages(roomId, currentUserId);
+        }
+
+        [Authorize]
+        [HttpPost("{roomId}/read")]
+        public IActionResult MarkRoomRead(int roomId)
+        {
+            if (!TryGetUserId(out var userId))
+                return Unauthorized();
+            if (!_roomService.IsUserInRoom(roomId, userId))
+                return Forbid();
+
+            var affected = _messageService.MarkRoomRead(userId, roomId);
+            return Ok(new { readCount = affected });
         }
 
         [Authorize]
