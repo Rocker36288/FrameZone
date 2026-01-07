@@ -184,6 +184,12 @@ namespace FrameZone_WebApi.Socials.Services
             return await _postRepository.RemovePostLikeAsync(existing);
         }
 
+        public async Task<List<PostReadDto>> GetLikedPostsAsync(long userId, int limit)
+        {
+            var posts = await _postRepository.GetLikedPostsAsync(userId, limit);
+            return posts.Select(p => MapToReadDto(p, userId)).ToList();
+        }
+
         public async Task<bool> RecordPostViewAsync(long userId, int postId)
         {
             var post = await _postRepository.GetPostByIdAsync(postId);

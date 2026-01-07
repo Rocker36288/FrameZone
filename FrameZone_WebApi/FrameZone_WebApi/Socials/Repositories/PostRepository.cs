@@ -232,6 +232,42 @@ namespace FrameZone_WebApi.Socials.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
+        public async Task<List<Post>> GetLikedPostsAsync(long userId, int limit)
+        {
+            var liked = await _context.PostLikes
+                .Where(l => l.UserId == userId)
+                .OrderByDescending(l => l.CreatedAt)
+                .Take(limit)
+                .Select(l => new { l.PostId, l.CreatedAt })
+                .ToListAsync();
+
+            if (liked.Count == 0)
+            {
+                return new List<Post>();
+            }
+
+            var postIds = liked.Select(x => x.PostId).ToList();
+            var posts = await _context.Posts
+                .Include(p => p.User)
+                    .ThenInclude(u => u.UserProfile)
+                .Include(p => p.PostLikes)
+                .Include(p => p.CommentTargets)
+                    .ThenInclude(ct => ct.Comments)
+                .Where(p =>
+                    postIds.Contains(p.PostId) &&
+                    p.Status != "Deleted" &&
+                    p.DeletedAt == null)
+                .ToListAsync();
+
+            var orderMap = liked
+                .Select((item, index) => new { item.PostId, index })
+                .ToDictionary(x => x.PostId, x => x.index);
+
+            return posts
+                .OrderBy(p => orderMap.ContainsKey(p.PostId) ? orderMap[p.PostId] : int.MaxValue)
+                .ToList();
+        }
+
         public async Task<PostView?> GetPostViewAsync(long userId, int postId)
         {
             return await _context.PostViews

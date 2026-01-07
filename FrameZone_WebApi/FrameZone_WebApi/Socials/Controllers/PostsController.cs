@@ -104,6 +104,17 @@ namespace FrameZone_WebApi.Socials.Controllers
             return Ok(posts);
         }
 
+        // GET: api/posts/liked?limit=20
+        [Authorize]
+        [HttpGet("liked")]
+        public async Task<IActionResult> GetLikedPosts([FromQuery] int limit = 20)
+        {
+            long userId = GetUserId();
+            limit = Math.Clamp(limit, 1, 50);
+            var posts = await _postService.GetLikedPostsAsync(userId, limit);
+            return Ok(posts);
+        }
+
         // POST: api/posts
         [Authorize]
         [HttpPost]

@@ -80,4 +80,11 @@ export class PostService {
       params: { limit }
     });
   }
+
+  /** 取得已按讚貼文 */
+  getLikedPosts(limit: number = 20): Observable<PostDto[]> {
+    return this.http.get<PostDto[]>(`${this.apiUrl}/liked`, {
+      params: { limit }
+    });
+  }
 }
