@@ -24,24 +24,30 @@
     </div>
     }
     <!-- 頭貼 + UserId + 時間 -->
-    <a class="d-flex align-items-center mb-2 text-decoration-none text-reset"
-      [routerLink]="['/social/profile', post.userId]">
-      <div class="avatar-wrapper me-2">
-        <img [src]="getPostUserAvatar()" [alt]="post.userName" />
-      </div>
+    <div class="d-flex align-items-center mb-2">
 
-      <div>
+      <!-- 頭像可點 -->
+      <a class="avatar-wrapper me-2 d-inline-flex text-decoration-none" [routerLink]="['/social/profile', post.userId]">
+        <img [src]="getPostUserAvatar()" [alt]="post.userName" />
+      </a>
+
+      <!-- 文字可點 -->
+      <a class="text-decoration-none text-reset" [routerLink]="['/social/profile', post.userId]">
         <div class="d-flex align-items-center gap-2 flex-wrap">
-          <strong>{{post.userName}}</strong>
+          <strong>{{ post.userName }}</strong>
+
           @if (post.isSharedPost) {
           <span class="badge bg-light text-secondary border">已分享</span>
           }
         </div>
+
         <span class="text-muted" style="font-size: 0.85rem;">
-          更新時間:{{post.updatedAt | date:'yyyy-MM-dd HH:mm'}}
+          更新時間: {{ post.updatedAt | date:'yyyy-MM-dd HH:mm' }}
         </span>
-      </div>
-    </a>
+      </a>
+
+    </div>
+
     <!-- 顯示貼文文字內容 -->
     @if(!isEditing){
     <div class="post-content">
@@ -58,32 +64,46 @@
     @if (post.postType === 'share') {
     <div class="shared-post border rounded p-2 mt-2 bg-light-subtle">
       @if (post.sharedPost) {
-      <a class="d-flex align-items-center mb-2 text-decoration-none text-reset"
-        [routerLink]="['/social/profile', post.sharedPost.userId]">
-        <div class="avatar-wrapper me-2">
+
+      <!-- ✅ 外層改成 div，不要整塊都是 link -->
+      <div class="d-flex align-items-center mb-2">
+
+        <!-- 頭像可點 -->
+        <a class="avatar-wrapper me-2 d-inline-flex text-decoration-none"
+          [routerLink]="['/social/profile', post.sharedPost.userId]">
           <img [src]="getSharedUserAvatar(post.sharedPost)" [alt]="post.sharedPost.userName" />
-        </div>
-        <div>
-          <strong>{{post.sharedPost.userName}}</strong><br />
-          <span class="text-muted" style="font-size: 0.85rem;">
-            更新時間:{{post.sharedPost.updatedAt | date:'yyyy-MM-dd HH:mm'}}
-          </span>
-        </div>
-      </a>
+        </a>
+
+        <!-- 文字可點 -->
+        <a class="text-decoration-none text-reset" [routerLink]="['/social/profile', post.sharedPost.userId]">
+          <div>
+            <strong>{{ post.sharedPost.userName }}</strong><br />
+            <span class="text-muted" style="font-size: 0.85rem;">
+              更新時間: {{ post.sharedPost.updatedAt | date:'yyyy-MM-dd HH:mm' }}
+            </span>
+          </div>
+        </a>
+
+      </div>
+
       <div class="post-content">
-        @if(post.sharedPost.postContent.length <= 10){ <span>{{ post.sharedPost.postContent }}</span>
+        @if (post.sharedPost.postContent.length <= 10) { <span>{{ post.sharedPost.postContent }}</span>
           } @else {
-          <span>{{ isFullContent ? post.sharedPost.postContent : (post.sharedPost.postContent | slice:0:10) + '...' }}</span>
+          <span>
+            {{ isFullContent ? post.sharedPost.postContent : (post.sharedPost.postContent | slice:0:10) + '...' }}
+          </span>
           <button class="btn btn-link btn-sm p-0 ms-1" (click)="toggleContent()">
             {{ isFullContent ? '' : '顯示全部' }}
           </button>
           }
       </div>
+
       } @else {
       <p class="text-muted mb-0">原貼文已刪除</p>
       }
     </div>
     }
+
 
     <br>
     <hr class="my-2">
