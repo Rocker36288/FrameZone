@@ -188,6 +188,9 @@ namespace FrameZone_WebApi.Socials.Services
         {
             var likeCount = post.PostLikes?.Count ?? 0;
             var isLiked = currentUserId.HasValue && post.PostLikes.Any(l => l.UserId == currentUserId.Value);
+            var commentCount = post.CommentTargets?
+                .SelectMany(ct => ct.Comments)
+                .Count(c => c.DeletedAt == null) ?? 0;
             return new PostReadDto
             {
                 PostId = post.PostId,
@@ -201,7 +204,8 @@ namespace FrameZone_WebApi.Socials.Services
                 UpdatedAt = post.UpdatedAt,
                 IsOwner = currentUserId.HasValue && post.UserId == currentUserId.Value,
                 LikeCount = likeCount,
-                IsLiked = isLiked
+                IsLiked = isLiked,
+                CommentCount = commentCount
             };
         }
     }

@@ -8,6 +8,7 @@ export interface PostDto {
   isOwner?: boolean //就是本人
   likeCount?: number;
   isLiked?: boolean;
+  commentCount?: number;
 }
 
 

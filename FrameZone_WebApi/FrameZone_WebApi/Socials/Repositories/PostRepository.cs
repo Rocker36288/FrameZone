@@ -20,6 +20,8 @@ namespace FrameZone_WebApi.Socials.Repositories
                     .Include(p => p.User)
                         .ThenInclude(u => u.UserProfile)
                     .Include(p => p.PostLikes)
+                    .Include(p => p.CommentTargets)
+                        .ThenInclude(ct => ct.Comments)
                     //依照貼文Id查詢 & 不顯示已刪除的貼文
                     .Where(p =>
                         p.Status != "Deleted" &&
@@ -44,6 +46,8 @@ namespace FrameZone_WebApi.Socials.Repositories
                     .Include(p => p.User)
                         .ThenInclude(u => u.UserProfile)
                     .Include(p => p.PostLikes)
+                    .Include(p => p.CommentTargets)
+                        .ThenInclude(ct => ct.Comments)
                     .Where(p =>
                         p.UserId == userId &&
                         p.Status != "Deleted" &&
@@ -67,6 +71,8 @@ namespace FrameZone_WebApi.Socials.Repositories
                     .Include(p => p.User)
                         .ThenInclude(u => u.UserProfile)
                     .Include(p => p.PostLikes)
+                    .Include(p => p.CommentTargets)
+                        .ThenInclude(ct => ct.Comments)
                     //依照貼文Id查詢 & 不顯示已刪除的貼文
                     .Where(p =>
                         p.PostId == postId &&

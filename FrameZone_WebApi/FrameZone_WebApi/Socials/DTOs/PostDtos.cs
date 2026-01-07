@@ -36,6 +36,7 @@ namespace FrameZone_WebApi.Socials.DTOs
         public bool IsOwner { get; set; }   //就是本人
         public int LikeCount { get; set; }
         public bool IsLiked { get; set; }
+        public int CommentCount { get; set; }
     }
 
     public class UserProfileSummaryDto
