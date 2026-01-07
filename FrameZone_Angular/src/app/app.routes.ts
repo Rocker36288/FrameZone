@@ -474,6 +474,13 @@ export const routes: Routes = [
                 (m) => m.SocialPostsListComponent
               ),
           },
+          {
+            path: 'commented',
+            loadComponent: () =>
+              import('./social/social-posts-list/social-posts-list.component').then(
+                (m) => m.SocialPostsListComponent
+              ),
+          },
         ],
       },
     ],

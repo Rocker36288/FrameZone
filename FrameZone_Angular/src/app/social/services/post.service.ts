@@ -87,4 +87,11 @@ export class PostService {
       params: { limit }
     });
   }
+
+  /** 取得留言過的貼文 */
+  getCommentedPosts(limit: number = 20): Observable<PostDto[]> {
+    return this.http.get<PostDto[]>(`${this.apiUrl}/commented`, {
+      params: { limit }
+    });
+  }
 }

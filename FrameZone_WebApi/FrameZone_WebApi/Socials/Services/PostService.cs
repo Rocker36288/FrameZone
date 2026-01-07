@@ -190,6 +190,12 @@ namespace FrameZone_WebApi.Socials.Services
             return posts.Select(p => MapToReadDto(p, userId)).ToList();
         }
 
+        public async Task<List<PostReadDto>> GetCommentedPostsAsync(long userId, int limit)
+        {
+            var posts = await _postRepository.GetCommentedPostsAsync(userId, limit);
+            return posts.Select(p => MapToReadDto(p, userId)).ToList();
+        }
+
         public async Task<bool> RecordPostViewAsync(long userId, int postId)
         {
             var post = await _postRepository.GetPostByIdAsync(postId);

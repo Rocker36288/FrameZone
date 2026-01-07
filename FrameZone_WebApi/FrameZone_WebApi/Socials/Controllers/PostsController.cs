@@ -115,6 +115,17 @@ namespace FrameZone_WebApi.Socials.Controllers
             return Ok(posts);
         }
 
+        // GET: api/posts/commented?limit=20
+        [Authorize]
+        [HttpGet("commented")]
+        public async Task<IActionResult> GetCommentedPosts([FromQuery] int limit = 20)
+        {
+            long userId = GetUserId();
+            limit = Math.Clamp(limit, 1, 50);
+            var posts = await _postService.GetCommentedPostsAsync(userId, limit);
+            return Ok(posts);
+        }
+
         // POST: api/posts
         [Authorize]
         [HttpPost]

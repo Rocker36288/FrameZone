@@ -268,6 +268,45 @@ namespace FrameZone_WebApi.Socials.Repositories
                 .ToList();
         }
 
+        public async Task<List<Post>> GetCommentedPostsAsync(long userId, int limit)
+        {
+            var commented = await _context.Comments
+                .Where(c => c.UserId == userId && c.DeletedAt == null)
+                .Select(c => new { c.CommentTarget.PostId, c.CreatedAt })
+                .Where(x => x.PostId.HasValue)
+                .GroupBy(x => x.PostId.Value)
+                .Select(g => new { PostId = g.Key, LastCommentedAt = g.Max(x => x.CreatedAt) })
+                .OrderByDescending(x => x.LastCommentedAt)
+                .Take(limit)
+                .ToListAsync();
+
+            if (commented.Count == 0)
+            {
+                return new List<Post>();
+            }
+
+            var postIds = commented.Select(x => x.PostId).ToList();
+            var posts = await _context.Posts
+                .Include(p => p.User)
+                    .ThenInclude(u => u.UserProfile)
+                .Include(p => p.PostLikes)
+                .Include(p => p.CommentTargets)
+                    .ThenInclude(ct => ct.Comments)
+                .Where(p =>
+                    postIds.Contains(p.PostId) &&
+                    p.Status != "Deleted" &&
+                    p.DeletedAt == null)
+                .ToListAsync();
+
+            var orderMap = commented
+                .Select((item, index) => new { item.PostId, index })
+                .ToDictionary(x => x.PostId, x => x.index);
+
+            return posts
+                .OrderBy(p => orderMap.ContainsKey(p.PostId) ? orderMap[p.PostId] : int.MaxValue)
+                .ToList();
+        }
+
         public async Task<PostView?> GetPostViewAsync(long userId, int postId)
         {
             return await _context.PostViews
