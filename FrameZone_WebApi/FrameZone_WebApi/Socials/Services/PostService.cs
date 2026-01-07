@@ -142,8 +142,52 @@ namespace FrameZone_WebApi.Socials.Services
             }
         }
 
+        public async Task<bool> AddLikeAsync(long userId, int postId)
+        {
+            var post = await _postRepository.GetPostByIdAsync(postId);
+            if (post == null)
+            {
+                throw new KeyNotFoundException("貼文不存在");
+            }
+
+            var existing = await _postRepository.GetPostLikeAsync(userId, postId);
+            if (existing != null)
+            {
+                return false;
+            }
+
+            var like = new PostLike
+            {
+                UserId = userId,
+                PostId = postId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            var saved = await _postRepository.AddPostLikeAsync(like);
+            return saved != null;
+        }
+
+        public async Task<bool> RemoveLikeAsync(long userId, int postId)
+        {
+            var post = await _postRepository.GetPostByIdAsync(postId);
+            if (post == null)
+            {
+                throw new KeyNotFoundException("貼文不存在");
+            }
+
+            var existing = await _postRepository.GetPostLikeAsync(userId, postId);
+            if (existing == null)
+            {
+                return false;
+            }
+
+            return await _postRepository.RemovePostLikeAsync(existing);
+        }
+
         private static PostReadDto MapToReadDto(Post post, long? currentUserId)
         {
+            var likeCount = post.PostLikes?.Count ?? 0;
+            var isLiked = currentUserId.HasValue && post.PostLikes.Any(l => l.UserId == currentUserId.Value);
             return new PostReadDto
             {
                 PostId = post.PostId,
@@ -155,7 +199,9 @@ namespace FrameZone_WebApi.Socials.Services
                 PostTypeId = post.PostTypeId,
                 CreatedAt = post.CreatedAt,
                 UpdatedAt = post.UpdatedAt,
-                IsOwner = currentUserId.HasValue && post.UserId == currentUserId.Value
+                IsOwner = currentUserId.HasValue && post.UserId == currentUserId.Value,
+                LikeCount = likeCount,
+                IsLiked = isLiked
             };
         }
     }

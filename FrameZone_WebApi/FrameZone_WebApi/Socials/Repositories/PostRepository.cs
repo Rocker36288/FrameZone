@@ -19,6 +19,7 @@ namespace FrameZone_WebApi.Socials.Repositories
                 return await _context.Posts
                     .Include(p => p.User)
                         .ThenInclude(u => u.UserProfile)
+                    .Include(p => p.PostLikes)
                     //依照貼文Id查詢 & 不顯示已刪除的貼文
                     .Where(p =>
                         p.Status != "Deleted" &&
@@ -42,6 +43,7 @@ namespace FrameZone_WebApi.Socials.Repositories
                 return await _context.Posts
                     .Include(p => p.User)
                         .ThenInclude(u => u.UserProfile)
+                    .Include(p => p.PostLikes)
                     .Where(p =>
                         p.UserId == userId &&
                         p.Status != "Deleted" &&
@@ -64,6 +66,7 @@ namespace FrameZone_WebApi.Socials.Repositories
                 return await _context.Posts
                     .Include(p => p.User)
                         .ThenInclude(u => u.UserProfile)
+                    .Include(p => p.PostLikes)
                     //依照貼文Id查詢 & 不顯示已刪除的貼文
                     .Where(p =>
                         p.PostId == postId &&
@@ -202,6 +205,25 @@ namespace FrameZone_WebApi.Socials.Repositories
                 Console.WriteLine($"刪除貼文失敗: {ex.Message}");
                 return false;
             }
+        }
+
+        public async Task<PostLike?> GetPostLikeAsync(long userId, int postId)
+        {
+            return await _context.PostLikes
+                .FirstOrDefaultAsync(l => l.UserId == userId && l.PostId == postId);
+        }
+
+        public async Task<PostLike?> AddPostLikeAsync(PostLike like)
+        {
+            await _context.PostLikes.AddAsync(like);
+            var result = await _context.SaveChangesAsync();
+            return result > 0 ? like : null;
+        }
+
+        public async Task<bool> RemovePostLikeAsync(PostLike like)
+        {
+            _context.PostLikes.Remove(like);
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

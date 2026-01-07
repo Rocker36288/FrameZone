@@ -58,4 +58,14 @@ export class PostService {
   deletePost(postId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${postId}`)
   }
+
+  /**按讚貼文 */
+  likePost(postId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${postId}/like`, {});
+  }
+
+  /**取消按讚 */
+  unlikePost(postId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${postId}/like`);
+  }
 }

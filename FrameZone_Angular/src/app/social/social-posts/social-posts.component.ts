@@ -28,8 +28,6 @@ export class SocialPostsComponent {
   editContent = "";
   isMenuOpen = false;
   isFullContent = false;
-  isLiked = false;
-  likeCount = 4;
 
   // --- 留言狀態 ---
   isCommentShowed = false;
@@ -71,8 +69,22 @@ export class SocialPostsComponent {
   // --- 貼文邏輯 ---
   toggleContent() { this.isFullContent = !this.isFullContent; }
   toggleLikes() {
-    this.isLiked = !this.isLiked;
-    this.isLiked ? this.likeCount++ : this.likeCount--;
+    const wasLiked = !!this.post.isLiked;
+    const currentCount = this.post.likeCount ?? 0;
+    this.post.isLiked = !wasLiked;
+    this.post.likeCount = wasLiked ? Math.max(0, currentCount - 1) : currentCount + 1;
+
+    const request$ = wasLiked
+      ? this.postService.unlikePost(this.post.postId)
+      : this.postService.likePost(this.post.postId);
+
+    request$.subscribe({
+      next: () => { },
+      error: () => {
+        this.post.isLiked = wasLiked;
+        this.post.likeCount = currentCount;
+      }
+    });
   }
 
   // --- 留言邏輯 ---

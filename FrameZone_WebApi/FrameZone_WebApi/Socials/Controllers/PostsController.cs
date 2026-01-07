@@ -151,6 +151,48 @@ namespace FrameZone_WebApi.Socials.Controllers
             }
         }
 
+        // POST: api/posts/1/like
+        [Authorize]
+        [HttpPost("{postId}/like")]
+        public async Task<IActionResult> LikePost(int postId)
+        {
+            try
+            {
+                long userId = GetUserId();
+                var created = await _postService.AddLikeAsync(userId, postId);
+                if (!created)
+                {
+                    return BadRequest(new { message = "已經按讚過" });
+                }
+                return Ok(new { message = "已按讚" });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+        // DELETE: api/posts/1/like
+        [Authorize]
+        [HttpDelete("{postId}/like")]
+        public async Task<IActionResult> UnlikePost(int postId)
+        {
+            try
+            {
+                long userId = GetUserId();
+                var removed = await _postService.RemoveLikeAsync(userId, postId);
+                if (!removed)
+                {
+                    return NotFound(new { message = "尚未按讚" });
+                }
+                return Ok(new { message = "已取消按讚" });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
         private long GetUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

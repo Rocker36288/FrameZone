@@ -56,9 +56,9 @@
     <div class="row text-center">
       <div class="col-4">
         <button class="btn btn-ghost-dark w-100 py-2 d-flex align-items-center justify-content-center"
-          (click)="toggleLikes()" [class.text-primary]="isLiked"> <i class="bi me-2"
-            [class.bi-hand-thumbs-up]="!isLiked" [class.bi-hand-thumbs-up-fill]="isLiked"></i>
-          {{likeCount}} 讚
+          (click)="toggleLikes()" [class.text-primary]="post.isLiked"> <i class="bi me-2"
+            [class.bi-hand-thumbs-up]="!post.isLiked" [class.bi-hand-thumbs-up-fill]="post.isLiked"></i>
+          {{ post.likeCount ?? 0 }} 讚
         </button>
       </div>
       <div class="col-4">
