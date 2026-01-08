@@ -14,6 +14,8 @@ export class OrderService {
   private http = inject(HttpClient);
   private apiUrl = backendPublicUrl + '/api/order';
 
+  //private apiUrl = 'https://localhost:7213/api/order';
+
   constructor() { }
 
   public createOrder(order: OrderDto): Observable<object> {
