@@ -74,16 +74,23 @@ export class AuthService {
    * @param rememberMe
    */
   private handleLoginSuccess(response: LoginResponseDto, rememberMe: boolean): void {
-    // 儲存 Token
+    // 1) token 一律寫入 localStorage（跨分頁）
     if (response.token) {
       localStorage.setItem('authToken', response.token);
+      // 可選：避免舊 session token 干擾
+      sessionStorage.removeItem('authToken');
     }
 
-    // 根據「記住我」決定儲存位置
-    const storage = rememberMe ? localStorage : sessionStorage;
-    storage.setItem('currentUser', JSON.stringify(response));
+    // 2) currentUser 一律寫入 localStorage（跨分頁）
+    localStorage.setItem('currentUser', JSON.stringify(response));
 
-    // 更新狀態
+    // 3) 若你仍想保留「不記住我」= 本分頁也存一份，可同步寫入 sessionStorage
+    if (!rememberMe) {
+      sessionStorage.setItem('currentUser', JSON.stringify(response));
+    } else {
+      sessionStorage.removeItem('currentUser');
+    }
+
     this.currentUserSubject.next(response);
   }
 
@@ -141,6 +148,7 @@ export class AuthService {
   private clearStorage() {
     localStorage.removeItem('authToken');
     localStorage.removeItem('currentUser');
+    sessionStorage.removeItem('authToken');
     sessionStorage.removeItem('currentUser');
   }
 
@@ -149,25 +157,17 @@ export class AuthService {
    */
   isAuthenticated(): boolean {
     const token = this.getToken();
-    const user = this.getCurrentUser();
-
-    const isAuth = !!(token && user);
-
-    console.log('isAuthenticated 檢查:', {
-      hasToken: !!token,
-      hasUser: !!user,
-      result: isAuth
-    });
-
-    return isAuth;
+    return !!token;
   }
 
   /**
    * 取得當前 Token
    */
   getToken() {
-    return localStorage.getItem('authToken');
+    return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
   }
+
+
 
   /**
    * 取得當前用戶資訊
