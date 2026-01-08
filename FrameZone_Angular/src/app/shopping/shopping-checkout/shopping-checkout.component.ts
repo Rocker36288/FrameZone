@@ -421,7 +421,7 @@ export class ShoppingCheckoutComponent {
 
     if (form) {
       // ✅ 關鍵：設定在新視窗開啟
-      form.target = '_blank';
+      form.target = '_self';
 
       // 將表單加入 DOM
       document.body.appendChild(form);

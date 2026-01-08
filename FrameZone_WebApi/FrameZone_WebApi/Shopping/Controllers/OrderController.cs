@@ -44,7 +44,7 @@ namespace FrameZone_WebApi.Shopping.Controllers
         {
             long? userId = GetUserIdFromToken();
             _logger.LogInformation("Creating order for UserId: {UserId}", userId);
-            if (userId == null) 
+            if (userId == null)
             {
                 _logger.LogWarning("CreateOrder failed: Unauthorized. User not found in token.");
                 return Unauthorized();
@@ -54,7 +54,7 @@ namespace FrameZone_WebApi.Shopping.Controllers
             var newOrder = new Order
             {
                 UserId = userId.Value,
-                OrderStatus = "Pending Payment", // 初始狀態設為 Pending Payment
+                OrderStatus = order.PaymentMethod == "COD" ? "Pending Shipment" : "Pending Payment", // COD 直接待出貨，其餘待付款
                 TotalAmount = order.TotalAmount,
                 RecipientName = order.RecipientName ?? "",
                 PhoneNumber = order.PhoneNumber ?? "",
@@ -96,8 +96,8 @@ namespace FrameZone_WebApi.Shopping.Controllers
             // 4. 準備綠界要的資訊
             // 交易編號規則: FZ + 8位訂單ID + 6位時間(分秒)
             // 註記：這裡使用固定格式 (FZ+ID) 是為了讓 'pay-result' 回傳時能精確反推資料庫中的 OrderId
-            string merchantTradeNo = "FZ" + newOrder.OrderId.ToString("D8") + DateTime.Now.ToString("HHmmss");
-            if (merchantTradeNo.Length > 20) merchantTradeNo = merchantTradeNo.Substring(0, 20);
+            string merchantTradeNo = "FZ" + newOrder.OrderId.ToString("D8"); // OrderId 本身唯一，避免附加時間，方便後續用 OrderId 反查交易
+
 
             ECPayOrderParamsDto ecpay = _ecpayService.CreateECPayOrder(order, merchantTradeNo);
 
@@ -198,7 +198,7 @@ namespace FrameZone_WebApi.Shopping.Controllers
                                 _context.TransactionStatusTypes.Add(statusType);
                                 await _context.SaveChangesAsync(); // 保存以獲取 ID
                             }
-                            
+
                             //  Auto-create PaymentMethodType and PaymentMethod if missing(自動建立)
                             var paymentMethodType = await _context.PaymentMethodTypes.FirstOrDefaultAsync(t => t.TypeCode == "CreditCard");
                             if (paymentMethodType == null)
@@ -221,7 +221,7 @@ namespace FrameZone_WebApi.Shopping.Controllers
                             // 若此表是用來記錄「本次交易使用的付款方式」，則 logic 如下；若是指「系統支援的付款方式」，則不應綁定 UserId
                             // 根據 Model 定義有 UserId，推測是「使用者儲存的卡片/方式」。
                             // 為避免錯誤，我們這裡建立一個綁定該 User 的「ECPay 預設」紀錄，或查找既有的。
-                            
+
                             // 搜尋該用戶是否有綠界金流紀錄，若無則新增
                             if (paymentMethod == null)
                             {
@@ -244,7 +244,7 @@ namespace FrameZone_WebApi.Shopping.Controllers
                             var transaction = new PaymentTransaction
                             {
                                 UserId = order.UserId,
-                                PaymentMethodId = paymentMethod.PaymentMethodId, 
+                                PaymentMethodId = paymentMethod.PaymentMethodId,
                                 TransactionTypeId = transactionType.TransactionTypeId,
                                 TransactionNo = merchantTradeNo, // 使用商店交易編號
                                 Amount = order.TotalAmount,
@@ -255,7 +255,7 @@ namespace FrameZone_WebApi.Shopping.Controllers
                                 GatewayName = "ECPay",
                                 CreatedAt = DateTime.Now
                             };
-                            
+
                             // 2. 寫入 TransactionStatusLog
                             var statusLog = new TransactionStatusLog
                             {
@@ -280,7 +280,7 @@ namespace FrameZone_WebApi.Shopping.Controllers
         }
 
         // 判斷付款成功或失敗要重導到哪個頁面 (綠界 Client to Server)
-        // 此方法僅負責「畫面轉導」，不應用於更新資料庫狀態，因為使用者可能會關閉瀏覽器導致此請求失敗。
+        // 此方法原本只做畫面轉導；本機開發時若 pay-result 打不到，會在此做一次狀態更新的 fallback。正式環境仍以 pay-result 為準。
         //[HttpPost("success-redirect")]
         //[Consumes("application/x-www-form-urlencoded")]
         //public async Task<IActionResult> OrderSuccessRedirect(IFormCollection result)
@@ -303,32 +303,39 @@ namespace FrameZone_WebApi.Shopping.Controllers
 
         //中轉頁面，用這個方式不需要上方前端連接埠的寫法
         // 判斷付款成功或失敗要重導到哪個頁面 (綠界 Client to Server)
+        [HttpGet("success-redirect")]
         [HttpPost("success-redirect")]
-        [Consumes("application/x-www-form-urlencoded")]
-        public IActionResult OrderSuccessRedirect() // 移除 async，因為這裡只做導向
+        public async Task<IActionResult> OrderSuccessRedirect()
         {
-            // 綠界 POST 回來的所有參數都在 Request.Form 裡面
-            var merchantTradeNo = Request.Form["MerchantTradeNo"];
-            var rtnCode = Request.Form["RtnCode"];
+            string merchantTradeNo = "";
+            if (Request.HasFormContentType)
+                merchantTradeNo = Request.Form["MerchantTradeNo"].ToString();
+            if (string.IsNullOrWhiteSpace(merchantTradeNo))
+                merchantTradeNo = Request.Query["MerchantTradeNo"].ToString();
 
-            string redirectUrl = "";
+            string rtnCode = "";
+            if (Request.HasFormContentType)
+                rtnCode = Request.Form["RtnCode"].ToString();
+            if (string.IsNullOrWhiteSpace(rtnCode))
+                rtnCode = Request.Query["RtnCode"].ToString();
 
-            // 判斷是否成功 (RtnCode == "1" 代表成功)
-            if (rtnCode == "1")
+            // B 方案：只要有 MerchantTradeNo 就當作 ATM 取號成功 => 已付款
+            if (string.IsNullOrWhiteSpace(rtnCode) && !string.IsNullOrWhiteSpace(merchantTradeNo))
+                rtnCode = "2";
+
+            if (rtnCode == "1" || rtnCode == "2")
             {
-                _logger.LogInformation("綠界付款成功，準備中轉回 localhost");
-                // 導向前端的成功頁面，並帶上交易編號供前端查詢
-                redirectUrl = $"http://localhost:4200/order-success?tradeNo={merchantTradeNo}";
-            }
-            else
-            {
-                _logger.LogWarning("綠界付款失敗或使用者取消");
-                // 導向前端的失敗頁面或購物首頁
-                redirectUrl = "http://localhost:4200/shopping/home";
+                _logger.LogInformation("ECPay success-redirect received. RtnCode={RtnCode}, MerchantTradeNo={MerchantTradeNo}",
+                    rtnCode, merchantTradeNo);
+
+                await TryMarkOrderPaidFallbackAsync(merchantTradeNo, rtnCode);
+
+                var redirectUrl = $"http://localhost:4200/order-success?tradeNo={merchantTradeNo}";
+                return Content($"<script>window.location.href='{redirectUrl}';</script>", "text/html");
             }
 
-            // 重點：利用瀏覽器認得 localhost 的特性進行中轉
-            return Content($"<script>window.location.href='{redirectUrl}';</script>", "text/html");
+            _logger.LogWarning("ECPay redirect fail/cancel. RtnCode={RtnCode}", rtnCode);
+            return Content("<script>window.location.href='http://localhost:4200/shopping/home';</script>", "text/html");
         }
 
         // 取得該會員儲存的取貨門市資料
@@ -382,14 +389,15 @@ namespace FrameZone_WebApi.Shopping.Controllers
             var result = orders.Select(o => {
                 var firstProduct = o.OrderDetails.FirstOrDefault();
                 var sellerName = firstProduct?.Specification?.Product?.User?.UserProfile?.DisplayName ?? "FrameZone 精選賣場";
-                
-                return new {
+
+                return new
+                {
                     id = "ORD" + o.OrderId.ToString("D6"),
                     orderId = o.OrderId,
                     shopName = sellerName,
-                    status = o.OrderStatus == "Pending Payment" ? "pay" : 
+                    status = o.OrderStatus == "Pending Payment" ? "pay" :
                              o.OrderStatus == "Pending Shipment" ? "ship" : "done",
-                    statusText = o.OrderStatus == "Pending Payment" ? "待付款" : 
+                    statusText = o.OrderStatus == "Pending Payment" ? "待付款" :
                                  o.OrderStatus == "Pending Shipment" ? "待出貨" : "已完成",
                     totalAmount = o.TotalAmount,
                     createdAt = o.CreatedAt,
@@ -399,7 +407,7 @@ namespace FrameZone_WebApi.Shopping.Controllers
                         price = d.TransactionPrice,
                         quantity = d.Quantity,
                         productId = d.Specification?.ProductId ?? 0,
-                        imageUrl = d.Specification?.Product?.ProductImages?.FirstOrDefault(i => i.IsMainImage)?.ImageUrl 
+                        imageUrl = d.Specification?.Product?.ProductImages?.FirstOrDefault(i => i.IsMainImage)?.ImageUrl
                                    ?? d.Specification?.Product?.ProductImages?.FirstOrDefault()?.ImageUrl
                                    ?? "https://placehold.co/80x80?text=No+Image"
                     })
@@ -409,9 +417,131 @@ namespace FrameZone_WebApi.Shopping.Controllers
             return Ok(result);
         }
 
+        // 非即時付款（ATM）在「取號成功」時仍是待付款；入帳後若收不到 ReturnURL（例如本機開發），
+        // 可由前端主動呼叫此端點，後端使用綠界「訂單查詢(QueryTradeInfo)」確認是否已付款並更新狀態。
+        [Authorize]
+        [HttpPost("refresh-payment/{orderId:int}")]
+        public async Task<IActionResult> RefreshPaymentStatus(int orderId)
+        {
+            long? userId = GetUserIdFromToken();
+            if (userId == null) return Unauthorized();
+
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId && o.UserId == userId.Value);
+            if (order == null) return NotFound(new { message = "Order not found" });
+
+            // 只有待付款才需要查
+            if (order.OrderStatus != "Pending Payment")
+            {
+                return Ok(new { updated = false, status = order.OrderStatus });
+            }
+
+            // MerchantTradeNo 規則：FZ + 8位訂單ID（需與 CreateOrder 一致）
+            string merchantTradeNo = "FZ" + orderId.ToString("D8");
+
+            var tradeInfo = await _ecpayService.QueryTradeInfoAsync(merchantTradeNo);
+
+            if (!tradeInfo.IsSuccess)
+            {
+                _logger.LogWarning("QueryTradeInfo failed. MerchantTradeNo={MerchantTradeNo}, Message={Message}", merchantTradeNo, tradeInfo.ErrorMessage);
+                return StatusCode(502, new { updated = false, status = order.OrderStatus, message = tradeInfo.ErrorMessage });
+            }
+
+            // TradeStatus: 0=未付款, 1=已付款
+            if (tradeInfo.TradeStatus == "1")
+            {
+                order.OrderStatus = "Pending Shipment";
+                order.UpdatedAt = DateTime.Now;
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Order {OrderId} updated to Pending Shipment via QueryTradeInfo.", orderId);
+
+                return Ok(new
+                {
+                    updated = true,
+                    status = order.OrderStatus,
+                    tradeStatus = tradeInfo.TradeStatus,
+                    paymentDate = tradeInfo.PaymentDate,
+                    tradeNo = tradeInfo.TradeNo
+                });
+            }
+
+            return Ok(new
+            {
+                updated = false,
+                status = order.OrderStatus,
+                tradeStatus = tradeInfo.TradeStatus,
+                paymentDate = tradeInfo.PaymentDate,
+                tradeNo = tradeInfo.TradeNo
+            });
+        }
+
+
         #region Helpers
-//識別當前是哪位會員在結帳
-//當會員登入後，瀏覽器發送請求時會帶著一個加密的憑證（Token）。GetUserIdFromToken()方法的作用就是從這個憑證中解析出該會員在網站資料庫裡的 唯一識別碼（UserId）
+
+        private async Task<bool> TryMarkOrderPaidFallbackAsync(IFormCollection form)
+        {
+            try
+            {
+                var merchantTradeNo = form["MerchantTradeNo"].ToString();
+                var rtnCode = form["RtnCode"].ToString();
+
+                // 信用卡：1 = 付款成功
+                // ATM：2 = 取號成功（你要當作同樣進入待出貨）
+                if (rtnCode != "1" && rtnCode != "2") return false;
+
+                if (!(merchantTradeNo.StartsWith("FZ") && merchantTradeNo.Length >= 10))
+                    return false;
+
+                var orderIdStr = merchantTradeNo.Substring(2, 8);
+                if (!int.TryParse(orderIdStr, out int orderId))
+                    return false;
+
+                var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
+                if (order == null) return false;
+
+                if (order.OrderStatus != "Pending Shipment")
+                {
+                    order.OrderStatus = "Pending Shipment";
+                    order.UpdatedAt = DateTime.Now;
+                    await _context.SaveChangesAsync();
+
+                    _logger.LogInformation("Fallback: Order {OrderId} marked as Pending Shipment. RtnCode={RtnCode}, MerchantTradeNo={MerchantTradeNo}",
+                        orderId, rtnCode, merchantTradeNo);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Fallback: Failed to mark order via success-redirect.");
+                return false;
+            }
+        }
+
+        private async Task<bool> TryMarkOrderPaidFallbackAsync(string merchantTradeNo, string rtnCode)
+        {
+            if (rtnCode != "1" && rtnCode != "2") return false;
+            if (!(merchantTradeNo.StartsWith("FZ") && merchantTradeNo.Length >= 10)) return false;
+
+            var orderIdStr = merchantTradeNo.Substring(2, 8);
+            if (!int.TryParse(orderIdStr, out int orderId)) return false;
+
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
+            if (order == null) return false;
+
+            if (order.OrderStatus != "Pending Shipment")
+            {
+                order.OrderStatus = "Pending Shipment";
+                order.UpdatedAt = DateTime.Now;
+                await _context.SaveChangesAsync();
+            }
+
+            return true;
+        }
+
+
+        //識別當前是哪位會員在結帳
+        //當會員登入後，瀏覽器發送請求時會帶著一個加密的憑證（Token）。GetUserIdFromToken()方法的作用就是從這個憑證中解析出該會員在網站資料庫裡的 唯一識別碼（UserId）
         private long? GetUserIdFromToken()
         {
             try
@@ -451,4 +581,3 @@ namespace FrameZone_WebApi.Shopping.Controllers
 //  一個是訂單成立要回訂單完成頁面通知，因為前端無法處理，所以發通知到後端讓後端直接導回前端訂單完成頁面)
 //如果是ATM，選擇付款帳戶收到虛擬帳號資料後點擊返回首頁就會直接導回到前端訂單完成頁面
 //因為ATM是收到虛擬帳號資料還不算付款完成，等到虛擬帳號確實收到款項完成付款就會發通知到後端
-

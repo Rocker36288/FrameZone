@@ -1,6 +1,8 @@
 ﻿using FrameZone_WebApi.Controllers;
 using FrameZone_WebApi.Shopping.DTOs;
 using Microsoft.Extensions.Logging;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
@@ -84,7 +86,7 @@ namespace FrameZone_WebApi.Shopping.Services
                     foreach (KeyValuePair<string, object> option in order.OptionParams)
                     {
                         // 使用索引器而不是 Add()，這樣不會因重複 key 報錯
-                        orderParams.Params[option.Key] = option.Value;  // ✅ 改這裡
+                        orderParams.Params[option.Key] = option.Value;
                     }
                 }
 
@@ -97,15 +99,19 @@ namespace FrameZone_WebApi.Shopping.Services
 
                 // 2) 使用者付款完成回跳：導到中轉頁（它會再導回前端 order-success）
                 var successRedirectPath = _configuration["ECPaySettings:SuccessRedirectPath"] ?? "/api/order/success-redirect";
-                var orderResultUrl = $"{baseUrl}{successRedirectPath}";
 
-                // 寫回參數
+                // 把 MerchantTradeNo 掛在 querystring，避免 GET 回跳拿不到資料
+                var successRedirectUrlWithTradeNo =
+                    $"{baseUrl}{successRedirectPath}?MerchantTradeNo={HttpUtility.UrlEncode(merchantTradeNo)}";
+
+                // ReturnURL（Server-to-Server）
                 orderParams.Params["ReturnURL"] = serverReturnUrl;
-                orderParams.Params["OrderResultURL"] = orderResultUrl;
 
-                // 3) ClientBackURL：使用者按「返回商店」導回（你原本用 ContainsKey 會永遠不會設定，因為 DTO 先放了空字串）
-                var frontendUrl = _configuration["AppSettings:FrontendUrl"] ?? "http://localhost:4200";
-                orderParams.Params["ClientBackURL"] = $"{frontendUrl.TrimEnd('/')}/shopping/home";
+                // OrderResultURL（回跳）
+                orderParams.Params["OrderResultURL"] = successRedirectUrlWithTradeNo;
+
+                // ClientBackURL（返回商店）
+                orderParams.Params["ClientBackURL"] = successRedirectUrlWithTradeNo;
 
                 _logger.LogInformation($"最終 ReturnURL: {orderParams.Params["ReturnURL"]}");
                 _logger.LogInformation($"最終 OrderResultURL: {orderParams.Params["OrderResultURL"]}");
@@ -125,6 +131,140 @@ namespace FrameZone_WebApi.Shopping.Services
         public void HandleECPayOrderResult(FormCollection result)
         {
             //_logger.LogInformation(result.ToString()); //付款完成結果紀錄在log，還未寫進資料庫
+        }
+
+
+        public class QueryTradeInfoResult
+        {
+            public bool IsSuccess { get; set; }
+            public string ErrorMessage { get; set; } = "";
+            public string MerchantTradeNo { get; set; } = "";
+            public string TradeStatus { get; set; } = "";   // 0=未付款, 1=已付款
+            public string PaymentDate { get; set; } = "";
+            public string TradeNo { get; set; } = "";
+            public Dictionary<string, string> Raw { get; set; } = new();
+        }
+
+        // 綠界：訂單查詢（QueryTradeInfo/V5）
+        // 用途：非即時付款（ATM）在本機開發收不到 ReturnURL 時，可由後端主動查詢是否已入帳。
+        public async Task<QueryTradeInfoResult> QueryTradeInfoAsync(string merchantTradeNo)
+        {
+            var result = new QueryTradeInfoResult { MerchantTradeNo = merchantTradeNo };
+
+            try
+            {
+                var merchantId = _configuration["ECPaySettings:MerchantID"] ?? "";
+                if (string.IsNullOrWhiteSpace(merchantId))
+                {
+                    result.IsSuccess = false;
+                    result.ErrorMessage = "Missing ECPaySettings:MerchantID";
+                    return result;
+                }
+
+                // 依綠界規範：TimeStamp 必須在 3 分鐘內
+                var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+
+                var reqParams = new SortedDictionary<string, string>
+                {
+                    ["MerchantID"] = merchantId,
+                    ["MerchantTradeNo"] = merchantTradeNo,
+                    ["TimeStamp"] = timeStamp
+                };
+
+                var paramString = string.Join("&", reqParams.Select(kv => $"{kv.Key}={kv.Value}"));
+                var checkMac = BuildCheckMacValue(paramString);
+
+                var postParams = new Dictionary<string, string>(reqParams)
+                {
+                    ["CheckMacValue"] = checkMac
+                };
+
+                var url = GetQueryTradeInfoUrl();
+
+                using var http = new HttpClient();
+                http.Timeout = TimeSpan.FromSeconds(15);
+
+                using var content = new FormUrlEncodedContent(postParams);
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
+
+                var resp = await http.PostAsync(url, content);
+                var body = await resp.Content.ReadAsStringAsync();
+
+                if (!resp.IsSuccessStatusCode)
+                {
+                    result.IsSuccess = false;
+                    result.ErrorMessage = $"ECPay QueryTradeInfo HTTP {(int)resp.StatusCode}: {body}";
+                    return result;
+                }
+
+                // 回傳格式通常為 querystring：Key=Value&Key=Value...
+                var nvc = HttpUtility.ParseQueryString(body ?? "");
+                foreach (var keyObj in nvc.AllKeys)
+                {
+                    if (string.IsNullOrWhiteSpace(keyObj)) continue;
+                    result.Raw[keyObj] = nvc[keyObj] ?? "";
+                }
+
+                // 基本欄位
+                result.TradeStatus = result.Raw.TryGetValue("TradeStatus", out var ts) ? ts : "";
+                result.PaymentDate = result.Raw.TryGetValue("PaymentDate", out var pd) ? pd : "";
+                result.TradeNo = result.Raw.TryGetValue("TradeNo", out var tn) ? tn : "";
+
+                // 驗簽（回傳的 CheckMacValue）
+                if (result.Raw.TryGetValue("CheckMacValue", out var respMac) && !string.IsNullOrWhiteSpace(respMac))
+                {
+                    var verifyDict = new SortedDictionary<string, string>(
+                        result.Raw
+                            .Where(kv => !string.Equals(kv.Key, "CheckMacValue", StringComparison.OrdinalIgnoreCase))
+                            .ToDictionary(kv => kv.Key, kv => kv.Value)
+                    );
+
+                    var verifyString = string.Join("&", verifyDict.Select(kv => $"{kv.Key}={kv.Value}"));
+                    var verifyMac = BuildCheckMacValue(verifyString);
+
+                    if (!string.Equals(verifyMac, respMac, StringComparison.OrdinalIgnoreCase))
+                    {
+                        result.IsSuccess = false;
+                        result.ErrorMessage = "QueryTradeInfo CheckMacValue mismatch";
+                        return result;
+                    }
+                }
+
+                result.IsSuccess = true;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "QueryTradeInfoAsync failed. MerchantTradeNo={MerchantTradeNo}", merchantTradeNo);
+                result.IsSuccess = false;
+                result.ErrorMessage = ex.Message;
+                return result;
+            }
+        }
+
+        private string GetQueryTradeInfoUrl()
+        {
+            // 可用設定覆蓋；否則依 ServiceURL 或 UseStage 判斷
+            var overrideUrl = _configuration["ECPaySettings:QueryTradeInfoUrl"];
+            if (!string.IsNullOrWhiteSpace(overrideUrl))
+                return overrideUrl;
+
+            bool useStage = false;
+
+            var useStageStr = _configuration["ECPaySettings:UseStage"];
+            if (bool.TryParse(useStageStr, out var parsed))
+                useStage = parsed;
+
+            if (!useStage)
+            {
+                var serviceUrl = _configuration["ECPaySettings:ServiceURL"] ?? _configuration["ECPaySettings:ServiceUrl"] ?? "";
+                if (serviceUrl.Contains("stage", StringComparison.OrdinalIgnoreCase))
+                    useStage = true;
+            }
+
+            return useStage
+                ? "https://payment-stage.ecpay.com.tw/Cashier/QueryTradeInfo/V5"
+                : "https://payment.ecpay.com.tw/Cashier/QueryTradeInfo/V5";
         }
 
         private ECPayOrderParamsDto CheckECPayOrderParams(ECPayOrderParamsDto orderParams)
