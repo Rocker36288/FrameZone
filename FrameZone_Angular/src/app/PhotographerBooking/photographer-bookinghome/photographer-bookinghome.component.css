@@ -12,6 +12,8 @@
   padding-bottom: 32px;
 }
 
-
-
-
+h2.fw-bold {
+  font-size: 2rem; /* 或是使用 32px */
+  letter-spacing: -0.5px; /* 稍微縮小字距，看起來更專業 */
+  margin-bottom: 24px; /* 調整標題下方的距離 */
+}
