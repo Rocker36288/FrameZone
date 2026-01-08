@@ -37,7 +37,7 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
                 .FirstOrDefaultAsync(p => p.PhotographerId == id);
         }
 
-        public async Task<List<Photographer>> SearchPhotographersAsync(string keyword, string location, string studioType)
+        public async Task<List<Photographer>> SearchPhotographersAsync(string keyword, string location, string studioType, string tag)
         {
             var query = _context.Photographers.AsQueryable();
 
@@ -48,12 +48,22 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
 
             if (!string.IsNullOrWhiteSpace(location))
             {
-                query = query.Where(p => p.StudioAddress.Contains(location));
+                query = query.Where(p => 
+                    p.StudioAddress.Contains(location) || 
+                    p.ServiceAreas.Any(sa => sa.City.Contains(location))
+                );
             }
 
             if (!string.IsNullOrWhiteSpace(studioType))
             {
                 query = query.Where(p => p.StudioType == studioType);
+            }
+
+            if (!string.IsNullOrWhiteSpace(tag))
+            {
+                query = query.Where(p => 
+                    p.PhotographerSpecialties.Any(ps => ps.SpecialtyTag.SpecialtyName.Contains(tag))
+                );
             }
 
             return await query

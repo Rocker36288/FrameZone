@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { PhotographerBookingService } from '../services/photographer-booking.service';
 interface CarouselImage {
   url: string;
   author: string;
@@ -42,9 +43,20 @@ export class PhotographerBookingheroComponent implements OnInit {
   // 快速標籤
   tags = ['韓系婚紗', '寵物攝影', '日系寫真'];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private bookingService: PhotographerBookingService) { }
   ngOnInit() {
     setInterval(() => this.nextSlide(), 5000);
+
+    // 從後端載入熱門標籤顯示3
+    this.bookingService.getPopularTags(3).subscribe({
+      next: (tags) => {
+        this.tags = tags;
+      },
+      error: (err) => {
+        console.error('Error loading popular tags', err);
+        // 保留預設標籤作為 fallback
+      }
+    });
   }
 
   nextSlide() {

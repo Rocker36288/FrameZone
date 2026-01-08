@@ -37,6 +37,7 @@ export interface PhotographerSearchDto {
   keyword?: string;
   location?: string;
   studioType?: string;
+  tag?: string;
 }
 
 export interface SearchFilters {

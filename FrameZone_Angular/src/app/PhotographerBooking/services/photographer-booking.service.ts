@@ -125,6 +125,11 @@ export class PhotographerBookingService {
     return this.specialtyTags;
   }
 
+  // Get popular tags from backend
+  getPopularTags(count: number = 10): Observable<string[]> {
+    return this.http.get<string[]>(`https://localhost:7213/api/SpecialtyTags/popular?count=${count}`);
+  }
+
   getTagsByCategory(catId: number): string[] {
     return this.specialtyTags
       .filter((tag) => tag.catId === catId)

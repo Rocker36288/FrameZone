@@ -30,7 +30,7 @@ namespace FrameZone_WebApi.PhotographerBooking.Services
 
         public async Task<List<PhotographerDto>> SearchPhotographersAsync(PhotographerSearchDto searchDto)
         {
-            var photographers = await _photographerRepository.SearchPhotographersAsync(searchDto.Keyword, searchDto.Location, searchDto.StudioType);
+            var photographers = await _photographerRepository.SearchPhotographersAsync(searchDto.Keyword, searchDto.Location, searchDto.StudioType, searchDto.Tag);
             return photographers.Select(p => MapToDto(p)).ToList();
         }
 
