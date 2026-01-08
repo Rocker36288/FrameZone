@@ -21,7 +21,14 @@ namespace FrameZone_WebApi.Socials.Controllers
         [HttpGet]
         public async Task<IActionResult> GetPosts()
         {
-            var currentUserId = TryGetUserId();
+            long? currentUserId = null;
+            try
+            {
+                currentUserId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
             var post = await _postService.GetPostsAsync(currentUserId);
 
             if (post == null)
@@ -31,11 +38,52 @@ namespace FrameZone_WebApi.Socials.Controllers
             return Ok(post);
         }
 
+        // GET: api/posts/user/1
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetPostsByUserId(long userId)
+        {
+            long? currentUserId = null;
+            try
+            {
+                currentUserId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
+            var posts = await _postService.GetPostsByUserIdAsync(userId, currentUserId);
+
+            if (posts == null)
+            {
+                return NotFound(new { message = "貼文不存在" });
+            }
+            return Ok(posts);
+        }
+
+        // GET: api/posts/user/1/profile
+        [HttpGet("user/{userId}/profile")]
+        public async Task<IActionResult> GetUserProfile(long userId)
+        {
+            var profile = await _postService.GetUserProfileSummaryAsync(userId);
+            if (profile == null)
+            {
+                return NotFound(new { message = "使用者不存在" });
+            }
+
+            return Ok(profile);
+        }
+
         // GET: api/posts/1
         [HttpGet("{postId}")]
         public async Task<IActionResult> GetPostById(int postId)
         {
-            var currentUserId = TryGetUserId();
+            long? currentUserId = null;
+            try
+            {
+                currentUserId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
             var post = await _postService.GetPostByIdAsync(postId, currentUserId);
 
             if (post == null)
@@ -43,6 +91,17 @@ namespace FrameZone_WebApi.Socials.Controllers
                 return NotFound(new { message = "貼文不存在" });
             }
             return Ok(post);
+        }
+
+        // GET: api/posts/commented?limit=20
+        [Authorize]
+        [HttpGet("commented")]
+        public async Task<IActionResult> GetCommentedPosts([FromQuery] int limit = 20)
+        {
+            long userId = GetUserId();
+            limit = Math.Clamp(limit, 1, 50);
+            var posts = await _postService.GetCommentedPostsAsync(userId, limit);
+            return Ok(posts);
         }
 
         // POST: api/posts
@@ -133,13 +192,5 @@ namespace FrameZone_WebApi.Socials.Controllers
             return long.Parse(userIdClaim);
         }
 
-        private long? TryGetUserId()
-        {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userIdClaim == null)
-                return null;
-
-            return long.Parse(userIdClaim);
-        }
     }
 }

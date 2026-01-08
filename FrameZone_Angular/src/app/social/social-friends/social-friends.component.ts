@@ -1,22 +1,22 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Output, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AuthService } from '../../core/services/auth.service';
+import { FollowUser } from '../models/follow.models';
+import { RecentChat } from '../models/recent-chat.models';
+import { UnreadCount } from '../models/unread-count.models';
+import { ChatService } from '../services/chat.service';
+import { FollowService } from '../services/follow.service';
+import { SocialChatStateService } from '../services/social-chat-state.service';
 interface Friend {
   id: number;
   name: string;
-  avatar: string;
-  online: boolean;
-}
-
-interface GroupChat {
-  id: number;
-  name: string;
-  iconClass: string;
-  bgColor: string;
-  iconColor: string;
+  avatar?: string | null;
 }
 @Component({
   selector: 'app-social-friends',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './social-friends.component.html',
   styleUrl: './social-friends.component.css'
 })
@@ -24,44 +24,124 @@ interface GroupChat {
 export class SocialFriendsComponent {
   @Output() friendSelected = new EventEmitter<Friend>();
 
-  friends: Friend[] = [
-    { id: 1, name: 'Alex Thompson', avatar: 'https://i.pravatar.cc/150?u=a1', online: true },
-    { id: 2, name: '李詩涵', avatar: 'https://i.pravatar.cc/150?img=37', online: true },
-    { id: 3, name: 'Jessica Wu', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jessica', online: true },
-    { id: 4, name: '張佳玲', avatar: 'https://i.pravatar.cc/150?img=25', online: true },
-    { id: 5, name: '林俊宇', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=JunYu', online: true },
-    { id: 6, name: '趙敏君', avatar: 'https://i.pravatar.cc/150?u=zh6', online: true },
-    { id: 7, name: '夜羽', avatar: 'https://api.dicebear.com/7.x/micah/svg?seed=NightHaze', online: false },
-    { id: 8, name: 'Emily Chen', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Emily', online: true },
-    { id: 9, name: '曾可欣', avatar: 'https://i.pravatar.cc/150?img=40', online: true },
-    { id: 10, name: 'Amy Wang', avatar: 'https://api.dicebear.com/7.x/fun-emoji/svg?seed=Amy', online: false }
-  ];
+  private authService = inject(AuthService);
+  private followService = inject(FollowService);
+  private chatService = inject(ChatService);
+  private chatState = inject(SocialChatStateService);
+  private destroyRef = inject(DestroyRef);
 
-  groupChats: GroupChat[] = [
-    {
-      id: 1,
-      name: '大學同學會',
-      iconClass: 'bi bi-chat-left-quote-fill',
-      bgColor: '#e7f3ff',
-      iconColor: '#007bff'
-    },
-    {
-      id: 2,
-      name: '遊戲開團群',
-      iconClass: 'bi bi-controller',
-      bgColor: '#fce4ec',
-      iconColor: '#d81b60'
-    },
-    {
-      id: 3,
-      name: '專題討論小組',
-      iconClass: 'bi bi-briefcase-fill',
-      bgColor: '#f0f2f5',
-      iconColor: '#555'
-    }
-  ];
+  following: FollowUser[] = [];
+  followers: FollowUser[] = [];
+  recentChats: RecentChat[] = [];
+  unreadMap = new Map<number, number>();
+  openSection: { recent: boolean; following: boolean; followers: boolean } = {
+    recent: true,
+    following: false,
+    followers: false
+  };
+  searchTerm = '';
+
+  ngOnInit(): void {
+    this.authService.currentUser$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(user => {
+        if (!user?.userId) {
+          this.following = [];
+          this.followers = [];
+          this.recentChats = [];
+          this.unreadMap.clear();
+          return;
+        }
+        this.followService.getFollowing(user.userId).subscribe({
+          next: (users) => {
+            this.following = users;
+          },
+          error: () => {
+            this.following = [];
+          }
+        });
+        this.followService.getFollowers(user.userId).subscribe({
+          next: (users) => {
+            this.followers = users;
+          },
+          error: () => {
+            this.followers = [];
+          }
+        });
+        this.chatService.getRecentSocialChats().subscribe({
+          next: (chats) => {
+            this.recentChats = chats;
+          },
+          error: () => {
+            this.recentChats = [];
+          }
+        });
+        this.refreshUnreadCounts();
+      });
+
+    this.chatState.unreadRefresh$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.refreshUnreadCounts();
+      });
+  }
 
   selectFriend(friend: Friend) {
     this.friendSelected.emit(friend);
+  }
+
+  getFollowAvatar(user: FollowUser): string {
+    if (user.avatar) return user.avatar;
+    const initial = (user.displayName || 'U').charAt(0).toUpperCase();
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+  }
+
+  getRecentAvatar(chat: RecentChat): string {
+    if (chat.targetUserAvatar) return chat.targetUserAvatar;
+    const initial = (chat.targetUserName || 'U').charAt(0).toUpperCase();
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+  }
+
+  getUnreadCount(userId: number): number {
+    return this.unreadMap.get(userId) ?? 0;
+  }
+
+  private refreshUnreadCounts() {
+    this.chatService.getUnreadCounts().subscribe({
+      next: (items: UnreadCount[]) => {
+        this.unreadMap = new Map(items.map(item => [item.targetUserId, item.unreadCount]));
+      },
+      error: () => {
+        this.unreadMap.clear();
+      }
+    });
+  }
+
+  toggleSection(section: 'recent' | 'following' | 'followers') {
+    this.openSection[section] = !this.openSection[section];
+  }
+
+  getFilteredRecentChats(): RecentChat[] {
+    const keyword = this.searchTerm.trim().toLowerCase();
+    if (!keyword) return this.recentChats;
+    return this.recentChats.filter(chat =>
+      (chat.targetUserName || '').toLowerCase().includes(keyword)
+    );
+  }
+
+  getFilteredFollowing(): FollowUser[] {
+    const keyword = this.searchTerm.trim().toLowerCase();
+    if (!keyword) return this.following;
+    return this.following.filter(user =>
+      (user.displayName || '').toLowerCase().includes(keyword)
+    );
+  }
+
+  getFilteredFollowers(): FollowUser[] {
+    const keyword = this.searchTerm.trim().toLowerCase();
+    if (!keyword) return this.followers;
+    return this.followers.filter(user =>
+      (user.displayName || '').toLowerCase().includes(keyword)
+    );
   }
 }

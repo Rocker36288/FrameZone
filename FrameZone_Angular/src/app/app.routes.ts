@@ -1,5 +1,6 @@
-import { Title } from '@angular/platform-browser';
+﻿import { Title } from '@angular/platform-browser';
 import { Routes } from '@angular/router';
+import { videoGuard } from './videos/guard/video.guard';
 
 export const routes: Routes = [
   {
@@ -13,7 +14,7 @@ export const routes: Routes = [
         path: '',
         loadComponent: () =>
           import('./pages/login/login.component').then((m) => m.LoginComponent),
-        title: 'FrameZone - 登入',
+        title: 'FrameZone - ?餃',
       },
     ],
   },
@@ -30,7 +31,7 @@ export const routes: Routes = [
           import('./pages/auth/register/register.component').then(
             (m) => m.RegisterComponent
           ),
-        title: 'FrameZone - 註冊',
+        title: 'FrameZone - 閮餃?',
       },
     ],
   },
@@ -47,7 +48,7 @@ export const routes: Routes = [
           import('./pages/auth/forgot-password/forgot-password.component').then(
             (m) => m.ForgotPasswordComponent
           ),
-        title: 'FrameZone - 忘記密碼',
+        title: 'FrameZone - 敹?撖Ⅳ',
       },
     ],
   },
@@ -64,7 +65,7 @@ export const routes: Routes = [
           import('./pages/auth/reset-password/reset-password.component').then(
             (m) => m.ResetPasswordComponent
           ),
-        title: 'FrameZone - 重設密碼',
+        title: 'FrameZone - ?身撖Ⅳ',
       },
     ],
   },
@@ -122,7 +123,7 @@ export const routes: Routes = [
           import(
             './pages/member/member-dashboard/member-dashboard.component'
           ).then((m) => m.MemberDashboardComponent),
-        title: 'FrameZone - 會員中心',
+        title: 'FrameZone - ?銝剖?',
       },
       {
         path: 'profile',
@@ -130,7 +131,7 @@ export const routes: Routes = [
           import('./pages/member/member-profile/member-profile.component').then(
             (m) => m.MemberProfileComponent
           ),
-        title: 'FrameZone - 個人資料',
+        title: 'FrameZone - ?犖鞈?',
       },
       {
         path: 'security',
@@ -138,7 +139,7 @@ export const routes: Routes = [
           import(
             './pages/member/member-security/member-security.component'
           ).then((m) => m.MemberSecurityComponent),
-        title: 'FrameZone - 帳號安全',
+        title: 'FrameZone - 撣唾?摰',
       },
       {
         path: 'notifications',
@@ -146,7 +147,7 @@ export const routes: Routes = [
           import(
             './pages/member/member-notifications/member-notifications.component'
           ).then((m) => m.MemberNotificationsComponent),
-        title: 'FrameZone - 通知設定',
+        title: 'FrameZone - ?閮剖?',
       },
       {
         path: 'privacy',
@@ -154,7 +155,7 @@ export const routes: Routes = [
           import('./pages/member/member-privacy/member-privacy.component').then(
             (m) => m.MemberPrivacyComponent
           ),
-        title: 'FrameZone - 隱私設定',
+        title: 'FrameZone - ?梁?閮剖?',
       },
       {
         path: 'logs',
@@ -162,7 +163,7 @@ export const routes: Routes = [
           import('./pages/member/member-logs/member-logs.component').then(
             (m) => m.MemberLogsComponent
           ),
-        title: 'FrameZone - 操作記錄',
+        title: 'FrameZone - ??閮?',
       },
     ],
   },
@@ -306,7 +307,7 @@ export const routes: Routes = [
         path: 'orders',
         redirectTo: 'orders/all',
         pathMatch: 'full',
-        // 建議保留一個不帶參數的預設路徑，避免直接輸入 /seller/orders 報錯
+        // 撱箄降靽?銝??撣嗅??貊??身頝臬?嚗??亥撓??/seller/orders ?梢
       },
       {
         path: 'reviews',
@@ -419,6 +420,7 @@ export const routes: Routes = [
   },
   {
     path: 'social',
+    // canActivateChild: [videoGuard], 銋????餃
     loadComponent: () =>
       import('./layouts/social-layout/social-layout.component').then(
         (m) => m.SocialLayoutComponent
@@ -445,10 +447,45 @@ export const routes: Routes = [
               ),
           },
           {
-            path: 'friends',
+            path: 'profile/:userId',
             loadComponent: () =>
-              import('./social/social-friends/social-friends.component').then(
-                (m) => m.SocialFriendsComponent
+              import('./social/social-profile/social-profile.component').then(
+                (m) => m.SocialProfileComponent
+              ),
+          },
+          {
+            path: 'following',
+            loadComponent: () =>
+              import('./social/social-posts-list/social-posts-list.component').then(
+                (m) => m.SocialPostsListComponent
+              ),
+          },
+          {
+            path: 'recent',
+            loadComponent: () =>
+              import('./social/social-posts-list/social-posts-list.component').then(
+                (m) => m.SocialPostsListComponent
+              ),
+          },
+          {
+            path: 'liked',
+            loadComponent: () =>
+              import('./social/social-posts-list/social-posts-list.component').then(
+                (m) => m.SocialPostsListComponent
+              ),
+          },
+          {
+            path: 'commented',
+            loadComponent: () =>
+              import('./social/social-posts-list/social-posts-list.component').then(
+                (m) => m.SocialPostsListComponent
+              ),
+          },
+          {
+            path: 'shared',
+            loadComponent: () =>
+              import('./social/social-posts-list/social-posts-list.component').then(
+                (m) => m.SocialPostsListComponent
               ),
           },
         ],
@@ -461,3 +498,5 @@ export const routes: Routes = [
       import('./videos/videos.routes').then((m) => m.VIDEO_ROUTES),
   },
 ];
+
+
