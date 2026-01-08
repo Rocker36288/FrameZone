@@ -6,9 +6,9 @@
 export var frontendPublicUrl: string = 'http://localhost:4200';
 
 
-//export var backendPublicUrl: string = 'https://xlsf3q5n-7213.asse.devtunnels.ms';
+export var backendPublicUrl: string = 'https://xlsf3q5n-7213.asse.devtunnels.ms';
 
-export var backendPublicUrl: string = 'https://74jcr1kn-7213.asse.devtunnels.ms';
+//export var backendPublicUrl: string = 'https://74jcr1kn-7213.asse.devtunnels.ms';
 
 //如果要在自己的電腦上執行，要用微軟工具devtunnel取得自己的公開url修改上面兩行參數，前後端都要
 
