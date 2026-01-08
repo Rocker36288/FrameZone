@@ -53,6 +53,25 @@ namespace FrameZone_WebApi.Socials.Repositories
             _context.SaveChanges();
             return message;
         }
+
+        public List<int> GetUnreadMessageIds(int roomId, long userId)
+        {
+            return _context.Messages
+                .Where(m =>
+                    m.RoomId == roomId &&
+                    m.DeletedAt == null &&
+                    m.SenderUserId != userId &&
+                    !_context.MessageReads.Any(r => r.MessageId == m.MessageId && r.UserId == userId))
+                .Select(m => m.MessageId)
+                .ToList();
+        }
+
+        public int AddMessageReads(List<MessageRead> reads)
+        {
+            if (reads.Count == 0) return 0;
+            _context.MessageReads.AddRange(reads);
+            return _context.SaveChanges();
+        }
     }
 
 }

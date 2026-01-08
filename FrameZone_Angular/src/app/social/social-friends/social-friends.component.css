@@ -24,6 +24,11 @@
   color: #333;
 }
 
+/* --- 2. 搜尋框間距 --- */
+.custom-search {
+  margin-bottom: 1.25rem;
+}
+
 /* --- 3. 朋友列表區域與滾動條 --- */
 .friend-list-content {
   flex-grow: 1;
@@ -90,6 +95,25 @@
   font-size: 0.95rem;
   color: #333;
   font-weight: 500;
+}
+
+/* 摺疊箭頭 */
+.section-arrow {
+  margin-left: auto;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* 未讀數量 */
+.unread-badge {
+  margin-left: auto;
+  background: #ff4d4f;
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 999px;
+  min-width: 20px;
+  text-align: center;
 }
 
 /* 線上狀態燈 - 使用你色票中的主色 */

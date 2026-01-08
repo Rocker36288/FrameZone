@@ -1,5 +1,6 @@
-import { Title } from '@angular/platform-browser';
+﻿import { Title } from '@angular/platform-browser';
 import { Routes } from '@angular/router';
+import { videoGuard } from './videos/guard/video.guard';
 
 export const routes: Routes = [
   {
@@ -419,6 +420,7 @@ export const routes: Routes = [
   },
   {
     path: 'social',
+    canActivateChild: [videoGuard],
     loadComponent: () =>
       import('./layouts/social-layout/social-layout.component').then(
         (m) => m.SocialLayoutComponent
@@ -445,10 +447,45 @@ export const routes: Routes = [
               ),
           },
           {
-            path: 'friends',
+            path: 'profile/:userId',
             loadComponent: () =>
-              import('./social/social-friends/social-friends.component').then(
-                (m) => m.SocialFriendsComponent
+              import('./social/social-profile/social-profile.component').then(
+                (m) => m.SocialProfileComponent
+              ),
+          },
+          {
+            path: 'following',
+            loadComponent: () =>
+              import('./social/social-posts-list/social-posts-list.component').then(
+                (m) => m.SocialPostsListComponent
+              ),
+          },
+          {
+            path: 'recent',
+            loadComponent: () =>
+              import('./social/social-posts-list/social-posts-list.component').then(
+                (m) => m.SocialPostsListComponent
+              ),
+          },
+          {
+            path: 'liked',
+            loadComponent: () =>
+              import('./social/social-posts-list/social-posts-list.component').then(
+                (m) => m.SocialPostsListComponent
+              ),
+          },
+          {
+            path: 'commented',
+            loadComponent: () =>
+              import('./social/social-posts-list/social-posts-list.component').then(
+                (m) => m.SocialPostsListComponent
+              ),
+          },
+          {
+            path: 'shared',
+            loadComponent: () =>
+              import('./social/social-posts-list/social-posts-list.component').then(
+                (m) => m.SocialPostsListComponent
               ),
           },
         ],
@@ -461,3 +498,5 @@ export const routes: Routes = [
       import('./videos/videos.routes').then((m) => m.VIDEO_ROUTES),
   },
 ];
+
+

@@ -19,12 +19,73 @@ namespace FrameZone_WebApi.Socials.Repositories
                 return await _context.Posts
                     .Include(p => p.User)
                         .ThenInclude(u => u.UserProfile)
+                    .Include(p => p.PostLikes)
+                    .Include(p => p.PostShares)
+                    .Include(p => p.CommentTargets)
+                        .ThenInclude(ct => ct.Comments)
                     //依照貼文Id查詢 & 不顯示已刪除的貼文
                     .Where(p =>
                         p.Status != "Deleted" &&
                         p.DeletedAt == null)
                     //依照貼文建立時間排序
                     .OrderByDescending(p => p.CreatedAt)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"取得貼文失敗: {ex.Message}");
+                return null;
+            }
+        }
+
+        // ================= 取得指定使用者貼文 =================
+        public async Task<List<Post>> GetPostsByUserIdAsync(long userId)
+        {
+            try
+            {
+                return await _context.Posts
+                    .Include(p => p.User)
+                        .ThenInclude(u => u.UserProfile)
+                    .Include(p => p.PostLikes)
+                    .Include(p => p.PostShares)
+                    .Include(p => p.CommentTargets)
+                        .ThenInclude(ct => ct.Comments)
+                    .Where(p =>
+                        p.UserId == userId &&
+                        p.Status != "Deleted" &&
+                        p.DeletedAt == null)
+                    .OrderByDescending(p => p.CreatedAt)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"取得貼文失敗: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<List<Post>> GetPostsByUserIdWithSharedAsync(long userId)
+        {
+            try
+            {
+                var sharedPostIds = await _context.PostShares
+                    .Where(s => s.UserId == userId)
+                    .Select(s => s.PostId)
+                    .Distinct()
+                    .ToListAsync();
+
+                return await _context.Posts
+                    .Include(p => p.User)
+                        .ThenInclude(u => u.UserProfile)
+                    .Include(p => p.PostLikes)
+                    .Include(p => p.PostShares)
+                    .Include(p => p.CommentTargets)
+                        .ThenInclude(ct => ct.Comments)
+                    .Where(p =>
+                        (p.UserId == userId || sharedPostIds.Contains(p.PostId)) &&
+                        p.Status != "Deleted" &&
+                        p.DeletedAt == null)
+                    .OrderByDescending(p => p.UpdatedAt)
                     .ToListAsync();
             }
             catch (Exception ex)
@@ -42,6 +103,10 @@ namespace FrameZone_WebApi.Socials.Repositories
                 return await _context.Posts
                     .Include(p => p.User)
                         .ThenInclude(u => u.UserProfile)
+                    .Include(p => p.PostLikes)
+                    .Include(p => p.PostShares)
+                    .Include(p => p.CommentTargets)
+                        .ThenInclude(ct => ct.Comments)
                     //依照貼文Id查詢 & 不顯示已刪除的貼文
                     .Where(p =>
                         p.PostId == postId &&
@@ -53,6 +118,58 @@ namespace FrameZone_WebApi.Socials.Repositories
             {
                 Console.WriteLine($"取得貼文失敗: {ex.Message}");
                 return null;
+            }
+        }
+
+        // ================= 取得使用者基本資料 =================
+        public async Task<User?> GetUserByIdAsync(long userId)
+        {
+            try
+            {
+                return await _context.Users
+                    .Include(u => u.UserProfile)
+                    .Where(u =>
+                        u.UserId == userId &&
+                        !u.IsDeleted &&
+                        u.DeletedAt == null)
+                    .FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"取得使用者失敗: {ex.Message}");
+                return null;
+            }
+        }
+
+        // ================= 取得粉絲數 =================
+        public async Task<int> GetFollowerCountAsync(long userId)
+        {
+            try
+            {
+                return await _context.Follows
+                    .Where(f => f.FollowingId == userId && f.DeleteAt == null)
+                    .CountAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"取得粉絲數失敗: {ex.Message}");
+                return 0;
+            }
+        }
+
+        // ================= 取得追蹤中數量 =================
+        public async Task<int> GetFollowingCountAsync(long userId)
+        {
+            try
+            {
+                return await _context.Follows
+                    .Where(f => f.FollowerId == userId && f.DeleteAt == null)
+                    .CountAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"取得追蹤中數量失敗: {ex.Message}");
+                return 0;
             }
         }
 
@@ -99,13 +216,12 @@ namespace FrameZone_WebApi.Socials.Repositories
                 await _context.SaveChangesAsync();
                 return post;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Console.WriteLine($"編輯貼文失敗: {ex.Message}");
                 return null;
             }
-
-        }        
+        }
 
         // ================= 軟刪除貼文 =================
         public async Task<bool> DeletePostAsync(Post post)
@@ -128,6 +244,67 @@ namespace FrameZone_WebApi.Socials.Repositories
                 Console.WriteLine($"刪除貼文失敗: {ex.Message}");
                 return false;
             }
+        }
+
+        public async Task<List<Post>> GetPostsByIdsAsync(List<int> postIds)
+        {
+            if (postIds == null || postIds.Count == 0)
+            {
+                return new List<Post>();
+            }
+
+            return await _context.Posts
+                .Include(p => p.User)
+                    .ThenInclude(u => u.UserProfile)
+                .Include(p => p.PostLikes)
+                .Include(p => p.PostShares)
+                .Include(p => p.CommentTargets)
+                    .ThenInclude(ct => ct.Comments)
+                .Where(p =>
+                    postIds.Contains(p.PostId) &&
+                    p.Status != "Deleted" &&
+                    p.DeletedAt == null)
+                .ToListAsync();
+        }
+
+        public async Task<List<Post>> GetCommentedPostsAsync(long userId, int limit)
+        {
+            var commented = await _context.Comments
+                .Where(c => c.UserId == userId && c.DeletedAt == null)
+                .Select(c => new { c.CommentTarget.PostId, c.CreatedAt })
+                .Where(x => x.PostId.HasValue)
+                .GroupBy(x => x.PostId.Value)
+                .Select(g => new { PostId = g.Key, LastCommentedAt = g.Max(x => x.CreatedAt) })
+                .OrderByDescending(x => x.LastCommentedAt)
+                .Take(limit)
+                .ToListAsync();
+
+            if (commented.Count == 0)
+            {
+                return new List<Post>();
+            }
+
+            var postIds = commented.Select(x => x.PostId).ToList();
+            var posts = await _context.Posts
+                .Include(p => p.User)
+                    .ThenInclude(u => u.UserProfile)
+                .Include(p => p.PostLikes)
+                .Include(p => p.PostShares)
+                .Include(p => p.CommentTargets)
+                    .ThenInclude(ct => ct.Comments)
+                .Where(p =>
+                    postIds.Contains(p.PostId) &&
+                    p.Status != "Deleted" &&
+                    p.DeletedAt == null)
+                .ToListAsync();
+
+            var orderMap = commented
+                .Select((item, index) => new { item.PostId, index })
+                .ToDictionary(x => x.PostId, x => x.index);
+
+            return posts
+                .OrderBy(p => orderMap.ContainsKey(p.PostId) ? orderMap[p.PostId] : int.MaxValue)
+                .ToList();
         }
     }
 }

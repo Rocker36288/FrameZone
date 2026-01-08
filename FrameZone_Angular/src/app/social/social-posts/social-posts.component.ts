@@ -7,14 +7,15 @@ import { DatePipe, SlicePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SocialCommentsComponent } from "../social-comments/social-comments.component";
 import { AuthService } from '../../core/services/auth.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-social-posts',
-  imports: [DatePipe, SlicePipe, FormsModule, SocialCommentsComponent],
+  imports: [DatePipe, SlicePipe, FormsModule, SocialCommentsComponent, RouterLink],
   templateUrl: './social-posts.component.html',
   styleUrl: './social-posts.component.css'
 })
-export class SocialPostsComponent {
+export class SocialPostsComponent implements AfterViewInit, OnDestroy {
   @Input() post!: PostDto;
   @Output() postDeleted = new EventEmitter<number>();
 
@@ -27,14 +28,18 @@ export class SocialPostsComponent {
   editContent = "";
   isMenuOpen = false;
   isFullContent = false;
-  isLiked = false;
-  likeCount = 4;
 
   // --- 留言狀態 ---
   isCommentShowed = false;
   comments = signal<CommentDto[]>([]); // 使用 Signal 管理留言列表
   newCommentContent = ""; // 綁定發布框
   isSubmittingComment = false; // 防止重複點擊
+  private viewObserver?: IntersectionObserver;
+  private hasTrackedView = false;
+  isShareModalOpen = false;
+  shareMessage = '';
+  shareTarget: 'personal' | 'facebook' | 'twitter' | 'line' = 'personal';
+  shareLink = window.location.href;
 
   // 注入 CommentService
   constructor(
@@ -51,17 +56,71 @@ export class SocialPostsComponent {
     }
   }
 
-  //頭像
-  getUserAvatar(): string {
-    if (this.currentUserAvatar) return this.currentUserAvatar;
-    const initial = (this.currentUserName || 'U').charAt(0).toUpperCase();
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+  ngAfterViewInit(): void {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser?.userId) return;
+
+    this.viewObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting && !this.hasTrackedView) {
+          this.hasTrackedView = true;
+          this.postService.recordView(this.post.postId).subscribe({
+            next: () => { },
+            error: () => { }
+          });
+          this.viewObserver?.disconnect();
+          break;
+        }
+      }
+    }, { threshold: 0.5 });
+
+    this.viewObserver.observe(this.eRef.nativeElement);
   }
-  getPostUserAvatar(): string {
-    if (this.post.avatar) return this.post.avatar;
-    const initial = (this.post.userName || 'U').charAt(0).toUpperCase();
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+
+  ngOnDestroy(): void {
+    this.viewObserver?.disconnect();
   }
+
+  /**
+ * 取得貼文作者頭像 URL
+ */
+getPostUserAvatar(): string {
+  const avatarUrl = this.post.avatar;
+  if (avatarUrl) {
+    return avatarUrl;
+  }
+  return this.getPostDefaultAvatar();
+}
+
+/**
+ * 產生貼文作者的預設頭像
+ */
+private getPostDefaultAvatar(): string {
+  const name = this.post.userName || 'U';
+  const initial = name.charAt(0).toUpperCase();
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+}
+
+/**
+ * 取得當前使用者頭像 URL
+ */
+getUserAvatar(): string {
+  const avatarUrl = this.currentUserAvatar;
+  if (avatarUrl) {
+    return avatarUrl;
+  }
+  return this.getCurrentUserDefaultAvatar();
+}
+
+/**
+ * 產生當前使用者的預設頭像
+ */
+private getCurrentUserDefaultAvatar(): string {
+  const name = this.currentUserName || 'U';
+  const initial = name.charAt(0).toUpperCase();
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+}
+
 
   //右上角選單
   toggleMenu() { this.isMenuOpen = !this.isMenuOpen; }
@@ -70,8 +129,86 @@ export class SocialPostsComponent {
   // --- 貼文邏輯 ---
   toggleContent() { this.isFullContent = !this.isFullContent; }
   toggleLikes() {
-    this.isLiked = !this.isLiked;
-    this.isLiked ? this.likeCount++ : this.likeCount--;
+    const wasLiked = !!this.post.isLiked;
+    const currentCount = this.post.likeCount ?? 0;
+    this.post.isLiked = !wasLiked;
+    this.post.likeCount = wasLiked ? Math.max(0, currentCount - 1) : currentCount + 1;
+
+    const request$ = wasLiked
+      ? this.postService.unlikePost(this.post.postId)
+      : this.postService.likePost(this.post.postId);
+
+    request$.subscribe({
+      next: () => { },
+      error: () => {
+        this.post.isLiked = wasLiked;
+        this.post.likeCount = currentCount;
+      }
+    });
+  }
+
+  openShareModal() {
+    this.shareMessage = '';
+    this.shareTarget = 'personal';
+    this.shareLink = window.location.href;
+    this.isShareModalOpen = true;
+  }
+
+  closeShareModal() {
+    this.isShareModalOpen = false;
+  }
+
+  submitShare() {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser?.userId) return;
+    if (this.post.isShared && this.shareTarget === 'personal') return;
+
+    if (this.shareTarget === 'personal') {
+      const currentCount = this.post.shareCount ?? 0;
+      this.post.isShared = true;
+      this.post.shareCount = currentCount + 1;
+
+      this.postService.recordShare(this.post.postId, this.shareMessage).subscribe({
+        next: () => {
+          this.closeShareModal();
+        },
+        error: () => {
+          this.post.isShared = false;
+          this.post.shareCount = currentCount;
+        }
+      });
+      return;
+    }
+
+    const shareUrl = encodeURIComponent(window.location.href);
+    const shareText = encodeURIComponent(this.shareMessage || this.post.postContent || '');
+
+    if (this.shareTarget === 'facebook') {
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`, '_blank');
+    } else if (this.shareTarget === 'twitter') {
+      window.open(`https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`, '_blank');
+    } else if (this.shareTarget === 'line') {
+      window.open(`https://social-plugins.line.me/lineit/share?url=${shareUrl}&text=${shareText}`, '_blank');
+    }
+
+    this.closeShareModal();
+  }
+
+  copyShareLink() {
+    const url = window.location.href;
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(url).catch(() => { });
+      return;
+    }
+    const textarea = document.createElement('textarea');
+    textarea.value = url;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
   }
 
   // --- 留言邏輯 ---

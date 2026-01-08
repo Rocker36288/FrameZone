@@ -1,7 +1,6 @@
 ﻿using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Socials.DTOs;
 using FrameZone_WebApi.Socials.Repositories;
-using System.Linq;
 
 namespace FrameZone_WebApi.Socials.Services
 {
@@ -22,7 +21,19 @@ namespace FrameZone_WebApi.Socials.Services
                 return null;
             }
 
-            return posts.Select(p => MapToReadDto(p, currentUserId)).ToList();
+            return await PostReadMapper.MapPostsWithSharedAsync(_postRepository, posts, currentUserId);
+        }
+
+        // ================= 取得指定使用者貼文 =================
+        public async Task<List<PostReadDto>> GetPostsByUserIdAsync(long userId, long? currentUserId)
+        {
+            var posts = await _postRepository.GetPostsByUserIdAsync(userId);
+            if (posts == null)
+            {
+                return null;
+            }
+
+            return await PostReadMapper.MapPostsWithSharedAsync(_postRepository, posts, currentUserId);
         }
 
         // ================= 取得貼文 =================
@@ -34,7 +45,37 @@ namespace FrameZone_WebApi.Socials.Services
                 return null;
             }
 
-            return MapToReadDto(post, currentUserId);
+            var dto = PostReadMapper.MapToReadDto(post, currentUserId);
+            if (post.PostType == "share" && post.PostTypeId.HasValue)
+            {
+                var shared = await _postRepository.GetPostByIdAsync(post.PostTypeId.Value);
+                if (shared != null)
+                {
+                    dto.SharedPost = PostReadMapper.MapToReadDto(shared, currentUserId);
+                }
+            }
+            return dto;
+        }
+
+        // ================= 取得使用者資料 =================
+        public async Task<UserProfileSummaryDto?> GetUserProfileSummaryAsync(long userId)
+        {
+            var user = await _postRepository.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return null;
+            }
+
+            var followerCount = await _postRepository.GetFollowerCountAsync(userId);
+            var followingCount = await _postRepository.GetFollowingCountAsync(userId);
+            return new UserProfileSummaryDto
+            {
+                UserId = user.UserId,
+                DisplayName = user.UserProfile?.DisplayName ?? user.Account ?? "使用者",
+                Avatar = user.UserProfile?.Avatar,
+                FollowerCount = followerCount,
+                FollowingCount = followingCount
+            };
         }
 
         // ================= 新增貼文 =================
@@ -54,7 +95,7 @@ namespace FrameZone_WebApi.Socials.Services
             }
 
             var createdWithUser = await _postRepository.GetPostByIdAsync(created.PostId);
-            return createdWithUser == null ? null : MapToReadDto(createdWithUser, userId);
+            return createdWithUser == null ? null : PostReadMapper.MapToReadDto(createdWithUser, userId);
         }
 
         // ================= 編輯貼文 =================
@@ -83,7 +124,7 @@ namespace FrameZone_WebApi.Socials.Services
                 throw new InvalidOperationException("編輯貼文失敗");
             }
 
-            return MapToReadDto(post, userId);
+            return PostReadMapper.MapToReadDto(post, userId);
         }
 
         // ================= 刪除貼文 =================
@@ -109,21 +150,10 @@ namespace FrameZone_WebApi.Socials.Services
             }
         }
 
-        private static PostReadDto MapToReadDto(Post post, long? currentUserId)
+        public async Task<List<PostReadDto>> GetCommentedPostsAsync(long userId, int limit)
         {
-            return new PostReadDto
-            {
-                PostId = post.PostId,
-                UserId = post.UserId,
-                UserName = post.User?.UserProfile?.DisplayName ?? "新使用者",
-                Avatar = post.User?.UserProfile?.Avatar,
-                PostContent = post.PostContent,
-                PostType = post.PostType,
-                PostTypeId = post.PostTypeId,
-                CreatedAt = post.CreatedAt,
-                UpdatedAt = post.UpdatedAt,
-                IsOwner = currentUserId.HasValue && post.UserId == currentUserId.Value
-            };
+            var posts = await _postRepository.GetCommentedPostsAsync(userId, limit);
+            return await PostReadMapper.MapPostsWithSharedAsync(_postRepository, posts, userId);
         }
     }
 }

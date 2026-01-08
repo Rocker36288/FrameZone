@@ -111,6 +111,21 @@ namespace FrameZone_WebApi.Socials.Services
                 })
                 .ToList();
         }
+
+        public List<RecentChatDto> GetRecentSocialChats(long userId)
+        {
+            return _roomRepo.GetRecentSocialPrivateChats(userId);
+        }
+
+        public List<UnreadCountDto> GetUnreadCounts(long userId)
+        {
+            return _roomRepo.GetUnreadCountsByTargetUser(userId);
+        }
+
+        public bool IsUserInRoom(int roomId, long userId)
+        {
+            return _roomRepo.IsUserInRoom(roomId, userId);
+        }
     }
 
 }
