@@ -45,7 +45,6 @@
     <Folder Include="PhotographerBooking\Services\" />
     <Folder Include="PhotographerBooking\Repositories\" />
     <Folder Include="wwwroot\image\photographerbooking\reviews\" />
-    <Folder Include="wwwroot\image\photographerbooking\portfolios\" />
     <Folder Include="wwwroot\image\photographerbooking\avatars\" />
   </ItemGroup>
 
