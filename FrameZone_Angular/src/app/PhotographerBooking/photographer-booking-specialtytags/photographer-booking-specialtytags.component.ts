@@ -25,6 +25,7 @@ export class PhotographerBookingSpecialtytagsComponent {
       totalBookings: 150,
       avatarUrl: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400',
       portfolioUrl: '',
+      serviceCities: ['台北'],
       services: []
     },
     {
@@ -41,6 +42,7 @@ export class PhotographerBookingSpecialtytagsComponent {
       totalBookings: 300,
       avatarUrl: 'https://images.unsplash.com/photo-1554080353-a576cf803bda?w=400',
       portfolioUrl: '',
+      serviceCities: ['台中'],
       services: []
     },
     {
@@ -57,6 +59,7 @@ export class PhotographerBookingSpecialtytagsComponent {
       totalBookings: 220,
       avatarUrl: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=400',
       portfolioUrl: '',
+      serviceCities: ['台北'],
       services: []
     },
     // Repeat for others if needed, using generic valid DTOs

@@ -29,32 +29,62 @@ export class PhotographerbookingSidebarSearchComponent implements OnInit {
   selectedLocations: Set<string> = new Set();
   selectedTags: Set<string> = new Set();
 
-  constructor(private bookingService: PhotographerBookingService) {}
+  constructor(private bookingService: PhotographerBookingService) { }
 
   ngOnInit(): void {
     this.initializeTagGroups();
   }
 
   initializeTagGroups(): void {
-    // 服務地區
-    const locations = this.bookingService.getLocations();
-    this.tagGroups.push({
-      title: '服務地區',
-      tags: locations,
-      isLocation: true,
-      expanded: locations.length <= 6,
+    // 從後端載入服務地區
+    this.bookingService.getServiceCities().subscribe({
+      next: (cities) => {
+        this.tagGroups.push({
+          title: '服務地區',
+          tags: cities,
+          isLocation: true,
+          expanded: cities.length <= 6,
+        });
+      },
+      error: (err) => {
+        console.error('Error loading service cities', err);
+        // Fallback to mock data
+        const locations = this.bookingService.getLocations();
+        this.tagGroups.push({
+          title: '服務地區',
+          tags: locations,
+          isLocation: true,
+          expanded: locations.length <= 6,
+        });
+      }
     });
 
-    // 動態標籤（拍攝風格、技術專長）
-    const categories = this.bookingService.getCategories();
-    categories.forEach((cat) => {
-      const tags = this.bookingService.getTagsByCategory(cat.id);
-      this.tagGroups.push({
-        title: cat.name,
-        tags: tags,
-        isLocation: false,
-        expanded: tags.length <= 6,
-      });
+    // 從後端載入專長分類與標籤
+    this.bookingService.getCategoriesWithTags().subscribe({
+      next: (categories) => {
+        categories.forEach((cat) => {
+          this.tagGroups.push({
+            title: cat.categoryName,
+            tags: cat.tags,
+            isLocation: false,
+            expanded: cat.tags.length <= 6,
+          });
+        });
+      },
+      error: (err) => {
+        console.error('Error loading specialty categories', err);
+        // Fallback to mock data
+        const categories = this.bookingService.getCategories();
+        categories.forEach((cat) => {
+          const tags = this.bookingService.getTagsByCategory(cat.id);
+          this.tagGroups.push({
+            title: cat.name,
+            tags: tags,
+            isLocation: false,
+            expanded: tags.length <= 6,
+          });
+        });
+      }
     });
   }
 

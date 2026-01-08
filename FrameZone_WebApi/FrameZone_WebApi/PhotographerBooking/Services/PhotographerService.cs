@@ -81,6 +81,7 @@ namespace FrameZone_WebApi.PhotographerBooking.Services
                 AvatarUrl = p.AvatarUrl,
                 PortfolioUrl = p.PortfolioUrl,
                 PortfolioFile = p.PortfolioFile,
+                ServiceCities = p.ServiceAreas?.Select(sa => sa.City).Where(c => !string.IsNullOrEmpty(c)).Distinct().ToList() ?? new List<string>(),
                 YearsOfExperience = p.YearsOfExperience,
                 Specialties = p.PhotographerSpecialties?.Select(s => s.SpecialtyTag?.SpecialtyName ?? "").Where(s => !string.IsNullOrEmpty(s)).ToList() ?? new List<string>(),
                 Services = p.PhotographerServices?.Select(s => new ServiceDto

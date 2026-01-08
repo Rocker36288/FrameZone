@@ -19,6 +19,7 @@ namespace FrameZone_WebApi.PhotographerBooking.DTOs
         public int ReviewCount { get; set; }
         public decimal MinPrice { get; set; }
         public int TotalBookings { get; set; }
+        public List<string> ServiceCities { get; set; } = new List<string>();
         public string PortfolioFile { get; set; }
     }
 

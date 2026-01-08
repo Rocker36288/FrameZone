@@ -9,7 +9,8 @@ import {
   AvailableSlotDto,
   BookingDto,
   CreateBookingDto,
-  PhotographerSearchDto
+  PhotographerSearchDto,
+  CategoryWithTags
 } from '../models/photographer-booking.models';
 
 
@@ -79,17 +80,37 @@ export class PhotographerBookingService {
   searchWithFilters(filters: SearchFilters): Observable<PhotographerDto[]> {
     let params = new HttpParams();
     if (filters.keyword) params = params.set('keyword', filters.keyword);
-    if (filters.serviceType) params = params.set('studioType', filters.serviceType); // Assuming studioType maps to serviceType
-    // locations logic can be complex if multiple, backend supports single location param currently.
-    // We might need to filter client side for multiple locations or update backend.
+    if (filters.serviceType) params = params.set('studioType', filters.serviceType);
+
+    // 如果只有一個地區,傳給後端
+    if (filters.locations.length === 1) {
+      params = params.set('location', filters.locations[0]);
+    }
+
+    // 如果只有一個標籤,傳給後端
+    if (filters.tags.length === 1) {
+      params = params.set('tag', filters.tags[0]);
+    }
 
     return this.http.get<PhotographerDto[]>(this.apiUrl, { params }).pipe(
       map(photographers => {
-        // Apply client-side filters for things backend doesn't handle yet
+        // Apply client-side filters for multiple selections
         return photographers.filter(p => {
-          const matchLoc = filters.locations.length === 0 || filters.locations.some(l => p.studioAddress.includes(l));
-          // const matchPrice... (Need to check service prices)
-          return matchLoc;
+          // 地區篩選: 如果有選擇地區,攝影師的服務城市列表必須包含至少一個選中的地區
+          const matchLoc = filters.locations.length === 0 ||
+            filters.locations.some(l => p.serviceCities?.includes(l));
+
+          // 標籤篩選: 如果有選擇標籤,攝影師必須擁有至少一個選中的標籤
+          const matchTags = filters.tags.length === 0 ||
+            filters.tags.some(tag => p.specialties.some(s => s.includes(tag)));
+
+          // 價格篩選
+          const matchPrice = !p.minPrice || p.minPrice <= filters.maxPrice;
+
+          // 評分篩選
+          const matchRating = !p.rating || p.rating >= filters.minRating;
+
+          return matchLoc && matchTags && matchPrice && matchRating;
         });
       })
     );
@@ -128,6 +149,16 @@ export class PhotographerBookingService {
   // Get popular tags from backend
   getPopularTags(count: number = 10): Observable<string[]> {
     return this.http.get<string[]>(`https://localhost:7213/api/SpecialtyTags/popular?count=${count}`);
+  }
+
+  // Get available service cities
+  getServiceCities(): Observable<string[]> {
+    return this.http.get<string[]>('https://localhost:7213/api/ServiceAreas/cities');
+  }
+
+  // Get specialty categories with tags
+  getCategoriesWithTags(): Observable<CategoryWithTags[]> {
+    return this.http.get<CategoryWithTags[]>('https://localhost:7213/api/SpecialtyCategories');
   }
 
   getTagsByCategory(catId: number): string[] {

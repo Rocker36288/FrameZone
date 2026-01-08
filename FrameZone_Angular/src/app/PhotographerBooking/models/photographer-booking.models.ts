@@ -18,6 +18,7 @@ export interface PhotographerDto {
   minPrice?: number;
   totalBookings?: number;
   portfolioFile?: string;
+  serviceCities?: string[];
 }
 
 export interface ServiceDto {
@@ -92,4 +93,10 @@ export interface SpecialtyTag {
 
 // Keep old Photographer interface for compatibility if needed, or remove it.
 // I'll alias it to PhotographerDto for now to minimize breakage if types are checked by name roughly
-export type Photographer = PhotographerDto; 
+export type Photographer = PhotographerDto;
+
+export interface CategoryWithTags {
+  categoryId: number;
+  categoryName: string;
+  tags: string[];
+}
