@@ -304,6 +304,9 @@ builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IAddressService, AddressService>();
+builder.Services.AddScoped<IFaqService, FaqService>();
+builder.Services.AddScoped<IShoppingMemberService, ShoppingMemberService>();
+builder.Services.AddScoped<IShoppingStoreService, ShoppingStoreService>();
 builder.Services.AddScoped<ECPayService>();  //綠界注入
 
 

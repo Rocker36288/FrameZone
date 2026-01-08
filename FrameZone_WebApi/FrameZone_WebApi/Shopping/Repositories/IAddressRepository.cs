@@ -27,5 +27,9 @@ namespace FrameZone_WebApi.Shopping.Repositories
         /// <param name="userId">使用者 ID</param>
         /// <param name="newDefaultAddressId">新的預設地址 ID</param>
         Task UpdateDefaultStatusAsync(long userId, int newDefaultAddressId);
+
+        Task<ReceivingAddress?> GetByIdAsync(int addressId);
+        Task UpdateAsync(ReceivingAddress address);
+        Task DeleteAsync(ReceivingAddress address);
     }
 }

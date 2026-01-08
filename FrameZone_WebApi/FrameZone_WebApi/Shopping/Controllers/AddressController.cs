@@ -132,6 +132,42 @@ namespace FrameZone_WebApi.Shopping.Controllers
             }
         }
 
+        [HttpPut("{addressId}")]
+        public async Task<IActionResult> UpdateAddress(int addressId, [FromBody] CreateAddressDto dto)
+        {
+            var userId = GetUserIdFromToken();
+            if (userId == null) return Unauthorized();
+
+            var result = await _addressService.UpdateAddressAsync(userId.Value, addressId, dto);
+            if (!result.Success) return BadRequest(new { success = false, message = result.Message });
+
+            return Ok(new { success = true, message = result.Message });
+        }
+
+        [HttpDelete("{addressId}")]
+        public async Task<IActionResult> DeleteAddress(int addressId)
+        {
+            var userId = GetUserIdFromToken();
+            if (userId == null) return Unauthorized();
+
+            var result = await _addressService.DeleteAddressAsync(userId.Value, addressId);
+            if (!result.Success) return BadRequest(new { success = false, message = result.Message });
+
+            return Ok(new { success = true, message = result.Message });
+        }
+
+        [HttpPut("{addressId}/default")]
+        public async Task<IActionResult> SetDefault(int addressId)
+        {
+            var userId = GetUserIdFromToken();
+            if (userId == null) return Unauthorized();
+
+            var result = await _addressService.SetDefaultAddressAsync(userId.Value, addressId);
+            if (!result.Success) return BadRequest(new { success = false, message = result.Message });
+
+            return Ok(new { success = true, message = result.Message });
+        }
+
         /// <summary>
         /// 從 JWT Token 取得使用者 ID
         /// </summary>

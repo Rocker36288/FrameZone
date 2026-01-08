@@ -22,13 +22,4 @@
         public int Price { get; set; }
         public int Quantity { get; set; }
     }
-
-    public class PickupStoreDto
-    {
-        public int Id { get; set; }
-        public string StoreName { get; set; } = string.Empty;
-        public string StoreCode { get; set; } = string.Empty;
-        public string RecipientName { get; set; } = string.Empty;
-        public string PhoneNumber { get; set; } = string.Empty;
-    }
 }

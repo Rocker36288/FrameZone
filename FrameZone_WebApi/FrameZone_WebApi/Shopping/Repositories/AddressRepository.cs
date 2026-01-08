@@ -62,5 +62,23 @@ namespace FrameZone_WebApi.Shopping.Repositories
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task<ReceivingAddress?> GetByIdAsync(int addressId)
+        {
+            return await _context.ReceivingAddresses.FindAsync(addressId);
+        }
+
+        public async Task UpdateAsync(ReceivingAddress address)
+        {
+            address.UpdatedAt = DateTime.Now;
+            _context.ReceivingAddresses.Update(address);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(ReceivingAddress address)
+        {
+            _context.ReceivingAddresses.Remove(address);
+            await _context.SaveChangesAsync();
+        }
     }
 }

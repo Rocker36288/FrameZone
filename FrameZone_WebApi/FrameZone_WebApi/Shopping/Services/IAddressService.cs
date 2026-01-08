@@ -35,5 +35,9 @@ namespace FrameZone_WebApi.Shopping.Services
         /// <param name="dto">建立地址 DTO</param>
         /// <returns>驗證結果</returns>
         (bool IsValid, string ErrorMessage) ValidateAddress(CreateAddressDto dto);
+
+        Task<(bool Success, string Message)> UpdateAddressAsync(long userId, int addressId, CreateAddressDto dto);
+        Task<(bool Success, string Message)> DeleteAddressAsync(long userId, int addressId);
+        Task<(bool Success, string Message)> SetDefaultAddressAsync(long userId, int addressId);
     }
 }
