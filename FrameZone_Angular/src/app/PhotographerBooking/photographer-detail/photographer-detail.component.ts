@@ -60,6 +60,12 @@ export class PhotographerDetailComponent implements OnInit {
   loadData(id: number): void {
     this.bookingService.getPhotographerById(id).subscribe({
       next: (data) => {
+        const apiBaseUrl = 'https://localhost:7213';
+
+        if (data.avatarUrl && !data.avatarUrl.startsWith('http')) {
+          data.avatarUrl = `${apiBaseUrl}${data.avatarUrl}`;
+        }
+
         this.photographer = data;
         this.services = data.services;
         this.specialties = data.specialties;
