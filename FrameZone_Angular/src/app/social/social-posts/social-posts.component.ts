@@ -1,6 +1,6 @@
 import { PostService } from '../services/post.service';
 import { CommentService } from '../services/comment.service';
-import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, Output, signal, inject } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, Output, signal, inject } from '@angular/core';
 import { PostDto } from "../models/PostDto";
 import { CommentDto } from "../models/CommentDto";
 import { DatePipe, SlicePipe } from '@angular/common';
