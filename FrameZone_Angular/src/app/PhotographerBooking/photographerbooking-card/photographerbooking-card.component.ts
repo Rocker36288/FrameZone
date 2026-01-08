@@ -22,6 +22,33 @@ export class PhotographerbookingCardComponent {
     return '價格詳談';
   }
 
+  get cardImage(): string {
+    const apiBaseUrl = 'https://localhost:7213';
+
+    // 優先使用 portfolioFile 的第一張圖
+    if (this.photographer.portfolioFile) {
+      const files = this.photographer.portfolioFile.split(',');
+      if (files.length > 0) {
+        const firstImage = files[0].trim();
+        if (firstImage.startsWith('http')) {
+          return firstImage;
+        }
+        return `${apiBaseUrl}${firstImage}`;
+      }
+    }
+
+    // Fallback 到 portfolioUrl
+    if (this.photographer.portfolioUrl) {
+      if (this.photographer.portfolioUrl.startsWith('http')) {
+        return this.photographer.portfolioUrl;
+      }
+      return `${apiBaseUrl}${this.photographer.portfolioUrl}`;
+    }
+
+    // 最後 fallback 到預設圖片
+    return '/images/Photographer/photographercard001.png';
+  }
+
   onViewDetails(): void {
     this.router.navigate(['/photographer-detail'], { queryParams: { id: this.photographer.photographerId } });
   }

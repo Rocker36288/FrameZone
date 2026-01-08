@@ -17,6 +17,7 @@ export interface PhotographerDto {
   reviewCount?: number;
   minPrice?: number;
   totalBookings?: number;
+  portfolioFile?: string;
 }
 
 export interface ServiceDto {
@@ -36,6 +37,7 @@ export interface PhotographerSearchDto {
   keyword?: string;
   location?: string;
   studioType?: string;
+  tag?: string;
 }
 
 export interface SearchFilters {

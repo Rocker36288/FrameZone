@@ -35,6 +35,7 @@ export class PhotographerBookinghomeComponent implements OnInit {
     // For now get all and take top 4 or use search parameters if API supports "featured"
     this.bookingService.getAllPhotographers().subscribe({
       next: (data) => {
+        console.log('API Data received:', data); // Debugging log
         // Take first 4 as featured for now
         this.featuredPhotographers = data.slice(0, 4);
       },

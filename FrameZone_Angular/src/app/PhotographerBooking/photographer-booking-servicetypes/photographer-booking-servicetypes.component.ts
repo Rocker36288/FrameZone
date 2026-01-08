@@ -19,19 +19,19 @@ export class PhotographerBookingServicetypesComponent {
       link: '/photographerbooking-page-search',
     },
     {
-      title: '產品攝影',
+      title: '商業攝影',
       desc: '拍攝高質感商品照片，提升銷售力',
       img: 'images/Photographer/Type-Product.png',
       link: '/photographerbooking-page-search',
     },
     {
-      title: '商業活動攝影',
+      title: '活動攝影',
       desc: '完整記錄企業活動與品牌形象',
       img: 'images/Photographer/Type-Event.jpg',
       link: '/photographerbooking-page-search',
     },
     {
-      title: '空間攝影',
+      title: '空間建築',
       desc: '拍攝室內空間與建築展示照片',
       img: 'images/Photographer/Type-Space.png',
       link: '/photographerbooking-page-search',

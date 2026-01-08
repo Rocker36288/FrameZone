@@ -1,11 +1,7 @@
 <div class="hero-container">
   <!-- 背景輪播圖 -->
-  <div
-    *ngFor="let img of dbImages; let i = index"
-    class="carousel-item"
-    [class.active]="i === currentIndex"
-    [style.backgroundImage]="'url(' + img.url + ')'"
-  >
+  <div *ngFor="let img of dbImages; let i = index" class="carousel-item" [class.active]="i === currentIndex"
+    [style.backgroundImage]="'url(' + img.url + ')'">
     <div class="photographer-tag">
       攝影師：{{ img.author }} | {{ img.style }}
     </div>
@@ -15,7 +11,7 @@
 
   <div class="hero-content">
     <h1>捕捉您的專屬瞬間</h1>
-    <p>搜尋超過 500 位高品質攝影師，即時查看檔期</p>
+    <p>搜尋高品質攝影師，即時查看檔期</p>
 
     <!-- 搜尋表單 -->
     <form class="search-bar" (ngSubmit)="onSearch()">

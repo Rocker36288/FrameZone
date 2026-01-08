@@ -30,7 +30,7 @@ namespace FrameZone_WebApi.PhotographerBooking.Services
 
         public async Task<List<PhotographerDto>> SearchPhotographersAsync(PhotographerSearchDto searchDto)
         {
-            var photographers = await _photographerRepository.SearchPhotographersAsync(searchDto.Keyword, searchDto.Location, searchDto.StudioType);
+            var photographers = await _photographerRepository.SearchPhotographersAsync(searchDto.Keyword, searchDto.Location, searchDto.StudioType, searchDto.Tag);
             return photographers.Select(p => MapToDto(p)).ToList();
         }
 
@@ -71,7 +71,7 @@ namespace FrameZone_WebApi.PhotographerBooking.Services
             return new PhotographerDto
             {
                 PhotographerId = p.PhotographerId,
-                DisplayName = !string.IsNullOrEmpty(p.StudioName) ? p.StudioName : p.DisplayName, // Prioritize StudioName if available, or keep DisplayName
+                DisplayName = p.DisplayName, // Direct mapping to avoid duplication with StudioName
                 StudioName = p.StudioName,
                 // Map StudioType to first ServiceType name if available, else fallback to StudioType string
                 StudioType = p.PhotographerServices?.FirstOrDefault()?.ServiceType?.ServiceName ?? p.StudioType ?? "攝影師", 
@@ -80,6 +80,7 @@ namespace FrameZone_WebApi.PhotographerBooking.Services
                 Description = p.Description,
                 AvatarUrl = p.AvatarUrl,
                 PortfolioUrl = p.PortfolioUrl,
+                PortfolioFile = p.PortfolioFile,
                 YearsOfExperience = p.YearsOfExperience,
                 Specialties = p.PhotographerSpecialties?.Select(s => s.SpecialtyTag?.SpecialtyName ?? "").Where(s => !string.IsNullOrEmpty(s)).ToList() ?? new List<string>(),
                 Services = p.PhotographerServices?.Select(s => new ServiceDto
@@ -97,10 +98,11 @@ namespace FrameZone_WebApi.PhotographerBooking.Services
                 }).ToList() ?? new List<ServiceDto>(),
                 
                 // Calculated fields
-                //Rating = (double)rating,
-                //ReviewCount = reviews.Count,
-                //MinPrice = minPrice,
-                //TotalBookings = p.Bookings?.Count ?? 0
+                // Calculated fields
+                Rating = (double)rating,
+                ReviewCount = reviews.Count,
+                MinPrice = minPrice,
+                TotalBookings = p.Bookings?.Count ?? 0
             };
         }
     }

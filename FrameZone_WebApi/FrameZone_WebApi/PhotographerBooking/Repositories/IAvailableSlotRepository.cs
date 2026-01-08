@@ -1,4 +1,4 @@
-using FrameZone_WebApi.Models;
+﻿using FrameZone_WebApi.Models;
 
 namespace FrameZone_WebApi.PhotographerBooking.Repositories
 {
@@ -11,3 +11,4 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
         Task<bool> IsSlotAvailableAsync(int slotId);
     }
 }
+//管理攝影師的可預約時段。

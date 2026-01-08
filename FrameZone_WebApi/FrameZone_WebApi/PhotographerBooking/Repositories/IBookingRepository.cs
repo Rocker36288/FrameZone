@@ -1,4 +1,4 @@
-using FrameZone_WebApi.Models;
+﻿using FrameZone_WebApi.Models;
 
 namespace FrameZone_WebApi.PhotographerBooking.Repositories
 {
@@ -11,3 +11,4 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
         Task<bool> UpdateBookingStatusAsync(int bookingId, string status);
     }
 }
+//處理預約單的建立與查詢

@@ -15,6 +15,11 @@ namespace FrameZone_WebApi.PhotographerBooking.DTOs
         public int? YearsOfExperience { get; set; }
         public List<string> Specialties { get; set; } = new List<string>();
         public List<ServiceDto> Services { get; set; } = new List<ServiceDto>();
+        public double Rating { get; set; }
+        public int ReviewCount { get; set; }
+        public decimal MinPrice { get; set; }
+        public int TotalBookings { get; set; }
+        public string PortfolioFile { get; set; }
     }
 
     public class ServiceDto
@@ -33,9 +38,10 @@ namespace FrameZone_WebApi.PhotographerBooking.DTOs
 
     public class PhotographerSearchDto
     {
-        public string Keyword { get; set; }
-        public string Location { get; set; }
-        public string StudioType { get; set; }
+        public string? Keyword { get; set; }
+        public string? Location { get; set; }
+        public string? StudioType { get; set; }
+        public string? Tag { get; set; } // Specialty tag name
     }
 
     public class BookingDto

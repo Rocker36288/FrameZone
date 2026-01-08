@@ -21,7 +21,7 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
                 .Include(p => p.ServiceAreas)
                 .Include(p => p.PhotographerServices).ThenInclude(ps => ps.ServiceType)
                 .Include(p => p.PhotographerSpecialties).ThenInclude(ps => ps.SpecialtyTag)
-                .Include(p => p.Bookings).ThenInclude(b => b.Reviews)
+                .Include(p => p.Bookings).ThenInclude(b => b.Reviews).ThenInclude(r => r.ReviewPhotos)
                 .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();
         }
@@ -33,11 +33,11 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
                 .Include(p => p.ServiceAreas)
                 .Include(p => p.PhotographerServices).ThenInclude(ps => ps.ServiceType)
                 .Include(p => p.PhotographerSpecialties).ThenInclude(ps => ps.SpecialtyTag)
-                .Include(p => p.Bookings).ThenInclude(b => b.Reviews)
+                .Include(p => p.Bookings).ThenInclude(b => b.Reviews).ThenInclude(r => r.ReviewPhotos)
                 .FirstOrDefaultAsync(p => p.PhotographerId == id);
         }
 
-        public async Task<List<Photographer>> SearchPhotographersAsync(string keyword, string location, string studioType)
+        public async Task<List<Photographer>> SearchPhotographersAsync(string keyword, string location, string studioType, string tag)
         {
             var query = _context.Photographers.AsQueryable();
 
@@ -48,7 +48,10 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
 
             if (!string.IsNullOrWhiteSpace(location))
             {
-                query = query.Where(p => p.StudioAddress.Contains(location));
+                query = query.Where(p => 
+                    p.StudioAddress.Contains(location) || 
+                    p.ServiceAreas.Any(sa => sa.City.Contains(location))
+                );
             }
 
             if (!string.IsNullOrWhiteSpace(studioType))
@@ -56,12 +59,19 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
                 query = query.Where(p => p.StudioType == studioType);
             }
 
+            if (!string.IsNullOrWhiteSpace(tag))
+            {
+                query = query.Where(p => 
+                    p.PhotographerSpecialties.Any(ps => ps.SpecialtyTag.SpecialtyName.Contains(tag))
+                );
+            }
+
             return await query
                 .Include(p => p.User)
                 .Include(p => p.ServiceAreas)
                 .Include(p => p.PhotographerServices).ThenInclude(ps => ps.ServiceType)
                 .Include(p => p.PhotographerSpecialties).ThenInclude(ps => ps.SpecialtyTag)
-                .Include(p => p.Bookings).ThenInclude(b => b.Reviews)
+                .Include(p => p.Bookings).ThenInclude(b => b.Reviews).ThenInclude(r => r.ReviewPhotos)
                 .ToListAsync();
         }
 
