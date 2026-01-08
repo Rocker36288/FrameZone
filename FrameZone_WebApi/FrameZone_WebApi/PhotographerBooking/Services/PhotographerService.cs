@@ -71,7 +71,7 @@ namespace FrameZone_WebApi.PhotographerBooking.Services
             return new PhotographerDto
             {
                 PhotographerId = p.PhotographerId,
-                DisplayName = !string.IsNullOrEmpty(p.StudioName) ? p.StudioName : p.DisplayName, // Prioritize StudioName if available, or keep DisplayName
+                DisplayName = p.DisplayName, // Direct mapping to avoid duplication with StudioName
                 StudioName = p.StudioName,
                 // Map StudioType to first ServiceType name if available, else fallback to StudioType string
                 StudioType = p.PhotographerServices?.FirstOrDefault()?.ServiceType?.ServiceName ?? p.StudioType ?? "攝影師", 
