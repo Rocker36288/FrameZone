@@ -6,6 +6,10 @@ using FrameZone_WebApi.Models;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using System.Net;
+using System.Text;
+using System.Globalization;
+
 
 namespace FrameZone_WebApi.Shopping.Controllers
 {
@@ -95,10 +99,44 @@ namespace FrameZone_WebApi.Shopping.Controllers
             string merchantTradeNo = "FZ" + newOrder.OrderId.ToString("D8") + DateTime.Now.ToString("HHmmss");
             if (merchantTradeNo.Length > 20) merchantTradeNo = merchantTradeNo.Substring(0, 20);
 
-            ECPayOrderParamsDto result = _ecpayService.CreateECPayOrder(order, merchantTradeNo);
+            ECPayOrderParamsDto ecpay = _ecpayService.CreateECPayOrder(order, merchantTradeNo);
 
-            return Ok(result);
+            // 將 ECPay 參數包成 HTML form（前端會抓 res.ecPayForm 去 submit）
+            string htmlForm = BuildEcpayForm(ecpay);
+
+            return Ok(new
+            {
+                orderId = newOrder.OrderId,
+                ecPayForm = htmlForm
+            });
         }
+
+        private static string BuildEcpayForm(ECPayOrderParamsDto ecpay)
+        {
+            // 假設 DTO 內有：ServiceURL、HttpMethod、Params(Dictionary<string,string>)
+            var sb = new StringBuilder();
+
+            var method = string.IsNullOrWhiteSpace(ecpay.HttpMethod) ? "POST" : ecpay.HttpMethod;
+
+            sb.Append($"<form id=\"ecpayForm\" method=\"{WebUtility.HtmlEncode(method)}\" action=\"{WebUtility.HtmlEncode(ecpay.ServiceURL)}\">");
+
+            if (ecpay.Params != null)
+            {
+                foreach (var kv in ecpay.Params)
+                {
+                    var valueStr = Convert.ToString(kv.Value, CultureInfo.InvariantCulture) ?? string.Empty;
+
+                    sb.Append(
+                        $"<input type=\"hidden\" name=\"{WebUtility.HtmlEncode(kv.Key)}\" value=\"{WebUtility.HtmlEncode(valueStr)}\" />"
+                    );
+                }
+
+            }
+
+            sb.Append("</form>");
+            return sb.ToString();
+        }
+
 
         // 最後付款完成通知 (綠界 Server to Server)
         // 此方法不受網址重定向影響，是綠界伺服器直接發送給本系統的確認訊息，最為可靠。

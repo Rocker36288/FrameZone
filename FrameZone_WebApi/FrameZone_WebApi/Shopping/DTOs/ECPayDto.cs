@@ -22,6 +22,8 @@
             //{"CheckMacValue", ""}, 計算檢查碼後再新增
             {"EncryptType", 1},
             // 其他 optional 參數會等收到前端的 request 後新增
+            {"OrderResultURL", ""},
+            {"ClientBackURL", ""}
         };
 
         // Debug 檢查用

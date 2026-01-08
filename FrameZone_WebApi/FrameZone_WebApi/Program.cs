@@ -291,6 +291,7 @@ builder.Services.AddScoped<IGeocodingService, GeocodingService>();
 
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ECPayService>();
 
 // ========== 社群服務 (DI注入) ==========
 builder.Services.AddScoped<PostRepository>();

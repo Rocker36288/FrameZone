@@ -1,5 +1,5 @@
 import { HeaderComponent } from './../../shared/components/header/header.component';
-import { Component, computed, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, computed, ElementRef, ViewChild } from '@angular/core';
 import { CartItem, Coupon } from '../interfaces/cart';
 import { OrderDto } from '../interfaces/order';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -7,8 +7,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { CartService } from '../shared/services/cart.service';
 import { OrderService } from '../shared/services/order.service';
-import { EcpayFormComponent } from '../shared/components/ecpay-form/ecpay-form.component';
-import { frontendPublicUrl, backendPublicUrl } from '../shared/configuration/url';
+import { frontendPublicUrl } from '../shared/configuration/url';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../shared/services/toast.service';
 import { Subject, takeUntil } from 'rxjs';
@@ -19,7 +18,7 @@ import { ReceivingAddress } from '../interfaces/address';
 @Component({
   selector: 'app-shopping-checkout',
   standalone: true,
-  imports: [FormsModule, CommonModule, ReactiveFormsModule, HeaderComponent, RouterLink, EcpayFormComponent],
+  imports: [FormsModule, CommonModule, ReactiveFormsModule, HeaderComponent, RouterLink],
   templateUrl: './shopping-checkout.component.html',
   styleUrl: './shopping-checkout.component.css'
 })
@@ -65,20 +64,6 @@ export class ShoppingCheckoutComponent {
   newPhoneNumber: string = '';
   newFullAddress: string = '';
   saveAddress: boolean = false;
-  // savedAddresses = [
-  //   {
-  //     id: 1,
-  //     name: '王小明',
-  //     phone: '0912-345-678',
-  //     address: '110 台北市信義區信義路五段7號 (台北 101)'
-  //   },
-  //   {
-  //     id: 2,
-  //     name: '家裡 (李大華)',
-  //     phone: '0988-123-456',
-  //     address: '220 新北市板橋區中山路一段1號'
-  //   }
-  // ];
 
   // 使用 Signal 的 Computed 屬性：從 Service 篩選出「已勾選」商品並進行分組
   groupedSelectedItems = computed(() => {
@@ -102,18 +87,6 @@ export class ShoppingCheckoutComponent {
     return groups;
   });
 
-  // 2. 屬性 (Property): 模擬購物車資料
-  // cartItems: CartItem[] = [
-  //   { id: 1, name: '相機 A', price: 2500, quantity: 1, selected: false },
-  //   { id: 2, name: '相機 B', price: 3500, quantity: 1, selected: false },
-  //   { id: 3, name: '相機 C', price: 4500, quantity: 1, selected: false },
-  //   { id: 4, name: '相機 D', price: 5500, quantity: 1, selected: false },
-  //   { id: 5, name: '相機 E', price: 6500, quantity: 1, selected: false },
-  //   { id: 6, name: '相機 F', price: 7500, quantity: 1, selected: false },
-
-  //   // 這裡的資料會從 API 服務中獲取，但目前先以硬編碼模擬
-  // ];
-
   // --- 優惠券相關屬性 ---
   couponCodeInput: string = '';
   selectedDiscount: number = 0;
@@ -129,10 +102,6 @@ export class ShoppingCheckoutComponent {
   // 會員資料
   memberAvatarUrl: string = '';
   memberName: string = '';
-
-
-  // 使用綠界 API 需要的相關參數
-  ecpayParams: any = null;
 
   ngOnInit(): void {
     if (!this.authService.isAuthenticated()) {
@@ -237,32 +206,23 @@ export class ShoppingCheckoutComponent {
         this.pickupStores = res.map(s => ({
           id: s.convenienceStoreId,
           name: s.convenienceStoreName,
-          code: s.convenienceStoreCode,
-          address: `店號: ${s.convenienceStoreCode}`,
-          phone: s.phoneNumber,
-          recipient: s.recipientName
+          address: s.convenienceStoreCode,
+          phone: ''
         }));
-      }
+      },
+      error: (err) => console.error('取得門市失敗：', err)
     });
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  // 取得目前選取的運費金額
-  getShippingFee(): number {
-    const method = this.checkoutForm?.get('shippingMethod')?.value;
-    return this.shippingRates[method] || 0;
-  }
-
-  /** 取得商品小計 (從 Service 直接獲取已選商品總額) */
   getTotalAmount(): number {
     return this.cartService.totalAmount();
   }
 
-  /** 最終應付金額計算 (商品總額 - 折扣 + 運費) */
+  getShippingFee(): number {
+    const method = this.checkoutForm.get('shippingMethod')?.value;
+    return this.shippingRates[method] || 0;
+  }
+
   getFinalTotal(): number {
     // 直接從 Service 讀取折扣金額，最保險
     const discount = this.cartService.appliedDiscount();
@@ -394,14 +354,12 @@ export class ShoppingCheckoutComponent {
       orderItems: orderItems,
       totalAmount: this.getFinalTotal(),
       paymentMethod: this.checkoutForm.value.paymentMethod,
-      returnURL: `${backendPublicUrl}/api/order/pay-result`,
       recipientName: recipientName,
       phoneNumber: phoneNumber,
       shippingAddress: shippingAddress,
       shippingMethod: method,
       optionParams: {
         ClientBackURL: clientBackURL,
-        OrderResultURL: `${backendPublicUrl}/api/order/success-redirect`
       }
     };
 
@@ -419,23 +377,67 @@ export class ShoppingCheckoutComponent {
       return;
     }
 
+    // 線上付款：建立訂單並開啟 ECPay
     this.orderService.createOrder(orderData).subscribe({
       next: (res: any) => {
-        console.log("Success", res);
+        console.log("✅ 訂單建立成功", res);
 
-        // 訂單完成：清空購物車 + 優惠券
-        this.cartService.markOrderCompleted();
+        if (res.ecPayForm) {
+          // 在新視窗開啟 ECPay 付款頁
+          this.submitECPayFormInNewWindow(res.ecPayForm);
 
-        // 用參數填到表單並用綠界 API 發送訂單
-        this.ecpayParams = res;
+          // 訂單完成：清空購物車 + 優惠券
+          this.cartService.markOrderCompleted();
+
+          // 顯示提示訊息
+          this.toastService.show('付款頁面已在新視窗開啟，請完成付款', 'top');
+
+          // 導航到商城首頁
+          setTimeout(() => {
+            this.router.navigate(['/shopping/home']);
+          }, 2000);
+        } else {
+          console.error('❌ 沒有收到 ECPay 表單');
+          this.toastService.show('建立訂單失敗，請稍後再試', 'top');
+        }
       },
       error: (err) => {
-        console.log("Error", err);
+        console.error("❌ 訂單建立失敗", err);
+        this.toastService.show('結帳失敗，請稍後再試', 'top');
       }
     });
+  }
 
-    // 前往成功頁
-    //this.router.navigate(['/order-success']);
+  /**
+   * 在新視窗開啟 ECPay 付款頁面
+   */
+  private submitECPayFormInNewWindow(htmlForm: string): void {
+    // 建立臨時容器
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlForm;
+
+    // 找到表單元素
+    const form = tempDiv.querySelector('form') as HTMLFormElement;
+
+    if (form) {
+      // ✅ 關鍵：設定在新視窗開啟
+      form.target = '_blank';
+
+      // 將表單加入 DOM
+      document.body.appendChild(form);
+
+      // 自動提交表單
+      form.submit();
+
+      // 清理：移除已提交的表單
+      setTimeout(() => {
+        document.body.removeChild(form);
+      }, 100);
+
+      console.log('✅ ECPay 表單已在新視窗開啟');
+    } else {
+      console.error('❌ 找不到 ECPay 表單元素');
+    }
   }
 
   /**

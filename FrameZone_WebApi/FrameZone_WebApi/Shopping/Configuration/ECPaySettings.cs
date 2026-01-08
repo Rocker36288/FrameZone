@@ -1,4 +1,6 @@
-﻿namespace FrameZone_WebApi.Shopping.Configuration
+﻿using Microsoft.OpenApi;
+
+namespace FrameZone_WebApi.Shopping.Configuration
 {
     public class ECPaySettings
     {
@@ -6,5 +8,10 @@
         public string MerchantID { get; set; } = string.Empty;
         public string HashKey { get; set; } = string.Empty;
         public string HashIV { get; set; } = string.Empty;
+
+        public string ApiUrl { get; set; } = string.Empty;
+
+        public string PayResultPath { get; set; } = string.Empty;
+        public string ServerReturnURL { get; set; } = string.Empty;
     }
 }

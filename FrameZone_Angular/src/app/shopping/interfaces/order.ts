@@ -2,7 +2,7 @@ export interface OrderDto {
   orderItems: OrderItem[];
   totalAmount: number;
   paymentMethod: string;
-  returnURL: string;
+  returnURL?: string;
 
   recipientName?: string;
   phoneNumber?: string;

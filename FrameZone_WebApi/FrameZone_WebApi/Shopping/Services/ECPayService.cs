@@ -11,6 +11,7 @@ namespace FrameZone_WebApi.Shopping.Services
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<ECPayService> _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         // 設定各參數的最大長度（只列特別需要檢查的）
         private Dictionary<string, int> ECPayOrderParamsMaxLength = new Dictionary<string, int> {
@@ -26,10 +27,18 @@ namespace FrameZone_WebApi.Shopping.Services
             //{"OrderResultURL", 200},
         };
 
-        public ECPayService(IConfiguration configuration, ILogger<ECPayService> logger)
+        public ECPayService(IConfiguration configuration, ILogger<ECPayService> logger, IHttpContextAccessor httpContextAccessor)
         {
             _configuration = configuration;
             _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        private string GetBaseUrl()
+        {
+            var ctx = _httpContextAccessor.HttpContext;
+            if (ctx == null) return string.Empty;
+            return $"{ctx.Request.Scheme}://{ctx.Request.Host}";
         }
 
         // 準備綠界要的參數
@@ -37,51 +46,81 @@ namespace FrameZone_WebApi.Shopping.Services
         // 這樣在綠界非同步回傳付款結果時，才能準確地抓到是對應哪一筆本地訂單。
         public ECPayOrderParamsDto CreateECPayOrder(OrderDto order, string merchantTradeNo)
         {
-            ECPayOrderParamsDto orderParams = new ECPayOrderParamsDto();
-            // string serialNum = DateTime.Now.Ticks.ToString().Substring(0, 10);
-
-            orderParams.Params["MerchantID"] = _configuration["ECPaySettings:MerchantID"];
-            orderParams.Params["MerchantTradeNo"] = merchantTradeNo;
-            orderParams.Params["MerchantTradeDate"] = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
-            orderParams.Params["TotalAmount"] = order.TotalAmount;
-            orderParams.Params["TradeDesc"] = "FrameZone Order " + merchantTradeNo;
-            orderParams.Params["ChoosePayment"] = order.PaymentMethod;
-            orderParams.Params["ReturnURL"] = order.ReturnURL;
-
-            //寫在綠界付款畫面的商品明細
-            if (order.OrderItems != null)
+            try
             {
-                StringBuilder stringBuilder = new StringBuilder();
-                bool isFirst = true;
+                ECPayOrderParamsDto orderParams = new ECPayOrderParamsDto();
 
-                foreach (var item in order.OrderItems)
+                orderParams.Params["MerchantID"] = _configuration["ECPaySettings:MerchantID"];
+                orderParams.Params["MerchantTradeNo"] = merchantTradeNo;
+                orderParams.Params["MerchantTradeDate"] = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
+                orderParams.Params["TotalAmount"] = order.TotalAmount;
+                orderParams.Params["TradeDesc"] = "FrameZone Order " + merchantTradeNo;
+                orderParams.Params["ChoosePayment"] = order.PaymentMethod;
+
+                // 商品明細
+                if (order.OrderItems != null)
                 {
-                    if (isFirst)
+                    StringBuilder stringBuilder = new StringBuilder();
+                    bool isFirst = true;
+
+                    foreach (var item in order.OrderItems)
                     {
-                        stringBuilder.Append(item.Name?.ToString() + " * " + item.Quantity.ToString());
-                        isFirst = false;
+                        if (isFirst)
+                        {
+                            stringBuilder.Append(item.Name?.ToString() + " * " + item.Quantity.ToString());
+                            isFirst = false;
+                        }
+                        else
+                        {
+                            stringBuilder.Append("#" + item.Name?.ToString() + " * " + item.Quantity.ToString());
+                        }
                     }
-                    else
+                    orderParams.Params["ItemName"] = stringBuilder.ToString();
+                }
+
+                // 其他可選參數帶入前端給的資訊
+                if (order.OptionParams != null)
+                {
+                    foreach (KeyValuePair<string, object> option in order.OptionParams)
                     {
-                        //第二樣以上商品用#換行
-                        stringBuilder.Append("#" + item.Name?.ToString() + " * " + item.Quantity.ToString());
+                        // 使用索引器而不是 Add()，這樣不會因重複 key 報錯
+                        orderParams.Params[option.Key] = option.Value;  // ✅ 改這裡
                     }
                 }
 
-                orderParams.Params["ItemName"] = stringBuilder.ToString();
-            }
+                // ===== URL 設定（必須在 optionParams 之後） =====
+                var baseUrl = GetBaseUrl().TrimEnd('/');
 
-            //其他可選參數帶入前端給的資訊
-            if (order.OptionParams != null)
+                // 1) 綠界 Server-to-Server 付款通知：只回 1|OK
+                var payResultPath = _configuration["ECPaySettings:PayResultPath"] ?? "/api/order/pay-result";
+                var serverReturnUrl = $"{baseUrl}{payResultPath}";
+
+                // 2) 使用者付款完成回跳：導到中轉頁（它會再導回前端 order-success）
+                var successRedirectPath = _configuration["ECPaySettings:SuccessRedirectPath"] ?? "/api/order/success-redirect";
+                var orderResultUrl = $"{baseUrl}{successRedirectPath}";
+
+                // 寫回參數
+                orderParams.Params["ReturnURL"] = serverReturnUrl;
+                orderParams.Params["OrderResultURL"] = orderResultUrl;
+
+                // 3) ClientBackURL：使用者按「返回商店」導回（你原本用 ContainsKey 會永遠不會設定，因為 DTO 先放了空字串）
+                var frontendUrl = _configuration["AppSettings:FrontendUrl"] ?? "http://localhost:4200";
+                orderParams.Params["ClientBackURL"] = $"{frontendUrl.TrimEnd('/')}/shopping/home";
+
+                _logger.LogInformation($"最終 ReturnURL: {orderParams.Params["ReturnURL"]}");
+                _logger.LogInformation($"最終 OrderResultURL: {orderParams.Params["OrderResultURL"]}");
+                _logger.LogInformation($"最終 ClientBackURL: {orderParams.Params["ClientBackURL"]}");
+
+                return CheckECPayOrderParams(orderParams);
+            }
+            catch (Exception ex)
             {
-                foreach (KeyValuePair<string, object> option in order.OptionParams)
-                {
-                    orderParams.Params.Add(option.Key, option.Value);
-                }
+                _logger.LogError($"CreateECPayOrder 錯誤: {ex.Message}");
+                _logger.LogError($"StackTrace: {ex.StackTrace}");
+                throw;
             }
-
-            return CheckECPayOrderParams(orderParams);
         }
+
 
         public void HandleECPayOrderResult(FormCollection result)
         {
