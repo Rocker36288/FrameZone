@@ -136,4 +136,10 @@ namespace FrameZone_WebApi.Videos.DTOs
         public int LikeCount { get; set; }
         public int ViewCount { get; set; }
     }
+
+    public class ChannelSpotlightDto
+{
+    public ChannelCardDto Channel { get; set; }
+    public List<VideoCardDto> Videos { get; set; } = new();
+}
 }

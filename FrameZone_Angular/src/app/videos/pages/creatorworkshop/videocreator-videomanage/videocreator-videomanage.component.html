@@ -53,7 +53,7 @@
     <div class="card-body">
       <div class="row g-3 align-items-center">
         <!-- 狀態篩選 -->
-        <div class="col-md-3">
+        <!-- <div class="col-md-3">
           <label class="form-label">影片狀態</label>
           <select class="form-select" [(ngModel)]="selectedStatus" (change)="onFilterChange()">
             <option value="">全部</option>
@@ -61,20 +61,20 @@
             <option value="private">私人</option>
             <option value="draft">草稿</option>
           </select>
-        </div>
+        </div> -->
 
         <!-- 排序 -->
-        <div class="col-md-3">
+        <!-- <div class="col-md-3">
           <label class="form-label">排序方式</label>
           <select class="form-select" [(ngModel)]="selectedSort" (change)="onFilterChange()">
             <option value="newest">最新上傳</option>
             <option value="oldest">最舊優先</option>
             <option value="views">觀看次數</option>
           </select>
-        </div>
+        </div> -->
 
         <!-- 每頁顯示 -->
-        <div class="col-md-2">
+        <!-- <div class="col-md-2">
           <label class="form-label">每頁顯示</label>
           <select class="form-select" [value]="itemsPerPage" (change)="onPageSizeChange($event)">
             <option value="5">5</option>
@@ -82,59 +82,59 @@
             <option value="20">20</option>
           </select>
         </div>
+      </div> -->
       </div>
     </div>
-  </div>
 
-  <!-- Video List -->
-  <app-videos-list [variant]="'creator-list'" [VideoDetailData]="VideoDetailsData!">
-  </app-videos-list>
+    <!-- Video List -->
+    <app-videos-list [variant]="'creator-list'" [VideoDetailData]="VideoDetailsData!">
+    </app-videos-list>
 
 
-  <!-- Pagination -->
-  <div class="card mt-3" *ngIf="VideoDetailsData && VideoDetailsData.length > 0">
-    <div class="card-body py-2">
-      <div class="d-flex align-items-center justify-content-between">
-        <!-- 顯示資訊 -->
-        <div class="text-muted">
-          顯示第 <span class="fw-bold">{{ getStartIndex() }}</span> –
-          <span class="fw-bold">{{ getEndIndex() }}</span> 筆，
-          共 <span class="fw-bold">{{ totalItems }}</span> 筆影片
+    <!-- Pagination -->
+    <div class="card mt-3" *ngIf="VideoDetailsData && VideoDetailsData.length > 0">
+      <div class="card-body py-2">
+        <div class="d-flex align-items-center justify-content-between">
+          <!-- 顯示資訊 -->
+          <div class="text-muted">
+            顯示第 <span class="fw-bold">{{ getStartIndex() }}</span> –
+            <span class="fw-bold">{{ getEndIndex() }}</span> 筆，
+            共 <span class="fw-bold">{{ totalItems }}</span> 筆影片
+          </div>
+
+          <!-- Page buttons -->
+          <ul class="pagination mb-0">
+            <!-- Previous -->
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="loadVideos(currentPage - 1)" href="javascript:void(0)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24"
+                  stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M15 6l-6 6l6 6" />
+                </svg>
+                上一頁
+              </a>
+            </li>
+
+            <!-- Page numbers -->
+            <li class="page-item" *ngFor="let p of pages" [class.active]="currentPage === p">
+              <a class="page-link" (click)="loadVideos(p)" href="javascript:void(0)">{{ p }}</a>
+            </li>
+
+            <!-- Next -->
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <a class="page-link" (click)="loadVideos(currentPage + 1)" href="javascript:void(0)">
+                下一頁
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24"
+                  stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M9 6l6 6l-6 6" />
+                </svg>
+              </a>
+            </li>
+          </ul>
         </div>
-
-        <!-- Page buttons -->
-        <ul class="pagination mb-0">
-          <!-- Previous -->
-          <li class="page-item" [class.disabled]="currentPage === 1">
-            <a class="page-link" (click)="loadVideos(currentPage - 1)" href="javascript:void(0)">
-              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24"
-                stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M15 6l-6 6l6 6" />
-              </svg>
-              上一頁
-            </a>
-          </li>
-
-          <!-- Page numbers -->
-          <li class="page-item" *ngFor="let p of pages" [class.active]="currentPage === p">
-            <a class="page-link" (click)="loadVideos(p)" href="javascript:void(0)">{{ p }}</a>
-          </li>
-
-          <!-- Next -->
-          <li class="page-item" [class.disabled]="currentPage === totalPages">
-            <a class="page-link" (click)="loadVideos(currentPage + 1)" href="javascript:void(0)">
-              下一頁
-              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="16" height="16" viewBox="0 0 24 24"
-                stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M9 6l6 6l-6 6" />
-              </svg>
-            </a>
-          </li>
-        </ul>
       </div>
     </div>
-  </div>
 
-</div>
+  </div>

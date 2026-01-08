@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 // import { environment } from '../../environments/environment';
-import { ChannelCard, ChannelHome, UpdateWatchHistoryRequest, VideoCardData, VideoCommentCard, VideoCommentRequest, VideoLikesDto, VideoLikesRequest, VideoSearchParams, VideoWatchHistoryDto } from '../models/video-model';
+import { ChannelCard, ChannelHome, ChannelSpotlightDto, UpdateWatchHistoryRequest, VideoCardData, VideoCommentCard, VideoCommentRequest, VideoLikesDto, VideoLikesRequest, VideoSearchParams, VideoWatchHistoryDto } from '../models/video-model';
 
 @Injectable({
   providedIn: 'root'
@@ -101,6 +101,16 @@ export class VideoService {
     return this.http.get<VideoCardData[]>(
       `${this.apiBase}/videos/search`,
       { params: queryParams }
+    );
+  }
+
+  // ===== 取得頻道 Spotlight（頻道卡片 + 最新影片）=====
+  getChannelSpotlight(channelId: number): Observable<ChannelSpotlightDto> {
+    return this.http.get<ChannelSpotlightDto>(
+      `${this.apiBase}/videos/SpotlightVideos`,
+      {
+        params: { channelId }
+      }
     );
   }
 }

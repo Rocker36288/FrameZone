@@ -169,10 +169,8 @@
           <!-- ✏️ 使用者留言輸入區 -->
           <div class="mb-4">
             <div class="d-flex gap-3 align-items-start">
-              <!-- 使用者頭像 -->
-              <span class="avatar avatar-sm rounded-circle bg-primary text-white">
-                {{ currentUserInitial }}
-              </span>
+              <!-- 使用者頭像或首字母 -->
+              <app-user-avatar [avatarUrl]="getUserAvatar()"></app-user-avatar>
 
               <!-- 輸入框 -->
               <div class="flex-grow-1">

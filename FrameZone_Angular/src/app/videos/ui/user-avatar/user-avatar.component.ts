@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { LoginResponseDto } from '../../../core/models/auth.models';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 })
 export class UserAvatarComponent {
   currentUser: LoginResponseDto | null = null;
-  avatarUrl: string = '';
+  @Input() avatarUrl: string = '';
 
   private destroy$ = new Subject<void>();
 

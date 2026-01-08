@@ -124,3 +124,9 @@ export interface VideoSearchParams {
   sortOrder?: 'asc' | 'desc';
   take?: number;
 }
+
+
+export interface ChannelSpotlightDto {
+  channel: ChannelCard;
+  videos: VideoCardData[];
+}

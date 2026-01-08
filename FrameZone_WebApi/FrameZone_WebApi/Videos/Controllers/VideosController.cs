@@ -136,6 +136,18 @@ namespace FrameZone_WebApi.Videos.Controllers
             return Ok(dto);
         }
 
+        //==============================獲取影片列表===========================
+
+        [HttpGet("SpotlightVideos")]
+        public async Task<IActionResult> GetChannelSpotlight(int channelId)
+        {
+            var result = await _videoServices.GetSpotlightVideosAsync(channelId);
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
+
         //===============================留言發布========================================
 
         [HttpPost("comment/publish")]
