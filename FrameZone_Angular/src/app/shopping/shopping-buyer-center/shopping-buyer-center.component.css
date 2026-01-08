@@ -16,12 +16,24 @@
 
 /* 模態框層級 */
 .modal-backdrop {
-  z-index: 1040;
-  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9998 !important;
+  background-color: rgba(0, 0, 0, 0.6) !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
 }
 
 .modal {
-  z-index: 1050;
+  z-index: 9999 !important;
+  display: block;
+  pointer-events: auto !important;
+}
+
+.modal-dialog {
+  z-index: 10000 !important;
+  pointer-events: auto !important;
 }
 
 /* 收藏卡片優化樣式 */
@@ -93,4 +105,15 @@
 
 .container-xl {
   margin-top: 150px;
+}
+
+/* 讓選單手動顯示時的位置正確 */
+.dropdown-menu.show {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  display: block;
+  z-index: 1000;
+  min-width: 120px;
+  background: white;
 }

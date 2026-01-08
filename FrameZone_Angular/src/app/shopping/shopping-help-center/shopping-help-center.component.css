@@ -202,3 +202,71 @@
   font-size: 40px;
 
 }
+
+/* --- FAQ 分類區塊樣式 --- */
+.faq-category-section {
+  margin-bottom: 3rem;
+}
+
+.category-header {
+  padding: 15px 20px;
+  background: linear-gradient(135deg, rgba(106, 17, 203, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+  border-left: 4px solid #6a11cb;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.category-header:hover {
+  background: linear-gradient(135deg, rgba(106, 17, 203, 0.12) 0%, rgba(118, 75, 162, 0.12) 100%);
+  transform: translateX(5px);
+}
+
+.category-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #6a11cb;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.category-title i {
+  font-size: 1.8rem;
+}
+
+/* FAQ 手風琴項目樣式增強 */
+.faq-category-section .accordion-button {
+  font-weight: 500;
+  padding: 1.2rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.faq-category-section .accordion-button:not(.collapsed) {
+  background: linear-gradient(135deg, rgba(106, 17, 203, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  color: #6a11cb;
+  box-shadow: 0 2px 8px rgba(106, 17, 203, 0.1);
+}
+
+.faq-category-section .accordion-button:hover {
+  background: rgba(106, 17, 203, 0.03);
+}
+
+.faq-category-section .accordion-body {
+  padding: 1.5rem;
+  line-height: 1.8;
+  background: #fafafa;
+}
+
+.faq-category-section .accordion-item {
+  border-radius: 12px !important;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.faq-category-section .accordion-item:hover {
+  box-shadow: 0 4px 15px rgba(106, 17, 203, 0.15) !important;
+}
+
+.FAQ-name {
+  font-size: 2rem;
+}
