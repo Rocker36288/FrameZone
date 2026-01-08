@@ -1,6 +1,6 @@
 import { PostService } from '../services/post.service';
 import { CommentService } from '../services/comment.service';
-import { Component, ElementRef, EventEmitter, HostListener, Input, Output, signal, inject } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, Output, signal, inject, AfterViewInit, OnDestroy } from '@angular/core';
 import { PostDto } from "../models/PostDto";
 import { CommentDto } from "../models/CommentDto";
 import { DatePipe, SlicePipe } from '@angular/common';
@@ -81,45 +81,22 @@ export class SocialPostsComponent implements AfterViewInit, OnDestroy {
     this.viewObserver?.disconnect();
   }
 
-  /**
- * 取得貼文作者頭像 URL
- */
-getPostUserAvatar(): string {
-  const avatarUrl = this.post.avatar;
-  if (avatarUrl) {
-    return avatarUrl;
+ //頭像
+  getUserAvatar(): string {
+    if (this.currentUserAvatar) return this.currentUserAvatar;
+    const initial = (this.currentUserName || 'U').charAt(0).toUpperCase();
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
   }
-  return this.getPostDefaultAvatar();
-}
-
-/**
- * 產生貼文作者的預設頭像
- */
-private getPostDefaultAvatar(): string {
-  const name = this.post.userName || 'U';
-  const initial = name.charAt(0).toUpperCase();
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
-}
-
-/**
- * 取得當前使用者頭像 URL
- */
-getUserAvatar(): string {
-  const avatarUrl = this.currentUserAvatar;
-  if (avatarUrl) {
-    return avatarUrl;
+  getPostUserAvatar(): string {
+    if (this.post.avatar) return this.post.avatar;
+    const initial = (this.post.userName || 'U').charAt(0).toUpperCase();
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
   }
-  return this.getCurrentUserDefaultAvatar();
-}
-
-/**
- * 產生當前使用者的預設頭像
- */
-private getCurrentUserDefaultAvatar(): string {
-  const name = this.currentUserName || 'U';
-  const initial = name.charAt(0).toUpperCase();
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
-}
+  getSharedUserAvatar(sharedPost: PostDto): string {
+    if (sharedPost.avatar) return sharedPost.avatar;
+    const initial = (sharedPost.userName || 'U').charAt(0).toUpperCase();
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+  }
 
 
   //右上角選單
