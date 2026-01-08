@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using FrameZone_WebApi.Socials.DTOs;
 using FrameZone_WebApi.Socials.Repositories;
 using FrameZone_WebApi.Socials.Services;
@@ -27,8 +27,15 @@ namespace FrameZone_WebApi.Socials.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            if (!TryGetUserId(out var userId))
+            long userId;
+            try
+            {
+                userId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
                 throw new HubException("Unauthorized");
+            }
 
             var httpContext = Context.GetHttpContext();
             var roomIdRaw = httpContext?.Request.Query["roomId"].FirstOrDefault();
@@ -51,20 +58,31 @@ namespace FrameZone_WebApi.Socials.Hubs
             {
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, GetGroupName(roomId));
             }
-            if (TryGetUserId(out var userId))
+            try
             {
+                var userId = GetUserId();
                 _connectionManager.Remove(userId, Context.ConnectionId);
+            }
+            catch (UnauthorizedAccessException)
+            {
             }
             await base.OnDisconnectedAsync(exception);
         }
 
         /// <summary>
-        /// 透過 Hub 直接送文字訊息（可選，前端目前仍用 REST）。
+        /// ?? Hub ?湔??摮??荔??舫嚗?蝡舐????REST嚗?
         /// </summary>
         public async Task SendMessage(int roomId, string messageContent)
         {
-            if (!TryGetUserId(out var userId))
+            long userId;
+            try
+            {
+                userId = GetUserId();
+            }
+            catch (UnauthorizedAccessException)
+            {
                 throw new HubException("Unauthorized");
+            }
 
             var content = messageContent?.Trim();
             if (string.IsNullOrWhiteSpace(content))
@@ -100,11 +118,14 @@ namespace FrameZone_WebApi.Socials.Hubs
             };
         }
 
-        private bool TryGetUserId(out long userId)
+        private long GetUserId()
         {
-            userId = 0;
             var idClaim = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return !string.IsNullOrEmpty(idClaim) && long.TryParse(idClaim, out userId);
+            if (idClaim == null)
+                throw new UnauthorizedAccessException("尚未登入");
+
+            return long.Parse(idClaim);
         }
     }
 }
+

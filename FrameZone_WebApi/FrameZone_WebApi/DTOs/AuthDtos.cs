@@ -38,7 +38,7 @@ namespace FrameZone_WebApi.DTOs
         public string? Token { get; set; }
 
         // 使用者ID
-        public long? UserID { get; set; }
+        public long? UserId { get; set; }
 
         // 帳號
         public string? Account { get; set; }

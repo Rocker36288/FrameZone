@@ -22,4 +22,21 @@
         public string RoomName { get; set; }
     }
 
+    public class RecentChatDto
+    {
+        public int RoomId { get; set; }
+        public long TargetUserId { get; set; }
+        public string TargetUserName { get; set; } = "使用者";
+        public string? TargetUserAvatar { get; set; }
+        public string? LastMessage { get; set; }
+        public string? LastMessageType { get; set; }
+        public DateTime LastMessageCreatedAt { get; set; }
+    }
+
+    public class UnreadCountDto
+    {
+        public long TargetUserId { get; set; }
+        public int UnreadCount { get; set; }
+    }
+
 }
