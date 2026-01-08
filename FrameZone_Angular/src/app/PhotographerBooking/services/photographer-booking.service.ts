@@ -112,6 +112,24 @@ export class PhotographerBookingService {
 
           return matchLoc && matchTags && matchPrice && matchRating;
         });
+      }),
+      map(photographers => {
+        // 實作排序邏輯
+        const sortOrder = filters.sortOrder;
+        if (!sortOrder || sortOrder === 'default') return photographers;
+
+        return [...photographers].sort((a, b) => {
+          switch (sortOrder) {
+            case 'priceAsc':
+              return (a.minPrice || 0) - (b.minPrice || 0);
+            case 'priceDesc':
+              return (b.minPrice || 0) - (a.minPrice || 0);
+            case 'ratingDesc':
+              return (b.rating || 0) - (a.rating || 0);
+            default:
+              return 0;
+          }
+        });
       })
     );
   }

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PhotographerBookingService } from '../services/photographer-booking.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { forkJoin } from 'rxjs';
 interface TagGroup {
   title: string;
   tags: string[];
@@ -36,33 +37,25 @@ export class PhotographerbookingSidebarSearchComponent implements OnInit {
   }
 
   initializeTagGroups(): void {
-    // 從後端載入服務地區
-    this.bookingService.getServiceCities().subscribe({
-      next: (cities) => {
-        this.tagGroups.push({
-          title: '服務地區',
-          tags: cities,
-          isLocation: true,
-          expanded: cities.length <= 6,
-        });
-      },
-      error: (err) => {
-        console.error('Error loading service cities', err);
-        // Fallback to mock data
-        const locations = this.bookingService.getLocations();
-        this.tagGroups.push({
-          title: '服務地區',
-          tags: locations,
-          isLocation: true,
-          expanded: locations.length <= 6,
-        });
-      }
-    });
+    // 使用 forkJoin 同步處理兩個標籤來源，確保載入順序：1. 服務地區, 2. 專長分類
+    forkJoin({
+      cities: this.bookingService.getServiceCities(),
+      categories: this.bookingService.getCategoriesWithTags()
+    }).subscribe({
+      next: (results) => {
+        // 清空現有標籤群組，避免重複載入或順序混亂
+        this.tagGroups = [];
 
-    // 從後端載入專長分類與標籤
-    this.bookingService.getCategoriesWithTags().subscribe({
-      next: (categories) => {
-        categories.forEach((cat) => {
+        // 1. 處理服務地區
+        this.tagGroups.push({
+          title: '服務地區',
+          tags: results.cities,
+          isLocation: true,
+          expanded: results.cities.length <= 6,
+        });
+
+        // 2. 處理專長分類
+        results.categories.forEach((cat) => {
           this.tagGroups.push({
             title: cat.categoryName,
             tags: cat.tags,
@@ -72,8 +65,17 @@ export class PhotographerbookingSidebarSearchComponent implements OnInit {
         });
       },
       error: (err) => {
-        console.error('Error loading specialty categories', err);
-        // Fallback to mock data
+        console.error('Error loading sidebar data', err);
+        // Fallback 邏輯：如果 API 失敗則顯示 Mock 資料（依樣維持固定順序）
+        this.tagGroups = [];
+        const locations = this.bookingService.getLocations();
+        this.tagGroups.push({
+          title: '服務地區',
+          tags: locations,
+          isLocation: true,
+          expanded: locations.length <= 6,
+        });
+
         const categories = this.bookingService.getCategories();
         categories.forEach((cat) => {
           const tags = this.bookingService.getTagsByCategory(cat.id);

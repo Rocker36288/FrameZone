@@ -36,22 +36,26 @@
   cursor: pointer;
   transition: 0.2s;
   background: #fff;
+  color: #495057;
+  /* 預設文字顏色 */
 }
 
+/* 懸停效果統一 */
 .tag-item:hover {
   border-color: #6b5cff;
+  color: #6b5cff;
 }
 
+/* --- 重點修改：統一選中狀態顏色 --- */
+/* 無論是地區 (loc-tag) 還是風格，選中時都使用相同的紫色 */
 .tag-item.active {
   background: #6b5cff;
   color: #fff;
   border-color: #6b5cff;
 }
 
-.tag-item.loc-tag.active {
-  background: #206bc4;
-  border-color: #206bc4;
-}
+/* 刪除或註解掉原本的 .tag-item.loc-tag.active 以避免藍色覆蓋 */
+/* .tag-item.loc-tag.active { ... } */
 
 .toggle-more-btn {
   background: none;
@@ -104,7 +108,8 @@
   width: 100%;
   padding: 10px;
   background: linear-gradient(135deg, #6b5cff 0%, #764ba2 100%);
-  border: 1px solid #eee;
+  border: none;
+  /* 移除邊框讓漸層更乾淨 */
   border-radius: 8px;
   cursor: pointer;
   font-size: 13px;
@@ -114,6 +119,7 @@
 
 .clear-btn:hover {
   transform: scale(1.02);
+  filter: brightness(1.1);
 }
 
 .form-range {
@@ -122,14 +128,19 @@
   background: #e9ecef;
   border-radius: 3px;
   outline: none;
+  appearance: none;
+  /* 確保在不同瀏覽器外觀一致 */
 }
 
 .form-range::-webkit-slider-thumb {
+  appearance: none;
   width: 16px;
   height: 16px;
   background: #6b5cff;
   border-radius: 50%;
   cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .form-range::-moz-range-thumb {
@@ -138,5 +149,5 @@
   background: #6b5cff;
   border-radius: 50%;
   cursor: pointer;
-  border: none;
+  border: 2px solid #fff;
 }
