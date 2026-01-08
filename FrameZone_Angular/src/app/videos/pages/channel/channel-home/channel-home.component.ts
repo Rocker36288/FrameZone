@@ -50,8 +50,15 @@ export class ChannelComponent {
     //讀取
     this.videoService.getChannelVideos(this.channelId!).subscribe({
       next: (videos: VideoCardData[]) => {
-        console.log(videos)
         this.LastUploadVideos = videos;
+      },
+      error: (err: any) => console.error(err)
+    });
+
+    //讀取
+    this.videoService.getChannelVideos(this.channelId!).subscribe({
+      next: (videos: VideoCardData[]) => {
+        this.PupularVideos = videos;
       },
       error: (err: any) => console.error(err)
     });

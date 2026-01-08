@@ -99,8 +99,7 @@
               <div class="video-wrapper">
                 <div class="video-glow"></div>
                 <div class="video-thumbnail-container">
-                  <img [src]="Videos![currentVideoIndex].thumbnail" [alt]="Videos![currentVideoIndex].title"
-                    class="video-thumbnail">
+                  <img [src]="currentVideoThumbnail" [alt]="Videos![currentVideoIndex].title" class="video-thumbnail">
                   <div class="video-overlay">
                     <button class="play-button">
                       <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
@@ -137,7 +136,7 @@
             <div class="video-thumbnails-list" *ngIf="Videos!.length > 1">
               <div class="thumbnail-item" *ngFor="let video of Videos; let i = index"
                 [class.active]="i === currentVideoIndex" (click)="selectVideo(i)">
-                <img [src]="video.thumbnail" [alt]="video.title" class="thumbnail-small">
+                <img [src]="getVideoThumbnail(video)" [alt]="video.title" class="thumbnail-small">
                 <div class="thumbnail-overlay">
                   <div class="thumbnail-duration">{{video.duration | videoDuration}}</div>
                 </div>

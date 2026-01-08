@@ -65,4 +65,8 @@ export class VideocreatorAnalysisComponent implements OnInit {
       ? Math.max(...this.analytics.performanceChart.map(d => d.views))
       : 1; // 防止除以 0
   }
+
+  getYAxisValue(percentage: number): string {
+    return this.formatNumber(Math.round(this.getMaxViews() * percentage));
+  }
 }

@@ -145,15 +145,40 @@
             </div>
             <div class="card-body">
               <div class="chart-container" style="height: 300px;">
-                <div class="d-flex justify-content-around align-items-end" style="height: 100%;">
-                  <div *ngFor="let data of analytics.performanceChart" class="text-center" style="flex: 1;">
-                    <div class="mb-2">
-                      <div class="chart-bar" [style.height.px]="(data.views / getMaxViews()) * 250"
-                        style="background: linear-gradient(180deg, #667eea 0%, #764ba2 100%); border-radius: 4px 4px 0 0; margin: 0 auto; width: 40px;"
-                        [title]="data.views + ' 觀看'">
+                <div class="d-flex" style="height: 100%;">
+                  <!-- Y-axis labels -->
+                  <div class="d-flex flex-column justify-content-between" style="width: 60px; padding-right: 10px;">
+                    <small class="text-muted text-end">{{getYAxisValue(1)}}</small>
+                    <small class="text-muted text-end">{{getYAxisValue(0.75)}}</small>
+                    <small class="text-muted text-end">{{getYAxisValue(0.5)}}</small>
+                    <small class="text-muted text-end">{{getYAxisValue(0.25)}}</small>
+                    <small class="text-muted text-end">0</small>
+                  </div>
+
+                  <!-- Chart bars -->
+                  <div class="d-flex justify-content-around align-items-end flex-grow-1"
+                    style="height: 100%; border-left: 1px solid #e9ecef; position: relative;">
+                    <!-- Horizontal grid lines -->
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 100%; pointer-events: none;">
+                      <div style="position: absolute; top: 0; left: 0; right: 0; border-top: 1px dashed #e9ecef;"></div>
+                      <div style="position: absolute; top: 25%; left: 0; right: 0; border-top: 1px dashed #e9ecef;">
+                      </div>
+                      <div style="position: absolute; top: 50%; left: 0; right: 0; border-top: 1px dashed #e9ecef;">
+                      </div>
+                      <div style="position: absolute; top: 75%; left: 0; right: 0; border-top: 1px dashed #e9ecef;">
                       </div>
                     </div>
-                    <small class="text-muted">{{data.date}}</small>
+
+                    <div *ngFor="let data of analytics.performanceChart" class="text-center"
+                      style="flex: 1; z-index: 1;">
+                      <div class="mb-2">
+                        <div class="chart-bar" [style.height.px]="(data.views / getMaxViews()) * 250"
+                          style="background: linear-gradient(180deg, #667eea 0%, #764ba2 100%); border-radius: 4px 4px 0 0; margin: 0 auto; width: 40px;"
+                          [title]="data.views + ' 觀看'">
+                        </div>
+                      </div>
+                      <small class="text-muted">{{data.date}}</small>
+                    </div>
                   </div>
                 </div>
               </div>

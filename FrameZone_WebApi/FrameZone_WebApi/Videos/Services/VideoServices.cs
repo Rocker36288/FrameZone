@@ -15,12 +15,31 @@ namespace FrameZone_WebApi.Videos.Services
         {
             _videoRepo = videoRepo;
         }
+        //獲取影片推薦
         public async Task<List<VideoCardDto>> GetVideoRecommendAsync()
         {
             var dto = await _videoRepo.GetRecommendVideosAsync();
 
             return dto ?? new List<VideoCardDto>();
         }
+
+        //獲取影片推薦
+        // 獲取頻道 Spotlight（頻道卡片 + 最新影片）
+        public async Task<ChannelSpotlightDto> GetSpotlightVideosAsync(int channelId)
+        {
+            var channel = await _videoRepo.GetChannelCardByIdAsync(channelId);
+            if (channel == null)
+                return null;
+
+            var videos = await _videoRepo.GetChannelLatestVideosAsync(channelId);
+
+            return new ChannelSpotlightDto
+            {
+                Channel = channel,
+                Videos = videos ?? new List<VideoCardDto>()
+            };
+        }
+
         //用guid獲取影片資訊
         public async Task<VideoCardDto?> GetVideoCardAsync(string guid)
         {

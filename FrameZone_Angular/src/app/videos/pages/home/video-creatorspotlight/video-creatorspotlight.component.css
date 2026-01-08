@@ -485,7 +485,8 @@
 }
 
 .video-thumbnail-container {
-
+  height: 20rem;
+  /* 固定高度，或根據需求 */
   max-width: 80%;
   margin: 0 auto;
   position: relative;
@@ -506,6 +507,12 @@
       transform: scale(1.1);
     }
   }
+}
+
+.video-thumbnail-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .video-thumbnail {

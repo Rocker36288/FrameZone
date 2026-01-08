@@ -325,4 +325,6 @@ export class MockChannelService {
   getVideoDetailsData() {
     return of(this.VideoDetailsData);
   }
+
+
 }

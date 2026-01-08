@@ -16,8 +16,9 @@
       <div class="header-decoration"></div>
     </div>
 
-    <div class="spotlight-container">
-      <app-video-creatorspotlight [channel]="spotlightChannel" [Videos]="spotlightVideos"></app-video-creatorspotlight>
+    <div class="spotlight-container" *ngIf="spotlightChannel && spotlightVideos?.length">
+      <app-video-creatorspotlight [channel]="spotlightChannel" [Videos]="spotlightVideos">
+      </app-video-creatorspotlight>
     </div>
   </section>
 

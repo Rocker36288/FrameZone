@@ -1,3 +1,4 @@
+<app-videos-notloginyet-modal *ngIf="showLoginModal" (close)="showLoginModal = false"></app-videos-notloginyet-modal>
 <div class="container my-4">
 
   <!-- 頻道 Banner -->
@@ -9,21 +10,22 @@
     <!-- 頭像 -->
     <div class="me-3">
       <img src="{{channelHome.avatar}}" alt="頻道頭像" class="rounded-circle"
-        style="width:10rem; height:10rem; object-fit:cover;" />
+        style="width:10rem; height:10rem; object-fit:cover;" (error)="onthumbnailError($event)" />
     </div>
 
     <!-- 頻道文字 -->
     <div class="flex-grow-1">
       <h4 class="mb-1 fs-1">{{channelHome.name}}</h4>
       <div class="text-muted small mb-1">
-        {{channelHome.gollows}} 位訂閱者 · {{channelHome.videosCount}} 部影片
+        {{channelHome.follows}} 位訂閱者 · {{channelHome.videosCount}} 部影片
       </div>
       <div class="long">{{channelHome.description}}</div>
     </div>
 
     <!-- 訂閱按鈕 -->
     <div>
-      <app-subscribe-button></app-subscribe-button>
+      <app-subscribe-button [isFollowing]="userIsFollowing"
+        (followToggle)="onFollowToggled($event)"></app-subscribe-button>
     </div>
 
   </div>

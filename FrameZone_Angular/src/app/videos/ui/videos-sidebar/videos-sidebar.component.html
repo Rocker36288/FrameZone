@@ -14,8 +14,8 @@
 
     <!-- 使用者資訊 -->
     <div class="sidebar-user-info" [ngClass]="{'collapsed': isCollapsed}">
-      <div class="sidebar-avatar-wrapper">
-        <app-user-avatar></app-user-avatar>
+      <div class="sidebar-avatar-wrapper" (click)="gotochannel()">
+        <app-user-avatar [avatarUrl]="getUserAvatar()"></app-user-avatar>
       </div>
       <div class="user-name-tag" *ngIf="!isCollapsed">
         {{ displayUserName }}

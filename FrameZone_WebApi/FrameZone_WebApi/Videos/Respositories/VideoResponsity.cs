@@ -1,5 +1,6 @@
 ﻿using FrameZone_WebApi.Models;
 using FrameZone_WebApi.Videos.DTOs;
+using FrameZone_WebApi.Videos.Enums;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Asn1.X509;
 using System.Threading.Channels;
@@ -268,6 +269,27 @@ namespace FrameZone_WebApi.Videos.Repositories
             var videos = await _context.Videos
                 .AsNoTracking()
                 .Where(v => v.IsDeleted == false)
+                .Include(v => v.Channel)
+                    .ThenInclude(c => c.UserProfile)
+                .OrderByDescending(v => v.CreatedAt)
+                .Take(take)
+                .ToListAsync();
+
+            return await MapVideosToDtoAsync(videos);
+        }
+
+        // 指定頻道最新影片
+        public async Task<List<VideoCardDto>> GetChannelLatestVideosAsync(
+            int channelId,
+            int take = 5)
+        {
+            var videos = await _context.Videos
+                .AsNoTracking()
+                .Where(v =>
+                    !v.IsDeleted &&
+                    v.ChannelId == channelId &&
+                    v.ProcessStatus == ProcessStatus.PUBLISHED.ToString() // 建議加
+                )
                 .Include(v => v.Channel)
                     .ThenInclude(c => c.UserProfile)
                 .OrderByDescending(v => v.CreatedAt)

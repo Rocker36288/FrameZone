@@ -24,6 +24,8 @@ export class VideoCreatorspotlightComponent {
 
     // 自動輪播特色影片（可選）
     this.startAutoRotate();
+
+    console.log(this.channel)
   }
 
   startAutoRotate() {
@@ -40,6 +42,19 @@ export class VideoCreatorspotlightComponent {
 
   toggleSubscribe() {
     // this.channel.isSubscribed = !this.channel.isSubscribed;
+  }
+
+  get currentVideoThumbnail(): string {
+    const video = this.Videos?.[this.currentVideoIndex];
+    if (!video) return '';
+
+    return video.thumbnail ||
+      `https://localhost:7213/api/Videos/video-thumbnail/${video.videoUri}`;
+  }
+
+  getVideoThumbnail(video: VideoCardData): string {
+    return video.thumbnail ||
+      `https://localhost:7213/api/Videos/video-thumbnail/${video.videoUri}`;
   }
 
 }

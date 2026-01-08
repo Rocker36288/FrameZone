@@ -6,6 +6,7 @@ import { UserAvatarComponent } from "../user-avatar/user-avatar.component";
 import { AuthService } from '../../../core/services/auth.service';
 import { VideosSidebarMenuComponent } from "./videos-sidebar-menu/videos-sidebar-menu.component";
 import { VideosSidebarCreatorComponent } from "./videos-sidebar-creator/videos-sidebar-creator.component";
+import { LoginResponseDto } from '../../../core/models/auth.models';
 
 @Component({
   selector: 'app-videos-sidebar',
@@ -14,9 +15,10 @@ import { VideosSidebarCreatorComponent } from "./videos-sidebar-creator/videos-s
   styleUrl: './videos-sidebar.component.css'
 })
 export class VideosSidebarComponent {
+  displayUserName: string = '';
+  currentUser: LoginResponseDto | null = null;
   isCollapsed = false;
   currentRoute = '';
-  displayUserName: string = '未知登入';
   isLoggedIn: boolean = false;
 
   private destroy$ = new Subject<void>();
@@ -89,5 +91,32 @@ export class VideosSidebarComponent {
   logout() {
     this.authService.logout()
     this.router.navigate(['/home']);
+  }
+
+  gotochannel() {
+    this.router.navigate(['/login']);
+  }
+
+  /**
+ * 取得使用者頭像 URL
+ */
+  getUserAvatar(): string {
+    const avatarUrl = this.currentUser?.avatar;
+
+    if (avatarUrl) {
+      return avatarUrl;
+    }
+
+    return this.getDefaultAvatar();
+  }
+
+  /**
+   * 產生預設頭像
+   */
+  private getDefaultAvatar(): string {
+    const name = this.displayUserName || 'U';
+    const initial = name.charAt(0).toUpperCase();
+
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
   }
 }

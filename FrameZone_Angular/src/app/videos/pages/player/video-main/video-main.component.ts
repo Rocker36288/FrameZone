@@ -21,10 +21,11 @@ import { CommonModule } from '@angular/common';
 import { VideosSharedModalComponent } from "../../../ui/videos-shared-modal/videos-shared-modal.component";
 import { VideosNotloginyetModalComponent } from "../../../ui/videos-notloginyet-modal/videos-notloginyet-modal.component";
 import { LoginResponseDto } from '../../../../core/models/auth.models';
+import { UserAvatarComponent } from "../../../ui/user-avatar/user-avatar.component";
 
 @Component({
   selector: 'app-video-main',
-  imports: [CommonModule, DatePipe, FormsModule, VideoPlayerComponent, VideoActionsBarComponent, ChannelCardComponent, NgIf, VideoCommentListComponent, VideosListComponent, VideosSidebarComponent, VideoSearchComponent, SearchboxComponent, VideosSharedModalComponent, VideosNotloginyetModalComponent],
+  imports: [CommonModule, DatePipe, FormsModule, VideoPlayerComponent, VideoActionsBarComponent, ChannelCardComponent, NgIf, VideoCommentListComponent, VideosListComponent, VideosSidebarComponent, VideoSearchComponent, SearchboxComponent, VideosSharedModalComponent, VideosNotloginyetModalComponent, UserAvatarComponent],
   templateUrl: './video-main.component.html',
   styleUrl: './video-main.component.css'
 })
@@ -85,10 +86,11 @@ export class VideoMainComponent {
    * 💬 留言相關狀態
    * ===================================================== */
 
+  displayUserName: string = '';
+  currentUser: LoginResponseDto | null = null;
+
   user: LoginResponseDto | null = null;
 
-  //使用者id
-  currentUserId: number = 1; // 模擬登入用
   /** 使用者正在輸入的留言 */
   newComment: string = '';
 
@@ -371,4 +373,29 @@ export class VideoMainComponent {
         .subscribe();
     }
   }
+
+  /**
+* 取得使用者頭像 URL
+*/
+  getUserAvatar(): string {
+    const avatarUrl = this.currentUser?.avatar;
+
+    if (avatarUrl) {
+      return avatarUrl;
+    }
+
+    return this.getDefaultAvatar();
+  }
+
+  /**
+   * 產生預設頭像
+   */
+  private getDefaultAvatar(): string {
+    const name = this.displayUserName || 'U';
+    const initial = name.charAt(0).toUpperCase();
+
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+  }
 }
+
+
