@@ -306,12 +306,13 @@ namespace FrameZone_WebApi.Shopping.Controllers
                 .OrderByDescending(s => s.IsDefault)
                 .Select(s => new PickupStoreDto
                 {
-                    Id = s.ConvenienceStoreId,
-                    StoreName = s.ConvenienceStoreName,
-                    StoreCode = s.ConvenienceStoreCode,
-                    //Address = "", // 這裡根據資料庫欄位調整，若資料庫沒存地址則留空
+                    ConvenienceStoreId = s.ConvenienceStoreId,
+                    ConvenienceStoreName = s.ConvenienceStoreName,
+                    ConvenienceStoreCode = s.ConvenienceStoreCode,
                     RecipientName = s.RecipientName,
-                    PhoneNumber = s.PhoneNumber
+                    PhoneNumber = s.PhoneNumber,
+                    IsDefault = s.IsDefault,
+                    CreatedAt = s.CreatedAt
                 })
                 .ToListAsync();
 

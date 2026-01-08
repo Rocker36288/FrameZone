@@ -29,11 +29,28 @@
             <i class="ti ti-search text-muted"></i>
           </span>
           <input type="text" class="form-control border-start-0 ps-0" placeholder="輸入關鍵字搜尋問題..."
-            (keyup.enter)="onSearch(searchInput.value)" #searchInput>
-          <button class="btn btn-primary custom-search-btn" type="button" (click)="onSearch(searchInput.value)">
+            [(ngModel)]="searchKeyword" (keyup.enter)="onSearch(searchKeyword)" #searchInput>
+          @if (searchKeyword) {
+          <button class="btn btn-sm btn-link text-muted" type="button" (click)="clearSearch()"
+            style="position: absolute; right: 120px; top: 50%; transform: translateY(-50%); z-index: 10;">
+            <i class="ti ti-x"></i>
+          </button>
+          }
+          <button class="btn btn-primary custom-search-btn" type="button" (click)="onSearch(searchKeyword)">
             搜尋
           </button>
         </div>
+        @if (searchKeyword && faqs.length === 0) {
+        <div class="alert alert-info mt-3 text-center">
+          <i class="ti ti-info-circle me-2"></i>
+          找不到包含「{{ searchKeyword }}」的相關問題
+        </div>
+        }
+        @if (searchKeyword && faqs.length > 0) {
+        <div class="text-muted mt-2 text-center">
+          找到 {{ faqs.length }} 個相關問題
+        </div>
+        }
       </div>
     </div>
 
@@ -53,24 +70,39 @@
 
     <div class="row mt-6">
       <div class="col-12">
-        <h2 class="mb-4">常見問題 (FAQ)</h2>
-        <div class="accordion" id="faq-accordion">
-          @for (faq of faqs; track faq.id) {
-          <div class="accordion-item mb-2 border-0 shadow-sm">
-            <h2 class="accordion-header" [id]="'heading-' + faq.id">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                [attr.data-bs-target]="'#collapse-' + faq.id">
-                {{ faq.question }}
-              </button>
-            </h2>
-            <div [id]="'collapse-' + faq.id" class="accordion-collapse collapse" data-bs-parent="#faq-accordion">
-              <div class="accordion-body text-secondary">
-                {{ faq.answer }}
+        <p class="FAQ-name mb-4 text-center">常見問題(FAQ)：</p>
+
+        @for (group of getFaqsByCategory(); track group.category) {
+        <div class="faq-category-section mb-5">
+          <div class="category-header mb-3">
+            <h3 class="category-title">
+              <i class="ti ti-help-circle me-2"></i>
+              {{ group.category }}
+            </h3>
+          </div>
+
+          <div class="accordion" [id]="'faq-accordion-' + group.category">
+            @for (faq of group.faqs; track faq.faqId) {
+            <div class="accordion-item mb-2 border-0 shadow-sm">
+              <h2 class="accordion-header" [id]="'heading-' + faq.faqId">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                  [attr.data-bs-target]="'#collapse-' + faq.faqId">
+                  <i class="ti ti-message-question me-2"></i>
+                  {{ faq.question }}
+                </button>
+              </h2>
+              <div [id]="'collapse-' + faq.faqId" class="accordion-collapse collapse"
+                [attr.data-bs-parent]="'#faq-accordion-' + group.category">
+                <div class="accordion-body text-secondary">
+                  <i class="ti ti-message-circle-2 me-2 text-primary"></i>
+                  {{ faq.answer }}
+                </div>
               </div>
             </div>
+            }
           </div>
-          }
         </div>
+        }
       </div>
     </div>
   </div>

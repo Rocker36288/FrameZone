@@ -10,7 +10,11 @@ import { CartItem } from '../interfaces/cart';
 import { ReviewModalComponent } from '../shared/components/review-modal/review-modal.component';
 import { ToastNotificationComponent } from '../shared/components/toast-notification/toast-notification.component';
 import { OrderService } from '../shared/services/order.service';
-import { MemberService } from '../../core/services/member.service';
+import { ShoppingUserService } from '../shared/services/shopping-user.service';
+import { AddressService } from '../shared/services/address.service';
+import { StoreService } from '../shared/services/store.service';
+import { ReceivingAddress, CreateAddressDto } from '../interfaces/address';
+import { PickupStore, CreatePickupStoreDto } from '../interfaces/store';
 
 @Component({
   selector: 'app-shopping-buyer-center',
@@ -23,6 +27,16 @@ export class ShoppingBuyerCenterComponent {
   activeMenu: string = 'orders';
   searchText: string = '';
   showModal: boolean = false;
+  showAddressModal: boolean = false;
+  showStoreModal: boolean = false;
+  isEditingAddress: boolean = false;
+  isEditingStore: boolean = false;
+  editingAddressId: number | null = null;
+  editingStoreId: number | null = null;
+
+  // 用於控制地址/門市清單中的下拉選單
+  activeDropdownType: string | null = null;
+  activeDropdownId: number | null = null;
 
   // 評價 Modal 控制
   showReviewModal: boolean = false;
@@ -124,37 +138,60 @@ export class ShoppingBuyerCenterComponent {
   displayOrders: any[] = [];
   displayFavorites: FavoriteItem[] = [];
 
+  // 地址與門市
+  userAddresses: ReceivingAddress[] = [];
+  userStores: PickupStore[] = [];
+
+  newAddress: CreateAddressDto = {
+    recipientName: '',
+    phoneNumber: '',
+    fullAddress: '',
+    isDefault: false
+  };
+
+  newStore: CreatePickupStoreDto = {
+    recipientName: '',
+    phoneNumber: '',
+    convenienceStoreCode: '',
+    convenienceStoreName: '',
+    isDefault: false
+  };
+
   constructor(
     private favoriteService: FavoriteService,
     private cartService: CartService,
     private toastService: ToastService,
     private orderService: OrderService,
-    private memberService: MemberService
+    private shoppingUserService: ShoppingUserService,
+    private addressService: AddressService,
+    private storeService: StoreService
   ) { }
 
   ngOnInit() {
     this.loadProfile();
     this.loadOrders();
     this.loadFavorites();
+    this.loadAddresses();
+    this.loadStores();
   }
 
   loadProfile() {
-    this.memberService.getProfile().subscribe({
-      next: (res) => {
-        if (res.success && res.data) {
-          const profile = res.data;
-          this.userProfile = {
-            username: profile.account || '',
-            name: profile.realName || profile.displayName || '',
-            password: '********',
-            email: profile.email || '',
-            phone: profile.phone || '',
-            gender: profile.gender === '1' ? '男' : profile.gender === '2' ? '女' : '未設定',
-            birthday: profile.birthDate || '',
-            avatar: profile.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.displayName || 'U')}&background=random`
-          };
-          this.tempProfile = { ...this.userProfile };
-        }
+    this.shoppingUserService.getUserProfile().subscribe({
+      next: (profile: any) => {
+        this.userProfile = {
+          username: profile.account,
+          name: profile.realName || profile.displayName,
+          password: '********',
+          email: profile.email,
+          phone: profile.phone,
+          gender: profile.gender,
+          birthday: profile.birthDate,
+          avatar: profile.avatar
+        };
+        this.tempProfile = { ...this.userProfile };
+      },
+      error: (err: any) => {
+        console.error('無法取得個人資料：', err);
       }
     });
   }
@@ -185,16 +222,18 @@ export class ShoppingBuyerCenterComponent {
 
   // 核心搜尋功能
   onSearch() {
-    const term = this.searchText.trim().toLowerCase();
+    const term = (this.searchText || '').trim().toLowerCase();
 
     if (this.activeMenu === 'orders') {
-      this.displayOrders = this.allOrders.filter(o =>
-        (this.currentOrderTab === 'all' || o.status === this.currentOrderTab) &&
-        (o.shopName?.toLowerCase().includes(term) || o.products.some((p: any) => p.name.toLowerCase().includes(term)))
-      );
+      this.displayOrders = this.allOrders.filter(o => {
+        const matchesTab = (this.currentOrderTab === 'all' || o.status === this.currentOrderTab);
+        const shopMatch = (o.shopName || '').toLowerCase().includes(term);
+        const productMatch = (o.products || []).some((p: any) => (p.name || '').toLowerCase().includes(term));
+        return matchesTab && (shopMatch || productMatch);
+      });
     } else if (this.activeMenu === 'favorite') {
       this.displayFavorites = this.allFavorites.filter(f =>
-        f.name.toLowerCase().includes(term)
+        (f.name || '').toLowerCase().includes(term)
       );
     }
   }
@@ -206,13 +245,15 @@ export class ShoppingBuyerCenterComponent {
 
   filterOrders(tab: string) {
     this.currentOrderTab = tab;
-    const term = this.searchText.trim().toLowerCase();
+    const term = (this.searchText || '').trim().toLowerCase();
     const baseOrders = tab === 'all' ? this.allOrders : this.allOrders.filter(o => o.status === tab);
 
     // 過濾時同步考慮搜尋字串
-    this.displayOrders = baseOrders.filter(o =>
-      (o.shopName?.toLowerCase().includes(term) || o.products.some((p: any) => p.name.toLowerCase().includes(term)))
-    );
+    this.displayOrders = baseOrders.filter(o => {
+      const shopMatch = (o.shopName || '').toLowerCase().includes(term);
+      const productMatch = (o.products || []).some((p: any) => (p.name || '').toLowerCase().includes(term));
+      return shopMatch || productMatch;
+    });
   }
 
   onAvatarChange(event: any) {
@@ -230,13 +271,160 @@ export class ShoppingBuyerCenterComponent {
   }
 
   saveProfile() {
-    this.userProfile = { ...this.tempProfile };
-    this.showModal = false;
-    alert('基本資料已更新！');
+    // 轉換為後端需要的格式
+    const updateDto = {
+      email: this.tempProfile.email,
+      phone: this.tempProfile.phone,
+      displayName: this.tempProfile.name,
+      avatar: this.tempProfile.avatar,
+      realName: this.tempProfile.name, // 暫時一致
+      gender: this.tempProfile.gender,
+      birthDate: this.tempProfile.birthday // 這裡可能需要轉為 DateOnly 格式，但我們先試試字串
+    };
+
+    this.shoppingUserService.updateUserProfile(updateDto).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.userProfile = { ...this.tempProfile };
+          this.showModal = false;
+          this.toastService.show('基本資料已更新！');
+        } else {
+          this.toastService.show(res.message || '更新失敗');
+        }
+      },
+      error: (err) => {
+        console.error('更新失敗：', err);
+        this.toastService.show('連線錯誤，請稍後再試');
+      }
+    });
   }
 
   cancelEdit() {
-    if (confirm('確定取消嗎？未儲存的變更將遺失。')) this.showModal = false;
+    this.showModal = false;
+    // 不再彈出確認視窗，減少干擾，或者直接關閉即可
+  }
+
+  // 地址處理邏輯擴展
+  editAddress(addr: ReceivingAddress) {
+    this.isEditingAddress = true;
+    this.editingAddressId = addr.addressId;
+    this.newAddress = {
+      recipientName: addr.recipientName,
+      phoneNumber: addr.phoneNumber,
+      fullAddress: addr.fullAddress,
+      isDefault: addr.isDefault
+    };
+    this.showAddressModal = true;
+  }
+
+  deleteAddress(addr: ReceivingAddress) {
+    if (confirm(`確定要刪除「${addr.recipientName}」的地址嗎？`)) {
+      this.addressService.deleteAddress(addr.addressId).subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.toastService.show('地址已刪除');
+            this.loadAddresses();
+          }
+        }
+      });
+    }
+  }
+
+  setDefaultAddress(addr: ReceivingAddress) {
+    this.addressService.setDefaultAddress(addr.addressId).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.toastService.show('已設為預設地址');
+          this.loadAddresses();
+        }
+      }
+    });
+  }
+
+  saveAddress() {
+    if (this.isEditingAddress && this.editingAddressId) {
+      this.addressService.updateAddress(this.editingAddressId, this.newAddress).subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.toastService.show('地址更新成功');
+            this.loadAddresses();
+            this.showAddressModal = false;
+          }
+        }
+      });
+    } else {
+      this.addressService.createAddress(this.newAddress).subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.toastService.show('地址新增成功');
+            this.loadAddresses();
+            this.showAddressModal = false;
+          }
+        }
+      });
+    }
+  }
+
+  // 門市處理邏輯擴展
+  editStore(store: PickupStore) {
+    this.isEditingStore = true;
+    this.editingStoreId = store.convenienceStoreId;
+    this.newStore = {
+      recipientName: store.recipientName,
+      phoneNumber: store.phoneNumber,
+      convenienceStoreCode: store.convenienceStoreCode,
+      convenienceStoreName: store.convenienceStoreName,
+      isDefault: store.isDefault
+    };
+    this.showStoreModal = true;
+  }
+
+  deleteStore(store: PickupStore) {
+    if (confirm(`確定要刪除門市「${store.convenienceStoreName}」嗎？`)) {
+      this.storeService.deleteStore(store.convenienceStoreId).subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.toastService.show('門市已刪除');
+            this.loadStores();
+          }
+        }
+      });
+    }
+  }
+
+  setDefaultStore(store: PickupStore) {
+    this.storeService.setDefaultStore(store.convenienceStoreId).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.toastService.show('已設為預設門市');
+          this.loadStores();
+        }
+      }
+    });
+  }
+
+  saveStore() {
+    if (this.isEditingStore && this.editingStoreId) {
+      this.storeService.updateStore(this.editingStoreId, this.newStore).subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.toastService.show('門市更新成功');
+            this.loadStores();
+            this.showStoreModal = false;
+          }
+        }
+      });
+    } else {
+      this.storeService.createStore(this.newStore).subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.toastService.show('門市新增成功');
+            this.loadStores();
+            this.showStoreModal = false;
+          }
+        }
+      });
+    }
   }
 
   toggleFavorite(item: FavoriteItem) {
@@ -276,4 +464,63 @@ export class ShoppingBuyerCenterComponent {
       this.couponCodeInput = '';
     }
   }
+
+  loadAddresses() {
+    this.addressService.getUserAddresses().subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.userAddresses = res.data;
+        }
+      },
+      error: (err) => console.error('無法取得地址資料：', err)
+    });
+  }
+
+  loadStores() {
+    this.storeService.getUserStores().subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.userStores = res.data;
+        }
+      },
+      error: (err) => console.error('無法取得門市資料：', err)
+    });
+  }
+
+  openAddressModal() {
+    this.isEditingAddress = false;
+    this.editingAddressId = null;
+    this.newAddress = {
+      recipientName: this.userProfile.name,
+      phoneNumber: this.userProfile.phone,
+      fullAddress: '',
+      isDefault: this.userAddresses.length === 0
+    };
+    this.showAddressModal = true;
+  }
+
+  openStoreModal() {
+    this.isEditingStore = false;
+    this.editingStoreId = null;
+    this.newStore = {
+      recipientName: this.userProfile.name,
+      phoneNumber: this.userProfile.phone,
+      convenienceStoreCode: '',
+      convenienceStoreName: '',
+      isDefault: this.userStores.length === 0
+    };
+    this.showStoreModal = true;
+  }
+
+  toggleDropdown(type: string, id: number) {
+    if (this.activeDropdownType === type && this.activeDropdownId === id) {
+      this.activeDropdownType = null;
+      this.activeDropdownId = null;
+    } else {
+      this.activeDropdownType = type;
+      this.activeDropdownId = id;
+    }
+  }
+
+  // 點擊空白處關閉選單 (如果在 HostListener 中實作會更完整，這裡先實作基本切換)
 }

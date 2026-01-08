@@ -181,5 +181,52 @@ namespace FrameZone_WebApi.Shopping.Services
 
             return (true, string.Empty);
         }
+
+        public async Task<(bool Success, string Message)> UpdateAddressAsync(long userId, int addressId, CreateAddressDto dto)
+        {
+            var address = await _addressRepository.GetByIdAsync(addressId);
+            if (address == null || address.UserId != userId)
+                return (false, "找不到地址或無權限修改");
+
+            var validation = ValidateAddress(dto);
+            if (!validation.IsValid) return (false, validation.ErrorMessage);
+
+            address.RecipientName = dto.RecipientName.Trim();
+            address.PhoneNumber = dto.PhoneNumber.Trim();
+            address.FullAddress = dto.FullAddress.Trim();
+            
+            // 如果從非預設改為預設
+            bool needUpdateDefaults = !address.IsDefault && dto.IsDefault;
+            address.IsDefault = dto.IsDefault;
+
+            await _addressRepository.UpdateAsync(address);
+
+            if (needUpdateDefaults)
+            {
+                await _addressRepository.UpdateDefaultStatusAsync(userId, addressId);
+            }
+
+            return (true, "地址更新成功");
+        }
+
+        public async Task<(bool Success, string Message)> DeleteAddressAsync(long userId, int addressId)
+        {
+            var address = await _addressRepository.GetByIdAsync(addressId);
+            if (address == null || address.UserId != userId)
+                return (false, "找不到地址或無權限刪除");
+
+            await _addressRepository.DeleteAsync(address);
+            return (true, "地址已刪除");
+        }
+
+        public async Task<(bool Success, string Message)> SetDefaultAddressAsync(long userId, int addressId)
+        {
+            var address = await _addressRepository.GetByIdAsync(addressId);
+            if (address == null || address.UserId != userId)
+                return (false, "找不到地址或無權限操作");
+
+            await _addressRepository.UpdateDefaultStatusAsync(userId, addressId);
+            return (true, "預設地址已變更");
+        }
     }
 }

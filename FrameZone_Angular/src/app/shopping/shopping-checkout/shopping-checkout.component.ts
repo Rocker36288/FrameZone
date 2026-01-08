@@ -235,10 +235,10 @@ export class ShoppingCheckoutComponent {
     this.orderService.getPickupStores().subscribe({
       next: (res) => {
         this.pickupStores = res.map(s => ({
-          id: s.id,
-          name: s.storeName,
-          code: s.storeCode,
-          address: s.address || `店號: ${s.storeCode}`,
+          id: s.convenienceStoreId,
+          name: s.convenienceStoreName,
+          code: s.convenienceStoreCode,
+          address: `店號: ${s.convenienceStoreCode}`,
           phone: s.phoneNumber,
           recipient: s.recipientName
         }));

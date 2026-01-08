@@ -31,4 +31,16 @@ export class AddressService {
     createAddress(dto: CreateAddressDto): Observable<AddressApiResponse<ReceivingAddress>> {
         return this.http.post<AddressApiResponse<ReceivingAddress>>(this.apiUrl, dto);
     }
+
+    updateAddress(addressId: number, dto: CreateAddressDto): Observable<AddressApiResponse<any>> {
+        return this.http.put<AddressApiResponse<any>>(`${this.apiUrl}/${addressId}`, dto);
+    }
+
+    deleteAddress(addressId: number): Observable<AddressApiResponse<any>> {
+        return this.http.delete<AddressApiResponse<any>>(`${this.apiUrl}/${addressId}`);
+    }
+
+    setDefaultAddress(addressId: number): Observable<AddressApiResponse<any>> {
+        return this.http.put<AddressApiResponse<any>>(`${this.apiUrl}/${addressId}/default`, {});
+    }
 }
