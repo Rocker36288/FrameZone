@@ -17,6 +17,7 @@ export interface PhotographerDto {
   reviewCount?: number;
   minPrice?: number;
   totalBookings?: number;
+  portfolioFile?: string;
 }
 
 export interface ServiceDto {

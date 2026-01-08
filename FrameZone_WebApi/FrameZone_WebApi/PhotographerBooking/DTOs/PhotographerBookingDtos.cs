@@ -19,6 +19,7 @@ namespace FrameZone_WebApi.PhotographerBooking.DTOs
         public int ReviewCount { get; set; }
         public decimal MinPrice { get; set; }
         public int TotalBookings { get; set; }
+        public string PortfolioFile { get; set; }
     }
 
     public class ServiceDto
@@ -37,9 +38,9 @@ namespace FrameZone_WebApi.PhotographerBooking.DTOs
 
     public class PhotographerSearchDto
     {
-        public string Keyword { get; set; }
-        public string Location { get; set; }
-        public string StudioType { get; set; }
+        public string? Keyword { get; set; }
+        public string? Location { get; set; }
+        public string? StudioType { get; set; }
     }
 
     public class BookingDto
