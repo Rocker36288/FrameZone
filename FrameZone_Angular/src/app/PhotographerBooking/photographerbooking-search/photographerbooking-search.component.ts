@@ -47,7 +47,8 @@ export class PhotographerbookingSearchComponent implements OnInit, OnDestroy {
       distinctUntilChanged(),
       takeUntil(this.destroy$)
     ).subscribe(keyword => {
-      this.bookingService.updateFilters({ keyword: keyword });
+      const trimmedKeyword = keyword.trim();
+      this.bookingService.updateFilters({ keyword: trimmedKeyword });
     });
   }
 
@@ -86,7 +87,11 @@ export class PhotographerbookingSearchComponent implements OnInit, OnDestroy {
   private updateSearch(): void {
     this.bookingService.updateFilters({
       serviceType: this.selectedServiceType,
-      // keyword is handled by debounce subject
+      // keyword is handled by debounce subject but we verify trim here if triggered manually
+      // keyword: this.searchKeyword.trim(), // Don't override debounce logic, or ensure consistency. 
+      // Actually updateSearch is mainly for other filters now or date. 
+      // Let's keep consistency.
+      keyword: this.searchKeyword.trim(),
       startDate: this.startDate,
       endDate: this.endDate
     });

@@ -53,11 +53,28 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
                     s.StartDateTime <= endDate.Value && 
                     s.BookingId == null));
             }
-
-            // AND Condition 2: Keyword
+            //關鍵字邏輯
+            // AND Condition 2: Keyword (Multi-term & Tags)
             if (!string.IsNullOrWhiteSpace(keyword))
             {
-                query = query.Where(p => p.DisplayName.Contains(keyword) || p.StudioName.Contains(keyword) || p.Description.Contains(keyword));
+                var terms = keyword.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var term in terms)
+                {
+                    bool isNumeric = decimal.TryParse(term, out decimal priceVal);
+
+                    query = query.Where(p => 
+                        p.DisplayName.Contains(term) || 
+                        p.StudioName.Contains(term) || 
+                        (p.Description != null && p.Description.Contains(term)) ||
+                        p.PhotographerSpecialties.Any(ps => ps.SpecialtyTag.SpecialtyName.Contains(term)) ||
+                        p.PhotographerServices.Any(s => 
+                            s.ServiceName.Contains(term) || 
+                            (s.Description != null && s.Description.Contains(term)) || 
+                            (isNumeric && s.BasePrice == priceVal) ||
+                            s.ServiceType.ServiceName.Contains(term)) ||
+                        p.ServiceAreas.Any(sa => sa.City != null && sa.City.Contains(term))
+                    );
+                }
             }
 
             // AND Condition 3: Location
