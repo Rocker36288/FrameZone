@@ -1,7 +1,11 @@
 <div class="hero-container">
   <!-- 背景輪播圖 -->
-  <div *ngFor="let img of dbImages; let i = index" class="carousel-item" [class.active]="i === currentIndex"
-    [style.backgroundImage]="'url(' + img.url + ')'">
+  <div
+    *ngFor="let img of dbImages; let i = index"
+    class="carousel-item"
+    [class.active]="i === currentIndex"
+    [style.backgroundImage]="'url(' + img.url + ')'"
+  >
     <div class="photographer-tag">
       攝影師：{{ img.author }} | {{ img.style }}
     </div>
@@ -31,7 +35,7 @@
       <div class="search-group">
         <i data-lucide="camera"></i>
         <select [(ngModel)]="type" name="type">
-          <option value="">拍攝類型</option>
+          <option value="">拍攝服務類型</option>
           <option value="wedding">婚紗攝影</option>
           <option value="portrait">人像寫真</option>
           <option value="event">活動紀錄</option>
