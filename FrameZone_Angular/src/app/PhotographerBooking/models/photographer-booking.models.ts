@@ -100,3 +100,8 @@ export interface CategoryWithTags {
   categoryName: string;
   tags: string[];
 }
+
+export interface ServiceType {
+  serviceTypeId: number;
+  serviceName: string;
+}

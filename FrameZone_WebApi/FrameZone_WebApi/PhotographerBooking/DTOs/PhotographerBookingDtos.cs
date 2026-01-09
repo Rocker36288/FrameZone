@@ -75,4 +75,11 @@ namespace FrameZone_WebApi.PhotographerBooking.DTOs
         public DateTime EndDateTime { get; set; }
         public bool IsAvailable { get; set; }
     }
+
+    public class ServiceTypeDto
+    {
+        public int ServiceTypeId { get; set; }
+        public string ServiceName { get; set; }
+        public string IconUrl { get; set; }
+    }
 }

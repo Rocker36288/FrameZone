@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component,  OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PhotographerBookingService } from '../services/photographer-booking.service';
+import { ServiceType } from '../models/photographer-booking.models';
 
 @Component({
   selector: 'app-photographerbooking-search',
@@ -10,15 +11,17 @@ import { PhotographerBookingService } from '../services/photographer-booking.ser
   styleUrl: './photographerbooking-search.component.css',
 })
 export class PhotographerbookingSearchComponent implements OnInit {
-  serviceTypes: string[] = [];
+  serviceTypes: ServiceType[] = [];
   selectedServiceType = '';
   searchKeyword = '';
   dateRange: string = '';
 
-  constructor(private bookingService: PhotographerBookingService) {}
+  constructor(private bookingService: PhotographerBookingService) { }
 
   ngOnInit(): void {
-    this.serviceTypes = this.bookingService.getServiceTypes();
+    this.bookingService.getServiceTypes().subscribe((types) => {
+      this.serviceTypes = types;
+    });
   }
 
   onServiceTypeChange(): void {

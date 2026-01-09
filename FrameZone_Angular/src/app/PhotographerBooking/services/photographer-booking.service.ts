@@ -10,7 +10,8 @@ import {
   BookingDto,
   CreateBookingDto,
   PhotographerSearchDto,
-  CategoryWithTags
+  CategoryWithTags,
+  ServiceType
 } from '../models/photographer-booking.models';
 
 
@@ -80,7 +81,8 @@ export class PhotographerBookingService {
   searchWithFilters(filters: SearchFilters): Observable<PhotographerDto[]> {
     let params = new HttpParams();
     if (filters.keyword) params = params.set('keyword', filters.keyword);
-    if (filters.serviceType) params = params.set('studioType', filters.serviceType);
+    if (filters.keyword) params = params.set('keyword', filters.keyword);
+    // Removed: if (filters.serviceType) params = params.set('studioType', filters.serviceType);
 
     // 如果只有一個地區,傳給後端
     if (filters.locations.length === 1) {
@@ -108,9 +110,14 @@ export class PhotographerBookingService {
           const matchPrice = !p.minPrice || p.minPrice <= filters.maxPrice;
 
           // 評分篩選
+          // 評分篩選
           const matchRating = !p.rating || p.rating >= filters.minRating;
 
-          return matchLoc && matchTags && matchPrice && matchRating;
+          // 服務類型篩選 (serviceType 為 ID)
+          const matchServiceType = !filters.serviceType ||
+            p.services?.some(s => s.serviceTypeId.toString() === filters.serviceType.toString());
+
+          return matchLoc && matchTags && matchPrice && matchRating && matchServiceType;
         });
       }),
       map(photographers => {
@@ -148,8 +155,8 @@ export class PhotographerBookingService {
 
   // --- Helper Methods ---
 
-  getServiceTypes(): string[] {
-    return this.serviceTypes;
+  getServiceTypes(): Observable<ServiceType[]> {
+    return this.http.get<ServiceType[]>('https://localhost:7213/api/ServiceTypes');
   }
 
   getLocations(): string[] {
