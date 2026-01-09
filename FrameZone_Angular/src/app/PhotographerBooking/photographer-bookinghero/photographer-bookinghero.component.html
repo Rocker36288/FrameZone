@@ -1,11 +1,7 @@
 <div class="hero-container">
   <!-- 背景輪播圖 -->
-  <div
-    *ngFor="let img of dbImages; let i = index"
-    class="carousel-item"
-    [class.active]="i === currentIndex"
-    [style.backgroundImage]="'url(' + img.url + ')'"
-  >
+  <div *ngFor="let img of dbImages; let i = index" class="carousel-item" [class.active]="i === currentIndex"
+    [style.backgroundImage]="'url(' + img.url + ')'">
     <div class="photographer-tag">
       攝影師：{{ img.author }} | {{ img.style }}
     </div>
@@ -23,22 +19,22 @@
         <i data-lucide="map-pin"></i>
         <select [(ngModel)]="city" name="city">
           <option value="">選擇地區</option>
-          <option value="taipei">台北市</option>
-          <option value="taichung">台中市</option>
-          <option value="kaohsiung">高雄市</option>
+          <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
         </select>
       </div>
       <div class="search-group">
         <i data-lucide="calendar"></i>
-        <input type="date" [(ngModel)]="date" name="date" min="2025-12-23" />
+        <div style="display: flex; align-items: center; gap: 5px; width: 100%;">
+          <input type="date" [(ngModel)]="startDate" name="startDate" placeholder="開始" style="min-width: 0;" />
+          <span style="color: #999;">-</span>
+          <input type="date" [(ngModel)]="endDate" name="endDate" placeholder="結束" style="min-width: 0;" />
+        </div>
       </div>
       <div class="search-group">
         <i data-lucide="camera"></i>
         <select [(ngModel)]="type" name="type">
           <option value="">拍攝服務類型</option>
-          <option value="wedding">婚紗攝影</option>
-          <option value="portrait">人像寫真</option>
-          <option value="event">活動紀錄</option>
+          <option *ngFor="let s of serviceTypes" [value]="s.serviceTypeId">{{ s.serviceName }}</option>
         </select>
       </div>
       <button type="submit" class="btn-search">

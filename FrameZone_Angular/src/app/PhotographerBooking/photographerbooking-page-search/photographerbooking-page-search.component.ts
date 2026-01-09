@@ -2,6 +2,7 @@ import { PhotographerbookingCardComponent } from './../photographerbooking-card/
 import { PhotographerbookingSearchComponent } from './../photographerbooking-search/photographerbooking-search.component';
 import { PhotographerbookingHeaderComponent } from './../photographerbooking-header/photographerbooking-header.component';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -33,23 +34,45 @@ export class PhotographerbookingPageSearchComponent
 
   private destroy$ = new Subject<void>();
 
-  constructor(private bookingService: PhotographerBookingService) { }
+  constructor(
+    private bookingService: PhotographerBookingService,
+    private route: ActivatedRoute
+  ) { }
 
   ngOnInit(): void {
-    // 訂閱篩選條件變更
+    // 1. Subscribe to URL Query Params (From Hero or external link)
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        // Only update if params exist to avoid clearing default state on pure nav if handled elsewhere
+        // But normally we want URL to drive state.
+        if (Object.keys(params).length > 0) {
+          const newFilters: Partial<SearchFilters> = {};
+
+          if (params['keyword']) newFilters.keyword = params['keyword'];
+          if (params['location']) newFilters.locations = [params['location']]; // Support single location from query
+
+          if (params['serviceTypeId']) {
+            // Ensure it handles string from URL
+            newFilters.serviceType = params['serviceTypeId'];
+          }
+
+          if (params['startDate']) newFilters.startDate = params['startDate'];
+          if (params['endDate']) newFilters.endDate = params['endDate'];
+          if (params['tag']) newFilters.tags = [params['tag']];
+
+          // Update service state which will trigger the filter subscription below
+          this.bookingService.updateFilters(newFilters);
+        }
+      });
+
+    // 2. 訂閱篩選條件變更 (Global State -> UI Search)
     this.bookingService.filters$
       .pipe(takeUntil(this.destroy$))
       .subscribe((filters) => {
-        // Check if filters are reset (you might need a flag or check values)
-        // For now, if we want "Clear All" to also reset sort, we can do it here or in the service reset.
-        // But the user said "Full Global Reset", so sort order should be default.
-        // We can just check if filters.sortOrder is default, or if we should sync local sortOrder from filters.
         this.sortOrder = filters.sortOrder;
         this.performSearch(filters);
       });
-
-    // 初始搜尋
-    this.performSearch(this.bookingService.getCurrentFilters());
   }
 
   ngOnDestroy(): void {
