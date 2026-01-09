@@ -278,6 +278,31 @@ namespace FrameZone_WebApi.Videos.Repositories
             return await MapVideosToDtoAsync(videos);
         }
 
+        // 熱門影片
+        public async Task<List<VideoCardDto>> GetPopularVideosAsync(int take = 5)
+        {
+            // 先從 View 表 group 出 Top VideoId
+            var topVideoIds = await _context.Views
+                .AsNoTracking()
+                .GroupBy(v => v.VideoId)
+                .OrderByDescending(g => g.Count())
+                .Select(g => g.Key)
+                .Take(take)
+                .ToListAsync();
+
+            // 再回查 Video 主資料
+            var videos = await _context.Videos
+                .AsNoTracking()
+                .Where(v => !v.IsDeleted && topVideoIds.Contains(v.VideoId))
+                .Include(v => v.Channel)
+                    .ThenInclude(c => c.UserProfile)
+                .ToListAsync();
+
+            // 保持排序一致（很重要）
+
+            return await MapVideosToDtoAsync(videos);
+        }
+
         // 指定頻道最新影片
         public async Task<List<VideoCardDto>> GetChannelLatestVideosAsync(
             int channelId,

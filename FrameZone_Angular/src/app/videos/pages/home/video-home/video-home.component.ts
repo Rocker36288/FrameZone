@@ -32,7 +32,7 @@ export class VideoHomeComponent {
   }
 
   ngOnInit(): void {
-    this.videoService.getVideoRecommend().subscribe(apiVideos => {
+    this.videoService.getVideoPopluar().subscribe(apiVideos => {
       this.popularVideos = [
         ...apiVideos,
       ];

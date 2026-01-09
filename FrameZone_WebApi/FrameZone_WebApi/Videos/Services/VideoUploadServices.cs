@@ -78,7 +78,7 @@ namespace FrameZone_WebApi.Videos.Services
             var createdVideo = await _repository.VideoDraftCreateAsync(video);
 
             // ✅ 傳字串格式的 guid
-            var reviewResult = await ReviewVideoAsync(filePath, guid);
+            var reviewResult = await ReviewVideoAsync_Simulated(filePath, guid);
             createdVideo.ProcessStatus = reviewResult.Passed ? "REVIEWED_APPROVED" : "REVIEWED_REJECTED";
 
             if (reviewResult.Passed)

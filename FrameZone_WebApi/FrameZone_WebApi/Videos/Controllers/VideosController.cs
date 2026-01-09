@@ -138,6 +138,22 @@ namespace FrameZone_WebApi.Videos.Controllers
 
         //==============================獲取影片列表===========================
 
+        [HttpGet("Popluar")]
+        public async Task<ActionResult<List<VideoCardDto>>> GetVideoPopluar()
+
+        {
+            var dto = await _videoServices.GetVideoPopularAsync();
+
+            if (dto == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(dto);
+        }
+
+        //==============================獲取影片列表===========================
+
         [HttpGet("SpotlightVideos")]
         public async Task<IActionResult> GetChannelSpotlight(int channelId)
         {
