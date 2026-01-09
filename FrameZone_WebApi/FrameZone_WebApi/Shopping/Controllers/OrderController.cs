@@ -87,21 +87,36 @@ namespace FrameZone_WebApi.Shopping.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            // 3. 如果是貨到付款，不需要跳轉綠界，直接結束並回傳空參數 (前端會根據此判斷直接導向成功頁)
+            // 3. 建立初步付款紀錄
+            string merchantTradeNo = "FZ" + newOrder.OrderId.ToString("D8") + DateTime.Now.ToString("HHmmss");
+
+            // 4. 如果是貨到付款，不需要跳轉綠界，直接結束並回傳空參數 (前端會根據此判斷直接導向成功頁)
             if (order.PaymentMethod == "COD")
             {
+                // 貨到付款直接記錄為成功 (待出貨)
+                await RecordPaymentTransactionAsync(newOrder, order.PaymentMethod, merchantTradeNo, "Success", "待出貨");
+                
+                newOrder.OrderStatus = "Pending Shipment";
+                newOrder.UpdatedAt = DateTime.Now;
+                await _context.SaveChangesAsync();
+                
+                // 更新付款紀錄為成功 (COD 下單即視為交易紀錄成立)
+                // await RecordPaymentTransactionAsync(newOrder, order.PaymentMethod, "FZ" + newOrder.OrderId.ToString("D8"), "Success", "COD Order Confirmed");
+                
                 return Ok(new ECPayOrderParamsDto());
             }
+            else
+            {
+                // 信用卡/ATM 記錄為處理中 (待付款)
+                await RecordPaymentTransactionAsync(newOrder, order.PaymentMethod, merchantTradeNo, "Pending", "待付款");
+            }
 
-            // 4. 準備綠界要的資訊
-            // 交易編號規則: FZ + 8位訂單ID + 6位時間(分秒)
-            // 註記：這裡使用固定格式 (FZ+ID) 是為了讓 'pay-result' 回傳時能精確反推資料庫中的 OrderId
-            string merchantTradeNo = "FZ" + newOrder.OrderId.ToString("D8"); // OrderId 本身唯一，避免附加時間，方便後續用 OrderId 反查交易
-
+            // 5. 準備綠界要的資訊
+            // string merchantTradeNo = "FZ" + newOrder.OrderId.ToString("D8"); 
 
             ECPayOrderParamsDto ecpay = _ecpayService.CreateECPayOrder(order, merchantTradeNo);
 
-            // 將 ECPay 參數包成 HTML form（前端會抓 res.ecPayForm 去 submit）
+            // 將 ECPay 參數包成 HTML form
             string htmlForm = BuildEcpayForm(ecpay);
 
             return Ok(new
@@ -166,111 +181,118 @@ namespace FrameZone_WebApi.Shopping.Controllers
                             order.UpdatedAt = DateTime.Now;
 
                             // 先查詢必要的 TypeId，避免 FK 錯誤
-                            var transactionType = await _context.TransactionTypes.FirstOrDefaultAsync(t => t.TypeCode == "Payment");
-                            if (transactionType == null)
-                            {
-                                transactionType = new TransactionType
-                                {
-                                    TypeCode = "Payment",
-                                    TypeName = "Payment",
-                                    Description = "Payment Transaction",
-                                    IsActive = true,
-                                    CreatedAt = DateTime.Now,
-                                    UpdatedAt = DateTime.Now
-                                };
-                                _context.TransactionTypes.Add(transactionType);
-                                await _context.SaveChangesAsync(); // 保存以獲取 ID
-                            }
+                            // var transactionType = await _context.TransactionTypes.FirstOrDefaultAsync(t => t.TypeCode == "Payment");
+                            // if (transactionType == null)
+                            // {
+                            //     transactionType = new TransactionType
+                            //     {
+                            //         TypeCode = "Payment",
+                            //         TypeName = "Payment",
+                            //         Description = "Payment Transaction",
+                            //         IsActive = true,
+                            //         CreatedAt = DateTime.Now,
+                            //         UpdatedAt = DateTime.Now
+                            //     };
+                            //     _context.TransactionTypes.Add(transactionType);
+                            //     await _context.SaveChangesAsync(); // 保存以獲取 ID
+                            // }
 
-                            var statusType = await _context.TransactionStatusTypes.FirstOrDefaultAsync(s => s.StatusCode == "Success");
-                            if (statusType == null)
-                            {
-                                statusType = new TransactionStatusType
-                                {
-                                    StatusCode = "Success",
-                                    StatusName = "Payment Success",
-                                    Description = "Payment Successful",
-                                    IsFinal = false,
-                                    IsSuccess = true,
-                                    CreatedAt = DateTime.Now,
-                                    UpdatedAt = DateTime.Now
-                                };
-                                _context.TransactionStatusTypes.Add(statusType);
-                                await _context.SaveChangesAsync(); // 保存以獲取 ID
-                            }
+                            // var statusType = await _context.TransactionStatusTypes.FirstOrDefaultAsync(s => s.StatusCode == "Success");
+                            // if (statusType == null)
+                            // {
+                            //     statusType = new TransactionStatusType
+                            //     {
+                            //         StatusCode = "Success",
+                            //         StatusName = "Payment Success",
+                            //         Description = "Payment Successful",
+                            //         IsFinal = false,
+                            //         IsSuccess = true,
+                            //         CreatedAt = DateTime.Now,
+                            //         UpdatedAt = DateTime.Now
+                            //     };
+                            //     _context.TransactionStatusTypes.Add(statusType);
+                            //     await _context.SaveChangesAsync(); // 保存以獲取 ID
+                            // }
 
-                            //  Auto-create PaymentMethodType and PaymentMethod if missing(自動建立)
-                            var paymentMethodType = await _context.PaymentMethodTypes.FirstOrDefaultAsync(t => t.TypeCode == "CreditCard");
-                            if (paymentMethodType == null)
-                            {
-                                paymentMethodType = new PaymentMethodType
-                                {
-                                    TypeCode = "CreditCard",
-                                    TypeName = "信用卡",
-                                    Description = "Credit Card Payment",
-                                    IsActive = true,
-                                    CreatedAt = DateTime.Now,
-                                    UpdatedAt = DateTime.Now
-                                };
-                                _context.PaymentMethodTypes.Add(paymentMethodType);
-                                await _context.SaveChangesAsync();
-                            }
+                            // //  Auto-create PaymentMethodType and PaymentMethod if missing(自動建立)
+                            // var paymentMethodType = await _context.PaymentMethodTypes.FirstOrDefaultAsync(t => t.TypeCode == "CreditCard");
+                            // if (paymentMethodType == null)
+                            // {
+                            //     paymentMethodType = new PaymentMethodType
+                            //     {
+                            //         TypeCode = "CreditCard",
+                            //         TypeName = "信用卡",
+                            //         Description = "Credit Card Payment",
+                            //         IsActive = true,
+                            //         CreatedAt = DateTime.Now,
+                            //         UpdatedAt = DateTime.Now
+                            //     };
+                            //     _context.PaymentMethodTypes.Add(paymentMethodType);
+                            //     await _context.SaveChangesAsync();
+                            // }
 
-                            var paymentMethod = await _context.PaymentMethods.FirstOrDefaultAsync(m => m.User.UserId == order.UserId && m.PaymentMethodType.TypeCode == "CreditCard" && m.CardLast4 == "ECPay");
-                            // 這裡的 PaymentMethod 通常是指使用者儲存的付款方式，或是系統全域的付款渠道
-                            // 若此表是用來記錄「本次交易使用的付款方式」，則 logic 如下；若是指「系統支援的付款方式」，則不應綁定 UserId
-                            // 根據 Model 定義有 UserId，推測是「使用者儲存的卡片/方式」。
-                            // 為避免錯誤，我們這裡建立一個綁定該 User 的「ECPay 預設」紀錄，或查找既有的。
+                            // var paymentMethod = await _context.PaymentMethods.FirstOrDefaultAsync(m => m.User.UserId == order.UserId && m.PaymentMethodType.TypeCode == "CreditCard" && m.CardLast4 == "ECPay");
+                            // // 這裡的 PaymentMethod 通常是指使用者儲存的付款方式，或是系統全域的付款渠道
+                            // // 若此表是用來記錄「本次交易使用的付款方式」，則 logic 如下；若是指「系統支援的付款方式」，則不應綁定 UserId
+                            // // 根據 Model 定義有 UserId，推測是「使用者儲存的卡片/方式」。
+                            // // 為避免錯誤，我們這裡建立一個綁定該 User 的「ECPay 預設」紀錄，或查找既有的。
 
-                            // 搜尋該用戶是否有綠界金流紀錄，若無則新增
-                            if (paymentMethod == null)
-                            {
-                                paymentMethod = new PaymentMethod
-                                {
-                                    UserId = order.UserId,
-                                    PaymentMethodTypeId = paymentMethodType.PaymentMethodTypeId,
-                                    IsDefault = false,
-                                    IsActive = true,
-                                    CardLast4 = "1234",
-                                    CardholderName = order.RecipientName ?? "ECPay User",
-                                    CreatedAt = DateTime.Now,
-                                    UpdatedAt = DateTime.Now
-                                };
-                                _context.PaymentMethods.Add(paymentMethod);
-                                await _context.SaveChangesAsync();
-                            }
+                            // // 搜尋該用戶是否有綠界金流紀錄，若無則新增
+                            // if (paymentMethod == null)
+                            // {
+                            //     paymentMethod = new PaymentMethod
+                            //     {
+                            //         UserId = order.UserId,
+                            //         PaymentMethodTypeId = paymentMethodType.PaymentMethodTypeId,
+                            //         IsDefault = false,
+                            //         IsActive = true,
+                            //         CardLast4 = "1234",
+                            //         CardholderName = order.RecipientName ?? "ECPay User",
+                            //         CreatedAt = DateTime.Now,
+                            //         UpdatedAt = DateTime.Now
+                            //     };
+                            //     _context.PaymentMethods.Add(paymentMethod);
+                            //     await _context.SaveChangesAsync();
+                            // }
 
-                            // 1. 寫入 PaymentTransaction
-                            var transaction = new PaymentTransaction
-                            {
-                                UserId = order.UserId,
-                                PaymentMethodId = paymentMethod.PaymentMethodId,
-                                TransactionTypeId = transactionType.TransactionTypeId,
-                                TransactionNo = merchantTradeNo, // 使用商店交易編號
-                                Amount = order.TotalAmount,
-                                Currency = "TWD",
-                                Description = "ECPay Payment",
-                                MerchantTradeNo = merchantTradeNo,
-                                GatewayTransactionId = result["TradeNo"], // 綠界的交易編號
-                                GatewayName = "ECPay",
-                                CreatedAt = DateTime.Now
-                            };
+                            // // 1. 寫入 PaymentTransaction
+                            // var transaction = new PaymentTransaction
+                            // {
+                            //     UserId = order.UserId,
+                            //     PaymentMethodId = paymentMethod.PaymentMethodId,
+                            //     TransactionTypeId = transactionType.TransactionTypeId,
+                            //     TransactionNo = merchantTradeNo, // 使用商店交易編號
+                            //     Amount = order.TotalAmount,
+                            //     Currency = "TWD",
+                            //     Description = "ECPay Payment",
+                            //     MerchantTradeNo = merchantTradeNo,
+                            //     GatewayTransactionId = result["TradeNo"], // 綠界的交易編號
+                            //     GatewayName = "ECPay",
+                            //     CreatedAt = DateTime.Now
+                            // };
 
-                            // 2. 寫入 TransactionStatusLog
-                            var statusLog = new TransactionStatusLog
-                            {
-                                Transaction = transaction,
-                                StatusTypeId = statusType.StatusTypeId,
-                                StatusMessage = "Payment Success",
-                                GatewayResponse = string.Join("&", result.Select(x => $"{x.Key}={x.Value}")),
-                                CreatedAt = DateTime.Now
-                            };
+                            // // 2. 寫入 TransactionStatusLog
+                            // var statusLog = new TransactionStatusLog
+                            // {
+                            //     Transaction = transaction,
+                            //     StatusTypeId = statusType.StatusTypeId,
+                            //     StatusMessage = "Payment Success",
+                            //     GatewayResponse = string.Join("&", result.Select(x => $"{x.Key}={x.Value}")),
+                            //     CreatedAt = DateTime.Now
+                            // };
 
-                            _context.PaymentTransactions.Add(transaction);
-                            _context.TransactionStatusLogs.Add(statusLog);
+                            // _context.PaymentTransactions.Add(transaction);
+                            // _context.TransactionStatusLogs.Add(statusLog);
 
                             await _context.SaveChangesAsync();
-                            _logger.LogInformation("Order {OrderId} status updated and Transaction recorded.", orderId);
+
+                            // 串接所有回傳參數作為 GatewayResponse
+                            string fullResponse = string.Join("&", result.Select(x => $"{x.Key}={x.Value}"));
+
+                            // 使用集中管理的方法紀錄付款
+                            await RecordPaymentTransactionAsync(order, "Credit", merchantTradeNo, "Success", "付款成功 (綠界非同步通知)", result["TradeNo"], fullResponse);
+                            
+                            _logger.LogInformation("Order {OrderId} status updated via callback.", orderId);
                         }
                     }
                 }
@@ -319,7 +341,7 @@ namespace FrameZone_WebApi.Shopping.Controllers
             if (string.IsNullOrWhiteSpace(rtnCode))
                 rtnCode = Request.Query["RtnCode"].ToString();
 
-            // B 方案：只要有 MerchantTradeNo 就當作 ATM 取號成功 => 已付款
+            // B 方案：只要有 MerchantTradeNo 就當作 ATM 取號成功
             if (string.IsNullOrWhiteSpace(rtnCode) && !string.IsNullOrWhiteSpace(merchantTradeNo))
                 rtnCode = "2";
 
@@ -328,7 +350,17 @@ namespace FrameZone_WebApi.Shopping.Controllers
                 _logger.LogInformation("ECPay success-redirect received. RtnCode={RtnCode}, MerchantTradeNo={MerchantTradeNo}",
                     rtnCode, merchantTradeNo);
 
-                await TryMarkOrderPaidFallbackAsync(merchantTradeNo, rtnCode);
+                // 只有 RtnCode == "1" (已付款) 才執行 fallback 更新狀態
+                // RtnCode == "2" (ATM 取號完成) 不需要更新狀態，保持 Pending Payment
+                if (rtnCode == "1")
+                {
+                    // 嘗試從 Form 或 Query 取得 TradeNo
+                    string tradeNo = "";
+                    if (Request.HasFormContentType) tradeNo = Request.Form["TradeNo"].ToString();
+                    if (string.IsNullOrWhiteSpace(tradeNo)) tradeNo = Request.Query["TradeNo"].ToString();
+
+                    await TryMarkOrderPaidFallbackAsync(merchantTradeNo, rtnCode, tradeNo);
+                }
 
                 var redirectUrl = $"http://localhost:4200/order-success?tradeNo={merchantTradeNo}";
                 return Content($"<script>window.location.href='{redirectUrl}';</script>", "text/html");
@@ -486,8 +518,8 @@ namespace FrameZone_WebApi.Shopping.Controllers
                 var rtnCode = form["RtnCode"].ToString();
 
                 // 信用卡：1 = 付款成功
-                // ATM：2 = 取號成功（你要當作同樣進入待出貨）
-                if (rtnCode != "1" && rtnCode != "2") return false;
+                // ATM：2 = 取號成功（僅導回，不更新狀態）
+                if (rtnCode != "1") return false;
 
                 if (!(merchantTradeNo.StartsWith("FZ") && merchantTradeNo.Length >= 10))
                     return false;
@@ -518,9 +550,9 @@ namespace FrameZone_WebApi.Shopping.Controllers
             }
         }
 
-        private async Task<bool> TryMarkOrderPaidFallbackAsync(string merchantTradeNo, string rtnCode)
+        private async Task<bool> TryMarkOrderPaidFallbackAsync(string merchantTradeNo, string rtnCode, string tradeNo = null)
         {
-            if (rtnCode != "1" && rtnCode != "2") return false;
+            if (rtnCode != "1") return false;
             if (!(merchantTradeNo.StartsWith("FZ") && merchantTradeNo.Length >= 10)) return false;
 
             var orderIdStr = merchantTradeNo.Substring(2, 8);
@@ -534,9 +566,139 @@ namespace FrameZone_WebApi.Shopping.Controllers
                 order.OrderStatus = "Pending Shipment";
                 order.UpdatedAt = DateTime.Now;
                 await _context.SaveChangesAsync();
+
+                // 取得目前 Request 中的參數作為備份
+                string backupResp = Request.HasFormContentType 
+                    ? string.Join("&", Request.Form.Select(x => $"{x.Key}={x.Value}"))
+                    : Request.QueryString.ToString();
+
+                // 補寫入付款紀錄
+                await RecordPaymentTransactionAsync(order, "Credit", merchantTradeNo, "Success", "付款成功 (導回確認)", tradeNo, backupResp);
             }
 
             return true;
+        }
+
+        private async Task RecordPaymentTransactionAsync(Order order, string paymentMethodCode, string merchantTradeNo, string statusCode, string message, string gatewayId = null, string gatewayResponse = null)
+        {
+            try
+            {
+                // 1. 確保基礎類型資料存在
+                var transactionType = await _context.TransactionTypes.FirstOrDefaultAsync(t => t.TypeCode == "Payment")
+                    ?? new TransactionType { TypeCode = "Payment", TypeName = "付款", Description = "Order Payment", IsActive = true, CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now };
+                if (transactionType.TransactionTypeId == 0) { _context.TransactionTypes.Add(transactionType); await _context.SaveChangesAsync(); }
+
+                var statusType = await _context.TransactionStatusTypes.FirstOrDefaultAsync(s => s.StatusCode == statusCode);
+                if (statusType == null)
+                {
+                    statusType = new TransactionStatusType 
+                    { 
+                        StatusCode = statusCode, 
+                        StatusName = statusCode == "Success" ? "成功" : (statusCode == "Pending" ? "處理中" : statusCode), 
+                        Description = statusCode, 
+                        IsFinal = (statusCode == "Success"), 
+                        IsSuccess = (statusCode == "Success"), 
+                        CreatedAt = DateTime.Now, 
+                        UpdatedAt = DateTime.Now 
+                    };
+                    _context.TransactionStatusTypes.Add(statusType);
+                    await _context.SaveChangesAsync();
+                }
+
+                // 2. 處理付款方式類型
+                string dbMethodTypeCode = paymentMethodCode switch
+                {
+                    "Credit" => "CreditCard",
+                    "ATM" => "ATM",
+                    "COD" => "COD",
+                    _ => paymentMethodCode
+                };
+
+                var paymentMethodType = await _context.PaymentMethodTypes.FirstOrDefaultAsync(t => t.TypeCode == dbMethodTypeCode);
+                if (paymentMethodType == null)
+                {
+                    paymentMethodType = new PaymentMethodType 
+                    { 
+                        TypeCode = dbMethodTypeCode, 
+                        TypeName = dbMethodTypeCode switch {
+                            "CreditCard" => "信用卡",
+                            "ATM" => "ATM轉帳",
+                            "COD" => "貨到付款",
+                            _ => dbMethodTypeCode
+                        },
+                        Description = dbMethodTypeCode + " Payment", 
+                        IsActive = true, 
+                        CreatedAt = DateTime.Now, 
+                        UpdatedAt = DateTime.Now 
+                    };
+                    _context.PaymentMethodTypes.Add(paymentMethodType);
+                    await _context.SaveChangesAsync();
+                }
+
+                // 3. 處理 PaymentMethod (改為 Find-or-Create 避免違反資料庫唯一約束)
+                // 註記：搜尋條件必須與下方建立時填入的欄位一致，否則會找不到舊紀錄。
+                var paymentMethod = await _context.PaymentMethods.FirstOrDefaultAsync(m => m.UserId == order.UserId && m.PaymentMethodTypeId == paymentMethodType.PaymentMethodTypeId && m.CardLast4 == "0000");
+                if (paymentMethod == null)
+                {
+                    paymentMethod = new PaymentMethod
+                    {
+                        UserId = order.UserId,
+                        PaymentMethodTypeId = paymentMethodType.PaymentMethodTypeId,
+                        IsDefault = false,
+                        IsActive = true,
+                        CardLast4 = "0000",
+                        CardholderName = order.RecipientName ?? "User",
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now
+                    };
+                    _context.PaymentMethods.Add(paymentMethod);
+                    await _context.SaveChangesAsync();
+                }
+
+                // 4. 建立或尋找交易紀錄
+                var transaction = await _context.PaymentTransactions.FirstOrDefaultAsync(t => t.MerchantTradeNo == merchantTradeNo);
+                if (transaction == null)
+                {
+                    transaction = new PaymentTransaction
+                    {
+                        UserId = order.UserId,
+                        PaymentMethodId = paymentMethod.PaymentMethodId,
+                        TransactionTypeId = transactionType.TransactionTypeId,
+                        TransactionNo = merchantTradeNo,
+                        Amount = order.TotalAmount,
+                        Currency = "TWD",
+                        Description = $"{dbMethodTypeCode} Order Payment", // 依支付方式分開描述
+                        MerchantTradeNo = merchantTradeNo,
+                        GatewayTransactionId = gatewayId,
+                        GatewayName = "ECPay",
+                        CreatedAt = DateTime.Now
+                    };
+                    _context.PaymentTransactions.Add(transaction);
+                }
+                else
+                {
+                    transaction.GatewayTransactionId = gatewayId ?? transaction.GatewayTransactionId;
+                    // 如果交易已存在但 PaymentMethod 沒對上，更新它（雖然通常交易是唯一的）
+                    transaction.PaymentMethodId = paymentMethod.PaymentMethodId;
+                }
+
+                // 5. 寫入狀態 Log
+                var statusLog = new TransactionStatusLog
+                {
+                    Transaction = transaction,
+                    StatusTypeId = statusType.StatusTypeId,
+                    StatusMessage = message, // 這裡可以維持中文供識別
+                    GatewayResponse = gatewayResponse ?? (gatewayId != null ? $"TradeNo:{gatewayId}" : ""),
+                    CreatedAt = DateTime.Now
+                };
+                _context.TransactionStatusLogs.Add(statusLog);
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to record payment transaction for Order {OrderId}", order.OrderId);
+            }
         }
 
 

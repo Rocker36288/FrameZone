@@ -180,7 +180,7 @@
                   <input class="form-check-input" type="radio" [value]="addr.id" formControlName="selectedAddressId"
                     [id]="'s2'+addr.id">
                   <label class="form-check-label small" [for]="'s2'+addr.id">
-                    {{addr.name}}門市 | {{addr.address}}
+                    {{addr.recipientName}} | {{addr.phone}} | {{addr.name}} | {{addr.address}}
                   </label>
                 </div>
               </div>
@@ -198,7 +198,7 @@
                   <input class="form-check-input" type="radio" [value]="addr.id" formControlName="selectedAddressId"
                     [id]="'s3'+addr.id">
                   <label class="form-check-label small" [for]="'s3'+addr.id">
-                    {{addr.name}}門市 | {{addr.address}}
+                    {{addr.recipientName}} | {{addr.phone}} | {{addr.name}} | {{addr.address}}
                   </label>
                 </div>
               </div>
@@ -249,4 +249,8 @@
 <div class="modal fade" id="couponModal" tabindex="-1" #couponModalElement>
 </div>
 
-<!-- ✅ 移除了舊的 <app-ecpay-form> 標籤 -->
+<!-- 隱藏表單已設置在後端 -->
+<!-- <div>
+  <app-ecpay-form *ngIf="ecpayParams" [apiUrl]="ecpayParams.serviceURL"
+    [postData]="ecpayParams.params"></app-ecpay-form>
+</div> -->

@@ -13,6 +13,8 @@ namespace FrameZone_WebApi.Shopping.Services
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<ECPayService> _logger;
+
+        //新增
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         // 設定各參數的最大長度（只列特別需要檢查的）
@@ -29,6 +31,7 @@ namespace FrameZone_WebApi.Shopping.Services
             //{"OrderResultURL", 200},
         };
 
+        //修改下面這段
         public ECPayService(IConfiguration configuration, ILogger<ECPayService> logger, IHttpContextAccessor httpContextAccessor)
         {
             _configuration = configuration;
@@ -59,7 +62,7 @@ namespace FrameZone_WebApi.Shopping.Services
                 orderParams.Params["TradeDesc"] = "FrameZone Order " + merchantTradeNo;
                 orderParams.Params["ChoosePayment"] = order.PaymentMethod;
 
-                // 商品明細
+                //寫在綠界付款畫面的商品明細
                 if (order.OrderItems != null)
                 {
                     StringBuilder stringBuilder = new StringBuilder();
@@ -74,6 +77,7 @@ namespace FrameZone_WebApi.Shopping.Services
                         }
                         else
                         {
+                            //第二樣以上商品用#換行
                             stringBuilder.Append("#" + item.Name?.ToString() + " * " + item.Quantity.ToString());
                         }
                     }

@@ -103,6 +103,9 @@ export class ShoppingCheckoutComponent {
   memberAvatarUrl: string = '';
   memberName: string = '';
 
+  // 使用綠界 API 需要的相關參數
+  //ecpayParams: any = null;
+
   ngOnInit(): void {
     if (!this.authService.isAuthenticated()) {
       this.toastService.show('請先登入會員', 'top');
@@ -207,7 +210,8 @@ export class ShoppingCheckoutComponent {
           id: s.convenienceStoreId,
           name: s.convenienceStoreName,
           address: s.convenienceStoreCode,
-          phone: ''
+          recipientName: s.recipientName,
+          phone: s.phoneNumber
         }));
       },
       error: (err) => console.error('取得門市失敗：', err)
@@ -325,9 +329,9 @@ export class ShoppingCheckoutComponent {
     if (isStore) {
       // 門市取貨
       const selectedStore = this.pickupStores.find(a => a.id === selectedId);
-      recipientName = selectedStore?.name + "門市" || '';
+      recipientName = selectedStore?.recipientName || '';
       phoneNumber = selectedStore?.phone || '';
-      shippingAddress = selectedStore?.address || '';
+      shippingAddress = (selectedStore?.name + '門市 (' + selectedStore?.address + ')') || '';
     } else {
       // 郵寄：檢查是使用新地址還是已儲存的地址
       if (this.useNewAddress) {
@@ -420,7 +424,7 @@ export class ShoppingCheckoutComponent {
     const form = tempDiv.querySelector('form') as HTMLFormElement;
 
     if (form) {
-      // ✅ 關鍵：設定在新視窗開啟
+      // 設定在同視窗開啟
       form.target = '_self';
 
       // 將表單加入 DOM
