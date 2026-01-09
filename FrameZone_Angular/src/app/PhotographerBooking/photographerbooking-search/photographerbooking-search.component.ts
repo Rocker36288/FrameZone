@@ -34,7 +34,10 @@ export class PhotographerbookingSearchComponent implements OnInit {
   }
 
   onDateChange(): void {
-    this.updateSearch();
+    // Only update search if both dates are selected or both are cleared
+    if ((this.startDate && this.endDate) || (!this.startDate && !this.endDate)) {
+      this.updateSearch();
+    }
   }
 
   onSearch(): void {

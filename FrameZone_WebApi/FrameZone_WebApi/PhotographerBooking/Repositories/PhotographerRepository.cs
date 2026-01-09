@@ -37,31 +37,30 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
                 .FirstOrDefaultAsync(p => p.PhotographerId == id);
         }
 
-        public async Task<List<Photographer>> SearchPhotographersAsync(string keyword, string location, string studioType, string tag, DateTime? startDate = null, DateTime? endDate = null)
+        public async Task<List<Photographer>> SearchPhotographersAsync(string keyword, string location, string studioType, string tag, DateTime? startDate = null, DateTime? endDate = null, int? serviceTypeId = null)
         {
             var query = _context.Photographers.AsQueryable();
 
-            // Date filtering logic
+            // AND Condition 1: Date Range
             if (startDate.HasValue && endDate.HasValue)
             {
-                // Find photographers who have AVAILABLE slots in the given range.
-                // An available slot has BookingId == null and is within the range.
-                // We use end date inclusive for the entire day logic if needed, but here assuming exact range passed or handled by caller.
-                // Adjusting endDate to end of day if caller passes only date part is good practice, but for now trusting parameters.
-                
-                var availablePhotographerIds = _context.AvailableSlots
-                    .Where(s => s.StartDateTime >= startDate.Value && s.StartDateTime <= endDate.Value && s.BookingId == null)
-                    .Select(s => s.PhotographerId)
-                    .Distinct();
-
-                query = query.Where(p => availablePhotographerIds.Contains(p.PhotographerId));
+                // We want photographers who have ANY available slot in the valid range.
+                // Using Any() is more efficient than getting IDs list first if the dataset is huge, 
+                // but the previous approach (Get IDs) is sometimes faster if Photographer table is joined with huge slots table.
+                // Standard EF Core way for 'AND' condition:
+                query = query.Where(p => p.AvailableSlots.Any(s => 
+                    s.StartDateTime >= startDate.Value && 
+                    s.StartDateTime <= endDate.Value && 
+                    s.BookingId == null));
             }
 
+            // AND Condition 2: Keyword
             if (!string.IsNullOrWhiteSpace(keyword))
             {
                 query = query.Where(p => p.DisplayName.Contains(keyword) || p.StudioName.Contains(keyword) || p.Description.Contains(keyword));
             }
 
+            // AND Condition 3: Location
             if (!string.IsNullOrWhiteSpace(location))
             {
                 query = query.Where(p => 
@@ -70,11 +69,19 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
                 );
             }
 
+            // AND Condition 4: Studio Type (Legacy String)
             if (!string.IsNullOrWhiteSpace(studioType))
             {
                 query = query.Where(p => p.StudioType == studioType);
             }
 
+            // AND Condition 5: Service Type ID (New Strict)
+            if (serviceTypeId.HasValue)
+            {
+                query = query.Where(p => p.PhotographerServices.Any(ps => ps.ServiceTypeId == serviceTypeId.Value));
+            }
+
+            // AND Condition 6: Tags
             if (!string.IsNullOrWhiteSpace(tag))
             {
                 query = query.Where(p => 
@@ -88,8 +95,10 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
                 .Include(p => p.PhotographerServices).ThenInclude(ps => ps.ServiceType)
                 .Include(p => p.PhotographerSpecialties).ThenInclude(ps => ps.SpecialtyTag)
                 .Include(p => p.Bookings).ThenInclude(b => b.Reviews).ThenInclude(r => r.ReviewPhotos)
-                // Include AvailableSlots to calculate SlotCount in Service later (or here if we did projection)
-                .Include(p => p.AvailableSlots) 
+                // Filtered Include for performance: ONLY load available slots in the future (or range if needed for detailed view)
+                // Note: EF Core supports Filtered Include. We only need future available slots to avoid loading history.
+                .Include(p => p.AvailableSlots.Where(s => s.BookingId == null && s.StartDateTime >= DateTime.Today))
+                .AsSplitQuery() // Optimization: Split queries to avoid data explosion with multiple Includes
                 .ToListAsync();
         }
 

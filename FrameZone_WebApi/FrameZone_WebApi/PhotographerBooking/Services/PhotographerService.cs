@@ -36,7 +36,8 @@ namespace FrameZone_WebApi.PhotographerBooking.Services
                 searchDto.StudioType, 
                 searchDto.Tag,
                 searchDto.StartDate,
-                searchDto.EndDate
+                searchDto.EndDate,
+                searchDto.ServiceTypeId
             );
 
             return photographers.Select(p => MapToDto(p, searchDto.StartDate, searchDto.EndDate)).ToList();

@@ -144,7 +144,14 @@ export class PhotographerbookingSidebarSearchComponent implements OnInit {
     this.selectedTags.clear();
     this.maxPrice = 10000;
     this.minRating = 0;
-    this.bookingService.resetFilters();
+
+    // Only reset sidebar-related filters, keeping keyword/dates/serviceType intact
+    this.bookingService.updateFilters({
+      locations: [],
+      tags: [],
+      maxPrice: 10000,
+      minRating: 0
+    });
   }
 
   get priceDisplay(): string {

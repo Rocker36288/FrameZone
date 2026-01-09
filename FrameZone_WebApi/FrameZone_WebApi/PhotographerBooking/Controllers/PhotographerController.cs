@@ -25,6 +25,7 @@ namespace FrameZone_WebApi.PhotographerBooking.Controllers
                 if (!string.IsNullOrEmpty(searchDto.Keyword) || 
                     !string.IsNullOrEmpty(searchDto.Location) || 
                     !string.IsNullOrEmpty(searchDto.StudioType) || 
+                    searchDto.ServiceTypeId.HasValue ||
                     searchDto.StartDate.HasValue || 
                     searchDto.EndDate.HasValue)
                 {

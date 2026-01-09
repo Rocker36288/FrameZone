@@ -43,6 +43,7 @@ namespace FrameZone_WebApi.PhotographerBooking.DTOs
         public string? Keyword { get; set; }
         public string? Location { get; set; }
         public string? StudioType { get; set; }
+        public int? ServiceTypeId { get; set; }
         public string? Tag { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }

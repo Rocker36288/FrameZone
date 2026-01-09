@@ -6,7 +6,7 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
     {
         Task<List<Photographer>> GetAllPhotographersAsync();
         Task<Photographer> GetPhotographerByIdAsync(int id);
-        Task<List<Photographer>> SearchPhotographersAsync(string keyword, string location, string studioType, string tag, DateTime? startDate = null, DateTime? endDate = null);
+        Task<List<Photographer>> SearchPhotographersAsync(string keyword, string location, string studioType, string tag, DateTime? startDate = null, DateTime? endDate = null, int? serviceTypeId = null);
         Task<bool> CreatePhotographerAsync(Photographer photographer);
         Task<bool> UpdatePhotographerAsync(Photographer photographer);
         Task<bool> DeletePhotographerAsync(int id);

@@ -81,7 +81,7 @@ export class PhotographerBookingService {
   searchWithFilters(filters: SearchFilters): Observable<PhotographerDto[]> {
     let params = new HttpParams();
     if (filters.keyword) params = params.set('keyword', filters.keyword);
-    if (filters.serviceType) params = params.set('studioType', filters.serviceType); // Map to backend param
+    if (filters.serviceType) params = params.set('serviceTypeId', filters.serviceType); // Map to backend param
     if (filters.startDate) params = params.set('startDate', filters.startDate);
     if (filters.endDate) params = params.set('endDate', filters.endDate);
 
