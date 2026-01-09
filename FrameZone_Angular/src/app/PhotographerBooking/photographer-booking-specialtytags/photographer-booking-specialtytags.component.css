@@ -30,22 +30,32 @@
   padding: 12px 24px; /* 高度增加 */
   border-radius: 50px;
   font-size: 1.1rem; /* 文字稍大 */
-  font-weight: 500;
+  font-weight: 450;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* --- 精緻邊框方案 --- */
+/* --- 漸層精緻方案 --- */
 .tag-outline {
   background-color: transparent;
+  /* 邊框維持深紫色，或使用漸層中較深的顏色 #764ba2 */
   color: #667eea;
   border: 1.5px solid #667eea;
+  transition: all 0.3s ease; /* 增加轉場動畫，變色更平滑 */
+  cursor: pointer;
 }
 
 .tag-outline:hover,
 .tag-outline.active {
-  background-color: #667eea;
+  /* 將背景換成你指定的漸層色 */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  /* 為了美觀，選中時通常會隱藏邊框或讓邊框顏色與漸層融合 */
+  border-color: transparent;
+
   color: white;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+
+  /* 調整陰影顏色，使其與漸層色系更搭配 */
+  box-shadow: 0 4px 12px rgba(118, 75, 162, 0.4);
 }
 
 /* 卡片 Grid */

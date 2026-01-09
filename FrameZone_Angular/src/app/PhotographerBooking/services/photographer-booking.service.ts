@@ -78,7 +78,7 @@ export class PhotographerBookingService {
 
   // Search using frontend filters - converting to backend call + client side filtering if needed
   // For now, let's try to map some filters to backend params and do the rest client side if backend is limited
-  searchWithFilters(filters: SearchFilters): Observable<PhotographerDto[]> {
+  searchWithFilters(filters: Partial<SearchFilters>): Observable<PhotographerDto[]> {
     let params = new HttpParams();
     if (filters.keyword) params = params.set('keyword', filters.keyword);
     if (filters.serviceType) params = params.set('serviceTypeId', filters.serviceType); // Map to backend param
@@ -86,12 +86,12 @@ export class PhotographerBookingService {
     if (filters.endDate) params = params.set('endDate', filters.endDate);
 
     // 如果只有一個地區,傳給後端
-    if (filters.locations.length === 1) {
+    if (filters.locations && filters.locations.length === 1) {
       params = params.set('location', filters.locations[0]);
     }
 
     // 如果只有一個標籤,傳給後端
-    if (filters.tags.length === 1) {
+    if (filters.tags && filters.tags.length === 1) {
       params = params.set('tag', filters.tags[0]);
     }
 
@@ -100,23 +100,27 @@ export class PhotographerBookingService {
         // Apply client-side filters for multiple selections
         return photographers.filter(p => {
           // 地區篩選: 如果有選擇地區,攝影師的服務城市列表必須包含至少一個選中的地區
-          const matchLoc = filters.locations.length === 0 ||
-            filters.locations.some(l => p.serviceCities?.includes(l));
+          const locations = filters.locations || [];
+          const matchLoc = locations.length === 0 ||
+            locations.some(l => p.serviceCities?.includes(l));
 
           // 標籤篩選: 如果有選擇標籤,攝影師必須擁有至少一個選中的標籤
-          const matchTags = filters.tags.length === 0 ||
-            filters.tags.some(tag => p.specialties.some(s => s.includes(tag)));
+          const tags = filters.tags || [];
+          const matchTags = tags.length === 0 ||
+            tags.some(tag => p.specialties.some(s => s.includes(tag)));
 
           // 價格篩選
-          const matchPrice = !p.minPrice || p.minPrice <= filters.maxPrice;
+          const maxPrice = filters.maxPrice ?? 10000;
+          const matchPrice = !p.minPrice || p.minPrice <= maxPrice;
 
           // 評分篩選
           // 評分篩選
-          const matchRating = !p.rating || p.rating >= filters.minRating;
+          const minRating = filters.minRating ?? 0;
+          const matchRating = !p.rating || p.rating >= minRating;
 
           // 服務類型篩選 (serviceType 為 ID)
           const matchServiceType = !filters.serviceType ||
-            p.services?.some(s => s.serviceTypeId.toString() === filters.serviceType.toString());
+            p.services?.some(s => s.serviceTypeId.toString() === filters.serviceType!.toString());
 
           return matchLoc && matchTags && matchPrice && matchRating && matchServiceType;
         });
