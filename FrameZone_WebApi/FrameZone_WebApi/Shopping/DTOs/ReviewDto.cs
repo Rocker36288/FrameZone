@@ -52,7 +52,7 @@ namespace FrameZone_WebApi.Shopping.DTOs
         public long OrderId { get; set; }
         public long ProductId { get; set; }
         public byte Rating { get; set; }
-        public string Content { get; set; }
-        public List<IFormFile> Images { get; set; }
+        public string? Content { get; set; }
+        public List<IFormFile>? Images { get; set; }
     }
 }

@@ -415,25 +415,30 @@ namespace FrameZone_WebApi.Shopping.Controllers
                         .ThenInclude(s => s.Product)
                             .ThenInclude(p => p.User)
                                 .ThenInclude(u => u.UserProfile)
+                                .Include(o => o.OrderDetails)
+                    .ThenInclude(d => d.Reviews)
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();
 
             var result = orders.Select(o => {
-                var firstProduct = o.OrderDetails.FirstOrDefault();
-                var sellerName = firstProduct?.Specification?.Product?.User?.UserProfile?.DisplayName ?? "FrameZone 精選賣場";
+            var firstProduct = o.OrderDetails.FirstOrDefault();
+            var sellerName = firstProduct?.Specification?.Product?.User?.UserProfile?.DisplayName ?? "FrameZone 精選賣場";
 
-                return new
-                {
-                    id = "ORD" + o.OrderId.ToString("D6"),
-                    orderId = o.OrderId,
-                    shopName = sellerName,
-                    status = o.OrderStatus == "Pending Payment" ? "pay" :
-                             o.OrderStatus == "Pending Shipment" ? "ship" : "done",
-                    statusText = o.OrderStatus == "Pending Payment" ? "待付款" :
-                                 o.OrderStatus == "Pending Shipment" ? "待出貨" : "已完成",
-                    totalAmount = o.TotalAmount,
-                    createdAt = o.CreatedAt,
-                    products = o.OrderDetails.Select(d => new {
+            return new
+            {
+                id = "ORD" + o.OrderId.ToString("D6"),
+                orderId = o.OrderId,
+                shopName = sellerName,
+                status = o.OrderStatus == "Pending Payment" ? "pay" :
+                         o.OrderStatus == "Pending Shipment" ? "ship" : "done",
+                statusText = o.OrderStatus == "Pending Payment" ? "待付款" :
+                             o.OrderStatus == "Pending Shipment" ? "待出貨" : "已完成",
+                totalAmount = o.TotalAmount,
+                createdAt = o.CreatedAt,
+                products = o.OrderDetails.Select(d => {
+                    var review = d.Reviews.FirstOrDefault();
+                    return new
+                    {
                         name = d.Specification?.Product?.ProductName ?? "未知商品",
                         spec = "預設規格", // 暫時固定，因資料庫結構較深
                         price = d.TransactionPrice,
@@ -441,11 +446,13 @@ namespace FrameZone_WebApi.Shopping.Controllers
                         productId = d.Specification?.ProductId ?? 0,
                         imageUrl = d.Specification?.Product?.ProductImages?.FirstOrDefault(i => i.IsMainImage)?.ImageUrl
                                    ?? d.Specification?.Product?.ProductImages?.FirstOrDefault()?.ImageUrl
-                                   ?? "https://placehold.co/80x80?text=No+Image"
-                    })
-                };
-            });
-
+                                   ?? "https://placehold.co/80x80?text=No+Image",
+                        isReviewed = review != null,
+                        rating = review?.Rating ?? 0
+                    };
+                })
+            };
+        });
             return Ok(result);
         }
 

@@ -142,7 +142,7 @@ export class ShoppingReviewsComponent implements OnInit, OnDestroy {
       id: r.reviewId,
       reviewer: {
         name: r.reviewerName,
-        avatar: r.reviewerAvatar
+        avatar: r.reviewerAvatar ? r.reviewerAvatar : `https://ui-avatars.com/api/?name=${encodeURIComponent((r.reviewerName || 'U').charAt(0).toUpperCase())}&background=667eea&color=fff&size=128`
       },
       rating: r.rating,
       date: new Date(r.createdAt).toLocaleDateString(),
@@ -190,7 +190,7 @@ export class ShoppingReviewsComponent implements OnInit, OnDestroy {
         id: i,
         reviewer: {
           name: '我',
-          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=me'
+          avatar: `https://ui-avatars.com/api/?name=U&background=667eea&color=fff&size=128`,
         },
         rating: Math.floor(Math.random() * 2) + 4,
         date: `${Math.floor(Math.random() * 60) + 1} 天前`,
@@ -209,7 +209,7 @@ export class ShoppingReviewsComponent implements OnInit, OnDestroy {
         id: i,
         reviewer: {
           name: `買家${i - 80}`,
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=buyer${i}`
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(('買家' + (i - 80)).charAt(0).toUpperCase())}&background=667eea&color=fff&size=128`
         },
         rating: Math.floor(Math.random() * 2) + 4,
         date: `${Math.floor(Math.random() * 60) + 1} 天前`,

@@ -229,7 +229,8 @@
             </div>
 
             <div class="review-photos" *ngIf="review.imageUrls && review.imageUrls.length > 0">
-              <img *ngFor="let photo of review.imageUrls" [src]="photo" alt="評價圖片" class="review-photo">
+              <img *ngFor="let photo of review.imageUrls" [src]="photo" alt="評價圖片" class="review-photo"
+                (click)="toggleImageModal(true, photo)">
             </div>
 
             <div class="seller-reply" *ngIf="review.reply">
@@ -431,7 +432,7 @@
       </svg>
     </button>
 
-    <img [src]="currentImage" alt="放大圖片" class="image-modal-content">
+    <img [src]="zoomImage" alt="放大圖片" class="image-modal-content">
   </div>
 </div>
 

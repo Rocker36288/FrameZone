@@ -103,5 +103,10 @@ namespace FrameZone_WebApi.Shopping.Repositories
             }
             return (null, null);
         }
+
+        public bool HasUserReviewedOrderDetail(int orderDetailsId)
+        {
+            return _context.Reviews.Any(r => r.OrderDetailsId == orderDetailsId);
+        }
     }
 }
