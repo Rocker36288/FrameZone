@@ -35,7 +35,7 @@ namespace FrameZone_WebApi.Shopping.Services
                 SellerId = c.Specification.Product.UserId,
                 SellerName = c.Specification.Product.User?.UserProfile?.DisplayName ?? 
                              c.Specification.Product.User?.Account ?? "官方賣場",
-                SellerAvatar = c.Specification.Product.User?.UserProfile?.Avatar ?? "/image/users/default-avatar.jpg"
+                SellerAvatar = c.Specification.Product.User?.UserProfile?.Avatar
             }).ToList();
         }
 

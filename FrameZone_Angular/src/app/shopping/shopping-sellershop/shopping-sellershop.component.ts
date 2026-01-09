@@ -377,7 +377,7 @@ export class ShoppingSellershopComponent {
       next: (data: any) => {
         this.sellerInfo = {
           name: data.storeName || data.displayName,
-          avatar: data.avatar,
+          avatar: data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent((data.displayName || data.storeName || 'S').charAt(0).toUpperCase())}&background=667eea&color=fff&size=128`,
           rating: data.rating || 0,
           reviewCount: data.reviewCount || 0,
           isOnline: true,

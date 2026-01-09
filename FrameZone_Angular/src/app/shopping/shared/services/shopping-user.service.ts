@@ -22,12 +22,17 @@ export class ShoppingUserService {
             map(response => {
                 if (response.success && response.data) {
                     const profile = response.data;
+                    let avatarUrl = profile.avatar;
+                    if (!avatarUrl) {
+                        const initial = (profile.displayName || profile.account || 'U').charAt(0).toUpperCase();
+                        avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+                    }
                     return {
                         account: profile.account || '',
                         email: profile.email || '',
                         phone: profile.phone || '',
                         displayName: profile.displayName || '',
-                        avatar: profile.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.displayName || 'U')}&background=random`,
+                        avatar: avatarUrl,
                         realName: profile.realName || '',
                         gender: profile.gender || '',
                         birthDate: profile.birthDate || ''
@@ -39,7 +44,7 @@ export class ShoppingUserService {
                     email: '',
                     phone: '',
                     displayName: '',
-                    avatar: 'https://ui-avatars.com/api/?name=U&background=random',
+                    avatar: 'https://ui-avatars.com/api/?name=U&background=667eea&color=fff&size=128',
                     realName: '',
                     gender: '',
                     birthDate: ''

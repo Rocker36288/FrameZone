@@ -70,8 +70,7 @@
           </div>
           <h3 class="card-title">
             <div class="d-flex align-items-center pt-1 mt-auto">
-              <span class="avatar"
-                [style.background-image]="'url(' + (group.sellerAvatar || 'https://i.pravatar.cc/150?u=' + group.sellerId) + ')'"></span>
+              <span class="avatar" [style.background-image]="'url(' + group.sellerAvatar + ')'"></span>
               <div class="ms-3">
                 <a [routerLink]="['/shopping/sellershop', group.sellerId]" class="text-body">{{ group.sellerName }}</a>
               </div>

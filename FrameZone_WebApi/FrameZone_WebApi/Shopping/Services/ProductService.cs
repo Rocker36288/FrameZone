@@ -100,7 +100,7 @@ namespace FrameZone_WebApi.Shopping.Services
                     // 從 UserProfile 取得頭像
                     Avatar = (product.User.UserProfile != null && !string.IsNullOrEmpty(product.User.UserProfile.Avatar))
                         ? $"{baseUrl}{product.User.UserProfile.Avatar}"
-                        : $"{baseUrl}/image/users/default-avatar.jpg",
+                        : null,
                     
                     Rating = _reviewService.GetSellerRatingSummary(product.UserId).AverageRating,
                     ReviewCount = _reviewService.GetSellerRatingSummary(product.UserId).ReviewCount
@@ -249,7 +249,7 @@ namespace FrameZone_WebApi.Shopping.Services
                 StoreName = storeInfo?.StoreName ?? user?.UserProfile?.DisplayName ?? "我的賣場",
                 Avatar = (user?.UserProfile != null && !string.IsNullOrEmpty(user.UserProfile.Avatar))
                     ? $"{baseUrl}{user.UserProfile.Avatar}"
-                    : $"{baseUrl}/image/users/default-avatar.jpg",
+                    : null,
                 CoverImage = (storeInfo != null && !string.IsNullOrEmpty(storeInfo.StoreImageUrl))
                     ? $"{baseUrl}{storeInfo.StoreImageUrl}"
                     : (user?.UserProfile != null && !string.IsNullOrEmpty(user.UserProfile.CoverImage))
@@ -332,7 +332,7 @@ namespace FrameZone_WebApi.Shopping.Services
                           DisplayName = product.User.UserProfile?.DisplayName ?? product.User.Account,
                           Avatar = (product.User.UserProfile != null && !string.IsNullOrEmpty(product.User.UserProfile.Avatar))
                                 ? $"{baseUrl}{product.User.UserProfile.Avatar}"
-                                : $"{baseUrl}/image/users/default-avatar.jpg",
+                                : null,
                           Rating = _reviewService.GetSellerRatingSummary(product.UserId).AverageRating,
                           ReviewCount = _reviewService.GetSellerRatingSummary(product.UserId).ReviewCount
                       }

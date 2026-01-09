@@ -54,8 +54,7 @@ export class ShoppingBuyerCenterComponent {
 
   onReviewSubmitted() {
     this.showReviewModal = false;
-    // 重整訂單狀態或顯示已評價 (視需求而定，目前只需關閉)
-    // 可以考慮重新載入訂單以更新狀態如果後端有變更
+    this.loadOrders(); // 重新載入訂單以更新評價狀態
   }
 
   // ... (original methods) ...
@@ -69,7 +68,7 @@ export class ShoppingBuyerCenterComponent {
     phone: '',
     gender: '',
     birthday: '',
-    avatar: 'https://ui-avatars.com/api/?name=U&background=random'
+    avatar: 'https://ui-avatars.com/api/?name=U&background=667eea&color=fff&size=128'
   };
 
   tempProfile = { ...this.userProfile };
@@ -178,6 +177,7 @@ export class ShoppingBuyerCenterComponent {
   loadProfile() {
     this.shoppingUserService.getUserProfile().subscribe({
       next: (profile: any) => {
+        const name = profile.realName || profile.displayName || profile.account || 'U';
         this.userProfile = {
           username: profile.account,
           name: profile.realName || profile.displayName,
@@ -188,6 +188,10 @@ export class ShoppingBuyerCenterComponent {
           birthday: profile.birthDate,
           avatar: profile.avatar
         };
+        if (!profile.avatar) {
+          const initial = name.charAt(0).toUpperCase();
+          this.userProfile.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+        }
         this.tempProfile = { ...this.userProfile };
       },
       error: (err: any) => {
