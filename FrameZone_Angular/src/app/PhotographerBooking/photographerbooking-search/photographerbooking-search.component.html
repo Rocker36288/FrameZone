@@ -19,8 +19,10 @@
 
   <div class="search-field" style="flex: 2">
     <i class="ti ti-search"></i>
-    <input type="text" placeholder="搜尋姓名、風格..." [(ngModel)]="searchKeyword" (input)="onKeywordChange()" />
+    <input type="text" placeholder="搜尋姓名、風格..." [ngModel]="searchKeyword" (ngModelChange)="onKeywordInput($event)" />
   </div>
 
-  <button class="search-btn" (click)="onSearch()">搜尋</button>
+  <button class="search-btn btn-secondary" (click)="onReset()" style="background-color: #6c757d;">
+    <i class="ti ti-trash"></i> 清除所有條件
+  </button>
 </header>

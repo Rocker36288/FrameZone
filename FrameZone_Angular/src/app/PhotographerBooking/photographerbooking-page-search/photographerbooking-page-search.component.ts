@@ -40,6 +40,11 @@ export class PhotographerbookingPageSearchComponent
     this.bookingService.filters$
       .pipe(takeUntil(this.destroy$))
       .subscribe((filters) => {
+        // Check if filters are reset (you might need a flag or check values)
+        // For now, if we want "Clear All" to also reset sort, we can do it here or in the service reset.
+        // But the user said "Full Global Reset", so sort order should be default.
+        // We can just check if filters.sortOrder is default, or if we should sync local sortOrder from filters.
+        this.sortOrder = filters.sortOrder;
         this.performSearch(filters);
       });
 

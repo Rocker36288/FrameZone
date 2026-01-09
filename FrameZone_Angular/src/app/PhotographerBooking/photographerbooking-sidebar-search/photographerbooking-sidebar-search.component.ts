@@ -34,6 +34,14 @@ export class PhotographerbookingSidebarSearchComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeTagGroups();
+
+    // Subscribe to filter changes to handle global reset
+    this.bookingService.filters$.subscribe(filters => {
+      this.selectedLocations = new Set(filters.locations);
+      this.selectedTags = new Set(filters.tags);
+      this.maxPrice = filters.maxPrice;
+      this.minRating = filters.minRating;
+    });
   }
 
   initializeTagGroups(): void {
@@ -90,6 +98,7 @@ export class PhotographerbookingSidebarSearchComponent implements OnInit {
     });
   }
 
+
   toggleTag(tag: string, isLocation: boolean): void {
     if (isLocation) {
       if (this.selectedLocations.has(tag)) {
@@ -144,14 +153,7 @@ export class PhotographerbookingSidebarSearchComponent implements OnInit {
     this.selectedTags.clear();
     this.maxPrice = 10000;
     this.minRating = 0;
-
-    // Only reset sidebar-related filters, keeping keyword/dates/serviceType intact
-    this.bookingService.updateFilters({
-      locations: [],
-      tags: [],
-      maxPrice: 10000,
-      minRating: 0
-    });
+    this.bookingService.resetFilters();
   }
 
   get priceDisplay(): string {
