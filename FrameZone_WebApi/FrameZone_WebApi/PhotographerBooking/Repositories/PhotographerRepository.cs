@@ -37,9 +37,25 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
                 .FirstOrDefaultAsync(p => p.PhotographerId == id);
         }
 
-        public async Task<List<Photographer>> SearchPhotographersAsync(string keyword, string location, string studioType, string tag)
+        public async Task<List<Photographer>> SearchPhotographersAsync(string keyword, string location, string studioType, string tag, DateTime? startDate = null, DateTime? endDate = null)
         {
             var query = _context.Photographers.AsQueryable();
+
+            // Date filtering logic
+            if (startDate.HasValue && endDate.HasValue)
+            {
+                // Find photographers who have AVAILABLE slots in the given range.
+                // An available slot has BookingId == null and is within the range.
+                // We use end date inclusive for the entire day logic if needed, but here assuming exact range passed or handled by caller.
+                // Adjusting endDate to end of day if caller passes only date part is good practice, but for now trusting parameters.
+                
+                var availablePhotographerIds = _context.AvailableSlots
+                    .Where(s => s.StartDateTime >= startDate.Value && s.StartDateTime <= endDate.Value && s.BookingId == null)
+                    .Select(s => s.PhotographerId)
+                    .Distinct();
+
+                query = query.Where(p => availablePhotographerIds.Contains(p.PhotographerId));
+            }
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
@@ -72,6 +88,8 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
                 .Include(p => p.PhotographerServices).ThenInclude(ps => ps.ServiceType)
                 .Include(p => p.PhotographerSpecialties).ThenInclude(ps => ps.SpecialtyTag)
                 .Include(p => p.Bookings).ThenInclude(b => b.Reviews).ThenInclude(r => r.ReviewPhotos)
+                // Include AvailableSlots to calculate SlotCount in Service later (or here if we did projection)
+                .Include(p => p.AvailableSlots) 
                 .ToListAsync();
         }
 

@@ -1,5 +1,8 @@
 <article class="card">
   <img [src]="cardImage" [alt]="photographer.displayName" />
+  <div class="slot-badge" *ngIf="photographer.slotCount && photographer.slotCount > 0">
+    <i class="ti ti-clock"></i> {{ photographer.slotCount }} 個時段
+  </div>
   <div class="card-body">
     <div class="d-flex justify-content-between align-items-center">
       <div class="fw-bold h4 mb-0">{{ photographer.displayName }}</div>
@@ -9,28 +12,19 @@
     </div>
     <div class="text-muted small mb-3">
       {{ photographer.studioAddress }}
-      <span *ngIf="photographer.reviewCount"
-        >· {{ photographer.reviewCount }} 則評價</span
-      >
-      <span *ngIf="photographer.studioName"
-        >({{ photographer.studioName }})</span
-      >
+      <span *ngIf="photographer.reviewCount">· {{ photographer.reviewCount }} 則評價</span>
+      <span *ngIf="photographer.studioName">({{ photographer.studioName }})</span>
     </div>
     <div class="card-tags">
       <span class="tag-small badge-service">
         <i class="ti ti-camera"></i> {{ photographer.studioType }}
       </span>
-      <span
-        *ngFor="let tag of photographer.specialties.slice(0, 2)"
-        class="tag-small"
-      >
+      <span *ngFor="let tag of photographer.specialties.slice(0, 2)" class="tag-small">
         {{ tag }}
       </span>
       <!-- 小標籤限制出現五個 -->
     </div>
-    <div
-      class="d-flex justify-content-between align-items-center mt-3 border-top pt-3"
-    >
+    <div class="d-flex justify-content-between align-items-center mt-3 border-top pt-3">
       <div class="price-text">{{ formattedPrice }}</div>
       <button class="btn btn-sm btn-ghost-primary" (click)="onViewDetails()">
         查看詳情

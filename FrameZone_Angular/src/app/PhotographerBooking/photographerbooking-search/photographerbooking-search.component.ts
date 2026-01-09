@@ -14,7 +14,8 @@ export class PhotographerbookingSearchComponent implements OnInit {
   serviceTypes: ServiceType[] = [];
   selectedServiceType = '';
   searchKeyword = '';
-  dateRange: string = '';
+  startDate = '';
+  endDate = '';
 
   constructor(private bookingService: PhotographerBookingService) { }
 
@@ -25,24 +26,27 @@ export class PhotographerbookingSearchComponent implements OnInit {
   }
 
   onServiceTypeChange(): void {
-    this.bookingService.updateFilters({
-      serviceType: this.selectedServiceType,
-    });
+    this.updateSearch();
   }
 
   onKeywordChange(): void {
-    this.bookingService.updateFilters({ keyword: this.searchKeyword });
+    this.updateSearch();
+  }
+
+  onDateChange(): void {
+    this.updateSearch();
   }
 
   onSearch(): void {
+    this.updateSearch();
+  }
+
+  private updateSearch(): void {
     this.bookingService.updateFilters({
       serviceType: this.selectedServiceType,
       keyword: this.searchKeyword,
+      startDate: this.startDate,
+      endDate: this.endDate
     });
-  }
-
-  onDateChange(event: any): void {
-    // 處理日期變更，可以在後續整合 flatpickr 或其他日期選擇器
-    console.log('Date changed:', event);
   }
 }

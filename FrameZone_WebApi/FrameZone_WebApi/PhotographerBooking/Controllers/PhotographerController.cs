@@ -22,7 +22,11 @@ namespace FrameZone_WebApi.PhotographerBooking.Controllers
         {
             try
             {
-                if (!string.IsNullOrEmpty(searchDto.Keyword) || !string.IsNullOrEmpty(searchDto.Location) || !string.IsNullOrEmpty(searchDto.StudioType))
+                if (!string.IsNullOrEmpty(searchDto.Keyword) || 
+                    !string.IsNullOrEmpty(searchDto.Location) || 
+                    !string.IsNullOrEmpty(searchDto.StudioType) || 
+                    searchDto.StartDate.HasValue || 
+                    searchDto.EndDate.HasValue)
                 {
                     var results = await _photographerService.SearchPhotographersAsync(searchDto);
                     return Ok(results);

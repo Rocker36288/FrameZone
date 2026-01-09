@@ -21,6 +21,7 @@ namespace FrameZone_WebApi.PhotographerBooking.DTOs
         public int TotalBookings { get; set; }
         public List<string> ServiceCities { get; set; } = new List<string>();
         public string PortfolioFile { get; set; }
+        public int SlotCount { get; set; }
     }
 
     public class ServiceDto
@@ -42,7 +43,9 @@ namespace FrameZone_WebApi.PhotographerBooking.DTOs
         public string? Keyword { get; set; }
         public string? Location { get; set; }
         public string? StudioType { get; set; }
-        public string? Tag { get; set; } // Specialty tag name
+        public string? Tag { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 
     public class BookingDto

@@ -30,8 +30,16 @@ namespace FrameZone_WebApi.PhotographerBooking.Services
 
         public async Task<List<PhotographerDto>> SearchPhotographersAsync(PhotographerSearchDto searchDto)
         {
-            var photographers = await _photographerRepository.SearchPhotographersAsync(searchDto.Keyword, searchDto.Location, searchDto.StudioType, searchDto.Tag);
-            return photographers.Select(p => MapToDto(p)).ToList();
+            var photographers = await _photographerRepository.SearchPhotographersAsync(
+                searchDto.Keyword, 
+                searchDto.Location, 
+                searchDto.StudioType, 
+                searchDto.Tag,
+                searchDto.StartDate,
+                searchDto.EndDate
+            );
+
+            return photographers.Select(p => MapToDto(p, searchDto.StartDate, searchDto.EndDate)).ToList();
         }
 
         public async Task<List<AvailableSlotDto>> GetPhotographerAvailableSlotsAsync(int photographerId, DateTime start, DateTime end)
@@ -56,17 +64,33 @@ namespace FrameZone_WebApi.PhotographerBooking.Services
             return slotDtos;
         }
 
-        private PhotographerDto MapToDto(Photographer p)
+        private PhotographerDto MapToDto(Photographer p, DateTime? filterStart = null, DateTime? filterEnd = null)
         {
             var reviews = p.Bookings?.SelectMany(b => b.Reviews).ToList() ?? new List<Review>();
             var rating = reviews.Any() ? Math.Round(reviews.Average(r => (double)r.Rating), 1) : 0;
             var minPrice = p.PhotographerServices?.Any() == true ? p.PhotographerServices.Min(s => s.BasePrice) : 0;
 
-            // User Requirement Mapping:
-            // Name: StudioName or DisplayName
-            // Loc: ServiceArea.City
-            // Type: ServiceTypes.ServiceTypeName (ServiceName)
-            // Tags: SpecialtyTags.SpecialtyName
+            // Calculate SlotCount based on filter range or default (e.g., next 30 days or all future)
+            // If range is provided, count slots in range.
+            // Requirement: "If date range selected, show count in range."
+            int slotCount = 0;
+            if (p.AvailableSlots != null)
+            {
+                var slotsQuery = p.AvailableSlots.Where(s => s.BookingId == null);
+                
+                if (filterStart.HasValue && filterEnd.HasValue)
+                {
+                    slotsQuery = slotsQuery.Where(s => s.StartDateTime >= filterStart.Value && s.StartDateTime <= filterEnd.Value);
+                }
+                else
+                {
+                    // If no range, maybe count all future available slots? 
+                    // Or just 0 if UI handles "Earliest available" differently.
+                    // Let's count all future ones for now as a "total available" indicator.
+                    slotsQuery = slotsQuery.Where(s => s.StartDateTime >= DateTime.Now);
+                }
+                slotCount = slotsQuery.Count();
+            }
 
             return new PhotographerDto
             {
@@ -103,7 +127,8 @@ namespace FrameZone_WebApi.PhotographerBooking.Services
                 Rating = (double)rating,
                 ReviewCount = reviews.Count,
                 MinPrice = minPrice,
-                TotalBookings = p.Bookings?.Count ?? 0
+                TotalBookings = p.Bookings?.Count ?? 0,
+                SlotCount = slotCount
             };
         }
     }

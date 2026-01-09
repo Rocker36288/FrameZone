@@ -81,8 +81,9 @@ export class PhotographerBookingService {
   searchWithFilters(filters: SearchFilters): Observable<PhotographerDto[]> {
     let params = new HttpParams();
     if (filters.keyword) params = params.set('keyword', filters.keyword);
-    if (filters.keyword) params = params.set('keyword', filters.keyword);
-    // Removed: if (filters.serviceType) params = params.set('studioType', filters.serviceType);
+    if (filters.serviceType) params = params.set('studioType', filters.serviceType); // Map to backend param
+    if (filters.startDate) params = params.set('startDate', filters.startDate);
+    if (filters.endDate) params = params.set('endDate', filters.endDate);
 
     // 如果只有一個地區,傳給後端
     if (filters.locations.length === 1) {

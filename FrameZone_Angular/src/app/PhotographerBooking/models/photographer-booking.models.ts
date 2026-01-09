@@ -19,6 +19,7 @@ export interface PhotographerDto {
   totalBookings?: number;
   portfolioFile?: string;
   serviceCities?: string[];
+  slotCount?: number;
 }
 
 export interface ServiceDto {
@@ -41,8 +42,19 @@ export interface PhotographerSearchDto {
   tag?: string;
 }
 
+export interface SearchFilterParams {
+  keyword?: string;
+  location?: string;
+  serviceType?: string;
+  startDate?: string;
+  endDate?: string;
+  tag?: string;
+}
+
 export interface SearchFilters {
-  dateRange?: { start: Date | null; end: Date | null };
+  dateRange?: { start: Date | null; end: Date | null }; // Keep for UI if needed
+  startDate?: string; // Add these compatibility fields or just use them
+  endDate?: string;
   serviceType: string;
   keyword: string;
   locations: string[];

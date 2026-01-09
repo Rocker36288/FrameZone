@@ -15,12 +15,22 @@
 
 .card img {
   width: 100%;
-  aspect-ratio: 3/2;
+  aspect-ratio: 4/3;
   object-fit: cover;
+  transition: transform 0.5s ease;
 }
 
-.card-body {
-  padding: 16px;
+.slot-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  backdrop-filter: blur(4px);
+  z-index: 2;
 }
 
 .card-tags {
