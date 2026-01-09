@@ -20,6 +20,8 @@ export interface PhotographerDto {
   portfolioFile?: string;
   serviceCities?: string[];
   slotCount?: number;
+  earliestAvailableDate?: string;
+  isAvailableSoon?: boolean;
 }
 
 export interface ServiceDto {

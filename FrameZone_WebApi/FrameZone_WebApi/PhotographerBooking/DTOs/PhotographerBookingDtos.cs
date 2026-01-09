@@ -22,6 +22,8 @@ namespace FrameZone_WebApi.PhotographerBooking.DTOs
         public List<string> ServiceCities { get; set; } = new List<string>();
         public string PortfolioFile { get; set; }
         public int SlotCount { get; set; }
+        public DateTime? EarliestAvailableDate { get; set; }
+        public bool IsAvailableSoon => EarliestAvailableDate.HasValue;
     }
 
     public class ServiceDto

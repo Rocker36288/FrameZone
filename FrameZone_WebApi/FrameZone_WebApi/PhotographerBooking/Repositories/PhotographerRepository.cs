@@ -22,6 +22,8 @@ namespace FrameZone_WebApi.PhotographerBooking.Repositories
                 .Include(p => p.PhotographerServices).ThenInclude(ps => ps.ServiceType)
                 .Include(p => p.PhotographerSpecialties).ThenInclude(ps => ps.SpecialtyTag)
                 .Include(p => p.Bookings).ThenInclude(b => b.Reviews).ThenInclude(r => r.ReviewPhotos)
+                // Include future available slots for "Recently Available" badge calculation
+                .Include(p => p.AvailableSlots.Where(s => s.BookingId == null && s.StartDateTime >= DateTime.Today))
                 .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();
         }

@@ -124,12 +124,16 @@ namespace FrameZone_WebApi.PhotographerBooking.Services
                 }).ToList() ?? new List<ServiceDto>(),
                 
                 // Calculated fields
-                // Calculated fields
                 Rating = (double)rating,
                 ReviewCount = reviews.Count,
                 MinPrice = minPrice,
                 TotalBookings = p.Bookings?.Count ?? 0,
-                SlotCount = slotCount
+                SlotCount = slotCount,
+                EarliestAvailableDate = p.AvailableSlots?
+                    .Where(s => s.BookingId == null && s.StartDateTime >= DateTime.Today && s.StartDateTime <= DateTime.Today.AddDays(7))
+                    .OrderBy(s => s.StartDateTime)
+                    .Select(s => (DateTime?)s.StartDateTime)
+                    .FirstOrDefault()
             };
         }
     }
