@@ -32,26 +32,22 @@
 }
 
 .search-btn {
-  background: var(--primary-color);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 0 24px;
-  border-radius: 8px;
+  padding: 0 32px;
+  height: 40px;
+  border-radius: 999px;
+  font-size: 16px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   white-space: nowrap;
-}
-
-.search-btn.btn-secondary {
-  background: #6c757d;
-}
-
-.search-btn.btn-secondary:hover {
-  background: #5a6268;
+  transition: all 0.3s ease;
 }
 
 .search-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+  transform: scale(1.03);
 }
