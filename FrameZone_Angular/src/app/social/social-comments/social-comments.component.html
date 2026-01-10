@@ -68,17 +68,28 @@
     </button>
 
   </div>
+  @if (comment.replies && comment.replies.length > 0) {
+  <div class="ms-5 mt-1">
+    <button class="btn btn-sm btn-link text-decoration-none p-0 me-3 small"
+      (click)="toggleReplies(comment.commentId); $event.stopPropagation()">
+      @if (isRepliesVisible(comment.commentId)) {
+      隱藏回覆
+      } @else {
+      顯示 {{ comment.replies.length }} 則回覆
+      }
+    </button>
+  </div>
+  }
 
   @if (activeReplyId === comment.commentId) {
   <div class="ms-5 mt-2 d-flex align-items-center" (click)="$event.stopPropagation()">
     <div class="position-relative flex-grow-1">
-  <input #replyInput type="text" [(ngModel)]="replyContent" (keyup.enter)="submitReply(comment.commentId)"
-    class="form-control form-control-sm rounded-pill bg-light border-0 pe-5 comment-input-custom"
-    placeholder="輸入回覆...">
+      <input #replyInput type="text" [(ngModel)]="replyContent" (keyup.enter)="submitReply(comment.commentId)"
+        class="form-control form-control-sm rounded-pill bg-light border-0 pe-5 comment-input-custom"
+        placeholder="輸入回覆...">
 
-      <button type="button"
-    class="btn position-absolute end-0 top-50 translate-middle-y p-0 me-3 btn-send-comment"
-    (click)="submitReply(comment.commentId)">
+      <button type="button" class="btn position-absolute end-0 top-50 translate-middle-y p-0 me-3 btn-send-comment"
+        (click)="submitReply(comment.commentId)">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
           class="icon icon-tabler icons-tabler-outline icon-tabler-send-2">
@@ -93,7 +104,7 @@
   }
 
 
-  @if (comment.replies && comment.replies.length > 0) {
+  @if (comment.replies && comment.replies.length > 0 && isRepliesVisible(comment.commentId)) {
   <div class="ms-4 ps-2 border-start">
     <app-social-comments [comments]="comment.replies" [postId]="postId" (refresh)="onChildRefresh()">
     </app-social-comments>

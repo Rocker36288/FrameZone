@@ -29,6 +29,7 @@ export class SocialCommentsComponent {
   activeMenuId: number | null = null;
   editingCommentId: number | null = null;
   editContent = "";
+  expandedReplies = new Set<number>();
 
 
   constructor() { }
@@ -70,6 +71,17 @@ export class SocialCommentsComponent {
   closeMenu() {
     this.activeMenuId = null;
   }
+  toggleReplies(commentId: number) {
+    if (this.expandedReplies.has(commentId)) {
+      this.expandedReplies.delete(commentId);
+      return;
+    }
+    this.expandedReplies.add(commentId);
+  }
+
+  isRepliesVisible(commentId: number): boolean {
+    return this.expandedReplies.has(commentId);
+  }
 
   toggleReply(commentId: number) {
     this.activeReplyId =
@@ -92,6 +104,7 @@ export class SocialCommentsComponent {
 
     this.commentService.createComment(dto).subscribe({
       next: () => {
+        this.expandedReplies.add(parentCommentId); // 送出後自動展開該留言的回覆
         this.activeReplyId = null;
         this.replyContent = "";
         this.refresh.emit(); // 通知最上層父元件重新抓取資料
