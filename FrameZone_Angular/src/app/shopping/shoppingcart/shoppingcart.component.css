@@ -153,3 +153,10 @@
 .member-profile-link:hover .member-name {
   color: #131b33;
 }
+
+/* 購物車商品圖片統一尺寸 */
+.cart-product-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+}
