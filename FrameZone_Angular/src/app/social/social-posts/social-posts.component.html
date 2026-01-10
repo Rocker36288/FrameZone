@@ -171,7 +171,7 @@
         <img [src]="getUserAvatar()" class="rounded-circle me-2" style="width:35px; height:35px; object-fit: cover;" />
 
         <div class="position-relative flex-grow-1">
-          <input type="text" [(ngModel)]="newCommentContent" (keyup.enter)="sendComment()"
+          <input #commentInput type="text" [(ngModel)]="newCommentContent" (keyup.enter)="sendComment()"
             class="form-control form-control-sm rounded-pill bg-light border-0 pe-5 comment-input-custom"
             placeholder="發佈留言...">
 

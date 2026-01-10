@@ -72,7 +72,7 @@
   @if (activeReplyId === comment.commentId) {
   <div class="ms-5 mt-2 d-flex align-items-center" (click)="$event.stopPropagation()">
     <div class="position-relative flex-grow-1">
-  <input type="text" [(ngModel)]="replyContent" (keyup.enter)="submitReply(comment.commentId)"
+  <input #replyInput type="text" [(ngModel)]="replyContent" (keyup.enter)="submitReply(comment.commentId)"
     class="form-control form-control-sm rounded-pill bg-light border-0 pe-5 comment-input-custom"
     placeholder="輸入回覆...">
 

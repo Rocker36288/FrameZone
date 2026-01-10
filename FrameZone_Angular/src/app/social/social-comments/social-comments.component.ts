@@ -1,5 +1,5 @@
 import { AuthService } from './../../core/services/auth.service';
-import { Component, Input, Output, EventEmitter, inject, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, HostListener, ElementRef, ViewChildren, QueryList } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CommentDto } from '../models/CommentDto';
@@ -17,6 +17,8 @@ export class SocialCommentsComponent {
   @Input() comments: CommentDto[] = [];
   @Input() postId!: number; // 從父元件傳進來，知道是哪則貼文
   @Output() refresh = new EventEmitter<void>(); // 用於通知父元件重新整理列表
+  @ViewChildren('replyInput') replyInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
 
   private commentService = inject(CommentService);
 
@@ -72,7 +74,12 @@ export class SocialCommentsComponent {
   toggleReply(commentId: number) {
     this.activeReplyId =
       this.activeReplyId === commentId ? null : commentId;
+
+    if (this.activeReplyId) {
+      setTimeout(() => this.replyInputs.first?.nativeElement.focus());
+    }
   }
+
 
   submitReply(parentCommentId: number) {
     if (!this.replyContent.trim()) return;

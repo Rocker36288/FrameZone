@@ -1,6 +1,6 @@
 import { PostService } from '../services/post.service';
 import { CommentService } from '../services/comment.service';
-import { Component, ElementRef, EventEmitter, HostListener, Input, Output, signal, inject, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, Output, signal, inject, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { PostDto } from "../models/PostDto";
 import { CommentDto } from "../models/CommentDto";
 import { DatePipe, SlicePipe } from '@angular/common';
@@ -18,6 +18,8 @@ import { RouterLink } from '@angular/router';
 export class SocialPostsComponent implements AfterViewInit, OnDestroy {
   @Input() post!: PostDto;
   @Output() postDeleted = new EventEmitter<number>();
+  @ViewChild('commentInput') commentInput?: ElementRef<HTMLInputElement>;
+
 
   private authService = inject(AuthService);
   currentUserAvatar = this.authService.getCurrentUser()?.avatar || null;
@@ -81,7 +83,7 @@ export class SocialPostsComponent implements AfterViewInit, OnDestroy {
     this.viewObserver?.disconnect();
   }
 
- //頭像
+  //頭像
   getUserAvatar(): string {
     if (this.currentUserAvatar) return this.currentUserAvatar;
     const initial = (this.currentUserName || 'U').charAt(0).toUpperCase();
@@ -198,9 +200,12 @@ export class SocialPostsComponent implements AfterViewInit, OnDestroy {
   // --- 留言邏輯 ---
   toggleComments() {
     this.isCommentShowed = !this.isCommentShowed;
-    // 如果展開且還沒有留言資料，就去抓取
-    if (this.isCommentShowed && this.comments().length === 0) {
-      this.loadComments();
+    if (this.isCommentShowed) {
+      setTimeout(() => this.commentInput?.nativeElement.focus());
+      // 如果展開且還沒有留言資料，就去抓取
+      if (this.comments().length === 0) {
+        this.loadComments();
+      }
     }
   }
 
