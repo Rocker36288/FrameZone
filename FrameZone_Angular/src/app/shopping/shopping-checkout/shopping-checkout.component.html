@@ -75,7 +75,7 @@
                 </div>
                 <div class="col-9 col-md-10">
                   <div class="fw-bold">{{item.name}}</div>
-                  <div class="text-secondary">${{item.price}} x {{item.quantity}}</div>
+                  <div class="text-secondary">${{item.price | number}} x {{item.quantity}}</div>
                 </div>
               </div>
             </div>
@@ -219,16 +219,16 @@
               </div>
               <div class="d-flex justify-content-between align-items-center mb-2 mt-4">
                 <h2 class="m-0">小計:</h2>
-                <h2 class="m-0 text-end">${{ getTotalAmount() }}</h2>
+                <h2 class="m-0 text-end">${{ getSubtotal() | number }}</h2>
               </div>
               <div class="d-flex justify-content-between align-items-center mb-2 mt-4">
                 <h2 class="m-0">運費:</h2>
-                <h2 class="m-0 text-end">${{ getShippingFee() }}</h2>
+                <h2 class="m-0 text-end">${{ getShippingFee() | number }}</h2>
               </div>
               <hr>
               <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="m-0">應付總金額:</h2>
-                <h2 class="m-0 text-end text-primary fw-bold">${{ getFinalTotal() }}</h2>
+                <h2 class="m-0 text-end text-primary fw-bold">${{ getFinalTotal() | number }}</h2>
               </div>
               <button type="button" (click)="onConfirmCheckout()" [disabled]="checkoutForm.invalid"
                 class="btn btn-animate-icon w-100 checkout-button text-white"

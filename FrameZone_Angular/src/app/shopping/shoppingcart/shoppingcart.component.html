@@ -99,7 +99,7 @@
                     <h2><a [routerLink]="['/shopping/product-detail', item.id]">{{item.name}}</a></h2>
                   </h3>
                   <div class="text-secondary">
-                    <h3>${{item.price}}</h3>
+                    <h3>${{item.price | number}}</h3>
                   </div>
                   <div class="mt-2 d-flex align-items-center">
                     <div class="input-group input-group-sm" style="width: 120px;">
@@ -149,7 +149,7 @@
             <br>
             <div class="d-flex justify-content-between align-items-center mb-2">
               <h2 class="m-0">總金額:</h2>
-              <h2 class="m-0 text-end">${{ cartService.totalAmount() }}</h2>
+              <h2 class="m-0 text-end">${{ cartService.totalAmount() | number }}</h2>
             </div>
             <br>
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -168,7 +168,7 @@
             <hr>
             <div class="d-flex justify-content-between align-items-center mb-4">
               <h2 class="m-0">小計:</h2>
-              <h2 class="m-0 text-end">${{ getFinalTotal() }}</h2>
+              <h2 class="m-0 text-end">${{ getFinalTotal() | number }}</h2>
             </div>
             <button class="btn btn-animate-icon w-100" style="background-color: rgb(139, 168, 231);"
               [routerLink]="['/checkout']" [disabled]="cartService.selectedTotalQuantity() === 0">
@@ -236,7 +236,7 @@
                   {{ coupon.code }}
                 </span>
               </h5>
-              <p class="text-secondary m-0">折扣金額: -${{ coupon.discount }}</p>
+              <p class="text-secondary m-0">折扣金額: -${{ coupon.discount | number }}</p>
               <small>使用期限: {{ coupon.expiryDate | date }}</small>
             </div>
           </div>

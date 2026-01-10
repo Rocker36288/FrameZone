@@ -239,20 +239,16 @@
   gap: 10px;
 }
 
-.seller-avatar-placeholder {
+.reviewer-avatar {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-color: #6b21e2;
+  /* background-color: #6b21e2; */
   border: 2px solid #fff;
   box-shadow: 0 0 0 2px #5965d4;
   flex-shrink: 0;
-}
-
-.seller-avatar-img {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
+
 }
 
 .seller-name {
@@ -1033,13 +1029,6 @@
   display: flex;
   gap: 12px;
   margin-bottom: 12px;
-}
-
-.reviewer-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
 }
 
 .reviewer-info .reviewer-name {

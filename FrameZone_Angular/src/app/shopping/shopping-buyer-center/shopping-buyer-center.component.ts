@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FooterComponent } from "../../shared/components/footer/footer.component";
 import { FavoriteService, FavoriteItem } from '../shared/services/favorite.service';
 import { CartService } from '../shared/services/cart.service';
@@ -163,10 +163,17 @@ export class ShoppingBuyerCenterComponent {
     private orderService: OrderService,
     private shoppingUserService: ShoppingUserService,
     private addressService: AddressService,
-    private storeService: StoreService
+    private storeService: StoreService,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      if (params['tab']) {
+        this.activeMenu = params['tab'];
+      }
+    });
+
     this.loadProfile();
     this.loadOrders();
     this.loadFavorites();

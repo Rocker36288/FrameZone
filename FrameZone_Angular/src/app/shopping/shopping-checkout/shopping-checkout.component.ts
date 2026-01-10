@@ -222,6 +222,12 @@ export class ShoppingCheckoutComponent {
     return this.cartService.totalAmount();
   }
 
+  getSubtotal(): number {
+    const total = this.cartService.totalAmount();
+    const discount = this.cartService.appliedDiscount();
+    return Math.max(0, total - discount);
+  }
+
   getShippingFee(): number {
     const method = this.checkoutForm.get('shippingMethod')?.value;
     return this.shippingRates[method] || 0;
