@@ -1,6 +1,6 @@
 @for (comment of comments; track comment.commentId) {
-  <div class="comment-wrapper mt-3">
-    <div class="d-flex align-items-start">
+<div class="comment-wrapper mt-3">
+  <div class="d-flex align-items-start">
     <a class="me-2 d-inline-block" [routerLink]="['/social/profile', comment.userId]">
       <img [src]="getCommentUserAvatar(comment)" class="rounded-circle"
         style="width:32px; height:32px; object-fit: cover;">
@@ -15,12 +15,14 @@
             {{ comment.displayName }}
           </span>
 
-          <span class="text-muted" style="font-size: 0.7rem; white-space: nowrap;">
+          <span class="text-muted" style="font-size: 0.7rem; white-space: nowrap;"
+            [attr.title]="isCommentEdited(comment) ? '建立時間: ' + (comment.createdAt | date:'yyyy-MM-dd HH:mm') : null">
             {{ getCommentDisplayTime(comment) | date:'yyyy-MM-dd HH:mm' }}
             @if (isCommentEdited(comment)) {
-            <span [attr.title]="'建立時間: ' + (comment.createdAt | date:'yyyy-MM-dd HH:mm')"> 已編輯</span>
+            <span> 已編輯</span>
             }
           </span>
+
         </div>
 
         <!-- 右側：功能選單 -->
