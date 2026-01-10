@@ -44,7 +44,7 @@
         <span class="text-muted" style="font-size: 0.85rem;">
           {{ getPostDisplayTime(post) | date:'yyyy-MM-dd HH:mm' }}
           @if (isPostEdited(post)) {
-          <span> 已編輯</span>
+          <span [attr.title]="'建立時間: ' + (post.createdAt | date:'yyyy-MM-dd HH:mm')"> 已編輯</span>
           }
         </span>
       </a>
@@ -84,7 +84,7 @@
             <span class="text-muted" style="font-size: 0.85rem;">
               {{ getPostDisplayTime(post.sharedPost) | date:'yyyy-MM-dd HH:mm' }}
               @if (isPostEdited(post.sharedPost)) {
-              <span> 已編輯</span>
+              <span [attr.title]="'建立時間: ' + (post.sharedPost.createdAt | date:'yyyy-MM-dd HH:mm')"> 已編輯</span>
               }
             </span>
           </div>

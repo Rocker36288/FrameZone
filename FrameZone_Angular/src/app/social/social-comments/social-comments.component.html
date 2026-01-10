@@ -18,7 +18,7 @@
           <span class="text-muted" style="font-size: 0.7rem; white-space: nowrap;">
             {{ getCommentDisplayTime(comment) | date:'yyyy-MM-dd HH:mm' }}
             @if (isCommentEdited(comment)) {
-            <span> 已編輯</span>
+            <span [attr.title]="'建立時間: ' + (comment.createdAt | date:'yyyy-MM-dd HH:mm')"> 已編輯</span>
             }
           </span>
         </div>
