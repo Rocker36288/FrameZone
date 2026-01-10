@@ -273,8 +273,10 @@
   align-items: center;
   padding: 4px 12px;
 
-  background-color: #f6f5fb; /* 極淡藍紫 */
-  color: #667eea; /* 灰藍紫字 */
+  background-color: #f6f5fb;
+  /* 極淡藍紫 */
+  color: #667eea;
+  /* 灰藍紫字 */
   border: 1px solid #667eea;
 
   border-radius: 999px;
@@ -298,12 +300,10 @@
   /* 灰綠 */
   padding: 0.75rem 1rem;
 
-  background: linear-gradient(
-    90deg,
-    #fcfcfd 0%,
-    /* 左側幾乎白 */ rgba(205, 200, 235, 0.06) 55%,
-    /* 中段超淡霧紫 */ rgba(205, 200, 235, 0.08) 100% /* 右側淡紫收尾 */
-  );
+  background: linear-gradient(90deg,
+      #f7f8f8 0%,
+      rgba(177, 149, 222, 0.639) 60%,
+      rgba(247, 247, 248, 0) 100%);
 
   margin-top: 1rem;
   border-radius: 0 10px 10px 0;
