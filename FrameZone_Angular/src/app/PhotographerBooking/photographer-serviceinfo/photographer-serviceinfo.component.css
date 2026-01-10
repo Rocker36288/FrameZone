@@ -1,22 +1,144 @@
-.package-card {
+.service-section {
+  margin-top: 10px;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 24px;
+}
+
+/* Airbnb × Tabler 風格卡片 */
+.service-card {
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 24px;
-  transition: all 0.2s;
+  border-radius: 16px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  background: #ffffff;
+  transition: all 0.25s ease;
   cursor: pointer;
-  background: white;
 }
 
-.package-card:hover {
-  border-color: #000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+.service-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
 }
 
-.kkday-tag {
-  border: 1px solid #00a5b8;
-  color: #00a5b8;
-  padding: 2px 8px;
-  border-radius: 4px;
+.service-card.active {
+  border-color: #6366f1;
+  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.18);
+}
+
+.service-summary {
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.service-info h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.service-desc {
   font-size: 12px;
-  font-weight: bold;
+  color: #718096;
+  margin: 4px 0 0 0;
+}
+
+.service-price {
+  font-weight: 600;
+  font-size: 16px;
+  color: #6366f1;
+  white-space: nowrap;
+  margin-right: 32px;
+}
+
+/* 展開內容 */
+.service-details {
+  padding: 0 24px;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.35s ease;
+  background: #fafafa;
+}
+
+.service-card.active .service-details {
+  max-height: 800px;
+  padding: 20px 24px 24px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.detail-item {
+  display: flex;
+  margin-bottom: 10px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.detail-label {
+  width: 100px;
+  color: #718096;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  color: #2d3748;
+}
+
+/* 小箭頭提示 */
+.service-summary::after {
+  content: "›";
+  font-size: 24px;
+  color: #cbd5e0;
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.3s ease;
+}
+
+.service-card.active .service-summary::after {
+  transform: translateY(-50%) rotate(90deg);
+  color: #6366f1;
+}
+
+/* 常見問題樣式 */
+.faq-item {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.accordion-button {
+  padding: 20px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.accordion-button:not(.collapsed) {
+  color: #6366f1;
+}
+
+.accordion-body {
+  padding: 20px;
+  background: #f8fafc;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  color: #4a5568;
+  line-height: 1.8;
+}
+
+.accordion-button::after {
+  filter: grayscale(1) opacity(0.5);
+}
+
+.accordion-button:not(.collapsed)::after {
+  filter: none;
 }

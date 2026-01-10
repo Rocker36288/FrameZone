@@ -2,10 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ServiceDto } from '../models/photographer-booking.models';
 
-interface FAQ {
+export interface FAQ {
   question: string;
   answer: string;
 }
+
 @Component({
   selector: 'app-photographer-serviceinfo',
   imports: [CommonModule],
@@ -20,16 +21,13 @@ export class PhotographerServiceinfoComponent {
 
   expandedServiceId: number | null = null;
 
-  onSelectService(service: ServiceDto): void {
+  toggleService(service: ServiceDto): void {
+    const serviceId = service.photographerServiceId;
+    this.expandedServiceId = this.expandedServiceId === serviceId ? null : serviceId;
     this.serviceSelected.emit(service);
   }
 
-  toggleServiceDetails(serviceId: number): void {
-    this.expandedServiceId =
-      this.expandedServiceId === serviceId ? null : serviceId;
-  }
-
-  isServiceExpanded(serviceId: number): boolean {
+  isExpanded(serviceId: number): boolean {
     return this.expandedServiceId === serviceId;
   }
 }

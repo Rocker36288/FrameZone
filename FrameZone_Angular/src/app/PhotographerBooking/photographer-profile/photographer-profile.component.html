@@ -23,8 +23,9 @@
         從業年資 {{ photographer.yearsOfExperience }} 年 · 已完成
         {{ photographer.totalBookings }}+ 場拍攝
       </p>
-      <div class="d-flex gap-2">
+      <div class="d-flex gap-2 flex-wrap">
         <span class="tag-pill" *ngFor="let specialty of specialties">
+          <i class="ti ti-sparkles"></i>
           {{ specialty }}
         </span>
       </div>
@@ -32,7 +33,7 @@
     <img [src]="photographer.avatarUrl" [alt]="photographer.displayName" class="rounded-circle shadow-sm"
       style="width: 64px; height: 64px; object-fit: cover" />
   </div>
-  <p class="text-muted fst-italic border-start border-3 ps-3 py-1">
+  <p class="profile-quote">
     「{{ photographer.description }}」
   </p>
 </section>
