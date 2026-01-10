@@ -12,36 +12,48 @@
   z-index: 1000;
 }
 
-/* Logo 區域 */
-.navbar-brand {
-  transition: transform 0.3s ease;
-}
-
-.navbar-brand:hover {
-  transform: scale(1.05);
-}
-
+/* Logo 區域 (恢復為原始類別但保留新樣式) */
 .navbar-brand a {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  text-decoration: none;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.625rem !important;
+  text-decoration: none !important;
+  transition: transform 0.2s ease !important;
 }
 
-.navbar-brand svg {
-  stroke: #667eea;
-  flex-shrink: 0;
+.navbar-brand a:hover {
+  transform: scale(1.05) !important;
+}
+
+.navbar-brand .logo-image {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.navbar-brand .logo-image img {
+  display: block !important;
+  width: 32px !important;
+  height: 32px !important;
+  object-fit: contain !important;
 }
 
 .navbar-brand h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  color: #1e293b;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  white-space: nowrap;
+  margin: 0 !important;
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  white-space: nowrap !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.navbar-brand a:hover h2 {
+  opacity: 0.85 !important;
 }
 
 /* ===== 導覽項目樣式 ===== */
@@ -66,22 +78,18 @@
 
 /* 導覽項目懸停效果 */
 #navbar-menu .navbar-nav .nav-link:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0.08) 0%,
-    rgba(118, 75, 162, 0.08) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(102, 126, 234, 0.08) 0%,
+      rgba(118, 75, 162, 0.08) 100%);
   color: #667eea !important;
   transform: translateY(-1px);
 }
 
 /* 活動狀態 */
 #navbar-menu .navbar-nav .nav-link.active {
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0.1) 0%,
-    rgba(118, 75, 162, 0.1) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(102, 126, 234, 0.1) 0%,
+      rgba(118, 75, 162, 0.1) 100%);
   color: #667eea !important;
 }
 
@@ -131,10 +139,11 @@
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2864, 74, 139, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
-/* ===== 右側功能區樣式 ===== */
-.navbar-nav.order-md-last {
-  gap: 0.5rem;
+/* ===== 右側操作區 ===== */
+.header-actions {
+  display: flex;
   align-items: center;
+  gap: 0.75rem;
 }
 
 /* ===== 主題切換按鈕樣式 ===== */
@@ -152,11 +161,9 @@
 }
 
 .theme-toggle:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0.1) 0%,
-    rgba(118, 75, 162, 0.1) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(102, 126, 234, 0.1) 0%,
+      rgba(118, 75, 162, 0.1) 100%);
   transform: scale(1.1);
 }
 
@@ -282,11 +289,9 @@
 }
 
 .dropdown-item:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0.08) 0%,
-    rgba(118, 75, 162, 0.08) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(102, 126, 234, 0.08) 0%,
+      rgba(118, 75, 162, 0.08) 100%);
   color: #667eea;
   transform: translateX(4px);
 }
@@ -367,6 +372,7 @@
 [data-bs-theme="dark"] .theme-toggle:hover {
   background: rgba(129, 140, 248, 0.15);
 }
+
 .logo-image {
   width: 50px;
   height: 50px;
@@ -378,8 +384,10 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 80px; /* Header 高度 */
-  z-index: 20; /* 大於 Hero 的 z-index */
+  height: 80px;
+  /* Header 高度 */
+  z-index: 20;
+  /* 大於 Hero 的 z-index */
   background-color: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
