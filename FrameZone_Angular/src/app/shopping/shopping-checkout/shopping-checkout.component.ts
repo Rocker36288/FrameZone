@@ -393,19 +393,12 @@ export class ShoppingCheckoutComponent {
         console.log("✅ 訂單建立成功", res);
 
         if (res.ecPayForm) {
-          // 在新視窗開啟 ECPay 付款頁
-          this.submitECPayFormInNewWindow(res.ecPayForm);
-
-          // 訂單完成：清空購物車 + 優惠券
+          // 訂單完成：清空購物車 + 優惠券（在跳轉前執行）
           this.cartService.markOrderCompleted();
 
-          // 顯示提示訊息
-          this.toastService.show('付款頁面已在新視窗開啟，請完成付款', 'top');
-
-          // 導航到商城首頁
-          setTimeout(() => {
-            this.router.navigate(['/shopping/home']);
-          }, 2000);
+          // 直接提交表單跳轉到 ECPay 付款頁（同視窗）
+          // 注意：表單提交後頁面會直接跳轉，不需要額外導航
+          this.submitECPayFormInNewWindow(res.ecPayForm);
         } else {
           console.error('❌ 沒有收到 ECPay 表單');
           this.toastService.show('建立訂單失敗，請稍後再試', 'top');
