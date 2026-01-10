@@ -284,61 +284,65 @@ namespace FrameZone_WebApi.Shopping.Services
         // 私有方法：統一 DTO 轉換邏輯
         private List<ProductListDto> MapToDtoList(List<Models.Product> products, List<long> favoriteIds)
         {
-             string baseUrl = "https://localhost:7213";
-             var result = new List<ProductListDto>();
+            string baseUrl = "https://localhost:7213";
+            // 如果產品是 null 或者 數量等於 0，就回傳空列表
+            if (products == null || products.Count == 0)
+            {
+                return new List<ProductListDto>();
+            }
 
-             foreach (var product in products)
-             {
-                // 取得主圖片（優先 IsMainImage = true，其次用 DisplayOrder）
-                 var mainImage = product.ProductImages
-                     .Where(img => img.IsMainImage)
-                     .FirstOrDefault()
-                     ?? product.ProductImages
-                         .OrderBy(img => img.DisplayOrder)
-                         .FirstOrDefault();
+            // 1. 批次收集 ID 並轉為 HashSet 提升搜尋速度 (O(1) 複雜度)
+            var productIds = products.Select(p => p.ProductId).Distinct().ToList();
+            var sellerIds = products.Select(p => p.UserId).Distinct().ToList();
+            var favoriteSet = new HashSet<long>(favoriteIds);
 
-                // 組合完整圖片 URL
-                string fullImageUrl;
-                 if (mainImage != null && !string.IsNullOrEmpty(mainImage.ImageUrl))
-                 {
-                     fullImageUrl = baseUrl + mainImage.ImageUrl;
-                 }
-                 else
-                 {
-                     fullImageUrl = baseUrl + "/image/shopping/products/default.jpg";
-                 }
+            // 2. 批次抓取（這部分你原本就做得很好）
+            var productRatings = _reviewService.GetProductRatingSummaries(productIds);
+            var sellerRatings = _reviewService.GetSellerRatingSummaries(sellerIds);
 
-                // 取得價格
-                 var price = product.ProductSpecifications
-                     .OrderBy(spec => spec.SpecificationId)
-                     .FirstOrDefault()?.Price ?? 0;
+            // 3. 預處理圖片與價格 (減少迴圈內的運算)
+            return products.Select(product =>
+            {
+                // 取得主圖片邏輯優化
+                var mainImage = product.ProductImages.FirstOrDefault(img => img.IsMainImage)
+                              ?? product.ProductImages.OrderBy(img => img.DisplayOrder).FirstOrDefault();
 
-                  result.Add(new ProductListDto
-                  {
-                      ProductId = product.ProductId,
-                      UserId = product.UserId,
-                      ProductName = product.ProductName,
-                      Description = product.Description,
-                      MainImageUrl = fullImageUrl,
-                      Price = price,
-                      CreatedAt = product.CreatedAt,
-                      SellerCategoryIds = product.ProductSellerCategoryMappins.Select(m => m.SellerCategoryId).ToList(),
-                      IsFavorite = favoriteIds.Contains(product.ProductId),
-                      AverageRating = _reviewService.GetProductRatingSummary(product.ProductId).AverageRating,
-                      ReviewCount = _reviewService.GetProductRatingSummary(product.ProductId).ReviewCount,
-                      Seller = new SellerDto
-                      {
-                          UserId = product.User.UserId,
-                          DisplayName = product.User.UserProfile?.DisplayName ?? product.User.Account,
-                          Avatar = (product.User.UserProfile != null && !string.IsNullOrEmpty(product.User.UserProfile.Avatar))
-                                ? $"{baseUrl}{product.User.UserProfile.Avatar}"
-                                : null,
-                          Rating = _reviewService.GetSellerRatingSummary(product.UserId).AverageRating,
-                          ReviewCount = _reviewService.GetSellerRatingSummary(product.UserId).ReviewCount
-                      }
-                  });
-              }
-              return result;
-         }
+                string fullImageUrl = mainImage != null && !string.IsNullOrEmpty(mainImage.ImageUrl)
+                    ? baseUrl + mainImage.ImageUrl
+                    : baseUrl + "/image/shopping/products/default.jpg";
+
+                // 價格取第一筆
+                var price = product.ProductSpecifications.FirstOrDefault()?.Price ?? 0;
+
+                // 取得統計
+                productRatings.TryGetValue(product.ProductId, out var pRating);
+                sellerRatings.TryGetValue(product.UserId, out var sRating);
+
+                return new ProductListDto
+                {
+                    ProductId = product.ProductId,
+                    UserId = product.UserId,
+                    ProductName = product.ProductName,
+                    Description = product.Description,
+                    MainImageUrl = fullImageUrl,
+                    Price = price,
+                    CreatedAt = product.CreatedAt,
+                    SellerCategoryIds = product.ProductSellerCategoryMappins.Select(m => m.SellerCategoryId).ToList(),
+                    IsFavorite = favoriteSet.Contains(product.ProductId), // HashSet 速度極快
+                    AverageRating = pRating?.AverageRating ?? 0,
+                    ReviewCount = pRating?.ReviewCount ?? 0,
+                    Seller = new SellerDto
+                    {
+                        UserId = product.User.UserId,
+                        DisplayName = product.User.UserProfile?.DisplayName ?? product.User.Account,
+                        Avatar = !string.IsNullOrEmpty(product.User.UserProfile?.Avatar)
+                            ? $"{baseUrl}{product.User.UserProfile.Avatar}"
+                            : null,
+                        Rating = sRating?.AverageRating ?? 0,
+                        ReviewCount = sRating?.ReviewCount ?? 0
+                    }
+                };
+            }).ToList();
+        }
     }
 }

@@ -104,6 +104,37 @@ namespace FrameZone_WebApi.Shopping.Repositories
             return (null, null);
         }
 
+        public Dictionary<long, (float average, int count)> GetProductRatingInfos(IEnumerable<long> productIds)
+        {
+            if (productIds == null || !productIds.Any()) return new Dictionary<long, (float average, int count)>();
+
+            return _context.Reviews
+                .Where(r => r.ReviewType == "Product" && productIds.Contains(r.OrderDetails.Specification.ProductId))
+                .GroupBy(r => r.OrderDetails.Specification.ProductId)
+                .Select(g => new
+                {
+                    ProductId = g.Key,
+                    Average = (float)g.Average(r => r.Rating),
+                    Count = g.Count()
+                })
+                .ToDictionary(x => x.ProductId, x => (x.Average, x.Count));
+        }
+
+        public Dictionary<long, (float average, int count)> GetSellerRatingInfos(IEnumerable<long> userIds)
+        {
+            if (userIds == null || !userIds.Any()) return new Dictionary<long, (float average, int count)>();
+
+            return _context.Reviews
+                .Where(r => userIds.Contains(r.RevieweeUserId))
+                .GroupBy(r => r.RevieweeUserId)
+                .Select(g => new
+                {
+                    SellerId = g.Key,
+                    Average = (float)g.Average(r => r.Rating),
+                    Count = g.Count()
+                })
+                .ToDictionary(x => x.SellerId, x => (x.Average, x.Count));
+        }
         public bool HasUserReviewedOrderDetail(int orderDetailsId)
         {
             return _context.Reviews.Any(r => r.OrderDetailsId == orderDetailsId);

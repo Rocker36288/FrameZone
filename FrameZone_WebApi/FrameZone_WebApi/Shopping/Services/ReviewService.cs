@@ -205,6 +205,24 @@ namespace FrameZone_WebApi.Shopping.Services
             // 先去 Repository 增加 `GetOrderDetailInfo(orderId, productId)`
             await _reviewRepo.AddReviewsAsync(reviews);
         }
+
+        public Dictionary<long, RatingSummaryDto> GetProductRatingSummaries(IEnumerable<long> productIds)
+        {
+            var infos = _reviewRepo.GetProductRatingInfos(productIds);
+            return infos.ToDictionary(
+                x => x.Key,
+                x => new RatingSummaryDto { AverageRating = x.Value.average, ReviewCount = x.Value.count }
+            );
+        }
+
+        public Dictionary<long, RatingSummaryDto> GetSellerRatingSummaries(IEnumerable<long> userIds)
+        {
+            var infos = _reviewRepo.GetSellerRatingInfos(userIds);
+            return infos.ToDictionary(
+                x => x.Key,
+                x => new RatingSummaryDto { AverageRating = x.Value.average, ReviewCount = x.Value.count }
+            );
+        }
     }
 }
 
