@@ -42,7 +42,10 @@
         </div>
 
         <span class="text-muted" style="font-size: 0.85rem;">
-          更新時間: {{ post.updatedAt | date:'yyyy-MM-dd HH:mm' }}
+          {{ getPostDisplayTime(post) | date:'yyyy-MM-dd HH:mm' }}
+          @if (isPostEdited(post)) {
+          <span> 已編輯</span>
+          }
         </span>
       </a>
 
@@ -79,7 +82,10 @@
           <div>
             <strong>{{ post.sharedPost.userName }}</strong><br />
             <span class="text-muted" style="font-size: 0.85rem;">
-              更新時間: {{ post.sharedPost.updatedAt | date:'yyyy-MM-dd HH:mm' }}
+              {{ getPostDisplayTime(post.sharedPost) | date:'yyyy-MM-dd HH:mm' }}
+              @if (isPostEdited(post.sharedPost)) {
+              <span> 已編輯</span>
+              }
             </span>
           </div>
         </a>

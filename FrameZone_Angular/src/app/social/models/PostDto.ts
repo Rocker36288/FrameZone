@@ -6,6 +6,7 @@ export interface PostDto {
   postContent: string;
   postType?: string | null;
   postTypeId?: number | null;
+  createdAt?: string;
   updatedAt: string;
   isOwner?: boolean //就是本人
   likeCount?: number;

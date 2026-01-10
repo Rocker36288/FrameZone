@@ -97,6 +97,13 @@ export class SocialPostsComponent implements AfterViewInit, OnDestroy {
     const initial = (sharedPost.userName || 'U').charAt(0).toUpperCase();
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
   }
+  getPostDisplayTime(post: PostDto): string | undefined {
+    if (post.createdAt && post.updatedAt && post.updatedAt !== post.createdAt) return post.updatedAt;
+    return post.createdAt ?? post.updatedAt;
+  }
+  isPostEdited(post: PostDto): boolean {
+    return !!post.createdAt && post.updatedAt !== post.createdAt;
+  }
 
 
   //右上角選單

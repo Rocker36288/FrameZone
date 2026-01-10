@@ -51,6 +51,13 @@ export class SocialCommentsComponent {
     const initial = (comment.displayName || 'U').charAt(0).toUpperCase();
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
   }
+  getCommentDisplayTime(comment: CommentDto): string {
+    if (comment.updatedAt && comment.updatedAt !== comment.createdAt) return comment.updatedAt;
+    return comment.createdAt;
+  }
+  isCommentEdited(comment: CommentDto): boolean {
+    return !!comment.updatedAt && comment.updatedAt !== comment.createdAt;
+  }
 
   toggleMenu(commentId: number, event: MouseEvent) {
     event.stopPropagation();
