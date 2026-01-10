@@ -6,24 +6,13 @@
   <div *ngFor="let group of tagGroups" class="filter-category">
     <div class="filter-category-title">{{ group.title }}</div>
     <div class="specialty-tags-group">
-      <span
-        *ngFor="let tag of getVisibleTags(group)"
-        class="tag-item"
-        [class.loc-tag]="group.isLocation"
-        [class.active]="isTagSelected(tag, group.isLocation)"
-        (click)="toggleTag(tag, group.isLocation)"
-      >
+      <span *ngFor="let tag of getVisibleTags(group)" class="tag-item" [class.loc-tag]="group.isLocation"
+        [class.active]="isTagSelected(tag, group.isLocation)" (click)="toggleTag(tag, group.isLocation)">
         {{ tag }}
       </span>
     </div>
-    <button
-      *ngIf="shouldShowToggle(group)"
-      class="toggle-more-btn"
-      (click)="toggleExpand(group)"
-    >
-      <i
-        [class]="group.expanded ? 'ti ti-chevron-up' : 'ti ti-chevron-down'"
-      ></i>
+    <button *ngIf="shouldShowToggle(group)" class="toggle-more-btn" (click)="toggleExpand(group)">
+      <i [class]="group.expanded ? 'ti ti-chevron-up' : 'ti ti-chevron-down'"></i>
       {{ group.expanded ? "收合內容" : "查看更多" }}
     </button>
   </div>
@@ -31,31 +20,22 @@
   <!-- 預算範圍 -->
   <div class="filter-category">
     <div class="filter-category-title">預算範圍</div>
-    <input
-      type="range"
-      class="form-range"
-      min="1000"
-      max="10000"
-      step="500"
-      [(ngModel)]="maxPrice"
-      (input)="onPriceChange()"
-    />
+    <input type="range" class="form-range" min="1000" max="10000" step="500" [(ngModel)]="maxPrice"
+      (input)="onPriceChange()" />
     <div class="mt-1 d-flex justify-content-between" style="font-size: 12px">
       <span>$1,000</span>
-      <span class="fw-bold text-primary">{{ priceDisplay }}</span>
+      <span class="price-text-value">{{ priceDisplay }}</span>
     </div>
+
+
   </div>
 
   <!-- 評分等級 -->
   <div class="filter-category">
     <div class="filter-category-title">評分等級</div>
     <div class="rating-filter">
-      <div
-        *ngFor="let option of ratingOptions"
-        class="rating-opt"
-        [class.active]="minRating === option.value"
-        (click)="onRatingChange(option.value)"
-      >
+      <div *ngFor="let option of ratingOptions" class="rating-opt" [class.active]="minRating === option.value"
+        (click)="onRatingChange(option.value)">
         {{ option.label }}
       </div>
     </div>

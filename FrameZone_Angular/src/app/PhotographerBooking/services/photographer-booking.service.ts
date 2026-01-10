@@ -35,6 +35,10 @@ export class PhotographerBookingService {
 
   filters$ = this.filtersSubject.asObservable();
 
+  // 全域載入狀態
+  private loadingSubject = new BehaviorSubject<boolean>(false);
+  loading$ = this.loadingSubject.asObservable();
+
   // Mock data for UI helpers
   private readonly locationList = ['台北', '新北', '桃園', '台中', '台南', '高雄', '基隆', '宜蘭', '新竹'];
   private readonly categories: Category[] = [
@@ -207,6 +211,7 @@ export class PhotographerBookingService {
   }
 
   resetFilters(): void {
+    this.setLoading(true);
     this.filtersSubject.next({
       serviceType: '',
       keyword: '',
@@ -216,5 +221,9 @@ export class PhotographerBookingService {
       minRating: 0,
       sortOrder: 'default',
     });
+  }
+
+  setLoading(value: boolean): void {
+    this.loadingSubject.next(value);
   }
 }

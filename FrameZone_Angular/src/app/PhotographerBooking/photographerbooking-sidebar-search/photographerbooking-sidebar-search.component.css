@@ -41,10 +41,13 @@
 }
 
 /* 懸停效果統一 */
-.tag-item:hover {
-  border-color: #6b5cff;
+/* 預算數值顯示 */
+.price-text-value {
+  font-weight: 700;
   color: #6b5cff;
 }
+
+
 
 /* --- 重點修改：統一選中狀態顏色 --- */
 /* 無論是地區 (loc-tag) 還是風格，選中時都使用相同的紫色 */

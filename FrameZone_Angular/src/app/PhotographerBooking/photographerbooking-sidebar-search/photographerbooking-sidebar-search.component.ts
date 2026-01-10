@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { PhotographerBookingService } from '../services/photographer-booking.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subject, debounceTime, takeUntil } from 'rxjs';
+import { SearchFilters } from '../models/photographer-booking.models';
+
 interface TagGroup {
   title: string;
   tags: string[];
@@ -19,6 +21,8 @@ export class PhotographerbookingSidebarSearchComponent implements OnInit {
   tagGroups: TagGroup[] = [];
   maxPrice = 10000;
   minRating = 0;
+  private priceSubject = new Subject<number>();
+  private destroy$ = new Subject<void>();
 
   ratingOptions = [
     { label: '全部', value: 0 },
@@ -36,13 +40,25 @@ export class PhotographerbookingSidebarSearchComponent implements OnInit {
     this.initializeTagGroups();
 
     // Subscribe to filter changes to handle global reset
-    this.bookingService.filters$.subscribe(filters => {
-      this.selectedLocations = new Set(filters.locations);
-      this.selectedTags = new Set(filters.tags);
-      this.maxPrice = filters.maxPrice;
-      this.minRating = filters.minRating;
+    this.bookingService.filters$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((filters: SearchFilters) => {
+        this.selectedLocations = new Set(filters.locations);
+        this.selectedTags = new Set(filters.tags);
+        this.maxPrice = filters.maxPrice;
+        this.minRating = filters.minRating;
+      });
+
+
+    // 價格防抖動處理：避免滑動時頻繁觸發骨架屏導致跳動
+    this.priceSubject.pipe(
+      debounceTime(400),
+      takeUntil(this.destroy$)
+    ).subscribe(price => {
+      this.bookingService.updateFilters({ maxPrice: price });
     });
   }
+
 
   initializeTagGroups(): void {
     // 使用 forkJoin 同步處理兩個標籤來源，確保載入順序：1. 服務地區, 2. 專長分類
@@ -140,7 +156,14 @@ export class PhotographerbookingSidebarSearchComponent implements OnInit {
   }
 
   onPriceChange(): void {
-    this.bookingService.updateFilters({ maxPrice: this.maxPrice });
+    // 立即更新 Subject，由其負責防抖動
+    this.priceSubject.next(this.maxPrice);
+  }
+
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   onRatingChange(value: number): void {
@@ -149,10 +172,12 @@ export class PhotographerbookingSidebarSearchComponent implements OnInit {
   }
 
   resetFilters(): void {
+    this.bookingService.setLoading(true);
     this.selectedLocations.clear();
     this.selectedTags.clear();
-    this.maxPrice = 10000;
-    this.minRating = 0;
+    this.minRating = 0; // 重置為全部 (0)
+    this.maxPrice = 10000; // 直接設定，不使用動畫
+
     this.bookingService.resetFilters();
   }
 

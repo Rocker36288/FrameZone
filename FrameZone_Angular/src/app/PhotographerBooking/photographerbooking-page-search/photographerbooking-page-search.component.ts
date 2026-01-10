@@ -76,6 +76,13 @@ export class PhotographerbookingPageSearchComponent
         this.sortOrder = filters.sortOrder;
         this.performSearch(filters);
       });
+
+    // 3. 訂閱全域載入狀態同步
+    this.bookingService.loading$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(loading => {
+        this.isLoading = loading;
+      });
   }
 
   ngOnDestroy(): void {
@@ -84,16 +91,16 @@ export class PhotographerbookingPageSearchComponent
   }
 
   performSearch(filters: SearchFilters): void {
-    this.isLoading = true;
+    this.bookingService.setLoading(true);
     const updatedFilters = { ...filters, sortOrder: this.sortOrder };
     this.bookingService.searchWithFilters(updatedFilters).subscribe({
       next: (data) => {
         this.photographers = data;
-        this.isLoading = false;
+        this.bookingService.setLoading(false);
       },
       error: (err) => {
         console.error('Error searching', err);
-        this.isLoading = false;
+        this.bookingService.setLoading(false);
       }
     });
   }
