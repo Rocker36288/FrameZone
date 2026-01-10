@@ -9,6 +9,8 @@ import { FooterComponent } from "../../shared/components/footer/footer.component
 import { PhotographerBookingService } from '../services/photographer-booking.service';
 import { PhotographerDto } from '../models/photographer-booking.models';
 import { PhotographerbookingCardComponent } from '../photographerbooking-card/photographerbooking-card.component';
+import { PhotographerSkeletonCardComponent } from '../photographer-skeleton-card/photographer-skeleton-card.component';
+
 
 @Component({
   selector: 'app-photographer-bookinghome',
@@ -21,25 +23,32 @@ import { PhotographerbookingCardComponent } from '../photographerbooking-card/ph
     PhotographerBookingServicetypesComponent,
     PhotographerBookingSpecialtytagsComponent,
     FooterComponent,
-    PhotographerbookingCardComponent
+    PhotographerbookingCardComponent,
+    PhotographerSkeletonCardComponent
   ],
   templateUrl: './photographer-bookinghome.component.html',
   styleUrl: './photographer-bookinghome.component.css',
 })
 export class PhotographerBookinghomeComponent implements OnInit {
   featuredPhotographers: PhotographerDto[] = [];
+  isLoading: boolean = false;
 
   constructor(private bookingService: PhotographerBookingService) { }
 
   ngOnInit(): void {
+    this.isLoading = true;
     // For now get all and take top 4 or use search parameters if API supports "featured"
     this.bookingService.getAllPhotographers().subscribe({
       next: (data) => {
         console.log('API Data received:', data); // Debugging log
         // Take first 4 as featured for now
         this.featuredPhotographers = data.slice(0, 4);
+        this.isLoading = false;
       },
-      error: (err) => console.error('Error fetching photographers', err)
+      error: (err) => {
+        console.error('Error fetching photographers', err);
+        this.isLoading = false;
+      }
     });
   }
 }

@@ -4,9 +4,11 @@ import { PhotographerBookingService } from '../services/photographer-booking.ser
 import { PhotographerbookingCardComponent } from '../photographerbooking-card/photographerbooking-card.component';
 import { CommonModule } from '@angular/common';
 
+import { PhotographerSkeletonCardComponent } from '../photographer-skeleton-card/photographer-skeleton-card.component';
+
 @Component({
   selector: 'app-photographer-booking-specialtytags',
-  imports: [PhotographerbookingCardComponent, CommonModule],
+  imports: [PhotographerbookingCardComponent, CommonModule, PhotographerSkeletonCardComponent],
   templateUrl: './photographer-booking-specialtytags.component.html',
   styleUrl: './photographer-booking-specialtytags.component.css',
 })
@@ -15,6 +17,7 @@ export class PhotographerBookingSpecialtytagsComponent implements OnInit {
   tags: string[] = [];
   selectedTag = '全部風格';
   filteredPhotographers: Photographer[] = [];
+  isLoading: boolean = false;
 
   constructor(private bookingService: PhotographerBookingService) { }
 
@@ -44,11 +47,16 @@ export class PhotographerBookingSpecialtytagsComponent implements OnInit {
       filters.tags = [tag];
     }
 
+    this.isLoading = true;
     this.bookingService.searchWithFilters(filters).subscribe({
       next: (data) => {
         this.filteredPhotographers = data;
+        this.isLoading = false;
       },
-      error: (err) => console.error('Error searching photographers', err)
+      error: (err) => {
+        console.error('Error searching photographers', err);
+        this.isLoading = false;
+      }
     });
   }
 }

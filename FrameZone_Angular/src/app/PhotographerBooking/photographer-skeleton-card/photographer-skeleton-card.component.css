@@ -1,0 +1,141 @@
+/* Photographer Skeleton Card Styles */
+.card {
+    background: #fff;
+    border: 1px solid #eeeeee;
+    border-radius: 14px;
+    overflow: hidden;
+    height: 100%;
+}
+
+.image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px 12px 0 0;
+}
+
+.skeleton-loader {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background-color: #f6f8fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.shimmer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.5) 50%,
+            rgba(255, 255, 255, 0) 100%);
+    animation: shimmer-animation 1.5s infinite linear;
+}
+
+@keyframes shimmer-animation {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(100%);
+    }
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+/* Tabler Placeholder Styles */
+.placeholder {
+    display: inline-block;
+    vertical-align: middle;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    min-height: 1em;
+    position: relative;
+    overflow: hidden;
+}
+
+.placeholder::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(90deg,
+            rgba(255, 255, 255, 0) 0,
+            rgba(255, 255, 255, 0.2) 20%,
+            rgba(255, 255, 255, 0.5) 60%,
+            rgba(255, 255, 255, 0));
+    animation: shimmer-text 2s infinite;
+    content: '';
+}
+
+@keyframes shimmer-text {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.d-flex {
+    display: flex;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-3 {
+    margin-bottom: 1rem;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}
+
+.border-top {
+    border-top: 1px solid #e9ecef;
+}
+
+.pt-3 {
+    padding-top: 1rem;
+}
+
+.col-6 {
+    width: 50%;
+}
+
+.col-2 {
+    width: 16.666667%;
+}
+
+.col-9 {
+    width: 75%;
+}
+
+.col-3 {
+    width: 25%;
+}
+
+.col-4 {
+    width: 33.333333%;
+}
+
+.me-1 {
+    margin-right: 0.25rem;
+}

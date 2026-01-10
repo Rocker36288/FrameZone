@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { PhotographerBookingService } from '../services/photographer-booking.service';
 import { PhotographerbookingSidebarSearchComponent } from '../photographerbooking-sidebar-search/photographerbooking-sidebar-search.component';
+import { PhotographerSkeletonCardComponent } from '../photographer-skeleton-card/photographer-skeleton-card.component';
 import {
   Photographer,
   SearchFilters,
@@ -23,6 +24,7 @@ import {
     PhotographerbookingSearchComponent,
     PhotographerbookingCardComponent,
     PhotographerbookingSidebarSearchComponent,
+    PhotographerSkeletonCardComponent,
   ],
   templateUrl: './photographerbooking-page-search.component.html',
   styleUrl: './photographerbooking-page-search.component.css',
@@ -31,6 +33,7 @@ export class PhotographerbookingPageSearchComponent
   implements OnInit, OnDestroy {
   photographers: Photographer[] = [];
   sortOrder: 'default' | 'priceAsc' | 'priceDesc' | 'ratingDesc' = 'default';
+  isLoading: boolean = false;
 
   private destroy$ = new Subject<void>();
 
@@ -81,14 +84,17 @@ export class PhotographerbookingPageSearchComponent
   }
 
   performSearch(filters: SearchFilters): void {
+    this.isLoading = true;
     const updatedFilters = { ...filters, sortOrder: this.sortOrder };
     this.bookingService.searchWithFilters(updatedFilters).subscribe({
       next: (data) => {
         this.photographers = data;
-        // Client side sorting if backend doesn't handle it yet (DTO-based sorting)
-        // this.sortPhotographers(); 
+        this.isLoading = false;
       },
-      error: (err) => console.error('Error searching', err)
+      error: (err) => {
+        console.error('Error searching', err);
+        this.isLoading = false;
+      }
     });
   }
 

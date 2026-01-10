@@ -1,46 +1,70 @@
 <article class="card" (click)="onViewDetails()">
   <div class="image-container">
-    <img [src]="cardImage" [alt]="photographer.displayName" />
+
+    <div class="skeleton-loader" *ngIf="!isLoaded">
+      <div class="shimmer"></div>
+      <i class="ti ti-photo text-white-50 opacity-25" style="font-size: 2rem; z-index: 1;"></i>
+    </div>
+
+    <img [src]="cardImage" [alt]="photographer.displayName" (load)="onImageLoad()" [class.loaded]="isLoaded" />
 
     <!-- 統一的可用性標籤 -->
-    <div class="availability-tag">
+    <div class="availability-tag" *ngIf="isLoaded">
       <ng-container *ngIf="photographer.isAvailableSoon; else totalSlots">
         <span class="status-dot"></span>
         <span class="date-text">{{ photographer.earliestAvailableDate | date:'MM/dd' }} 有空</span>
       </ng-container>
 
       <ng-template #totalSlots>
-        <ng-container *ngIf="photographer.slotCount && photographer.slotCount > 0">
+        <div class="d-flex align-items-center gap-1">
           <i class="ti ti-calendar-event"></i>
           <span>{{ photographer.slotCount }} 個時段</span>
-        </ng-container>
+        </div>
       </ng-template>
     </div>
   </div>
 
   <div class="card-body">
-    <div class="d-flex justify-content-between align-items-center">
-      <div class="fw-bold h4 mb-0">{{ photographer.displayName }}</div>
-      <div class="text-warning fw-bold" *ngIf="photographer.rating" style="white-space: nowrap;">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div *ngIf="!isLoaded" class="placeholder col-6"></div>
+      <div *ngIf="isLoaded" class="fw-bold h4 mb-0">{{ photographer.displayName }}</div>
+
+      <div *ngIf="!isLoaded" class="placeholder col-2"></div>
+      <div *ngIf="isLoaded && photographer.rating" class="text-warning fw-bold" style="white-space: nowrap;">
         ★ {{ photographer.rating }}
       </div>
     </div>
-    <div class="text-muted small mb-3">
-      {{ photographer.studioAddress }}
-      <span *ngIf="photographer.reviewCount">· {{ photographer.reviewCount }} 則評價</span>
-      <span *ngIf="photographer.studioName">({{ photographer.studioName }})</span>
+
+    <div class="mb-3">
+      <div *ngIf="!isLoaded" class="placeholder col-9 mb-1"></div>
+      <div *ngIf="isLoaded" class="text-muted small">
+        {{ photographer.studioAddress }}
+        <span *ngIf="photographer.reviewCount">· {{ photographer.reviewCount }} 則評價</span>
+        <span *ngIf="photographer.studioName">({{ photographer.studioName }})</span>
+      </div>
     </div>
+
     <div class="card-tags">
-      <span class="tag-small badge-service">
-        <i class="ti ti-camera"></i> {{ photographer.studioType }}
-      </span>
-      <span *ngFor="let tag of photographer.specialties.slice(0, 2)" class="tag-small">
-        {{ tag }}
-      </span>
+      <ng-container *ngIf="!isLoaded">
+        <span class="placeholder col-3 me-1" style="height: 20px;"></span>
+        <span class="placeholder col-3" style="height: 20px;"></span>
+      </ng-container>
+      <ng-container *ngIf="isLoaded">
+        <span class="tag-small badge-service">
+          <i class="ti ti-camera"></i> {{ photographer.studioType }}
+        </span>
+        <span *ngFor="let tag of photographer.specialties.slice(0, 2)" class="tag-small">
+          {{ tag }}
+        </span>
+      </ng-container>
     </div>
+
     <div class="d-flex justify-content-between align-items-center mt-3 border-top pt-3">
-      <div class="price-text">{{ formattedPrice }}</div>
-      <button class="btn-detail" (click)="onViewDetails(); $event.stopPropagation()">
+      <div *ngIf="!isLoaded" class="placeholder col-4" style="height: 24px;"></div>
+      <div *ngIf="isLoaded" class="price-text">{{ formattedPrice }}</div>
+
+      <div *ngIf="!isLoaded" class="placeholder col-3" style="height: 32px;"></div>
+      <button *ngIf="isLoaded" class="btn-detail" (click)="onViewDetails(); $event.stopPropagation()">
         查看詳情 <i class="ti ti-chevron-right"></i>
       </button>
     </div>
