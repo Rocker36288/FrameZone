@@ -420,6 +420,8 @@ namespace FrameZone_WebApi.Shopping.Controllers
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();
 
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+
             var result = orders.Select(o => {
             var firstProduct = o.OrderDetails.FirstOrDefault();
             var sellerName = firstProduct?.Specification?.Product?.User?.UserProfile?.DisplayName ?? "FrameZone 精選賣場";
@@ -437,6 +439,9 @@ namespace FrameZone_WebApi.Shopping.Controllers
                 createdAt = o.CreatedAt,
                 products = o.OrderDetails.Select(d => {
                     var review = d.Reviews.FirstOrDefault();
+                    var img = d.Specification?.Product?.ProductImages?.FirstOrDefault(i => i.IsMainImage)?.ImageUrl
+                              ?? d.Specification?.Product?.ProductImages?.FirstOrDefault()?.ImageUrl;
+                    
                     return new
                     {
                         name = d.Specification?.Product?.ProductName ?? "未知商品",
@@ -444,9 +449,7 @@ namespace FrameZone_WebApi.Shopping.Controllers
                         price = d.TransactionPrice,
                         quantity = d.Quantity,
                         productId = d.Specification?.ProductId ?? 0,
-                        imageUrl = d.Specification?.Product?.ProductImages?.FirstOrDefault(i => i.IsMainImage)?.ImageUrl
-                                   ?? d.Specification?.Product?.ProductImages?.FirstOrDefault()?.ImageUrl
-                                   ?? "https://placehold.co/80x80?text=No+Image",
+                        imageUrl = !string.IsNullOrEmpty(img) ? baseUrl + img : "https://placehold.co/80x80?text=No+Image",
                         isReviewed = review != null,
                         rating = review?.Rating ?? 0
                     };

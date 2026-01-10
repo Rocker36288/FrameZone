@@ -20,22 +20,28 @@ namespace FrameZone_WebApi.Shopping.Services
         public async Task<List<CartResponseDto>> GetUserCartAsync(long userId)
         {
             var cartItems = await _cartRepo.GetUserCartAsync(userId);
-            return cartItems.Select(c => new CartResponseDto
+            return cartItems.Select(c => 
             {
-                ShoppingCartId = c.ShoppingCartId,
-                SpecificationId = c.SpecificationId,
-                Quantity = c.Quantity,
-                ProductId = c.Specification.ProductId,
-                ProductName = c.Specification.Product.ProductName,
-                ProductImage = c.Specification.Product.ProductImages?.FirstOrDefault(i => i.IsMainImage)?.ImageUrl ?? 
-                               c.Specification.Product.ProductImages?.FirstOrDefault()?.ImageUrl ?? "",
-                Price = c.Specification.Price,
-                SpecificationName = string.Join(" / ", c.Specification.SpecOptionMappings.Select(m => m.PropertyDetails.OptionValue)),
-                StockQuantity = c.Specification.StockQuantity,
-                SellerId = c.Specification.Product.UserId,
-                SellerName = c.Specification.Product.User?.UserProfile?.DisplayName ?? 
-                             c.Specification.Product.User?.Account ?? "官方賣場",
-                SellerAvatar = c.Specification.Product.User?.UserProfile?.Avatar
+                var productImg = c.Specification.Product.ProductImages?.FirstOrDefault(i => i.IsMainImage)?.ImageUrl ?? 
+                               c.Specification.Product.ProductImages?.FirstOrDefault()?.ImageUrl;
+                var sellerAvatar = c.Specification.Product.User?.UserProfile?.Avatar;
+
+                return new CartResponseDto
+                {
+                    ShoppingCartId = c.ShoppingCartId,
+                    SpecificationId = c.SpecificationId,
+                    Quantity = c.Quantity,
+                    ProductId = c.Specification.ProductId,
+                    ProductName = c.Specification.Product.ProductName,
+                    ProductImage = !string.IsNullOrEmpty(productImg) ? _baseUrl + productImg : "",
+                    Price = c.Specification.Price,
+                    SpecificationName = string.Join(" / ", c.Specification.SpecOptionMappings.Select(m => m.PropertyDetails.OptionValue)),
+                    StockQuantity = c.Specification.StockQuantity,
+                    SellerId = c.Specification.Product.UserId,
+                    SellerName = c.Specification.Product.User?.UserProfile?.DisplayName ?? 
+                                 c.Specification.Product.User?.Account ?? "官方賣場",
+                    SellerAvatar = !string.IsNullOrEmpty(sellerAvatar) ? _baseUrl + sellerAvatar : null
+                };
             }).ToList();
         }
 

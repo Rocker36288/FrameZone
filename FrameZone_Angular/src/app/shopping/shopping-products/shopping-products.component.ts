@@ -51,6 +51,7 @@ export class ShoppingProductsComponent {
   minPrice: number | null = null;
   maxPrice: number | null = null;
   sortBy: string = 'default';
+  isLoading: boolean = true;
 
 
   ngOnInit(): void {
@@ -75,8 +76,10 @@ export class ShoppingProductsComponent {
 
   loadProductsFromApi(): void {
     console.log('開始載入商品資料...'); // 除錯用
+    this.isLoading = true;
     this.productApiService.getProducts().subscribe({
       next: (data) => {
+        this.isLoading = false;
         console.log('API 回傳資料:', data); // 除錯用
 
         // 2. 將 API 回傳的 DTO 對應到你的前端介面
@@ -105,6 +108,7 @@ export class ShoppingProductsComponent {
         this.applyFilters();
       },
       error: (err) => {
+        this.isLoading = false;
         console.error('API 讀取失敗', err);
         console.error('錯誤詳情', err.error);
         console.error('狀態碼:', err.status);
