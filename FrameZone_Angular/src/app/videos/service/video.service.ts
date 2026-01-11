@@ -24,6 +24,11 @@ export class VideoService {
     return this.http.get<VideoCardData[]>(`${this.apiBase}/videos/Recommend`);
   }
 
+  // ===== 取得影片熱門 =====
+  getVideoPopluar(): Observable<VideoCardData[]> {
+    return this.http.get<VideoCardData[]>(`${this.apiBase}/videos/Popluar`);
+  }
+
   // ===== 取得影片留言 =====
   getVideoComments(videoGuid: string): Observable<VideoCommentCard[]> {
     return this.http.get<VideoCommentCard[]>(`${this.apiBase}/videos/${videoGuid}/comment`);

@@ -125,7 +125,7 @@ namespace FrameZone_WebApi.Videos.Controllers
         public async Task<IActionResult> GetVideoAIResult(string guid)
         {
             var userId = GetUserId();
-
+           
             var result = await _videoCreatorService.GetVideoAIResultAsync(guid, userId);
 
             if (result == null)
@@ -147,7 +147,8 @@ namespace FrameZone_WebApi.Videos.Controllers
                 || !int.TryParse(userIdClaim.Value, out var userId)
                 || userId <= 0)
             {
-                throw new UnauthorizedAccessException("Invalid user.");
+                // 驗證失敗，回傳 null
+                return 0;
             }
 
             return userId;

@@ -23,7 +23,14 @@ namespace FrameZone_WebApi.Videos.Services
             return dto ?? new List<VideoCardDto>();
         }
 
-        //獲取影片推薦
+        //獲取熱門影片
+        public async Task<List<VideoCardDto>> GetVideoPopularAsync()
+        {
+            var dto = await _videoRepo.GetPopularVideosAsync();
+
+            return dto ?? new List<VideoCardDto>();
+        }
+
         // 獲取頻道 Spotlight（頻道卡片 + 最新影片）
         public async Task<ChannelSpotlightDto> GetSpotlightVideosAsync(int channelId)
         {
