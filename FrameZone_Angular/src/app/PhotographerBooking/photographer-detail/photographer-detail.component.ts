@@ -6,6 +6,7 @@ import { PhotographerBookingsidebarComponent } from "../photographer-bookingside
 import { PhotographerServiceinfoComponent } from "../photographer-serviceinfo/photographer-serviceinfo.component";
 import { PhotographerProfileComponent } from "../photographer-profile/photographer-profile.component";
 import { PhotographerBookingService } from '../services/photographer-booking.service';
+import { MockBookingService } from '../services/mock-booking.service';
 import { PhotographerDto, ServiceDto } from '../models/photographer-booking.models';
 
 // Using local interfaces for reviews/faq/specialty if they are not in main models yet,
@@ -40,12 +41,16 @@ export class PhotographerDetailComponent implements OnInit {
   reviews: Review[] = [];
   portfolioImages: string[] = [];
   faqs: FAQ[] = [];
+  mockRating: number = 5.0;
+  mockReviewCount: number = 3;
 
   selectedService: ServiceDto | null = null;
+  isFavorite: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
-    private bookingService: PhotographerBookingService
+    private bookingService: PhotographerBookingService,
+    private mockBookingService: MockBookingService
   ) { }
 
   ngOnInit(): void {
@@ -73,22 +78,7 @@ export class PhotographerDetailComponent implements OnInit {
         // 如果後端回傳 portfolioFile，解析它
         if (data.portfolioFile) {
           const files = data.portfolioFile.split(',');
-          // 假設後端回傳的是相對路徑 (例如 /image/...)，加上 Base URL
-          // 這裡假設 API Server 和圖片 Server 是同一個，或者前端有設定 Proxy
-          // 如果是開發環境，通常是 http://localhost:5276 (根據 launchSettings.json)
-          // 但這裡為了簡單，我們假設前端可以透過相對路徑存取 (如果有設定 proxy.conf.json)
-          // 或者我們直接加上完整的 API URL 前綴。目前先假設直接使用路徑即可 (如果前端 server 有 proxy 或是同源)
-          // 但通常 .NET Core Web API 的靜態檔案需要完整的 URL 或是前端 proxy
-          // 為了保險起見，我們看看是否需要加 Base URL。
-          // 原本的 portfolioUrl 也是 string，這裡我們試著直接用。
-          // 根據使用者描述: "資料庫Photographers的PortfolioFile 裡/image/..."
-          // 這看起來是 Server 的相對路徑。Angular 開發伺服器如果不設 Proxy 指向 API Server 的 wwwroot，會 404。
-          // 假設 API 位置在 environment 裡，不過這裡沒有看到 environment 引用。
-          // 先試著加上一個固定的 Base URL 常數，或者寫在 Service 裡比較好？
-          // 暫時先 hardcode 一個常見的 localhost 端口，或者假設使用者有 proxy。
-          // 觀察之前的 portfolioUrl 處理方式: `data.portfolioUrl.startsWith('http')`
-          // 我們先加上 path。
-          const apiBaseUrl = 'https://localhost:7213'; // 根據一般 .NET API 預設端口，或需確認
+          const apiBaseUrl = 'https://localhost:7213';
           this.portfolioImages = files.map(file => {
             if (file.startsWith('http')) return file;
             return `${apiBaseUrl}${file.trim()}`;
@@ -97,13 +87,13 @@ export class PhotographerDetailComponent implements OnInit {
         // Fallback for demo if empty
         else if (data.portfolioUrl && data.portfolioUrl.startsWith('http')) {
           this.portfolioImages = [data.portfolioUrl];
-          this.portfolioImages.push('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=400');
-          this.portfolioImages.push('https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=400');
+          this.portfolioImages.push('images/Photographer/Carousel02.png');
+          this.portfolioImages.push('images/Photographer/Carousel03.png');
         } else {
           // Fallback
           this.portfolioImages = [
-            'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800',
-            'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=400',
+            'images/Photographer/Carousel01.png',
+            'images/Photographer/Carousel02.png',
           ];
         }
 
@@ -112,34 +102,34 @@ export class PhotographerDetailComponent implements OnInit {
         }
 
         // Mock FAQ and Reviews (as backend doesn't provide them yet or I didn't add to DTO)
-        this.loadMockFaqsAndReviews();
+        this.loadMockFaqsAndReviews(id);
       },
       error: (err) => console.error('Error loading photographer', err)
     });
   }
 
-  loadMockFaqsAndReviews(): void {
+  loadMockFaqsAndReviews(photographerId: number): void {
     this.faqs = [
       {
-        question: '服務地區與交通費計算',
+        question: '交通費用如何計算？',
         answer: '大台北地區免交通費。桃園、宜蘭地區需加收 TWD 500,其他地區請私訊詢問。',
       },
       {
-        question: '如何改期或取消預約?',
+        question: '如何改期或取消預約？',
         answer: '拍攝日前 7 天可免費改期一次,3 天內改期或取消將扣除 30% 訂金。',
       },
-    ];
-    this.reviews = [
       {
-        reviewId: 1,
-        reviewerName: 'Wei-Ting',
-        rating: 5,
-        reviewContent: '攝影師非常專業,拍攝過程氣氛很輕鬆!',
-        createdAt: '2024年12月',
-        avatarUrl: 'https://i.pravatar.cc/100?u=jane',
-        photos: []
-      }
+        question: '天氣不佳的改期政策',
+        answer: '若氣象局發佈降雨機率 > 60%，可於拍攝前 24 小時免費改期一次。若因天災等不可APP力因素則無條件退還訂金。',
+      },
     ];
+
+    // 從服務中讀取同步的模擬評價
+    this.mockBookingService.getReviews(photographerId).subscribe(data => {
+      this.reviews = data;
+      this.mockRating = 4.9;
+      this.mockReviewCount = this.reviews.length;
+    });
   }
 
   onServiceSelected(service: ServiceDto): void { // Start of unchanged methods
@@ -156,8 +146,8 @@ export class PhotographerDetailComponent implements OnInit {
   }
 
   toggleFavorite(): void {
-    // 實作收藏功能
-    console.log('切換收藏');
+    this.isFavorite = !this.isFavorite;
+    console.log('切換收藏:', this.isFavorite);
   }
 
   showAllPhotos(): void {

@@ -91,6 +91,23 @@ export const routes: Routes = [
       ).then((m) => m.PhotographerDetailComponent),
   },
   {
+    path: 'photographer-booking/success',
+    loadComponent: () =>
+      import(
+        './PhotographerBooking/booking-success/booking-success.component'
+      ).then((m) => m.BookingSuccessComponent),
+    title: 'FrameZone - 預約成功',
+  },
+  {
+    path: 'booking-center',
+    loadComponent: () =>
+      import(
+        './PhotographerBooking/member-dashboard/photographer-booking-list.component'
+      ).then((m) => m.PhotographerBookingListComponent),
+    title: 'FrameZone - 預約中心',
+  },
+
+  {
     path: '',
     loadComponent: () =>
       import('./layouts/main-layout/main-layout.component').then(

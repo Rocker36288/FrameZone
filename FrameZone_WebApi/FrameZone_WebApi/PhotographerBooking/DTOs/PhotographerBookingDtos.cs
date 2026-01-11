@@ -19,7 +19,11 @@ namespace FrameZone_WebApi.PhotographerBooking.DTOs
         public int ReviewCount { get; set; }
         public decimal MinPrice { get; set; }
         public int TotalBookings { get; set; }
+        public List<string> ServiceCities { get; set; } = new List<string>();
         public string PortfolioFile { get; set; }
+        public int SlotCount { get; set; }
+        public DateTime? EarliestAvailableDate { get; set; }
+        public bool IsAvailableSoon => EarliestAvailableDate.HasValue;
     }
 
     public class ServiceDto
@@ -41,7 +45,10 @@ namespace FrameZone_WebApi.PhotographerBooking.DTOs
         public string? Keyword { get; set; }
         public string? Location { get; set; }
         public string? StudioType { get; set; }
-        public string? Tag { get; set; } // Specialty tag name
+        public int? ServiceTypeId { get; set; }
+        public string? Tag { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 
     public class BookingDto
@@ -73,5 +80,12 @@ namespace FrameZone_WebApi.PhotographerBooking.DTOs
         public DateTime StartDateTime { get; set; }
         public DateTime EndDateTime { get; set; }
         public bool IsAvailable { get; set; }
+    }
+
+    public class ServiceTypeDto
+    {
+        public int ServiceTypeId { get; set; }
+        public string ServiceName { get; set; }
+        public string IconUrl { get; set; }
     }
 }

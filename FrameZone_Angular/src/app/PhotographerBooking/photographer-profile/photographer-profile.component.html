@@ -20,11 +20,11 @@
         {{ photographer.displayName }} · {{ photographer.studioName }}
       </h1>
       <p class="text-secondary mb-3">
-        從業年資 {{ photographer.yearsOfExperience }} 年 · 已完成
-        {{ photographer.totalBookings }}+ 場拍攝
+        從業年資 {{ photographer.yearsOfExperience }} 年
       </p>
-      <div class="d-flex gap-2">
+      <div class="d-flex gap-2 flex-wrap">
         <span class="tag-pill" *ngFor="let specialty of specialties">
+          <i class="ti ti-sparkles"></i>
           {{ specialty }}
         </span>
       </div>
@@ -32,7 +32,61 @@
     <img [src]="photographer.avatarUrl" [alt]="photographer.displayName" class="rounded-circle shadow-sm"
       style="width: 64px; height: 64px; object-fit: cover" />
   </div>
-  <p class="text-muted fst-italic border-start border-3 ps-3 py-1">
+  <p class="profile-quote">
     「{{ photographer.description }}」
   </p>
 </section>
+
+<!-- Lightbox 畫廊 -->
+<div class="lightbox-overlay" *ngIf="isLightboxOpen" (click)="closeLightbox()" (keydown)="onKeyDown($event)"
+  tabindex="0">
+  <div class="lightbox-container" (click)="$event.stopPropagation()">
+
+    <!-- 關閉按鈕 -->
+    <button class="lightbox-close" (click)="closeLightbox()">
+      <i class="ti ti-x"></i>
+    </button>
+
+    <!-- 資訊側欄 -->
+    <div class="lightbox-sidebar">
+      <div class="sidebar-header">
+        <img [src]="photographer?.avatarUrl" [alt]="photographer?.displayName" class="sidebar-avatar" />
+        <div>
+          <h3 class="sidebar-title">{{ photographer?.displayName }}</h3>
+          <p class="sidebar-subtitle">{{ photographer?.studioName }}</p>
+        </div>
+      </div>
+      <div class="sidebar-counter">
+        {{ currentImageIndex + 1 }} / {{ portfolioImages.length }}
+      </div>
+    </div>
+
+    <!-- 圖片顯示區 -->
+    <div class="lightbox-image-wrapper">
+      <img [src]="portfolioImages[currentImageIndex]" [alt]="'作品集圖片 ' + (currentImageIndex + 1)"
+        [class.zoomed]="isZoomed" [style.transform]="'scale(' + zoomLevel + ')'" (click)="toggleZoom()"
+        (contextmenu)="preventContextMenu($event)" loading="lazy" class="lightbox-image" />
+
+      <!-- 縮放提示 -->
+      <div class="zoom-hint" *ngIf="!isZoomed">
+        <i class="ti ti-zoom-in me-1"></i>點擊圖片放大
+      </div>
+    </div>
+
+    <!-- 導航按鈕 -->
+    <button class="lightbox-nav lightbox-prev" (click)="prevImage()" *ngIf="portfolioImages.length > 1">
+      <i class="ti ti-chevron-left"></i>
+    </button>
+    <button class="lightbox-nav lightbox-next" (click)="nextImage()" *ngIf="portfolioImages.length > 1">
+      <i class="ti ti-chevron-right"></i>
+    </button>
+
+    <!-- 縮圖導航 -->
+    <div class="lightbox-thumbnails">
+      <div *ngFor="let image of portfolioImages; let i = index" class="thumbnail-item"
+        [class.active]="i === currentImageIndex" (click)="currentImageIndex = i; isZoomed = false; zoomLevel = 1">
+        <img [src]="image" [alt]="'縮圖 ' + (i + 1)" loading="lazy" />
+      </div>
+    </div>
+  </div>
+</div>

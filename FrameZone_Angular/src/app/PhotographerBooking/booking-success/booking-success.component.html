@@ -1,0 +1,67 @@
+<div class="success-container animate-fade-in">
+    <div class="success-card">
+        <div class="confetti-decor"></div>
+
+        <div class="header-section">
+            <div class="success-icon">
+                <i class="ti ti-circle-check-filled"></i>
+            </div>
+            <h1>預約已受理！</h1>
+            <p class="subtitle">您的攝影行程已初步排定，請於 24 小時內完成付款以確保留位</p>
+        </div>
+
+        <div class="booking-summary">
+            <div class="summary-item">
+                <span class="label">預約編號</span>
+                <span class="value highlight">#{{ bookingData.bookingNumber }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="label">拍攝方案</span>
+                <span class="value">{{ bookingData.serviceName }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="label">攝影師</span>
+                <span class="value">{{ bookingData.photographerName }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="label">預約時間</span>
+                <span class="value">{{ bookingData.date | date: 'yyyy-MM-dd HH:mm' }}</span>
+            </div>
+        </div>
+
+        <div class="promise-section">
+            <h3><i class="ti ti-shield-check"></i> 服務承諾 (Service Commitments)</h3>
+            <div class="promise-grid">
+                <div class="promise-card">
+                    <i class="ti ti-photo-star"></i>
+                    <h4>精修張數</h4>
+                    <p>{{ bookingData.includedPhotos }} 張</p>
+                </div>
+                <div class="promise-card">
+                    <i class="ti ti-clock-bolt"></i>
+                    <h4>交付天數</h4>
+                    <p>{{ bookingData.deliveryDays }} 天</p>
+                </div>
+                <div class="promise-card">
+                    <i class="ti ti-calendar-event"></i>
+                    <h4>預計交付</h4>
+                    <p>{{ bookingData.expectedDeliveryDate | date: 'yyyy-MM-dd' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-alert">
+            <i class="ti ti-info-circle"></i>
+            <p>攝影師將在拍攝前 24 小時與您再次透過電話確認細節。</p>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-primary" (click)="goToMyBookings()">
+                前往我的預約
+            </button>
+            <button class="btn-outline" routerLink="/photographer-bookinghome">
+                返回首頁
+            </button>
+        </div>
+    </div>
+</div>

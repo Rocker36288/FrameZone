@@ -11,6 +11,7 @@
   border-bottom: 1px solid #eeeeee;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
+
 .search-field {
   flex: 1;
   display: flex;
@@ -31,19 +32,25 @@
 }
 
 .search-btn {
-  background: linear-gradient(135deg, #6b5cff 0%, #764ba2 100%);
-  color: #fff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
   border: none;
+  padding: 0 32px;
+  height: 40px;
   border-radius: 999px;
-  padding: 10px 24px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight:350;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
-  transition: transform 0.2s;
+  gap: 8px;
+  white-space: nowrap;
+  transition: all 0.3s ease;
 }
 
 .search-btn:hover {
-  transform: scale(1.02);
+  color: white;
+  filter: brightness(1.05); /* 稍微變亮一點點 */
+  transform: scale(1.02); /* 微微放大 2% */
+  box-shadow: 0 4px 12px rgba(107, 92, 255, 0.3);
 }

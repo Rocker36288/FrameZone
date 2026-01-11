@@ -16,11 +16,7 @@
           找到 <span class="text-primary">{{ resultsCount }}</span> 位專家
         </div>
         <div style="width: 150px">
-          <select
-            class="form-select form-select-sm"
-            [(ngModel)]="sortOrder"
-            (change)="onSortChange()"
-          >
+          <select class="form-select form-select-sm" [(ngModel)]="sortOrder" (change)="onSortChange()">
             <option value="default">預設排序</option>
             <option value="priceAsc">價格：低到高</option>
             <option value="priceDesc">價格：高到低</option>
@@ -29,16 +25,19 @@
         </div>
       </div>
 
+      <!-- 骨架屏載入區 -->
+      <main class="results-grid" *ngIf="isLoading">
+        <app-photographer-skeleton-card *ngFor="let i of [1,2,3,4,5,6]"></app-photographer-skeleton-card>
+      </main>
+
       <!-- 結果卡片網格 -->
-      <main class="results-grid">
-        <app-photographerbooking-card
-          *ngFor="let photographer of photographers"
-          [photographer]="photographer"
-        ></app-photographerbooking-card>
+      <main class="results-grid" *ngIf="!isLoading && photographers.length > 0">
+        <app-photographerbooking-card *ngFor="let photographer of photographers"
+          [photographer]="photographer"></app-photographerbooking-card>
       </main>
 
       <!-- 無結果提示 -->
-      <div *ngIf="resultsCount === 0" class="no-results">
+      <div *ngIf="!isLoading && photographers.length === 0" class="no-results">
         <i class="ti ti-photo-off"></i>
         <h4>找不到符合條件的攝影師</h4>
         <p>試試調整篩選條件或關鍵字</p>

@@ -1,0 +1,170 @@
+<nav class="independent-nav">
+    <div class="nav-content">
+        <div class="brand" routerLink="/home">
+            <i class="ti ti-camera"></i>
+            <span>FrameZone 預約中心</span>
+        </div>
+        <div class="nav-links">
+            <a routerLink="/photographer-bookinghome">探索攝影師</a>
+            <a routerLink="/home">返回首頁</a>
+        </div>
+    </div>
+</nav>
+
+<div class="full-page-wrapper">
+    <div class="booking-list-container animate-fade-in">
+        <div class="list-header">
+            <h2>我的預約管理</h2>
+            <p>在此查看您的拍攝進度與預約紀錄</p>
+        </div>
+
+        <div class="booking-grid">
+            <div *ngFor="let booking of bookings" class="booking-card">
+                <div class="card-top">
+                    <span class="booking-nr">#{{ booking.bookingNumber }}</span>
+                    <span [class]="'status-badge ' + getStatusClass(booking)">{{
+                        getDisplayStatus(booking)
+                        }}</span>
+                </div>
+
+                <div class="card-content">
+                    <div class="main-info" (click)="toggleDetails(booking)" style="cursor: pointer">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h3 class="service-name">{{ booking.serviceName }}</h3>
+                            <i class="ti" [ngClass]="
+                  booking.isExpanded ? 'ti-chevron-up' : 'ti-chevron-down'
+                " style="color: #64748b"></i>
+                        </div>
+                        <p class="photographer" [routerLink]="['/photographer-detail']"
+                            [queryParams]="{ id: booking.photographerId }"
+                            style="cursor: pointer; transition: color 0.2s;">
+                            <i class="ti ti-camera"></i> {{ booking.photographerName }}
+                            <small style="color: #64748b; margin-left: 4px;">(點擊查看專頁)</small>
+                        </p>
+                    </div>
+
+                    <!-- 點擊後才展開的詳情區 -->
+                    <div class="expandable-details" *ngIf="booking.isExpanded">
+                        <div class="detail-info">
+                            <div class="info-row">
+                                <i class="ti ti-calendar"></i>
+                                <span>{{
+                                    (booking.bookingStartDatetime || booking.bookingDate) | date : "yyyy-MM-dd HH:mm"
+                                    }}</span>
+                            </div>
+                            <div class="info-row">
+                                <i class="ti ti-coin"></i>
+                                <span class="price">TWD {{ (booking.servicePrice || booking.price) | number }}</span>
+                            </div>
+                        </div>
+
+                        <div class="promises-footer">
+                            <div class="promise-item">
+                                <span class="label">精修</span>
+                                <span class="value">{{ booking.includedPhotos }}</span>
+                            </div>
+                            <div class="promise-item">
+                                <span class="label">交付</span>
+                                <span class="value">{{ booking.deliveryDays }}天</span>
+                            </div>
+                            <div class="promise-item">
+                                <span class="label">預估</span>
+                                <span class="value">{{
+                                    booking.expectedDeliveryDate | date : "MM/dd"
+                                    }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <button class="btn-detail" (click)="viewVoucher(booking)">
+                        查看憑證
+                    </button>
+
+                    <button *ngIf="getDisplayStatus(booking) === '待付款'" class="btn-detail btn-pay"
+                        (click)="onPay(booking)">
+                        立即付款
+                    </button>
+
+                    <button *ngIf="booking.bookingStatus === '已完成' && !booking.isReviewed" class="btn-detail btn-review"
+                        (click)="openReviewModal(booking)">
+                        去評價
+                    </button>
+
+                    <button *ngIf="booking.isReviewed" class="btn-reviewed" disabled>
+                        已評價
+                    </button>
+
+                    <button
+                        *ngIf="booking.bookingStatus !== '已完成' && !booking.isReviewed && getDisplayStatus(booking) !== '待付款'"
+                        class="btn-contact">
+                        聯繫攝影師
+                    </button>
+                </div>
+            </div>
+
+            <div *ngIf="bookings.length === 0" class="empty-state">
+                <i class="ti ti-calendar-x"></i>
+                <p>目前尚無預約紀錄</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 模擬評價彈窗 -->
+<div class="review-modal-overlay" *ngIf="showReviewModal" (click)="closeReviewModal()">
+    <div class="review-modal-box animate-fade-in" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>撰寫攝影服務評價</h3>
+            <button class="close-btn" (click)="closeReviewModal()">
+                <i class="ti ti-x"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="target-info">
+                <i class="ti ti-camera"></i>
+                <span>正在為
+                    <strong>{{ currentReviewBooking?.photographerName }}</strong>
+                    進行評分</span>
+            </div>
+
+            <div class="rating-selector">
+                <div class="stars">
+                    <i *ngFor="let s of [1, 2, 3, 4, 5]" class="ti" [ngClass]="
+              s <= tempRating ? 'ti-star-filled text-warning' : 'ti-star'
+            " (click)="setRating(s)">
+                    </i>
+                </div>
+                <div class="rating-text">
+                    {{ tempRating }} 分 -
+                    {{
+                    tempRating >= 5
+                    ? "極致完美"
+                    : tempRating >= 4
+                    ? "品質優異"
+                    : tempRating >= 3
+                    ? "符合期待"
+                    : "尚可改善"
+                    }}
+                </div>
+            </div>
+
+            <div class="comment-area">
+                <label>服務心得回饋</label>
+                <textarea [(ngModel)]="tempComment" placeholder="分享拍攝過程中的閃光點，或是給攝影師的誠摯建議..."></textarea>
+            </div>
+
+            <div class="upload-simulation">
+                <div class="upload-btn">
+                    <i class="ti ti-photo-plus"></i>
+                    <span>上傳拍攝作品</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" (click)="closeReviewModal()">稍後再說</button>
+            <button class="btn-submit" (click)="submitReview()">正式提交評價</button>
+        </div>
+    </div>
+</div>

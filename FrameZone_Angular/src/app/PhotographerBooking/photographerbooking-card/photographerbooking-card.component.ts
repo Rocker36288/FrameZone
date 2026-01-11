@@ -13,6 +13,9 @@ export class PhotographerbookingCardComponent {
   constructor(private router: Router) { }
   @Input() photographer!: Photographer;
 
+  // 新增：追蹤圖片載入狀態
+  isLoaded: boolean = false;
+
   get formattedPrice(): string {
     // If we have services, show min price
     if (this.photographer.services && this.photographer.services.length > 0) {
@@ -24,30 +27,25 @@ export class PhotographerbookingCardComponent {
 
   get cardImage(): string {
     const apiBaseUrl = 'https://localhost:7213';
+    // 預設圖片路徑
+    let imageUrl = '/images/Photographer/photographercard001.png';
 
-    // 優先使用 portfolioFile 的第一張圖
     if (this.photographer.portfolioFile) {
-      const files = this.photographer.portfolioFile.split(',');
-      if (files.length > 0) {
-        const firstImage = files[0].trim();
-        if (firstImage.startsWith('http')) {
-          return firstImage;
-        }
-        return `${apiBaseUrl}${firstImage}`;
-      }
+      const firstImage = this.photographer.portfolioFile.split(',')[0].trim();
+      imageUrl = firstImage.startsWith('http') ? firstImage : `${apiBaseUrl}${firstImage}`;
+    } else if (this.photographer.portfolioUrl) {
+      imageUrl = this.photographer.portfolioUrl.startsWith('http') ?
+        this.photographer.portfolioUrl : `${apiBaseUrl}${this.photographer.portfolioUrl}`;
     }
 
-    // Fallback 到 portfolioUrl
-    if (this.photographer.portfolioUrl) {
-      if (this.photographer.portfolioUrl.startsWith('http')) {
-        return this.photographer.portfolioUrl;
-      }
-      return `${apiBaseUrl}${this.photographer.portfolioUrl}`;
-    }
-
-    // 最後 fallback 到預設圖片
-    return '/images/Photographer/photographercard001.png';
+    return imageUrl;
   }
+
+  // 新增：圖片載入完成的處理函式
+  onImageLoad(): void {
+    this.isLoaded = true;
+  }
+
 
   onViewDetails(): void {
     this.router.navigate(['/photographer-detail'], { queryParams: { id: this.photographer.photographerId } });

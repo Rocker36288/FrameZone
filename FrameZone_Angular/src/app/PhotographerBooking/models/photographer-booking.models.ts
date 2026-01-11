@@ -18,6 +18,10 @@ export interface PhotographerDto {
   minPrice?: number;
   totalBookings?: number;
   portfolioFile?: string;
+  serviceCities?: string[];
+  slotCount?: number;
+  earliestAvailableDate?: string;
+  isAvailableSoon?: boolean;
 }
 
 export interface ServiceDto {
@@ -40,8 +44,19 @@ export interface PhotographerSearchDto {
   tag?: string;
 }
 
+export interface SearchFilterParams {
+  keyword?: string;
+  location?: string;
+  serviceType?: string;
+  startDate?: string;
+  endDate?: string;
+  tag?: string;
+}
+
 export interface SearchFilters {
-  dateRange?: { start: Date | null; end: Date | null };
+  dateRange?: { start: Date | null; end: Date | null }; // Keep for UI if needed
+  startDate?: string; // Add these compatibility fields or just use them
+  endDate?: string;
   serviceType: string;
   keyword: string;
   locations: string[];
@@ -92,4 +107,15 @@ export interface SpecialtyTag {
 
 // Keep old Photographer interface for compatibility if needed, or remove it.
 // I'll alias it to PhotographerDto for now to minimize breakage if types are checked by name roughly
-export type Photographer = PhotographerDto; 
+export type Photographer = PhotographerDto;
+
+export interface CategoryWithTags {
+  categoryId: number;
+  categoryName: string;
+  tags: string[];
+}
+
+export interface ServiceType {
+  serviceTypeId: number;
+  serviceName: string;
+}

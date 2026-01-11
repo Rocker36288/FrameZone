@@ -1,0 +1,194 @@
+.success-container {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.success-card {
+    background: white;
+    width: 100%;
+    max-width: 600px;
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+    padding: 3rem;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.success-icon {
+    font-size: 5rem;
+    color: #22c55e;
+    margin-bottom: 1.5rem;
+    filter: drop-shadow(0 4px 10px rgba(34, 197, 94, 0.3));
+}
+
+h1 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: #64748b;
+    font-size: 1.1rem;
+    margin-bottom: 2.5rem;
+}
+
+.booking-summary {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.summary-item .label {
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.summary-item .value {
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.summary-item .value.highlight {
+    color: #6366f1;
+    font-family: monospace;
+}
+
+.promise-section {
+    text-align: left;
+    margin-bottom: 2.5rem;
+}
+
+.promise-section h3 {
+    font-size: 1rem;
+    color: #1e293b;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.promise-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.promise-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.25rem 0.75rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.promise-card:hover {
+    border-color: #6366f1;
+    transform: translateY(-5px);
+}
+
+.promise-card i {
+    font-size: 1.5rem;
+    color: #6366f1;
+    margin-bottom: 0.75rem;
+}
+
+.promise-card h4 {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 0.25rem;
+}
+
+.promise-card p {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.info-alert {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+    text-align: left;
+}
+
+.info-alert p {
+    font-size: 0.85rem;
+    color: #1e40af;
+    margin: 0;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-primary,
+.btn-outline {
+    flex: 1;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: #1e293b;
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #0f172a;
+}
+
+.btn-outline {
+    background: white;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-outline:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

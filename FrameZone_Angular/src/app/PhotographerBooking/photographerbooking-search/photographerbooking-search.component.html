@@ -1,34 +1,28 @@
 <!-- components/photographerbooking-search/photographerbooking-search.component.html -->
 <header class="search-bar">
-  <div class="search-field" style="flex: 1.2">
+  <div class="search-field" style="flex: 1.5; display: flex; gap: 5px; align-items: center;">
     <i class="ti ti-calendar"></i>
-    <input
-      type="text"
-      placeholder="拍攝日期或範圍"
-      [(ngModel)]="dateRange"
-      (change)="onDateChange($event)"
-    />
+    <input type="date" placeholder="開始" [(ngModel)]="startDate" (change)="onDateChange()" style="width: 130px;" />
+    <span>-</span>
+    <input type="date" placeholder="結束" [(ngModel)]="endDate" (change)="onDateChange()" style="width: 130px;" />
   </div>
 
   <div class="search-field" style="flex: 1.2">
     <i class="ti ti-camera"></i>
     <select [(ngModel)]="selectedServiceType" (change)="onServiceTypeChange()">
-      <option value="">所有服務類型</option>
-      <option *ngFor="let type of serviceTypes" [value]="type">
-        {{ type }}
+      <option value="">所有拍攝服務類型</option>
+      <option *ngFor="let type of serviceTypes" [value]="type.serviceTypeId">
+        {{ type.serviceName }}
       </option>
     </select>
   </div>
 
   <div class="search-field" style="flex: 2">
     <i class="ti ti-search"></i>
-    <input
-      type="text"
-      placeholder="搜尋姓名、器材或細分風格..."
-      [(ngModel)]="searchKeyword"
-      (input)="onKeywordChange()"
-    />
+    <input type="text" placeholder="搜尋姓名、風格..." [ngModel]="searchKeyword" (ngModelChange)="onKeywordInput($event)" />
   </div>
 
-  <button class="search-btn" (click)="onSearch()">搜尋</button>
+  <button class="search-btn btn-secondary" (click)="onReset()">
+    <i class="ti ti-trash"></i> 清除所有條件
+  </button>
 </header>

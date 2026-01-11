@@ -1,0 +1,53 @@
+.nav-back-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 0 32px;
+    height: 40px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 350;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+.nav-back-btn i {
+    font-size: 18px;
+}
+
+.nav-back-btn:hover {
+    color: white;
+    filter: brightness(1.05);
+    /* 稍微變亮一點點 */
+    transform: scale(1.02);
+    /* 微微放大 2% */
+    box-shadow: 0 4px 12px rgba(107, 92, 255, 0.3);
+}
+
+/* 右側 icon 按鈕 */
+.nav-icon-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.nav-icon-btn i {
+    font-size: 18px;
+}
+
+.nav-icon-btn:hover {
+    background: #f3f4f6;
+}

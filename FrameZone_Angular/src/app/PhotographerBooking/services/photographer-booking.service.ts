@@ -9,7 +9,9 @@ import {
   AvailableSlotDto,
   BookingDto,
   CreateBookingDto,
-  PhotographerSearchDto
+  PhotographerSearchDto,
+  CategoryWithTags,
+  ServiceType
 } from '../models/photographer-booking.models';
 
 
@@ -32,6 +34,10 @@ export class PhotographerBookingService {
   });
 
   filters$ = this.filtersSubject.asObservable();
+
+  // 全域載入狀態
+  private loadingSubject = new BehaviorSubject<boolean>(false);
+  loading$ = this.loadingSubject.asObservable();
 
   // Mock data for UI helpers
   private readonly locationList = ['台北', '新北', '桃園', '台中', '台南', '高雄', '基隆', '宜蘭', '新竹'];
@@ -76,20 +82,69 @@ export class PhotographerBookingService {
 
   // Search using frontend filters - converting to backend call + client side filtering if needed
   // For now, let's try to map some filters to backend params and do the rest client side if backend is limited
-  searchWithFilters(filters: SearchFilters): Observable<PhotographerDto[]> {
+  searchWithFilters(filters: Partial<SearchFilters>): Observable<PhotographerDto[]> {
     let params = new HttpParams();
     if (filters.keyword) params = params.set('keyword', filters.keyword);
-    if (filters.serviceType) params = params.set('studioType', filters.serviceType); // Assuming studioType maps to serviceType
-    // locations logic can be complex if multiple, backend supports single location param currently.
-    // We might need to filter client side for multiple locations or update backend.
+    if (filters.serviceType) params = params.set('serviceTypeId', filters.serviceType); // Map to backend param
+    if (filters.startDate) params = params.set('startDate', filters.startDate);
+    if (filters.endDate) params = params.set('endDate', filters.endDate);
+
+    // 如果只有一個地區,傳給後端
+    if (filters.locations && filters.locations.length === 1) {
+      params = params.set('location', filters.locations[0]);
+    }
+
+    // 如果只有一個標籤,傳給後端
+    if (filters.tags && filters.tags.length === 1) {
+      params = params.set('tag', filters.tags[0]);
+    }
 
     return this.http.get<PhotographerDto[]>(this.apiUrl, { params }).pipe(
       map(photographers => {
-        // Apply client-side filters for things backend doesn't handle yet
+        // Apply client-side filters for multiple selections
         return photographers.filter(p => {
-          const matchLoc = filters.locations.length === 0 || filters.locations.some(l => p.studioAddress.includes(l));
-          // const matchPrice... (Need to check service prices)
-          return matchLoc;
+          // 地區篩選: 如果有選擇地區,攝影師的服務城市列表必須包含至少一個選中的地區
+          const locations = filters.locations || [];
+          const matchLoc = locations.length === 0 ||
+            locations.some(l => p.serviceCities?.includes(l));
+
+          // 標籤篩選: 如果有選擇標籤,攝影師必須擁有至少一個選中的標籤
+          const tags = filters.tags || [];
+          const matchTags = tags.length === 0 ||
+            tags.some(tag => p.specialties.some(s => s.includes(tag)));
+
+          // 價格篩選
+          const maxPrice = filters.maxPrice ?? 10000;
+          const matchPrice = !p.minPrice || p.minPrice <= maxPrice;
+
+          // 評分篩選
+          // 評分篩選
+          const minRating = filters.minRating ?? 0;
+          const matchRating = !p.rating || p.rating >= minRating;
+
+          // 服務類型篩選 (serviceType 為 ID)
+          const matchServiceType = !filters.serviceType ||
+            p.services?.some(s => s.serviceTypeId.toString() === filters.serviceType!.toString());
+
+          return matchLoc && matchTags && matchPrice && matchRating && matchServiceType;
+        });
+      }),
+      map(photographers => {
+        // 實作排序邏輯
+        const sortOrder = filters.sortOrder;
+        if (!sortOrder || sortOrder === 'default') return photographers;
+
+        return [...photographers].sort((a, b) => {
+          switch (sortOrder) {
+            case 'priceAsc':
+              return (a.minPrice || 0) - (b.minPrice || 0);
+            case 'priceDesc':
+              return (b.minPrice || 0) - (a.minPrice || 0);
+            case 'ratingDesc':
+              return (b.rating || 0) - (a.rating || 0);
+            default:
+              return 0;
+          }
         });
       })
     );
@@ -109,8 +164,8 @@ export class PhotographerBookingService {
 
   // --- Helper Methods ---
 
-  getServiceTypes(): string[] {
-    return this.serviceTypes;
+  getServiceTypes(): Observable<ServiceType[]> {
+    return this.http.get<ServiceType[]>('https://localhost:7213/api/ServiceTypes');
   }
 
   getLocations(): string[] {
@@ -130,6 +185,16 @@ export class PhotographerBookingService {
     return this.http.get<string[]>(`https://localhost:7213/api/SpecialtyTags/popular?count=${count}`);
   }
 
+  // Get available service cities
+  getServiceCities(): Observable<string[]> {
+    return this.http.get<string[]>('https://localhost:7213/api/ServiceAreas/cities');
+  }
+
+  // Get specialty categories with tags
+  getCategoriesWithTags(): Observable<CategoryWithTags[]> {
+    return this.http.get<CategoryWithTags[]>('https://localhost:7213/api/SpecialtyCategories');
+  }
+
   getTagsByCategory(catId: number): string[] {
     return this.specialtyTags
       .filter((tag) => tag.catId === catId)
@@ -146,6 +211,7 @@ export class PhotographerBookingService {
   }
 
   resetFilters(): void {
+    this.setLoading(true);
     this.filtersSubject.next({
       serviceType: '',
       keyword: '',
@@ -155,5 +221,9 @@ export class PhotographerBookingService {
       minRating: 0,
       sortOrder: 'default',
     });
+  }
+
+  setLoading(value: boolean): void {
+    this.loadingSubject.next(value);
   }
 }

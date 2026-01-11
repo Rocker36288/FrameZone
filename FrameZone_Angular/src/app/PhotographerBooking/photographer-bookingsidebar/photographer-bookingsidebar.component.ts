@@ -3,6 +3,9 @@ import { Component, Input, OnChanges } from '@angular/core';
 import { ServiceDto, AvailableSlotDto } from '../models/photographer-booking.models';
 import { PhotographerBookingService } from '../services/photographer-booking.service';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+
 
 @Component({
   selector: 'app-photographer-bookingsidebar',
@@ -13,11 +16,17 @@ import { FormsModule } from '@angular/forms';
 export class PhotographerBookingsidebarComponent implements OnChanges {
   @Input() selectedService: ServiceDto | null = null;
   @Input() photographerId!: number;
+  @Input() photographerName: string = '';
 
   availableSlots: AvailableSlotDto[] = [];
   selectedSlotId: number | null = null;
 
-  constructor(private bookingService: PhotographerBookingService) { }
+  constructor(
+    private bookingService: PhotographerBookingService,
+    private authService: AuthService,
+    private router: Router
+  ) { }
+
 
   selectedDate: Date | null = null;
   additionalFees: number = 0;
@@ -70,21 +79,35 @@ export class PhotographerBookingsidebarComponent implements OnChanges {
       return;
     }
 
-    const bookingDto = {
-      photographerId: this.photographerId,
-      availableSlotId: this.selectedSlotId,
-      userId: 1, // TODO: Get from auth service
-      location: this.selectedService.serviceName, // simplified
-      paymentMethodId: 1 // simplified/mock
-    };
+    // 檢查登入狀態
+    if (!this.authService.isAuthenticated()) {
+      alert('請先登入後再進行預約');
+      this.router.navigate(['/login']);
+      return;
+    }
 
-    this.bookingService.createBooking(bookingDto).subscribe({
-      next: (res) => {
-        alert('預約成功! 編號: ' + res.bookingId);
-        // Navigate to success page or booking history
-      },
-      error: (err) => alert('預約失敗: ' + err.message)
+    const currentUser = this.authService.getCurrentUser();
+    const userId = currentUser?.userId || 0;
+
+    // 前端模擬成功流程
+    const bookingId = Math.floor(Math.random() * 100000);
+    const bookingNumber = `BK${new Date().toISOString().slice(0, 10).replace(/-/g, '')}${Math.floor(Math.random() * 10000)}`;
+
+    this.router.navigate(['/photographer-booking/success'], {
+      state: {
+        bookingId: bookingId,
+        bookingNumber: bookingNumber,
+        serviceName: this.selectedService.serviceName,
+        price: this.totalPrice,
+        includedPhotos: this.selectedService.includedPhotos || 30,
+        deliveryDays: this.selectedService.deliveryDays || 7,
+        location: this.selectedService.serviceName,
+        date: this.selectedDate?.toISOString(),
+        photographerName: this.photographerName,
+        photographerId: this.photographerId
+      }
     });
+
   }
 
   onSelectDate(): void {

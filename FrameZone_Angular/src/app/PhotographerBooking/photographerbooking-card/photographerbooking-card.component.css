@@ -13,14 +13,116 @@
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
 }
 
-.card img {
-  width: 100%;
-  aspect-ratio: 3/2;
-  object-fit: cover;
+/* 圖片容器 */
+.image-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
 }
 
-.card-body {
-  padding: 16px;
+/* 圖片內容 */
+.card img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* 圖片載入完成：淡入 */
+.card img.loaded {
+  opacity: 1;
+}
+
+/* 骨架背景顏色建議使用 Tabler 的 $gray-100 */
+.skeleton-loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background-color: #f6f8fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 2;
+}
+
+/* 流光掃描動畫 */
+.shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.5) 50%,
+      rgba(255, 255, 255, 0) 100%);
+  animation: shimmer-animation 1.5s infinite linear;
+}
+
+@keyframes shimmer-animation {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+
+/* 右上角二擇一標籤：黑色半透明遮罩 */
+.availability-tag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+
+  background: rgba(0, 0, 0, 0.6);
+  /* 黑色半透明 */
+  backdrop-filter: blur(4px);
+  /* 微量模糊增加質感 */
+  padding: 4px 10px;
+  border-radius: 6px;
+  /* 稍微方正，與原本時段樣式一致 */
+
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+
+/* 狀態點：僅在顯示「近期有空」時出現 */
+.status-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #2fb344;
+  /* 成功綠 */
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(47, 179, 68, 0.8);
+}
+
+/* 圖示微調：用於「時段數」 */
+.availability-tag i {
+  font-size: 13px;
+  opacity: 0.9;
 }
 
 .card-tags {
@@ -51,25 +153,23 @@
   color: #222;
 }
 
-.btn {
+/* 查看詳情按鈕 */
+.btn-detail {
+  background: #f8f9fa;
+  color: #6b5cff;
+  border: 1px solid #e9ecef;
   padding: 6px 14px;
   border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.2s;
-  border: none;
+  transition: all 0.2s;
 }
 
-.btn-ghost-primary {
-  background: #f8f9fa;
-  color: #6b5cff;
-  border: 1px solid #e9ecef;
-}
-
-.btn-ghost-primary:hover {
+.btn-detail:hover {
   background: #6b5cff;
-  color: #fff;
+  color: white;
+  border-color: #6b5cff;
 }
 
 .text-warning {
@@ -123,4 +223,38 @@
 
 .align-items-center {
   align-items: center;
+}
+
+/* Tabler 骨架脈動效果 */
+.placeholder {
+  display: inline-block;
+  vertical-align: middle;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  min-height: 1em;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 讓文字骨架也有流光感 */
+.placeholder::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(90deg,
+      rgba(255, 255, 255, 0) 0,
+      rgba(255, 255, 255, 0.2) 20%,
+      rgba(255, 255, 255, 0.5) 60%,
+      rgba(255, 255, 255, 0));
+  animation: shimmer-text 2s infinite;
+  content: '';
+}
+
+@keyframes shimmer-text {
+  100% {
+    transform: translateX(100%);
+  }
 }

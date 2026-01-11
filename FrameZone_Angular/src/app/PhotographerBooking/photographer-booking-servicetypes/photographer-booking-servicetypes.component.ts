@@ -16,25 +16,25 @@ export class PhotographerBookingServicetypesComponent {
       title: '婚禮攝影',
       desc: '紀錄婚禮當天的重要時刻與感動回憶',
       img: '/images/Photographer/Type-Wedding.png', // 圖片路徑
-      link: '/photographerbooking-page-search',
+      link: '/photographerbooking-page-search?serviceTypeId=1',
     },
     {
       title: '商業攝影',
       desc: '拍攝高質感商品照片，提升銷售力',
       img: 'images/Photographer/Type-Product.png',
-      link: '/photographerbooking-page-search',
+      link: '/photographerbooking-page-search?serviceTypeId=3',
     },
     {
       title: '活動攝影',
       desc: '完整記錄企業活動與品牌形象',
       img: 'images/Photographer/Type-Event.jpg',
-      link: '/photographerbooking-page-search',
+      link: '/photographerbooking-page-search?serviceTypeId=4',
     },
     {
       title: '空間建築',
       desc: '拍攝室內空間與建築展示照片',
       img: 'images/Photographer/Type-Space.png',
-      link: '/photographerbooking-page-search',
+      link: '/photographerbooking-page-search?serviceTypeId=6',
     },
   ];
 

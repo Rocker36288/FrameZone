@@ -1,11 +1,20 @@
 import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
-
-import { isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme-toggle.component';
+import { UserMenuComponent } from '../../shared/components/user-menu/user-menu.component';
+import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
 
 @Component({
   selector: 'app-photographerbooking-header',
-  imports: [RouterModule],
+  standalone: true,
+  imports: [
+    RouterModule,
+    CommonModule,
+    ThemeToggleComponent,
+    UserMenuComponent,
+    NotificationBellComponent,
+  ],
   templateUrl: './photographerbooking-header.component.html',
   styleUrl: './photographerbooking-header.component.css',
 })

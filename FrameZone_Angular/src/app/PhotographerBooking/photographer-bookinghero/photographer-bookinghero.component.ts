@@ -8,6 +8,8 @@ interface CarouselImage {
   author: string;
   style: string;
 }
+import { ServiceType } from '../models/photographer-booking.models';
+
 @Component({
   selector: 'app-photographer-bookinghero',
   imports: [CommonModule, FormsModule],
@@ -37,8 +39,13 @@ export class PhotographerBookingheroComponent implements OnInit {
 
   // 搜尋欄
   city = '';
-  date = '';
+  startDate = '';
+  endDate = '';
   type = '';
+
+  // 動態資料來源
+  cities: string[] = [];
+  serviceTypes: ServiceType[] = [];
 
   // 快速標籤
   tags = ['韓系婚紗', '寵物攝影', '日系寫真'];
@@ -47,7 +54,22 @@ export class PhotographerBookingheroComponent implements OnInit {
   ngOnInit() {
     setInterval(() => this.nextSlide(), 5000);
 
-    // 從後端載入熱門標籤顯示3
+    // 1. 載入地區
+    this.bookingService.getServiceCities().subscribe({
+      next: (cities) => this.cities = cities,
+      error: (err) => {
+        console.error('Error loading cities', err);
+        this.cities = this.bookingService.getLocations(); // fallback
+      }
+    });
+
+    // 2. 載入服務類型
+    this.bookingService.getServiceTypes().subscribe({
+      next: (types) => this.serviceTypes = types,
+      error: (err) => console.error('Error loading service types', err)
+    });
+
+    // 3. 從後端載入熱門標籤顯示3
     this.bookingService.getPopularTags(3).subscribe({
       next: (tags) => {
         this.tags = tags;
@@ -66,9 +88,12 @@ export class PhotographerBookingheroComponent implements OnInit {
   onSearch() {
     const queryParams: any = {};
 
-    if (this.city) queryParams.city = this.city;
-    if (this.date) queryParams.date = this.date;
-    if (this.type) queryParams.type = this.type;
+    if (this.city) queryParams.location = this.city; // Map 'city' to 'location' param
+    if (this.type) queryParams.serviceTypeId = this.type; // Map 'type' to 'serviceTypeId'
+
+    // 日期範圍條件
+    if (this.startDate) queryParams.startDate = this.startDate;
+    if (this.endDate) queryParams.endDate = this.endDate;
 
     // 沒條件也可以 → {}
     this.router.navigate(['/photographerbooking-page-search'], { queryParams });

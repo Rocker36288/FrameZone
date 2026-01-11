@@ -2,12 +2,14 @@ import { PhotographerbookingCardComponent } from './../photographerbooking-card/
 import { PhotographerbookingSearchComponent } from './../photographerbooking-search/photographerbooking-search.component';
 import { PhotographerbookingHeaderComponent } from './../photographerbooking-header/photographerbooking-header.component';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { PhotographerBookingService } from '../services/photographer-booking.service';
 import { PhotographerbookingSidebarSearchComponent } from '../photographerbooking-sidebar-search/photographerbooking-sidebar-search.component';
+import { PhotographerSkeletonCardComponent } from '../photographer-skeleton-card/photographer-skeleton-card.component';
 import {
   Photographer,
   SearchFilters,
@@ -22,6 +24,7 @@ import {
     PhotographerbookingSearchComponent,
     PhotographerbookingCardComponent,
     PhotographerbookingSidebarSearchComponent,
+    PhotographerSkeletonCardComponent,
   ],
   templateUrl: './photographerbooking-page-search.component.html',
   styleUrl: './photographerbooking-page-search.component.css',
@@ -30,21 +33,56 @@ export class PhotographerbookingPageSearchComponent
   implements OnInit, OnDestroy {
   photographers: Photographer[] = [];
   sortOrder: 'default' | 'priceAsc' | 'priceDesc' | 'ratingDesc' = 'default';
+  isLoading: boolean = false;
 
   private destroy$ = new Subject<void>();
 
-  constructor(private bookingService: PhotographerBookingService) { }
+  constructor(
+    private bookingService: PhotographerBookingService,
+    private route: ActivatedRoute
+  ) { }
 
   ngOnInit(): void {
-    // 訂閱篩選條件變更
+    // 1. Subscribe to URL Query Params (From Hero or external link)
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        // Only update if params exist to avoid clearing default state on pure nav if handled elsewhere
+        // But normally we want URL to drive state.
+        if (Object.keys(params).length > 0) {
+          const newFilters: Partial<SearchFilters> = {};
+
+          if (params['keyword']) newFilters.keyword = params['keyword'];
+          if (params['location']) newFilters.locations = [params['location']]; // Support single location from query
+
+          if (params['serviceTypeId']) {
+            // Ensure it handles string from URL
+            newFilters.serviceType = params['serviceTypeId'];
+          }
+
+          if (params['startDate']) newFilters.startDate = params['startDate'];
+          if (params['endDate']) newFilters.endDate = params['endDate'];
+          if (params['tag']) newFilters.tags = [params['tag']];
+
+          // Update service state which will trigger the filter subscription below
+          this.bookingService.updateFilters(newFilters);
+        }
+      });
+
+    // 2. 訂閱篩選條件變更 (Global State -> UI Search)
     this.bookingService.filters$
       .pipe(takeUntil(this.destroy$))
       .subscribe((filters) => {
+        this.sortOrder = filters.sortOrder;
         this.performSearch(filters);
       });
 
-    // 初始搜尋
-    this.performSearch(this.bookingService.getCurrentFilters());
+    // 3. 訂閱全域載入狀態同步
+    this.bookingService.loading$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(loading => {
+        this.isLoading = loading;
+      });
   }
 
   ngOnDestroy(): void {
@@ -53,14 +91,17 @@ export class PhotographerbookingPageSearchComponent
   }
 
   performSearch(filters: SearchFilters): void {
+    this.bookingService.setLoading(true);
     const updatedFilters = { ...filters, sortOrder: this.sortOrder };
     this.bookingService.searchWithFilters(updatedFilters).subscribe({
       next: (data) => {
         this.photographers = data;
-        // Client side sorting if backend doesn't handle it yet (DTO-based sorting)
-        // this.sortPhotographers(); 
+        this.bookingService.setLoading(false);
       },
-      error: (err) => console.error('Error searching', err)
+      error: (err) => {
+        console.error('Error searching', err);
+        this.bookingService.setLoading(false);
+      }
     });
   }
 

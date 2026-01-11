@@ -8,6 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\image\photographerbooking\portfolios\p4_01.jpg" />
+    <Content Remove="wwwroot\image\photographerbooking\portfolios\p4_02.jpg" />
+    <Content Remove="wwwroot\image\photographerbooking\portfolios\p4_03.jpg" />
+    <Content Remove="wwwroot\image\photographerbooking\portfolios\p4_04.jpg" />
+    <Content Remove="wwwroot\image\photographerbooking\portfolios\p4_05.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="efpt.config.json.user" />
   </ItemGroup>
 
