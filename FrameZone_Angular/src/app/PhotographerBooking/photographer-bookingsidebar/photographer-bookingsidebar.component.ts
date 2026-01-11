@@ -94,7 +94,7 @@ export class PhotographerBookingsidebarComponent implements OnChanges {
     const bookingNumber = `BK${new Date().toISOString().slice(0, 10).replace(/-/g, '')}${Math.floor(Math.random() * 10000)}`;
 
     this.router.navigate(['/photographer-booking/success'], {
-      queryParams: {
+      state: {
         bookingId: bookingId,
         bookingNumber: bookingNumber,
         serviceName: this.selectedService.serviceName,

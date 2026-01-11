@@ -78,7 +78,7 @@
                 </div>
 
                 <div class="card-actions">
-                    <button class="btn-detail" [routerLink]="['/photographer-booking/success']" [queryParams]="booking">
+                    <button class="btn-detail" (click)="viewVoucher(booking)">
                         查看憑證
                     </button>
 

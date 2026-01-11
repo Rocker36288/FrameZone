@@ -20,10 +20,11 @@ export class BookingSuccessComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.route.queryParams.subscribe(params => {
-            if (Object.keys(params).length === 0) return;
+        // 從 Router State 獲取資料，這樣參數就不會顯示在網址上
+        const state = history.state;
 
-            this.bookingData = { ...params };
+        if (state && state.bookingNumber) {
+            this.bookingData = { ...state };
 
             // 計算預計交付日期
             if (this.bookingData.date && this.bookingData.deliveryDays) {
@@ -35,13 +36,16 @@ export class BookingSuccessComponent implements OnInit {
             // 同步到模擬列表服務
             this.mockService.addBooking({
                 ...this.bookingData,
-                bookingNumber: this.mockService.generateBookingNumber(), // 生成符合規範的編號
                 bookingStartDatetime: this.bookingData.date,
                 servicePrice: this.bookingData.price,
                 bookingStatus: '已確認',
                 paymentStatus: '未付款'
             });
-        });
+        } else {
+            // 如果沒有 state (例如直接重整頁面)，導回預約中心
+            // 或者您可以選擇保留 queryParams 作為降級方案，但這裡為了隱私優先選擇導回
+            this.router.navigate(['/booking-center']);
+        }
     }
 
     goToMyBookings(): void {

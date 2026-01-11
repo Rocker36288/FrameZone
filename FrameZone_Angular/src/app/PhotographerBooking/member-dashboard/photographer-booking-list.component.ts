@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { MockBookingService } from '../services/mock-booking.service';
 
 @Component({
@@ -19,7 +19,10 @@ export class PhotographerBookingListComponent implements OnInit {
     tempRating: number = 5;
     tempComment: string = '';
 
-    constructor(private mockService: MockBookingService) { }
+    constructor(
+        private mockService: MockBookingService,
+        private router: Router
+    ) { }
 
     ngOnInit(): void {
         this.mockService.getBookings().subscribe((data) => {
@@ -115,5 +118,16 @@ export class PhotographerBookingListComponent implements OnInit {
             });
             alert('支付成功！預約已確認。');
         }
+    }
+
+    viewVoucher(booking: any): void {
+        // 使用 state 傳遞資料，避免參數出現在網址
+        this.router.navigate(['/photographer-booking/success'], {
+            state: {
+                ...booking,
+                price: booking.servicePrice || booking.price,
+                date: booking.bookingStartDatetime || booking.bookingDate
+            }
+        });
     }
 }
