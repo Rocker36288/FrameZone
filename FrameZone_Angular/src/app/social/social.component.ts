@@ -21,6 +21,8 @@ export class SocialComponent {
   private destroyRef = inject(DestroyRef);
 
   selectedFriend: { id: number; name: string; avatar?: string } | null = null;
+  isLeftSidebarOpen = false;
+  isRightSidebarOpen = false;
 
   constructor() {
     this.chatState.openChat$
@@ -36,10 +38,33 @@ export class SocialComponent {
 
   onFriendSelected(friend: { id: number; name: string }) {
     this.selectedFriend = friend;
+    this.closeRightSidebar();
   }
 
   onChatClosed() {
     this.selectedFriend = null;
+  }
+
+  toggleLeftSidebar() {
+    this.isLeftSidebarOpen = !this.isLeftSidebarOpen;
+    if (this.isLeftSidebarOpen) {
+      this.isRightSidebarOpen = false;
+    }
+  }
+
+  closeLeftSidebar() {
+    this.isLeftSidebarOpen = false;
+  }
+
+  toggleRightSidebar() {
+    this.isRightSidebarOpen = !this.isRightSidebarOpen;
+    if (this.isRightSidebarOpen) {
+      this.isLeftSidebarOpen = false;
+    }
+  }
+
+  closeRightSidebar() {
+    this.isRightSidebarOpen = false;
   }
 
 

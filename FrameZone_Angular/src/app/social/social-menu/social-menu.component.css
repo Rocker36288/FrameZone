@@ -149,3 +149,26 @@
   color: #2d2d2d;
   /* 改用更深的灰黑色 */
 }
+
+@media (max-width: 991.98px) {
+  :host.compact .menu-card .card-body {
+    padding: 0.75rem 0.5rem;
+  }
+
+  :host.compact .menu-title {
+    display: none;
+  }
+
+  :host.compact .menu-item-btn {
+    justify-content: center;
+    padding: 10px 0;
+  }
+
+  :host.compact .menu-item-name {
+    display: none;
+  }
+
+  :host.compact .icon-circle {
+    margin-right: 0;
+  }
+}

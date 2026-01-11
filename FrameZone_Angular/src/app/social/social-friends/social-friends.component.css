@@ -134,3 +134,37 @@
   background-color: #e0e0e0;
   box-shadow: none;
 }
+
+@media (max-width: 991.98px) {
+  :host.compact .friend-list-card .card-body {
+    padding: 0.75rem 0.5rem;
+  }
+
+  :host.compact .custom-search {
+    display: none;
+  }
+
+  :host.compact .section-btn {
+    display: none;
+  }
+
+  :host.compact hr {
+    display: none;
+  }
+
+  :host.compact .friend-item {
+    justify-content: center;
+    padding: 6px 0;
+  }
+
+  :host.compact .friend-name,
+  :host.compact .section-arrow,
+  :host.compact .text-muted,
+  :host.compact .unread-badge {
+    display: none;
+  }
+
+  :host.compact .friend-avatar {
+    margin-right: 0;
+  }
+}

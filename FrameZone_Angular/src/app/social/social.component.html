@@ -1,33 +1,42 @@
 <section>
   <div class="container-fluid bg-light" style="min-height:100vh;">
-    <div class="row">
-      <!-- 左側欄（功能選單） -->
-      <div class="col-md-3 col-sm-12 p-2">
+    <div class="row social-row">
+      <div class="col-md-3 col-sm-12 p-2 side-col left-side" [class.drawer-open]="isLeftSidebarOpen">
         <div class="sidebar">
-          <app-social-menu></app-social-menu>
+          <app-social-menu (click)="closeLeftSidebar()"></app-social-menu>
         </div>
       </div>
-      <!-- 中間欄（貼文區域） -->
-      <div class="col-md-6 col-sm-12 p-2">
+
+      <div class="col-md-6 col-sm-12 p-2 middle-col">
         <div class="middle">
+          <div class="drawer-controls">
+            <button class="menu-drawer-toggle" type="button" (click)="toggleLeftSidebar()"
+              [attr.aria-pressed]="isLeftSidebarOpen" aria-label="Toggle menu">
+              <i class="bi" [ngClass]="isLeftSidebarOpen ? 'bi-x-lg' : 'bi-list'"></i>
+            </button>
+            <button class="menu-drawer-toggle right-toggle" type="button" (click)="toggleRightSidebar()"
+              [attr.aria-pressed]="isRightSidebarOpen" aria-label="Toggle friends">
+              <i class="bi" [ngClass]="isRightSidebarOpen ? 'bi-x-lg' : 'bi-people'"></i>
+            </button>
+          </div>
           <router-outlet></router-outlet>
         </div>
       </div>
-      <!-- 右側欄（朋友列表 / 廣告） -->
-      <div class="col-md-3 col-sm-12 p-2">
+
+      <div class="col-md-3 col-sm-12 p-2 side-col right-side" [class.drawer-open]="isRightSidebarOpen">
         <div class="sidebar">
           <app-social-friends (friendSelected)="onFriendSelected($event)"></app-social-friends>
         </div>
-        <!-- 回到最上面按鈕 -->
-        @if(showBackToTop){
-        <button ngClass="btn-up" id="backToTopBtn" (click)="backToTop()">
-          ↑
-        </button>
-        }
       </div>
     </div>
+    @if(showBackToTop){
+    <button ngClass="btn-up" id="backToTopBtn" (click)="backToTop()">
+      ↑
+    </button>
+    }
+    <div class="drawer-overlay" [class.show]="isLeftSidebarOpen || isRightSidebarOpen"
+      (click)="closeLeftSidebar(); closeRightSidebar()"></div>
   </div>
-
 </section>
-<!-- 聊天室 -->
+
 <app-social-chat [selectedFriend]="selectedFriend" (closed)="onChatClosed()"></app-social-chat>
