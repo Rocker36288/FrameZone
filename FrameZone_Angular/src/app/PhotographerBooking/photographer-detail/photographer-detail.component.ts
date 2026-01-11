@@ -40,6 +40,8 @@ export class PhotographerDetailComponent implements OnInit {
   reviews: Review[] = [];
   portfolioImages: string[] = [];
   faqs: FAQ[] = [];
+  mockRating: number = 5.0;
+  mockReviewCount: number = 3;
 
   selectedService: ServiceDto | null = null;
   isFavorite: boolean = false;
@@ -131,20 +133,45 @@ export class PhotographerDetailComponent implements OnInit {
       },
       {
         question: '天氣不佳的改期政策',
-        answer: '若氣象局發佈降雨機率 > 60%，可於拍攝前 24 小時免費改期一次。若因天災等不可抗力因素則無條件退還訂金。',
+        answer: '若氣象局發佈降雨機率 > 60%，可於拍攝前 24 小時免費改期一次。若因天災等不可APP力因素則無條件退還訂金。',
       },
     ];
+    this.mockRating = 4.9;
     this.reviews = [
       {
         reviewId: 1,
-        reviewerName: 'Wei-Ting',
+        reviewerName: '簡宜君',
         rating: 5,
-        reviewContent: '攝影師非常專業,拍攝過程氣氛很輕鬆!',
-        createdAt: '2024年12月',
-        avatarUrl: 'https://i.pravatar.cc/100?u=jane',
+        reviewContent: '攝影師非常專業, 拍攝過程氣氛很輕鬆！對於不習慣面對鏡頭的我們提供了很好的引導，最後的作品色調非常優雅，家人都很滿意。',
+        createdAt: '2025年12月',
+        avatarUrl: 'https://i.pravatar.cc/150?u=jane',
+        photos: [
+          'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=400',
+          'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=400'
+        ]
+      },
+      {
+        reviewId: 2,
+        reviewerName: '陳志雄',
+        rating: 5,
+        reviewContent: '這次的戶外親子寫真拍得很棒。攝影師對小孩非常有耐性，能捕捉到很自然的互動瞬間。修圖速度也很快，值得推薦！',
+        createdAt: '2025年11月',
+        avatarUrl: 'https://i.pravatar.cc/150?u=chen',
+        photos: [
+          'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=400'
+        ]
+      },
+      {
+        reviewId: 3,
+        reviewerName: 'Linda Wang',
+        rating: 4,
+        reviewContent: '整體的服務體驗很好，從諮詢到拍攝都很流暢。攝影師非常有美感，捕捉到很多我沒想過的視角。',
+        createdAt: '2025年10月',
+        avatarUrl: 'https://i.pravatar.cc/150?u=linda',
         photos: []
       }
     ];
+    this.mockReviewCount = this.reviews.length;
   }
 
   onServiceSelected(service: ServiceDto): void { // Start of unchanged methods
