@@ -52,10 +52,10 @@
         </div>
 
         <div class="action-buttons">
-            <button class="btn-primary" routerLink="/photographer-bookinghome">
-                探索更多攝影師
+            <button class="btn-primary" (click)="goToMyBookings()">
+                前往我的預約
             </button>
-            <button class="btn-outline" (click)="goHome()">
+            <button class="btn-outline" routerLink="/photographer-bookinghome">
                 返回首頁
             </button>
         </div>

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { MockBookingService } from '../services/mock-booking.service';
 
 @Component({
     selector: 'app-booking-success',
@@ -14,11 +15,14 @@ export class BookingSuccessComponent implements OnInit {
 
     constructor(
         private route: ActivatedRoute,
-        private router: Router
+        private router: Router,
+        private mockService: MockBookingService
     ) { }
 
     ngOnInit(): void {
         this.route.queryParams.subscribe(params => {
+            if (Object.keys(params).length === 0) return;
+
             this.bookingData = { ...params };
 
             // 計算預計交付日期
@@ -27,7 +31,18 @@ export class BookingSuccessComponent implements OnInit {
                 date.setDate(date.getDate() + parseInt(this.bookingData.deliveryDays));
                 this.bookingData.expectedDeliveryDate = date;
             }
+
+            // 同步到模擬列表服務
+            this.mockService.addBooking({
+                ...this.bookingData,
+                bookingDate: new Date(this.bookingData.date),
+                status: '已確認'
+            });
         });
+    }
+
+    goToMyBookings(): void {
+        this.router.navigate(['/booking-center']);
     }
 
     goHome(): void {

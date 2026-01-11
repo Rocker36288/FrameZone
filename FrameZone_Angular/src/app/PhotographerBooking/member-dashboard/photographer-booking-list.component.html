@@ -1,0 +1,75 @@
+<nav class="independent-nav">
+    <div class="nav-content">
+        <div class="brand" routerLink="/home">
+            <i class="ti ti-camera"></i>
+            <span>FrameZone 預約中心</span>
+        </div>
+        <div class="nav-links">
+            <a routerLink="/photographer-bookinghome">探索攝影師</a>
+            <a routerLink="/home">返回首頁</a>
+        </div>
+    </div>
+</nav>
+
+<div class="full-page-wrapper">
+    <div class="booking-list-container animate-fade-in">
+        <div class="list-header">
+            <h2>我的預約管理</h2>
+            <p>在此查看您的拍攝進度與預約紀錄</p>
+        </div>
+
+        <div class="booking-grid">
+            <div *ngFor="let booking of bookings" class="booking-card">
+                <div class="card-top">
+                    <span class="booking-nr">#{{ booking.bookingNumber }}</span>
+                    <span [class]="'status-badge ' + getStatusClass(booking.status)">{{ booking.status }}</span>
+                </div>
+
+                <div class="card-content">
+                    <div class="main-info">
+                        <h3 class="service-name">{{ booking.serviceName }}</h3>
+                        <p class="photographer"><i class="ti ti-camera"></i> {{ booking.photographerName || '特約攝影師' }}
+                        </p>
+                    </div>
+
+                    <div class="detail-info">
+                        <div class="info-row">
+                            <i class="ti ti-calendar"></i>
+                            <span>{{ booking.bookingDate | date: 'yyyy-MM-dd HH:mm' }}</span>
+                        </div>
+                        <div class="info-row">
+                            <i class="ti ti-coin"></i>
+                            <span class="price">TWD {{ booking.price | number }}</span>
+                        </div>
+                    </div>
+
+                    <div class="promises-footer">
+                        <div class="promise-item">
+                            <span class="label">精修</span>
+                            <span class="value">{{ booking.includedPhotos }}</span>
+                        </div>
+                        <div class="promise-item">
+                            <span class="label">交付</span>
+                            <span class="value">{{ booking.deliveryDays }}天</span>
+                        </div>
+                        <div class="promise-item">
+                            <span class="label">預計</span>
+                            <span class="value">{{ booking.expectedDeliveryDate | date: 'MM/dd' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <button class="btn-detail" [routerLink]="['/photographer-booking/success']"
+                        [queryParams]="booking">查看憑證</button>
+                    <button class="btn-contact">聯繫攝影師</button>
+                </div>
+            </div>
+
+            <div *ngIf="bookings.length === 0" class="empty-state">
+                <i class="ti ti-calendar-x"></i>
+                <p>目前尚無預約紀錄</p>
+            </div>
+        </div>
+    </div>
+</div>
