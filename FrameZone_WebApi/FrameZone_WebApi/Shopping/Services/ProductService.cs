@@ -249,6 +249,48 @@ namespace FrameZone_WebApi.Shopping.Services
             return MapToDtoList(products, favoriteIds);
         }
 
+        // 根據 UserId 取得商品列表 (分頁投影版)
+        public ProductPagedListDto GetProductsByUserIdPaged(long userId, int page, int pageSize, int? categoryId = null, string keyword = null, long? observerUserId = null)
+        {
+            var (items, total) = _repo.GetSellerProductsPagedProjected(userId, page, pageSize, categoryId, keyword);
+            
+            // 處理收藏狀態
+            if (observerUserId.HasValue)
+            {
+                var favoriteIds = _repo.GetFavoriteProductIds(observerUserId.Value);
+                var favoriteSet = new HashSet<long>(favoriteIds);
+                foreach (var item in items)
+                {
+                    item.IsFavorite = favoriteSet.Contains(item.ProductId);
+                }
+            }
+
+            // 獲取賣家基本資訊 (一次性)
+            var user = _repo.GetUserWithProfile(userId);
+            string baseUrl = "https://localhost:7213";
+            var sellerDto = new SellerDto
+            {
+                UserId = user.UserId,
+                DisplayName = user.UserProfile?.DisplayName ?? user.Account,
+                Avatar = !string.IsNullOrEmpty(user.UserProfile?.Avatar) 
+                    ? $"{baseUrl}{user.UserProfile.Avatar}" 
+                    : null
+            };
+
+            foreach (var item in items)
+            {
+                item.Seller = sellerDto;
+            }
+
+            return new ProductPagedListDto
+            {
+                Items = items,
+                TotalCount = total,
+                PageIndex = page,
+                PageSize = pageSize
+            };
+        }
+
         // 取得賣家公開資料 (優化版：避免載入所有商品)
         public SellerProfileDto GetSellerProfile(long userId)
         {

@@ -136,12 +136,71 @@ namespace FrameZone_WebApi.Shopping.Repositories
         }
 
         // 取得特定使用者的商品 (預設載入 User 資料，用於通用場景)
+        // 取得特定使用者的商品 (進階分頁與投影版)
+        public (List<DTOs.ProductListDto> items, int total) GetSellerProductsPagedProjected(long userId, int page, int pageSize, int? categoryId = null, string keyword = null)
+        {
+            var query = _context.Products.AsQueryable();
+
+            query = query.Where(p => p.UserId == userId 
+                         && p.Status == "上架中" 
+                         && p.AuditStatus.Contains("通過"));
+
+            if (categoryId.HasValue && categoryId > 0)
+            {
+                query = query.Where(p => p.ProductSellerCategoryMappins.Any(m => m.SellerCategoryId == categoryId.Value));
+            }
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                var lowerKeyword = keyword.ToLower();
+                query = query.Where(p => p.ProductName.ToLower().Contains(lowerKeyword) || (p.Description != null && p.Description.ToLower().Contains(lowerKeyword)));
+            }
+
+            var total = query.Count();
+
+            var items = query
+                .OrderByDescending(p => p.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new DTOs.ProductListDto
+                {
+                    ProductId = p.ProductId,
+                    UserId = p.UserId,
+                    ProductName = p.ProductName,
+                    Description = p.Description,
+                    CreatedAt = p.CreatedAt,
+                    Price = p.ProductSpecifications.OrderBy(s => s.Price).Select(s => s.Price).FirstOrDefault(),
+                    MainImageUrl = p.ProductImages.Where(i => i.IsMainImage).Select(i => i.ImageUrl).FirstOrDefault() 
+                                   ?? p.ProductImages.OrderBy(i => i.DisplayOrder).Select(i => i.ImageUrl).FirstOrDefault(),
+                    SellerCategoryIds = p.ProductSellerCategoryMappins.Select(m => m.SellerCategoryId).ToList(),
+                    AverageRating = (float)(_context.Reviews.Where(r => r.ReviewType == "Product" && r.OrderDetails.Specification.ProductId == p.ProductId).Average(r => (double?)r.Rating) ?? 0),
+                    ReviewCount = _context.Reviews.Count(r => r.ReviewType == "Product" && r.OrderDetails.Specification.ProductId == p.ProductId)
+                })
+                .ToList();
+
+            // 修正圖片路徑 (補上 BaseUrl)
+            string baseUrl = "https://localhost:7213";
+            foreach (var item in items)
+            {
+                if (!string.IsNullOrEmpty(item.MainImageUrl))
+                {
+                    item.MainImageUrl = baseUrl + item.MainImageUrl;
+                }
+                else
+                {
+                    item.MainImageUrl = baseUrl + "/image/shopping/products/default.jpg";
+                }
+            }
+
+            return (items, total);
+        }
+
         public List<Product> GetProductsByUserId(long userId)
         {
             return _context.Products
                 .Include(p => p.ProductImages)
                 .Include(p => p.ProductSpecifications)
-                .Include(p => p.ProductSellerCategoryMappins)
+                .Include(p => p.ProductSellerCategoryMappins) // 加入分類關聯
                 .Include(p => p.User)
                 .ThenInclude(u => u.UserProfile)
                 .Where(p => p.UserId == userId 
