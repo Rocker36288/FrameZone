@@ -238,17 +238,18 @@
           <div class="row g-3">
             <div *ngFor="let fav of displayFavorites" class="col-md-4">
               <div class="card fav-card h-100 shadow-none border">
-                <div class="position-relative overflow-hidden">
+                <div class="position-relative overflow-hidden cursor-pointer" (click)="goToProduct(fav.productId)">
                   <img class="card-img-top object-cover" style="height: 180px;" [src]="fav.imageUrl">
                   <div class="fav-badge-overlay">
                     <button class="btn btn-icon btn-white rounded-circle text-danger shadow-sm"
-                      (click)="toggleFavorite(fav)">
+                      (click)="toggleFavorite(fav); $event.stopPropagation()">
                       <i class="ti ti-heart-filled"></i>
                     </button>
                   </div>
                 </div>
                 <div class="card-body d-flex flex-column p-3">
-                  <h4 class="card-title mb-1 text-truncate-2">{{ fav.name }}</h4>
+                  <h4 class="card-title mb-1 text-truncate-2 cursor-pointer" (click)="goToProduct(fav.productId)">{{
+                    fav.name }}</h4>
                   <div class="text-muted small mb-3">收藏於 {{ fav.date }}</div>
                   <div class="mt-auto d-flex align-items-center justify-content-between">
                     <span class="fw-bold text-primary fs-2">${{ fav.price }}</span>

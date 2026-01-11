@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FooterComponent } from "../../shared/components/footer/footer.component";
 import { FavoriteService, FavoriteItem } from '../shared/services/favorite.service';
 import { CartService } from '../shared/services/cart.service';
@@ -164,8 +164,14 @@ export class ShoppingBuyerCenterComponent {
     private shoppingUserService: ShoppingUserService,
     private addressService: AddressService,
     private storeService: StoreService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
+
+  // 跳轉到商品詳情頁面
+  goToProduct(productId: number) {
+    this.router.navigate(['/shopping/product-detail', productId]);
+  }
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {

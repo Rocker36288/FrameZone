@@ -152,6 +152,24 @@ namespace FrameZone_WebApi.Shopping.Repositories
                 .ToList();
         }
 
+        // 取得特定使用者的商品數量 (輕量查詢，不載入商品資料)
+        public int GetProductCountByUserId(long userId)
+        {
+            return _context.Products
+                .Count(p => p.UserId == userId 
+                         && p.Status == "上架中" 
+                         && p.AuditStatus.Contains("通過"));
+        }
+
+        // 取得使用者及其 Profile (輕量查詢)
+        public User GetUserWithProfile(long userId)
+        {
+            return _context.Users
+                .Include(u => u.UserProfile)
+                .AsNoTracking()
+                .FirstOrDefault(u => u.UserId == userId);
+        }
+
         // 取得商品評分資訊 (平均分數與總評價數)
         public (float average, int count) GetProductRatingInfo(long productId)
         {

@@ -229,18 +229,21 @@ namespace FrameZone_WebApi.Shopping.Services
             return MapToDtoList(products, favoriteIds);
         }
 
-        // 取得賣家公開資料
+        // 取得賣家公開資料 (優化版：避免載入所有商品)
         public SellerProfileDto GetSellerProfile(long userId)
         {
             var storeInfo = _repo.GetStoreInfoByUserId(userId);
-            var products = _repo.GetProductsByUserId(userId);
             
-            // 如果連基本 User 都找不到，可能需要從 UserRepo 拿，但這裡我們先從產品中拿 User 實體（如果有的話）
-            // 或是更直接一點，我們假設 userId 是有效的
-            var firstProduct = products.FirstOrDefault();
-            var user = firstProduct?.User;
+            // 只查詢商品數量，不載入完整商品資料
+            var productCount = _repo.GetProductCountByUserId(userId);
+            
+            // 直接查詢使用者資訊，不透過商品
+            var user = _repo.GetUserWithProfile(userId);
 
             string baseUrl = "https://localhost:7213";
+            
+            // 只查一次評分
+            var ratingSummary = _reviewService.GetSellerRatingSummary(userId);
 
             return new SellerProfileDto
             {
@@ -258,9 +261,9 @@ namespace FrameZone_WebApi.Shopping.Services
                 Bio = user?.UserProfile?.Bio ?? "這個賣家很懶，什麼都沒留下。",
                 StoreDescription = storeInfo?.StoreDescription ?? user?.UserProfile?.Bio ?? "歡迎來到我的賣場！",
                 Location = user?.UserProfile?.Location ?? "台灣",
-                ProductCount = products.Count,
-                Rating = _reviewService.GetSellerRatingSummary(userId).AverageRating,
-                ReviewCount = _reviewService.GetSellerRatingSummary(userId).ReviewCount
+                ProductCount = productCount,
+                Rating = ratingSummary.AverageRating,
+                ReviewCount = ratingSummary.ReviewCount
             };
         }
 
