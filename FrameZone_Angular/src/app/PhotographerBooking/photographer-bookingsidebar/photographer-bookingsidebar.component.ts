@@ -16,6 +16,7 @@ import { AuthService } from '../../core/services/auth.service';
 export class PhotographerBookingsidebarComponent implements OnChanges {
   @Input() selectedService: ServiceDto | null = null;
   @Input() photographerId!: number;
+  @Input() photographerName: string = '';
 
   availableSlots: AvailableSlotDto[] = [];
   selectedSlotId: number | null = null;
@@ -101,7 +102,9 @@ export class PhotographerBookingsidebarComponent implements OnChanges {
         includedPhotos: this.selectedService.includedPhotos || 30,
         deliveryDays: this.selectedService.deliveryDays || 7,
         location: this.selectedService.serviceName,
-        date: this.selectedDate?.toISOString()
+        date: this.selectedDate?.toISOString(),
+        photographerName: this.photographerName,
+        photographerId: this.photographerId
       }
     });
 

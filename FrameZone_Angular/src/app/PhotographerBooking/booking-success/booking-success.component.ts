@@ -35,8 +35,11 @@ export class BookingSuccessComponent implements OnInit {
             // 同步到模擬列表服務
             this.mockService.addBooking({
                 ...this.bookingData,
-                bookingDate: new Date(this.bookingData.date),
-                status: '已確認'
+                bookingNumber: this.mockService.generateBookingNumber(), // 生成符合規範的編號
+                bookingStartDatetime: this.bookingData.date,
+                servicePrice: this.bookingData.price,
+                bookingStatus: '已確認',
+                paymentStatus: '未付款'
             });
         });
     }

@@ -42,7 +42,7 @@
     <div class="col-lg-4">
       <!-- 側邊預約卡片 -->
       <app-photographer-bookingsidebar [selectedService]="selectedService"
-        [photographerId]="photographer?.photographerId || 0">
+        [photographerId]="photographer?.photographerId || 0" [photographerName]="photographer?.displayName || ''">
       </app-photographer-bookingsidebar>
     </div>
   </div>
