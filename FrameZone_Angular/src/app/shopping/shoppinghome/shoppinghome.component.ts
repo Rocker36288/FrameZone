@@ -36,11 +36,11 @@ export class ShoppinghomeComponent {
   // 分類資料
   categories = [
     { name: '相機', image: 'images/products/1.jpg', keyword: '相機' },
-    { name: '拍立得', image: 'images/products/2.jpg', keyword: '拍立得' },
-    { name: '攝影機', image: 'images/products/4.jpg', keyword: '攝影機' },
-    { name: '閃光燈', image: 'images/products/5.jpg', keyword: '閃光燈' },
-    { name: '腳架', image: 'images/products/6.jpg', keyword: '腳架' },
-    { name: '底片', image: 'images/products/7.jpg', keyword: '底片' },
+    { name: '拍立得', image: 'images/products/6.jpg', keyword: '拍立得' },
+    { name: '攝影機', image: 'images/products/17.jpg', keyword: '攝影機' },
+    { name: '閃光燈', image: 'images/products/7.jpg', keyword: '閃光燈' },
+    { name: '腳架', image: 'images/products/2.jpg', keyword: '腳架' },
+    { name: '底片', image: 'images/products/3.jpg', keyword: '底片' },
     { name: '相機包', image: 'images/products/8.jpg', keyword: '相機包' },
     // 創作分類使用多個關鍵字，用 | 分隔
     { name: '創作', image: 'images/products/1.jpg', keyword: '明信片|T恤|書|創作|手作|藝術|攝影集' }
