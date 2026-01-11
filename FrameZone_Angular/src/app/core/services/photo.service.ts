@@ -133,11 +133,17 @@ export class PhotoService {
   /**
    * 取得標籤階層（用於 Sidebar）
    */
-  getTagHierarchy(): Observable<TagHierarchyResponse> {
-    return this.http.get<TagHierarchyResponse>(
-      `${this.apiUrl}/tags/hierarchy`
-    );
-  }
+  getTagHierarchy(aiSource?: 'Claude' | 'Azure' | 'All') {
+  const options = aiSource && aiSource !== 'All'
+    ? { params: { aiSource } }
+    : {};
+
+  return this.http.get<TagHierarchyResponse>(
+    `${this.apiUrl}/tags/hierarchy`,
+    options
+  );
+}
+
 
   /**
    * 查詢照片（支援標籤篩選、多條件篩選）

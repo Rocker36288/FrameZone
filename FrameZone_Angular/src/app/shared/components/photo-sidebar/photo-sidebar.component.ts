@@ -60,7 +60,7 @@ export class PhotoSidebarComponent implements OnInit {
     try {
       this.isLoading.set(true);
 
-      const response = await firstValueFrom(this.photoService.getTagHierarchy());
+      const response = await firstValueFrom(this.photoService.getTagHierarchy('Claude'));
 
       if (response && response.success) {
         // 初始化展開狀態

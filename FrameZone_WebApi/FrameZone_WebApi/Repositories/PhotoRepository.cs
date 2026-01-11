@@ -1795,7 +1795,7 @@ namespace FrameZone_WebApi.Repositories
         /// </summary>
         /// <param name="userId">使用者 ID</param>
         /// <returns>分類與標籤列表</returns>
-        public async Task<List<CategoryWithTagsDTO>> GetTagHierarchyAsync(long userId)
+        public async Task<List<CategoryWithTagsDTO>> GetTagHierarchyAsync(long userId, string? aiSource = null)
         {
             try
             {
@@ -1824,14 +1824,25 @@ namespace FrameZone_WebApi.Repositories
 
                 // 2️⃣ 取得每個標籤的照片數量
                 var tagPhotoCounts = await GetTagPhotoCountsAsync(userId);
+                var aiTagCounts = await GetAiTagPhotoCountsAsync(userId, aiSource);
+                var aiTagIdSet = aiTagCounts.Keys.ToHashSet();
 
                 // 3️⃣ 針對每個分類，取得其標籤並建立階層結構
                 foreach (var category in categories)
                 {
-                    // 取得該分類下的所有標籤
-                    var tags = await _context.PhotoTags
+                    var isAiCategory = category.CategoryCode == "AI";
+
+                    var tagsQuery = _context.PhotoTags
                         .AsNoTracking()
-                        .Where(t => t.CategoryId == category.CategoryId && t.IsActive)
+                        .Where(t => t.CategoryId == category.CategoryId && t.IsActive);
+
+                    if (isAiCategory && !string.IsNullOrWhiteSpace(aiSource) && !aiSource.Equals("All", StringComparison.OrdinalIgnoreCase))
+                    {
+                        tagsQuery = tagsQuery.Where(t => aiTagIdSet.Contains(t.TagId));
+                    }
+
+                    // 取得該分類下的所有標籤
+                    var tags = await tagsQuery
                         .OrderBy(t => t.DisplayOrder)
                         .ThenBy(t => t.TagName)
                         .Select(t => new TagTreeNodeDTO
@@ -1841,15 +1852,17 @@ namespace FrameZone_WebApi.Repositories
                             TagType = t.TagType,
                             CategoryId = t.CategoryId,
                             ParentTagId = t.ParentTagId,
-                            PhotoCount = tagPhotoCounts.ContainsKey(t.TagId) ? tagPhotoCounts[t.TagId] : 0,
+
+                            // ✅ AI 分類用 aiTagCounts，其它分類用原本 tagPhotoCounts
+                            PhotoCount = isAiCategory
+                                ? (aiTagCounts.ContainsKey(t.TagId) ? aiTagCounts[t.TagId] : 0)
+                                : (tagPhotoCounts.ContainsKey(t.TagId) ? tagPhotoCounts[t.TagId] : 0),
+
                             DisplayOrder = t.DisplayOrder,
                             Children = new List<TagTreeNodeDTO>()
                         })
                         .ToListAsync();
 
-                    _logger.LogInformation("分類 [{CategoryName}] 有 {Count} 個標籤", category.CategoryName, tags.Count);
-
-                    // 4️⃣ 建立階層結構（父子關係）
                     category.Tags = BuildTagHierarchy(tags);
                 }
 
@@ -1862,6 +1875,35 @@ namespace FrameZone_WebApi.Repositories
                 throw;
             }
         }
+
+        private async Task<Dictionary<int, int>> GetAiTagPhotoCountsAsync(long userId, string? aiSource)
+        {
+            var source = string.IsNullOrWhiteSpace(aiSource) || aiSource.Equals("All", StringComparison.OrdinalIgnoreCase)
+                ? null
+                : aiSource.Trim();
+
+            var q = _context.PhotoAiclassificationSuggestions
+                .AsNoTracking()
+                .Where(s => s.Photo.UserId == userId && s.Photo.IsDeleted == false)
+                .Where(s => s.TagId != null); // ✅ 避免 int?
+
+            if (source != null)
+                q = q.Where(s => s.Source == source);
+
+            var tagCounts = await q
+                .GroupBy(s => s.TagId!.Value) // ✅ 用 int 當 key
+                .Select(g => new
+                {
+                    TagId = g.Key,
+                    Count = g.Select(x => x.PhotoId).Distinct().Count()
+                })
+                .ToDictionaryAsync(x => x.TagId, x => x.Count);
+
+            return tagCounts;
+        }
+
+
+
 
         /// <summary>
         /// 取得每個標籤的照片數量

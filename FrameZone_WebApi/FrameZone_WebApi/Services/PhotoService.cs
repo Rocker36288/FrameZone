@@ -1105,14 +1105,14 @@ namespace FrameZone_WebApi.Services
         /// </summary>
         /// <param name="userId">使用者 ID</param>
         /// <returns>標籤階層回應</returns>
-        public async Task<TagHierarchyResponseDTO> GetTagHierarchyAsync(long userId)
+        public async Task<TagHierarchyResponseDTO> GetTagHierarchyAsync(long userId, string? aiSource)
         {
             try
             {
                 _logger.LogInformation("🏷️ 開始取得標籤階層，UserId: {UserId}", userId);
 
                 // 從 Repository 取得標籤階層
-                var categories = await _photoRepository.GetTagHierarchyAsync(userId);
+                var categories = await _photoRepository.GetTagHierarchyAsync(userId, aiSource);
 
                 if (categories == null || !categories.Any())
                 {

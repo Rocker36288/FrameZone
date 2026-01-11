@@ -55,7 +55,7 @@ namespace FrameZone_WebApi.Services
         /// </summary>
         /// <param name="userId">使用者 ID</param>
         /// <returns>標籤階層回應</returns>
-        Task<TagHierarchyResponseDTO> GetTagHierarchyAsync(long userId);
+        Task<TagHierarchyResponseDTO> GetTagHierarchyAsync(long userId, string? aiSource = null);
 
         /// <summary>
         /// 根據標籤篩選照片（使用現有的 QueryPhotosAsync，這是一個便捷方法）

@@ -436,7 +436,7 @@ namespace FrameZone_WebApi.Repositories
         /// </summary>
         Task<PhotoTag> GetTagByIdAsync(int tagId);
 
-        Task<List<CategoryWithTagsDTO>> GetTagHierarchyAsync(long userId);
+        Task<List<CategoryWithTagsDTO>> GetTagHierarchyAsync(long userId, string? aiSource = null);
         Task<Dictionary<int, int>> GetTagPhotoCountsAsync(long userId);
         Task<PhotoTag> CreateCustomTagAsync(string tagName, int categoryId, int? parentTagId, long userId);
     }
