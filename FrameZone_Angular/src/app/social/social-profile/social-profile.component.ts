@@ -3,7 +3,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { SocialPostsListComponent } from '../social-posts-list/social-posts-list.component';
-import { SocialPostsImagesComponent } from '../social-posts-images/social-posts-images.component';
 import { AuthService } from '../../core/services/auth.service';
 import { PostService } from '../services/post.service';
 import { SocialProfileSummary } from '../models/social-profile.models';
@@ -15,7 +14,7 @@ import { combineLatest, distinctUntilChanged, map, of, startWith, switchMap, tak
 @Component({
   selector: 'app-social-profile',
   standalone: true,
-  imports: [AsyncPipe, RouterLink, SocialPostsListComponent, SocialPostsImagesComponent], // 在 Angular 19 中，內建控制流不需要 CommonModule
+  imports: [AsyncPipe, RouterLink, SocialPostsListComponent], // 在 Angular 19 中，內建控制流不需要 CommonModule
   templateUrl: './social-profile.component.html',
   styleUrl: './social-profile.component.css'
 })
@@ -108,7 +107,6 @@ export class SocialProfileComponent {
   private normalizeView(view: string | null): string {
     switch (view) {
       case 'all':
-      case 'photos':
       case 'following':
       case 'followers':
         return view;

@@ -35,7 +35,6 @@
 
     <nav class="tab-nav">
       <button [class.active]="currentView() === 'all'" (click)="setView('all')">全部貼文</button>
-      <button [class.active]="currentView() === 'photos'" (click)="setView('photos')">貼文照片</button>
       <button [class.active]="currentView() === 'following'" (click)="setView('following')">追蹤中</button>
       <button [class.active]="currentView() === 'followers'" (click)="setView('followers')">粉絲</button>
     </nav>
@@ -51,9 +50,6 @@
     }
     }
 
-    @case ('photos') {
-    <app-social-posts-images></app-social-posts-images>
-    }
 
     @case ('following') {
     @if (following$ | async; as following) {

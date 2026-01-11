@@ -1,12 +1,12 @@
 @for (comment of comments; track comment.commentId) {
-  <div class="comment-wrapper mt-3">
-    <div class="d-flex align-items-start">
+<div class="comment-wrapper mt-3">
+  <div class="d-flex align-items-start">
     <a class="me-2 d-inline-block" [routerLink]="['/social/profile', comment.userId]">
       <img [src]="getCommentUserAvatar(comment)" class="rounded-circle"
         style="width:32px; height:32px; object-fit: cover;">
     </a>
 
-    <div class="bg-light rounded p-2 flex-grow-1 shadow-sm position-relative">
+    <div class="comment-bubble rounded p-2 flex-grow-1 shadow-sm position-relative">
       <div class="d-flex justify-content-between align-items-start mb-1">
 
         <!-- 左側：名稱 + 時間（同一行） -->
@@ -15,9 +15,14 @@
             {{ comment.displayName }}
           </span>
 
-          <span class="text-muted" style="font-size: 0.7rem; white-space: nowrap;">
-            {{ comment.updatedAt || comment.createdAt | date:'yyyy-MM-dd HH:mm' }}
+          <span class="text-muted" style="font-size: 0.7rem; white-space: nowrap;"
+            [attr.title]="isCommentEdited(comment) ? '建立時間: ' + (comment.createdAt | date:'yyyy-MM-dd HH:mm') : null">
+            {{ getCommentDisplayTime(comment) | date:'yyyy-MM-dd HH:mm' }}
+            @if (isCommentEdited(comment)) {
+            <span> 已編輯</span>
+            }
           </span>
+
         </div>
 
         <!-- 右側：功能選單 -->
@@ -63,12 +68,25 @@
     </button>
 
   </div>
+  @if (comment.replies && comment.replies.length > 0) {
+  <div class="ms-5 mt-1">
+    <button class="btn btn-sm btn-link text-decoration-none p-0 me-3 small"
+      (click)="toggleReplies(comment.commentId); $event.stopPropagation()">
+      @if (isRepliesVisible(comment.commentId)) {
+      隱藏回覆
+      } @else {
+      顯示 {{ comment.replies.length }} 則回覆
+      }
+    </button>
+  </div>
+  }
 
   @if (activeReplyId === comment.commentId) {
   <div class="ms-5 mt-2 d-flex align-items-center" (click)="$event.stopPropagation()">
     <div class="position-relative flex-grow-1">
-      <input type="text" [(ngModel)]="replyContent" (keyup.enter)="submitReply(comment.commentId)"
-        class="form-control form-control-sm rounded-pill bg-light border-0 pe-5" placeholder="撰寫回覆...">
+      <input #replyInput type="text" [(ngModel)]="replyContent" (keyup.enter)="submitReply(comment.commentId)"
+        class="form-control form-control-sm rounded-pill bg-light border-0 pe-5 comment-input-custom"
+        placeholder="輸入回覆...">
 
       <button type="button" class="btn position-absolute end-0 top-50 translate-middle-y p-0 me-3 btn-send-comment"
         (click)="submitReply(comment.commentId)">
@@ -86,7 +104,7 @@
   }
 
 
-  @if (comment.replies && comment.replies.length > 0) {
+  @if (comment.replies && comment.replies.length > 0 && isRepliesVisible(comment.commentId)) {
   <div class="ms-4 ps-2 border-start">
     <app-social-comments [comments]="comment.replies" [postId]="postId" (refresh)="onChildRefresh()">
     </app-social-comments>

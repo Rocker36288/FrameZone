@@ -8,9 +8,36 @@
 }
 
 /* 讓氣泡寬度不要撐滿，更像聊天對話框 */
-.bg-light {
+.comment-bubble {
   background-color: #f0f2f5 !important;
   max-width: 90%;
 }
 
-/* 如果是深色模式，可以自行微調這裡 */
+
+.comment-input-custom {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  transition: all 0.2s ease;
+}
+
+.comment-input-custom:focus {
+  box-shadow: none !important;
+  background-color: #f0f2f5 !important;
+}
+
+.btn-send-comment {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  color: #0d6efd;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.btn-send-comment:hover,
+.btn-send-comment:focus,
+.btn-send-comment:active {
+  background-color: transparent !important;
+  color: #0a58ca !important;
+  transform: translateY(-50%) scale(1.1) !important;
+}

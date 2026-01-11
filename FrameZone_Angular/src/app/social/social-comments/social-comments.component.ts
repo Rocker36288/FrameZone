@@ -1,5 +1,5 @@
 import { AuthService } from './../../core/services/auth.service';
-import { Component, Input, Output, EventEmitter, inject, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, HostListener, ElementRef, ViewChildren, QueryList } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CommentDto } from '../models/CommentDto';
@@ -17,6 +17,8 @@ export class SocialCommentsComponent {
   @Input() comments: CommentDto[] = [];
   @Input() postId!: number; // 從父元件傳進來，知道是哪則貼文
   @Output() refresh = new EventEmitter<void>(); // 用於通知父元件重新整理列表
+  @ViewChildren('replyInput') replyInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
 
   private commentService = inject(CommentService);
 
@@ -27,6 +29,7 @@ export class SocialCommentsComponent {
   activeMenuId: number | null = null;
   editingCommentId: number | null = null;
   editContent = "";
+  expandedReplies = new Set<number>();
 
 
   constructor() { }
@@ -51,6 +54,13 @@ export class SocialCommentsComponent {
     const initial = (comment.displayName || 'U').charAt(0).toUpperCase();
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
   }
+  getCommentDisplayTime(comment: CommentDto): string {
+    if (comment.updatedAt && comment.updatedAt !== comment.createdAt) return comment.updatedAt;
+    return comment.createdAt;
+  }
+  isCommentEdited(comment: CommentDto): boolean {
+    return !!comment.updatedAt && comment.updatedAt !== comment.createdAt;
+  }
 
   toggleMenu(commentId: number, event: MouseEvent) {
     event.stopPropagation();
@@ -61,11 +71,27 @@ export class SocialCommentsComponent {
   closeMenu() {
     this.activeMenuId = null;
   }
+  toggleReplies(commentId: number) {
+    if (this.expandedReplies.has(commentId)) {
+      this.expandedReplies.delete(commentId);
+      return;
+    }
+    this.expandedReplies.add(commentId);
+  }
+
+  isRepliesVisible(commentId: number): boolean {
+    return this.expandedReplies.has(commentId);
+  }
 
   toggleReply(commentId: number) {
     this.activeReplyId =
       this.activeReplyId === commentId ? null : commentId;
+
+    if (this.activeReplyId) {
+      setTimeout(() => this.replyInputs.first?.nativeElement.focus());
+    }
   }
+
 
   submitReply(parentCommentId: number) {
     if (!this.replyContent.trim()) return;
@@ -78,6 +104,7 @@ export class SocialCommentsComponent {
 
     this.commentService.createComment(dto).subscribe({
       next: () => {
+        this.expandedReplies.add(parentCommentId); // 送出後自動展開該留言的回覆
         this.activeReplyId = null;
         this.replyContent = "";
         this.refresh.emit(); // 通知最上層父元件重新抓取資料

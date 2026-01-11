@@ -10,7 +10,7 @@
     </div>
 
     <div class="friend-list-content">
-      <button class="friend-btn rounded" type="button" (click)="toggleSection('recent')">
+      <button class="friend-btn rounded section-btn" type="button" (click)="toggleSection('recent')">
         <span class="friend-name">最近聊天</span>
         <span class="section-arrow">
           <i class="bi" [ngClass]="openSection.recent ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
@@ -22,7 +22,7 @@
       }
       @else {
       @for (c of getFilteredRecentChats(); track c.roomId) {
-      <button class="friend-btn rounded" type="button"
+      <button class="friend-btn rounded friend-item" type="button"
         (click)="selectFriend({ id: c.targetUserId, name: c.targetUserName, avatar: c.targetUserAvatar }); $event.stopPropagation()">
         <img [src]="getRecentAvatar(c)" class="friend-avatar" [alt]="c.targetUserName" />
         <div class="d-flex flex-column align-items-start">
@@ -39,7 +39,7 @@
 
       <hr class="my-3">
 
-      <button class="friend-btn rounded" type="button" (click)="toggleSection('following')">
+      <button class="friend-btn rounded section-btn" type="button" (click)="toggleSection('following')">
         <span class="friend-name">追蹤中 ({{ following.length }})</span>
         <span class="section-arrow">
           <i class="bi" [ngClass]="openSection.following ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
@@ -51,7 +51,7 @@
       }
       @else {
       @for (f of getFilteredFollowing(); track f.userId) {
-      <button class="friend-btn rounded" type="button"
+      <button class="friend-btn rounded friend-item" type="button"
         (click)="selectFriend({ id: f.userId, name: f.displayName, avatar: f.avatar }); $event.stopPropagation()">
         <img [src]="getFollowAvatar(f)" class="friend-avatar" [alt]="f.displayName" />
         <span class="friend-name">{{ f.displayName }}</span>
@@ -65,7 +65,7 @@
 
       <hr class="my-3">
 
-      <button class="friend-btn rounded" type="button" (click)="toggleSection('followers')">
+      <button class="friend-btn rounded section-btn" type="button" (click)="toggleSection('followers')">
         <span class="friend-name">粉絲 ({{ followers.length }})</span>
         <span class="section-arrow">
           <i class="bi" [ngClass]="openSection.followers ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
@@ -77,7 +77,7 @@
       }
       @else {
       @for (f of getFilteredFollowers(); track f.userId) {
-      <button class="friend-btn rounded" type="button"
+      <button class="friend-btn rounded friend-item" type="button"
         (click)="selectFriend({ id: f.userId, name: f.displayName, avatar: f.avatar }); $event.stopPropagation()">
         <img [src]="getFollowAvatar(f)" class="friend-avatar" [alt]="f.displayName" />
         <span class="friend-name">{{ f.displayName }}</span>

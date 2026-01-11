@@ -41,9 +41,14 @@
           }
         </div>
 
-        <span class="text-muted" style="font-size: 0.85rem;">
-          更新時間: {{ post.updatedAt | date:'yyyy-MM-dd HH:mm' }}
+        <span class="text-muted" style="font-size: 0.85rem;"
+          [attr.title]="isPostEdited(post) ? '建立時間: ' + (post.createdAt | date:'yyyy-MM-dd HH:mm') : null">
+          {{ getPostDisplayTime(post) | date:'yyyy-MM-dd HH:mm' }}
+          @if (isPostEdited(post)) {
+          <span> 已編輯</span>
+          }
         </span>
+
       </a>
 
     </div>
@@ -78,9 +83,14 @@
         <a class="text-decoration-none text-reset" [routerLink]="['/social/profile', post.sharedPost.userId]">
           <div>
             <strong>{{ post.sharedPost.userName }}</strong><br />
-            <span class="text-muted" style="font-size: 0.85rem;">
-              更新時間: {{ post.sharedPost.updatedAt | date:'yyyy-MM-dd HH:mm' }}
+            <span class="text-muted" style="font-size: 0.85rem;"
+              [attr.title]="isPostEdited(post.sharedPost) ? '建立時間: ' + (post.sharedPost.createdAt | date:'yyyy-MM-dd HH:mm') : null">
+              {{ getPostDisplayTime(post.sharedPost) | date:'yyyy-MM-dd HH:mm' }}
+              @if (isPostEdited(post.sharedPost)) {
+              <span> 已編輯</span>
+              }
             </span>
+
           </div>
         </a>
 
@@ -161,7 +171,7 @@
         <img [src]="getUserAvatar()" class="rounded-circle me-2" style="width:35px; height:35px; object-fit: cover;" />
 
         <div class="position-relative flex-grow-1">
-          <input type="text" [(ngModel)]="newCommentContent" (keyup.enter)="sendComment()"
+          <input #commentInput type="text" [(ngModel)]="newCommentContent" (keyup.enter)="sendComment()"
             class="form-control form-control-sm rounded-pill bg-light border-0 pe-5 comment-input-custom"
             placeholder="發佈留言...">
 
