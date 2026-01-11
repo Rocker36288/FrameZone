@@ -599,14 +599,14 @@ namespace FrameZone_WebApi.Controllers
         [ProducesResponseType(typeof(TagHierarchyResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetTagHierarchy()
+        public async Task<IActionResult> GetTagHierarchy([FromQuery] string? aiSource = null)
         {
             try
             {
                 var userId = GetCurrentUserId();
                 _logger.LogInformation("🏷️ API: 取得標籤階層，UserId: {UserId}", userId);
 
-                var result = await _photoService.GetTagHierarchyAsync(userId);
+                var result = await _photoService.GetTagHierarchyAsync(userId, aiSource);
 
                 if (!result.Success)
                 {
