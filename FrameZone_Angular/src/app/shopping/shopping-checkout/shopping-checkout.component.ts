@@ -76,7 +76,7 @@ export class ShoppingCheckoutComponent {
         group = {
           sellerId: item.sellerId,
           sellerName: item.sellerName || '官方賣場',
-          sellerAvatar: item.sellerAvatar || `https://i.pravatar.cc/150?u=${item.sellerId}`,
+          sellerAvatar: item.sellerAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent((item.sellerName || 'S').charAt(0).toUpperCase())}&background=667eea&color=fff&size=128`,
           items: []
         };
         groups.push(group);
@@ -102,6 +102,9 @@ export class ShoppingCheckoutComponent {
   // 會員資料
   memberAvatarUrl: string = '';
   memberName: string = '';
+
+  // 使用綠界 API 需要的相關參數
+  //ecpayParams: any = null;
 
   ngOnInit(): void {
     if (!this.authService.isAuthenticated()) {
@@ -145,7 +148,7 @@ export class ShoppingCheckoutComponent {
             this.memberAvatarUrl = user.avatar;
           } else {
             const initial = (this.memberName || 'U').charAt(0).toUpperCase();
-            this.memberAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
+            this.memberAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(this.memberName.charAt(0).toUpperCase())}&background=667eea&color=fff&size=128`;
           }
         }
       });
@@ -207,7 +210,8 @@ export class ShoppingCheckoutComponent {
           id: s.convenienceStoreId,
           name: s.convenienceStoreName,
           address: s.convenienceStoreCode,
-          phone: ''
+          recipientName: s.recipientName,
+          phone: s.phoneNumber
         }));
       },
       error: (err) => console.error('取得門市失敗：', err)
@@ -216,6 +220,12 @@ export class ShoppingCheckoutComponent {
 
   getTotalAmount(): number {
     return this.cartService.totalAmount();
+  }
+
+  getSubtotal(): number {
+    const total = this.cartService.totalAmount();
+    const discount = this.cartService.appliedDiscount();
+    return Math.max(0, total - discount);
   }
 
   getShippingFee(): number {
@@ -325,9 +335,9 @@ export class ShoppingCheckoutComponent {
     if (isStore) {
       // 門市取貨
       const selectedStore = this.pickupStores.find(a => a.id === selectedId);
-      recipientName = selectedStore?.name + "門市" || '';
+      recipientName = selectedStore?.recipientName || '';
       phoneNumber = selectedStore?.phone || '';
-      shippingAddress = selectedStore?.address || '';
+      shippingAddress = (selectedStore?.name + ' (' + selectedStore?.address + ')') || '';
     } else {
       // 郵寄：檢查是使用新地址還是已儲存的地址
       if (this.useNewAddress) {
@@ -383,19 +393,12 @@ export class ShoppingCheckoutComponent {
         console.log("✅ 訂單建立成功", res);
 
         if (res.ecPayForm) {
-          // 在新視窗開啟 ECPay 付款頁
-          this.submitECPayFormInNewWindow(res.ecPayForm);
-
-          // 訂單完成：清空購物車 + 優惠券
+          // 訂單完成：清空購物車 + 優惠券（在跳轉前執行）
           this.cartService.markOrderCompleted();
 
-          // 顯示提示訊息
-          this.toastService.show('付款頁面已在新視窗開啟，請完成付款', 'top');
-
-          // 導航到商城首頁
-          setTimeout(() => {
-            this.router.navigate(['/shopping/home']);
-          }, 2000);
+          // 直接提交表單跳轉到 ECPay 付款頁（同視窗）
+          // 注意：表單提交後頁面會直接跳轉，不需要額外導航
+          this.submitECPayFormInNewWindow(res.ecPayForm);
         } else {
           console.error('❌ 沒有收到 ECPay 表單');
           this.toastService.show('建立訂單失敗，請稍後再試', 'top');
@@ -420,7 +423,7 @@ export class ShoppingCheckoutComponent {
     const form = tempDiv.querySelector('form') as HTMLFormElement;
 
     if (form) {
-      // ✅ 關鍵：設定在新視窗開啟
+      // 設定在同視窗開啟
       form.target = '_self';
 
       // 將表單加入 DOM

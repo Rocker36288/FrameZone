@@ -117,3 +117,10 @@
   min-width: 120px;
   background: white;
 }
+
+/* 訂單商品圖片統一尺寸 (與購物車一致) */
+.order-product-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+}

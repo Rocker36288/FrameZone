@@ -5,8 +5,8 @@
         public List<OrderItem>? OrderItems { get; set; }
         public int TotalAmount { get; set; }
         public string PaymentMethod { get; set; } = "ALL";
-        public string? ReturnURL { get; set; } = string.Empty;
-        
+        public string? ReturnURL { get; set; } = string.Empty;  //改成string?
+
         public string? RecipientName { get; set; }
         public string? PhoneNumber { get; set; }
         public string? ShippingAddress { get; set; }

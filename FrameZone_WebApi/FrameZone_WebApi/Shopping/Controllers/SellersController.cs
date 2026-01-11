@@ -30,11 +30,16 @@ namespace FrameZone_WebApi.Shopping.Controllers
 
         // GET: api/sellers/{userId}/products
         [HttpGet("{userId}/products")]
-        public IActionResult GetSellerProducts(long userId)
+        public IActionResult GetSellerProducts(
+            long userId, 
+            [FromQuery] int page = 1, 
+            [FromQuery] int pageSize = 20,
+            [FromQuery] int? categoryId = null,
+            [FromQuery] string keyword = null)
         {
             long? observerUserId = GetUserIdFromToken();
-            var products = _productService.GetProductsByUserId(userId, observerUserId);
-            return Ok(products);
+            var result = _productService.GetProductsByUserIdPaged(userId, page, pageSize, categoryId, keyword, observerUserId);
+            return Ok(result);
         }
 
         private long? GetUserIdFromToken()

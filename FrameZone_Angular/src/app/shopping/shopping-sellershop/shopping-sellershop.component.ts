@@ -372,12 +372,15 @@ export class ShoppingSellershopComponent {
 
   loadSellerData() {
     this.isLoading = true;
+    this.allProducts = [];
+    this.filteredProducts = [];
+    this.displayProducts = [];
     // 獲取賣家基本資料
     this.productApiService.getSellerProfile(this.sellerAccount).subscribe({
       next: (data: any) => {
         this.sellerInfo = {
           name: data.storeName || data.displayName,
-          avatar: data.avatar,
+          avatar: data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent((data.displayName || data.storeName || 'S').charAt(0).toUpperCase())}&background=667eea&color=fff&size=128`,
           rating: data.rating || 0,
           reviewCount: data.reviewCount || 0,
           isOnline: true,
@@ -406,10 +409,21 @@ export class ShoppingSellershopComponent {
       }
     });
 
-    // 獲取賣家所有商品
-    this.productApiService.getProductsBySeller(this.sellerAccount).subscribe({
-      next: (res: any[]) => {
-        this.allProducts = res.map(item => ({
+    this.fetchProducts();
+  }
+
+  fetchProducts() {
+    this.isLoading = true;
+    this.productApiService.getProductsBySeller(
+      this.sellerAccount,
+      this.currentPage,
+      this.itemsPerPage,
+      this.selectedCategoryId,
+      this.searchKeyword
+    ).subscribe({
+      next: (res: any) => {
+        const items = res.items || [];
+        this.allProducts = items.map((item: any) => ({
           productId: item.productId,
           name: item.productName,
           image: item.mainImageUrl || 'assets/images/default.jpg',
@@ -427,7 +441,11 @@ export class ShoppingSellershopComponent {
           averageRating: item.averageRating || 0,
           reviewCount: item.reviewCount || 0
         }));
-        this.filterProducts();
+
+        this.totalPages = Math.ceil(res.totalCount / this.itemsPerPage);
+        this.filteredProducts = [...this.allProducts];
+        this.applySorting();
+        this.displayProducts = [...this.filteredProducts];
         this.isLoading = false;
       },
       error: (err) => {
@@ -478,54 +496,17 @@ export class ShoppingSellershopComponent {
   }
 
   filterProducts() {
-    // 根據分類篩選
-    if (this.selectedCategoryId === null || this.selectedCategoryId === 0) {
-      this.filteredProducts = [...this.allProducts];
-    } else {
-      this.filteredProducts = this.allProducts.filter(
-        p => p.sellerCategoryIds && p.sellerCategoryIds.includes(this.selectedCategoryId!)
-      );
-    }
-
-    // 根據價格區間篩選
-    if (this.minPrice !== null) {
-      this.filteredProducts = this.filteredProducts.filter(
-        p => p.price >= this.minPrice!
-      );
-    }
-    if (this.maxPrice !== null) {
-      this.filteredProducts = this.filteredProducts.filter(
-        p => p.price <= this.maxPrice!
-      );
-    }
-
-    // 根據關鍵字篩選
-    if (this.searchKeyword.trim()) {
-      const keyword = this.searchKeyword.toLowerCase();
-      this.filteredProducts = this.filteredProducts.filter(
-        p => p.name.toLowerCase().includes(keyword) ||
-          p.description.toLowerCase().includes(keyword)
-      );
-    }
-
-    // 排序
-    this.applySorting();
-
-    // 計算總頁數
-    this.totalPages = Math.ceil(this.filteredProducts.length / this.itemsPerPage);
-
-    // 更新顯示的商品
-    this.updateDisplayProducts();
+    this.fetchProducts();
   }
 
   onSearch() {
     this.currentPage = 1;
-    this.filterProducts();
+    this.fetchProducts();
   }
 
   onPriceFilter() {
     this.currentPage = 1;
-    this.filterProducts();
+    this.fetchProducts();
   }
 
   applySorting() {
@@ -559,19 +540,14 @@ export class ShoppingSellershopComponent {
       this.sortOrder = 'desc';
     }
     this.applySorting();
-    this.updateDisplayProducts();
-  }
-
-  updateDisplayProducts() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    this.displayProducts = this.filteredProducts.slice(startIndex, endIndex);
+    this.displayProducts = [...this.filteredProducts];
   }
 
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
-      this.updateDisplayProducts();
+      this.fetchProducts();
+      this.scrollToProducts();
     }
   }
 
@@ -610,4 +586,8 @@ export class ShoppingSellershopComponent {
   //     this.showToast = false;
   //   }, 2000);
   // }
+
+  trackByProductId(index: number, product: any): number {
+    return product.productId;
+  }
 }

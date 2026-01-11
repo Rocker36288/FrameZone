@@ -85,7 +85,7 @@ export class ShoppingChatsComponent {
         id: i,
         user: {
           name: `使用者${i}`,
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=user${i}`
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(`使用者${i}`.charAt(0).toUpperCase())}&background=667eea&color=fff&size=128`
         },
         product: {
           name: products[Math.floor(Math.random() * products.length)],

@@ -9,8 +9,8 @@ namespace FrameZone_WebApi.Shopping.Configuration
         public string HashKey { get; set; } = string.Empty;
         public string HashIV { get; set; } = string.Empty;
 
+        //以下新增
         public string ApiUrl { get; set; } = string.Empty;
-
         public string PayResultPath { get; set; } = string.Empty;
         public string ServerReturnURL { get; set; } = string.Empty;
     }

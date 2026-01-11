@@ -319,9 +319,22 @@
             </div>
           </div>
 
+          <!-- 骨架屏載入狀態 (載入中顯示) -->
+          <div class="row row-cards" *ngIf="isLoading">
+            <div class="col-xl-2-4 col-lg-3 col-md-4 col-sm-6 mb-3" *ngFor="let i of [1,2,3,4,5]">
+              <div class="card h-100 p-3">
+                <div class="skeleton skeleton-img mb-2" style="height: 200px; width: 100%; border-radius: 8px;"></div>
+                <div class="skeleton skeleton-text mb-2" style="height: 1.2rem; width: 100%;"></div>
+                <div class="skeleton skeleton-line mb-3" style="height: 0.8rem; width: 80%;"></div>
+                <div class="skeleton skeleton-price" style="height: 1.5rem; width: 60%;"></div>
+              </div>
+            </div>
+          </div>
+
           <!-- 商品列表 -->
-          <div class="row row-cards" *ngIf="displayProducts.length > 0">
-            <div class="col-xl-2-4 col-lg-3 col-md-4 col-sm-6 mb-3" *ngFor="let product of displayProducts">
+          <div class="row row-cards" *ngIf="!isLoading && displayProducts.length > 0">
+            <div class="col-xl-2-4 col-lg-3 col-md-4 col-sm-6 mb-3"
+              *ngFor="let product of displayProducts; trackBy: trackByProductId">
               <app-product-card [product]="product" (favoriteChange)="product.isFavorite = $event">
               </app-product-card>
 
@@ -337,7 +350,7 @@
                   </div>
                   <div class="mt-auto d-flex align-items-center justify-content-between">
                     <div class="h3 text-primary mb-0">
-                      NT$ {{ product.price }}
+                      NT$ {{ product.price | number }}
                     </div> -->
               <!-- <a href="javascript:void(0)" class="favorite-icon" [class.favorited]="isFavorite(product.id)"
                       (click)="toggleFavorite(product, $event)">
@@ -358,7 +371,7 @@
     </div>
 
     <!-- 無商品提示 -->
-    <div class="card" *ngIf="displayProducts.length === 0">
+    <div class="card" *ngIf="!isLoading && displayProducts.length === 0">
       <div class="card-body">
         <div class="empty">
           <div class="empty-icon">

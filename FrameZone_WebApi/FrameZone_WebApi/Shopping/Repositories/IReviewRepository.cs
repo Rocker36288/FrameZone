@@ -25,5 +25,14 @@ namespace FrameZone_WebApi.Shopping.Repositories
 
         // 輔助查找：根據 OrderId 與 ProductId 找到 OrderDetailsId 與 SellerId
         (int? orderDetailsId, long? sellerId) GetOrderDetailInfo(long orderId, long productId);
+
+        // 批次取得商品評分統計
+        Dictionary<long, (float average, int count)> GetProductRatingInfos(IEnumerable<long> productIds);
+        
+        // 批次取得賣家評分統計
+        Dictionary<long, (float average, int count)> GetSellerRatingInfos(IEnumerable<long> userIds);
+
+        // 檢查是否已評價
+        bool HasUserReviewedOrderDetail(int orderDetailsId);
     }
 }

@@ -59,8 +59,7 @@
           <div class="card-header">
             <h3 class="card-title">
               <div class="d-flex align-items-center pt-1 mt-auto">
-                <span class="avatar"
-                  [style.background-image]="'url(' + (group.sellerAvatar || 'https://i.pravatar.cc/150?u=' + group.sellerId) + ')'"></span>
+                <span class="avatar" [style.background-image]="'url(' + group.sellerAvatar + ')'"></span>
                 <div class="ms-3">
                   <a [routerLink]="['/shopping/sellershop', group.sellerId]" class="text-body">{{ group.sellerName
                     }}</a>
@@ -76,7 +75,7 @@
                 </div>
                 <div class="col-9 col-md-10">
                   <div class="fw-bold">{{item.name}}</div>
-                  <div class="text-secondary">${{item.price}} x {{item.quantity}}</div>
+                  <div class="text-secondary">${{item.price | number}} x {{item.quantity}}</div>
                 </div>
               </div>
             </div>
@@ -180,7 +179,7 @@
                   <input class="form-check-input" type="radio" [value]="addr.id" formControlName="selectedAddressId"
                     [id]="'s2'+addr.id">
                   <label class="form-check-label small" [for]="'s2'+addr.id">
-                    {{addr.name}}門市 | {{addr.address}}
+                    {{addr.recipientName}} | {{addr.phone}} | {{addr.name}} | {{addr.address}}
                   </label>
                 </div>
               </div>
@@ -198,7 +197,7 @@
                   <input class="form-check-input" type="radio" [value]="addr.id" formControlName="selectedAddressId"
                     [id]="'s3'+addr.id">
                   <label class="form-check-label small" [for]="'s3'+addr.id">
-                    {{addr.name}}門市 | {{addr.address}}
+                    {{addr.recipientName}} | {{addr.phone}} | {{addr.name}} | {{addr.address}}
                   </label>
                 </div>
               </div>
@@ -220,16 +219,16 @@
               </div>
               <div class="d-flex justify-content-between align-items-center mb-2 mt-4">
                 <h2 class="m-0">小計:</h2>
-                <h2 class="m-0 text-end">${{ getTotalAmount() }}</h2>
+                <h2 class="m-0 text-end">${{ getSubtotal() | number }}</h2>
               </div>
               <div class="d-flex justify-content-between align-items-center mb-2 mt-4">
                 <h2 class="m-0">運費:</h2>
-                <h2 class="m-0 text-end">${{ getShippingFee() }}</h2>
+                <h2 class="m-0 text-end">${{ getShippingFee() | number }}</h2>
               </div>
               <hr>
               <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="m-0">應付總金額:</h2>
-                <h2 class="m-0 text-end text-primary fw-bold">${{ getFinalTotal() }}</h2>
+                <h2 class="m-0 text-end text-primary fw-bold">${{ getFinalTotal() | number }}</h2>
               </div>
               <button type="button" (click)="onConfirmCheckout()" [disabled]="checkoutForm.invalid"
                 class="btn btn-animate-icon w-100 checkout-button text-white"
@@ -249,4 +248,8 @@
 <div class="modal fade" id="couponModal" tabindex="-1" #couponModalElement>
 </div>
 
-<!-- ✅ 移除了舊的 <app-ecpay-form> 標籤 -->
+<!-- 隱藏表單已設置在後端 -->
+<!-- <div>
+  <app-ecpay-form *ngIf="ecpayParams" [apiUrl]="ecpayParams.serviceURL"
+    [postData]="ecpayParams.params"></app-ecpay-form>
+</div> -->

@@ -74,8 +74,8 @@ namespace FrameZone_WebApi.Shopping.Services
                 ReviewerName = MaskAccount(r.ReviewerUser?.Account),
                 RevieweeName = MaskAccount(r.RevieweeUser?.Account),
                 ReviewerAvatar = (r.ReviewerUser?.UserProfile != null && !string.IsNullOrEmpty(r.ReviewerUser.UserProfile.Avatar))
-                    ? $"{_baseUrl}{r.ReviewerUser.UserProfile.Avatar}"
-                    : $"{_baseUrl}/image/users/default-avatar.jpg",
+                    ? r.ReviewerUser.UserProfile.Avatar
+                    : $"https://ui-avatars.com/api/?name={Uri.EscapeDataString((r.ReviewerUser?.UserProfile?.DisplayName ?? r.ReviewerUser?.Account ?? "U").Substring(0, 1).ToUpper())}&background=667eea&color=fff&size=128",
                 Rating = r.Rating,
                 Content = r.ReviewContent,
                 Reply = r.RevieweeReply,
@@ -104,14 +104,25 @@ namespace FrameZone_WebApi.Shopping.Services
                     ReviewerUserId = userId,
                     ReviewType = "Product",
                     Rating = dto.Rating,
-                    ReviewContent = dto.Content,
+                    ReviewContent = dto.Content ?? "",
                     CreatedAt = now,
                     UpdatedAt = now
                 };
 
                 // 查詢關聯 ID
                 var (odId, sellerId) = _reviewRepo.GetOrderDetailInfo(dto.OrderId, dto.ProductId);
-                if (odId.HasValue) review.OrderDetailsId = odId.Value;
+                if (!odId.HasValue)
+                {
+                    continue; // 找不到訂單明細則跳過，或可選擇報錯
+                }
+
+                // 檢查是否已評價過
+                if (_reviewRepo.HasUserReviewedOrderDetail(odId.Value))
+                {
+                    continue; // 已評價過則跳過
+                }
+
+                review.OrderDetailsId = odId.Value;
                 if (sellerId.HasValue) review.RevieweeUserId = sellerId.Value;
 
                 // 處理圖片
@@ -193,6 +204,24 @@ namespace FrameZone_WebApi.Shopping.Services
             // 由於上述查詢困難，這裡先暫停 Service 的修改，
             // 先去 Repository 增加 `GetOrderDetailInfo(orderId, productId)`
             await _reviewRepo.AddReviewsAsync(reviews);
+        }
+
+        public Dictionary<long, RatingSummaryDto> GetProductRatingSummaries(IEnumerable<long> productIds)
+        {
+            var infos = _reviewRepo.GetProductRatingInfos(productIds);
+            return infos.ToDictionary(
+                x => x.Key,
+                x => new RatingSummaryDto { AverageRating = x.Value.average, ReviewCount = x.Value.count }
+            );
+        }
+
+        public Dictionary<long, RatingSummaryDto> GetSellerRatingSummaries(IEnumerable<long> userIds)
+        {
+            var infos = _reviewRepo.GetSellerRatingInfos(userIds);
+            return infos.ToDictionary(
+                x => x.Key,
+                x => new RatingSummaryDto { AverageRating = x.Value.average, ReviewCount = x.Value.count }
+            );
         }
     }
 }

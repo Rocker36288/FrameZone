@@ -23,5 +23,11 @@ namespace FrameZone_WebApi.Shopping.Services
 
         // 建立評價 (批次)
         Task CreateReviewsAsync(long userId, List<CreateReviewDto> reviewDtos);
+
+        // 批次取得商品評分概要
+        Dictionary<long, RatingSummaryDto> GetProductRatingSummaries(IEnumerable<long> productIds);
+        
+        // 批次取得賣家評分概要
+        Dictionary<long, RatingSummaryDto> GetSellerRatingSummaries(IEnumerable<long> userIds);
     }
 }

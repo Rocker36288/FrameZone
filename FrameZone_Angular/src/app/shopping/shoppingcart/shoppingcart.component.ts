@@ -44,7 +44,7 @@ export class ShoppingcartComponent {
         group = {
           sellerId: item.sellerId,
           sellerName: item.sellerName || '官方賣場',
-          sellerAvatar: item.sellerAvatar || `https://i.pravatar.cc/150?u=${item.sellerId}`,
+          sellerAvatar: item.sellerAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent((item.sellerName || 'S').charAt(0).toUpperCase())}&background=667eea&color=fff&size=128`,
           items: []
         };
         groups.push(group);
@@ -100,12 +100,7 @@ export class ShoppingcartComponent {
       .subscribe(user => {
         if (user) {
           this.memberName = user.account || user.displayName || '會員';
-          if (user.avatar) {
-            this.memberAvatarUrl = user.avatar;
-          } else {
-            const initial = (this.memberName || 'U').charAt(0).toUpperCase();
-            this.memberAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
-          }
+          this.memberAvatarUrl = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(this.memberName.charAt(0).toUpperCase())}&background=667eea&color=fff&size=128`;
         }
       });
   }
@@ -272,4 +267,17 @@ export class ShoppingcartComponent {
   // 範例會員名稱
   memberName: string = '';
 
+  /**
+   * TrackBy 函式：優化賣家分組渲染
+   */
+  trackBySellerId(index: number, group: any): string | number {
+    return group.sellerId;
+  }
+
+  /**
+   * TrackBy 函式：優化購物車項目渲染
+   */
+  trackByCartItemId(index: number, item: CartItem): string {
+    return `${item.id}-${item.specificationId}`;
+  }
 }

@@ -100,7 +100,7 @@ namespace FrameZone_WebApi.Shopping.Services
                     // 從 UserProfile 取得頭像
                     Avatar = (product.User.UserProfile != null && !string.IsNullOrEmpty(product.User.UserProfile.Avatar))
                         ? $"{baseUrl}{product.User.UserProfile.Avatar}"
-                        : $"{baseUrl}/image/users/default-avatar.jpg",
+                        : null,
                     
                     Rating = _reviewService.GetSellerRatingSummary(product.UserId).AverageRating,
                     ReviewCount = _reviewService.GetSellerRatingSummary(product.UserId).ReviewCount
@@ -221,6 +221,26 @@ namespace FrameZone_WebApi.Shopping.Services
             return MapToDtoList(sortedProducts, favoriteIds);
         }
 
+        // 根據 UserId 取得商品列表 (優化版：用於個人賣場，不重複查詢賣家資訊)
+        public List<ProductListDto> GetProductsByUserIdOptimized(long userId, long? observerUserId = null)
+        {
+            var products = _repo.GetProductsByUserIdOptimized(userId);
+            var favoriteIds = observerUserId.HasValue ? _repo.GetFavoriteProductIds(observerUserId.Value) : new List<long>();
+            
+            // 獲取賣家基本資訊
+            var user = _repo.GetUserWithProfile(userId);
+            var storeInfo = _repo.GetStoreInfoByUserId(userId);
+            string baseUrl = "https://localhost:7213";
+
+            // 手動將資訊附加到所有商品上
+            foreach (var p in products)
+            {
+                p.User = user;
+            }
+
+            return MapToDtoList(products, favoriteIds);
+        }
+
         // 根據 UserId 取得商品列表
         public List<ProductListDto> GetProductsByUserId(long userId, long? observerUserId = null)
         {
@@ -229,18 +249,63 @@ namespace FrameZone_WebApi.Shopping.Services
             return MapToDtoList(products, favoriteIds);
         }
 
-        // 取得賣家公開資料
+        // 根據 UserId 取得商品列表 (分頁投影版)
+        public ProductPagedListDto GetProductsByUserIdPaged(long userId, int page, int pageSize, int? categoryId = null, string keyword = null, long? observerUserId = null)
+        {
+            var (items, total) = _repo.GetSellerProductsPagedProjected(userId, page, pageSize, categoryId, keyword);
+            
+            // 處理收藏狀態
+            if (observerUserId.HasValue)
+            {
+                var favoriteIds = _repo.GetFavoriteProductIds(observerUserId.Value);
+                var favoriteSet = new HashSet<long>(favoriteIds);
+                foreach (var item in items)
+                {
+                    item.IsFavorite = favoriteSet.Contains(item.ProductId);
+                }
+            }
+
+            // 獲取賣家基本資訊 (一次性)
+            var user = _repo.GetUserWithProfile(userId);
+            string baseUrl = "https://localhost:7213";
+            var sellerDto = new SellerDto
+            {
+                UserId = user.UserId,
+                DisplayName = user.UserProfile?.DisplayName ?? user.Account,
+                Avatar = !string.IsNullOrEmpty(user.UserProfile?.Avatar) 
+                    ? $"{baseUrl}{user.UserProfile.Avatar}" 
+                    : null
+            };
+
+            foreach (var item in items)
+            {
+                item.Seller = sellerDto;
+            }
+
+            return new ProductPagedListDto
+            {
+                Items = items,
+                TotalCount = total,
+                PageIndex = page,
+                PageSize = pageSize
+            };
+        }
+
+        // 取得賣家公開資料 (優化版：避免載入所有商品)
         public SellerProfileDto GetSellerProfile(long userId)
         {
             var storeInfo = _repo.GetStoreInfoByUserId(userId);
-            var products = _repo.GetProductsByUserId(userId);
             
-            // 如果連基本 User 都找不到，可能需要從 UserRepo 拿，但這裡我們先從產品中拿 User 實體（如果有的話）
-            // 或是更直接一點，我們假設 userId 是有效的
-            var firstProduct = products.FirstOrDefault();
-            var user = firstProduct?.User;
+            // 只查詢商品數量，不載入完整商品資料
+            var productCount = _repo.GetProductCountByUserId(userId);
+            
+            // 直接查詢使用者資訊，不透過商品
+            var user = _repo.GetUserWithProfile(userId);
 
             string baseUrl = "https://localhost:7213";
+            
+            // 只查一次評分
+            var ratingSummary = _reviewService.GetSellerRatingSummary(userId);
 
             return new SellerProfileDto
             {
@@ -249,7 +314,7 @@ namespace FrameZone_WebApi.Shopping.Services
                 StoreName = storeInfo?.StoreName ?? user?.UserProfile?.DisplayName ?? "我的賣場",
                 Avatar = (user?.UserProfile != null && !string.IsNullOrEmpty(user.UserProfile.Avatar))
                     ? $"{baseUrl}{user.UserProfile.Avatar}"
-                    : $"{baseUrl}/image/users/default-avatar.jpg",
+                    : null,
                 CoverImage = (storeInfo != null && !string.IsNullOrEmpty(storeInfo.StoreImageUrl))
                     ? $"{baseUrl}{storeInfo.StoreImageUrl}"
                     : (user?.UserProfile != null && !string.IsNullOrEmpty(user.UserProfile.CoverImage))
@@ -258,9 +323,9 @@ namespace FrameZone_WebApi.Shopping.Services
                 Bio = user?.UserProfile?.Bio ?? "這個賣家很懶，什麼都沒留下。",
                 StoreDescription = storeInfo?.StoreDescription ?? user?.UserProfile?.Bio ?? "歡迎來到我的賣場！",
                 Location = user?.UserProfile?.Location ?? "台灣",
-                ProductCount = products.Count,
-                Rating = _reviewService.GetSellerRatingSummary(userId).AverageRating,
-                ReviewCount = _reviewService.GetSellerRatingSummary(userId).ReviewCount
+                ProductCount = productCount,
+                Rating = ratingSummary.AverageRating,
+                ReviewCount = ratingSummary.ReviewCount
             };
         }
 
@@ -284,61 +349,65 @@ namespace FrameZone_WebApi.Shopping.Services
         // 私有方法：統一 DTO 轉換邏輯
         private List<ProductListDto> MapToDtoList(List<Models.Product> products, List<long> favoriteIds)
         {
-             string baseUrl = "https://localhost:7213";
-             var result = new List<ProductListDto>();
+            string baseUrl = "https://localhost:7213";
+            // 如果產品是 null 或者 數量等於 0，就回傳空列表
+            if (products == null || products.Count == 0)
+            {
+                return new List<ProductListDto>();
+            }
 
-             foreach (var product in products)
-             {
-                // 取得主圖片（優先 IsMainImage = true，其次用 DisplayOrder）
-                 var mainImage = product.ProductImages
-                     .Where(img => img.IsMainImage)
-                     .FirstOrDefault()
-                     ?? product.ProductImages
-                         .OrderBy(img => img.DisplayOrder)
-                         .FirstOrDefault();
+            // 1. 批次收集 ID 並轉為 HashSet 提升搜尋速度 (O(1) 複雜度)
+            var productIds = products.Select(p => p.ProductId).Distinct().ToList();
+            var sellerIds = products.Select(p => p.UserId).Distinct().ToList();
+            var favoriteSet = new HashSet<long>(favoriteIds);
 
-                // 組合完整圖片 URL
-                string fullImageUrl;
-                 if (mainImage != null && !string.IsNullOrEmpty(mainImage.ImageUrl))
-                 {
-                     fullImageUrl = baseUrl + mainImage.ImageUrl;
-                 }
-                 else
-                 {
-                     fullImageUrl = baseUrl + "/image/shopping/products/default.jpg";
-                 }
+            // 2. 批次抓取（這部分你原本就做得很好）
+            var productRatings = _reviewService.GetProductRatingSummaries(productIds);
+            var sellerRatings = _reviewService.GetSellerRatingSummaries(sellerIds);
 
-                // 取得價格
-                 var price = product.ProductSpecifications
-                     .OrderBy(spec => spec.SpecificationId)
-                     .FirstOrDefault()?.Price ?? 0;
+            // 3. 預處理圖片與價格 (減少迴圈內的運算)
+            return products.Select(product =>
+            {
+                // 取得主圖片邏輯優化
+                var mainImage = product.ProductImages.FirstOrDefault(img => img.IsMainImage)
+                              ?? product.ProductImages.OrderBy(img => img.DisplayOrder).FirstOrDefault();
 
-                  result.Add(new ProductListDto
-                  {
-                      ProductId = product.ProductId,
-                      UserId = product.UserId,
-                      ProductName = product.ProductName,
-                      Description = product.Description,
-                      MainImageUrl = fullImageUrl,
-                      Price = price,
-                      CreatedAt = product.CreatedAt,
-                      SellerCategoryIds = product.ProductSellerCategoryMappins.Select(m => m.SellerCategoryId).ToList(),
-                      IsFavorite = favoriteIds.Contains(product.ProductId),
-                      AverageRating = _reviewService.GetProductRatingSummary(product.ProductId).AverageRating,
-                      ReviewCount = _reviewService.GetProductRatingSummary(product.ProductId).ReviewCount,
-                      Seller = new SellerDto
-                      {
-                          UserId = product.User.UserId,
-                          DisplayName = product.User.UserProfile?.DisplayName ?? product.User.Account,
-                          Avatar = (product.User.UserProfile != null && !string.IsNullOrEmpty(product.User.UserProfile.Avatar))
-                                ? $"{baseUrl}{product.User.UserProfile.Avatar}"
-                                : $"{baseUrl}/image/users/default-avatar.jpg",
-                          Rating = _reviewService.GetSellerRatingSummary(product.UserId).AverageRating,
-                          ReviewCount = _reviewService.GetSellerRatingSummary(product.UserId).ReviewCount
-                      }
-                  });
-              }
-              return result;
-         }
+                string fullImageUrl = mainImage != null && !string.IsNullOrEmpty(mainImage.ImageUrl)
+                    ? baseUrl + mainImage.ImageUrl
+                    : baseUrl + "/image/shopping/products/default.jpg";
+
+                // 價格取第一筆
+                var price = product.ProductSpecifications.FirstOrDefault()?.Price ?? 0;
+
+                // 取得統計
+                productRatings.TryGetValue(product.ProductId, out var pRating);
+                sellerRatings.TryGetValue(product.UserId, out var sRating);
+
+                return new ProductListDto
+                {
+                    ProductId = product.ProductId,
+                    UserId = product.UserId,
+                    ProductName = product.ProductName,
+                    Description = product.Description,
+                    MainImageUrl = fullImageUrl,
+                    Price = price,
+                    CreatedAt = product.CreatedAt,
+                    SellerCategoryIds = product.ProductSellerCategoryMappins.Select(m => m.SellerCategoryId).ToList(),
+                    IsFavorite = favoriteSet.Contains(product.ProductId), // HashSet 速度極快
+                    AverageRating = pRating?.AverageRating ?? 0,
+                    ReviewCount = pRating?.ReviewCount ?? 0,
+                    Seller = new SellerDto
+                    {
+                        UserId = product.User.UserId,
+                        DisplayName = product.User.UserProfile?.DisplayName ?? product.User.Account,
+                        Avatar = !string.IsNullOrEmpty(product.User.UserProfile?.Avatar)
+                            ? $"{baseUrl}{product.User.UserProfile.Avatar}"
+                            : null,
+                        Rating = sRating?.AverageRating ?? 0,
+                        ReviewCount = sRating?.ReviewCount ?? 0
+                    }
+                };
+            }).ToList();
+        }
     }
 }

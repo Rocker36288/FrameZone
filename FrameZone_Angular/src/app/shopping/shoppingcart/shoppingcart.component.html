@@ -59,7 +59,7 @@
 
   <div class="row" *ngIf="cartService.items().length > 0; else emptyCart">
     <div class="col-lg-8">
-      <div *ngFor="let group of groupedItems()" class="card mb-4 seller-group">
+      <div *ngFor="let group of groupedItems(); trackBy: trackBySellerId" class="card mb-4 seller-group">
         <div class="card-header">
           <div class="col-auto ps-1 pt-1">
             <label class="form-check m-0">
@@ -70,8 +70,7 @@
           </div>
           <h3 class="card-title">
             <div class="d-flex align-items-center pt-1 mt-auto">
-              <span class="avatar"
-                [style.background-image]="'url(' + (group.sellerAvatar || 'https://i.pravatar.cc/150?u=' + group.sellerId) + ')'"></span>
+              <span class="avatar" [style.background-image]="'url(' + group.sellerAvatar + ')'"></span>
               <div class="ms-3">
                 <a [routerLink]="['/shopping/sellershop', group.sellerId]" class="text-body">{{ group.sellerName }}</a>
               </div>
@@ -79,7 +78,7 @@
           </h3>
         </div>
         <div class="card-body">
-          <div *ngFor="let item of group.items" class="card mb-3">
+          <div *ngFor="let item of group.items; trackBy: trackByCartItemId" class="card mb-3">
             <div class="row row-0 flex-fill align-items-center">
               <div class="col-auto ps-3">
                 <label class="form-check m-0">
@@ -88,9 +87,9 @@
                 </label>
               </div>
 
-              <div class="col-md-3">
+              <div class="col-auto">
                 <a [routerLink]="['/shopping/product-detail', item.id]">
-                  <img [src]="item.imageUrl || 'images/products/4.jpg'" class="w-100 h-100 object-cover"
+                  <img [src]="item.imageUrl || 'images/products/4.jpg'" class="cart-product-img rounded border"
                     alt="Product image" />
                 </a>
               </div>
@@ -100,7 +99,7 @@
                     <h2><a [routerLink]="['/shopping/product-detail', item.id]">{{item.name}}</a></h2>
                   </h3>
                   <div class="text-secondary">
-                    <h3>${{item.price}}</h3>
+                    <h3>${{item.price | number}}</h3>
                   </div>
                   <div class="mt-2 d-flex align-items-center">
                     <div class="input-group input-group-sm" style="width: 120px;">
@@ -150,7 +149,7 @@
             <br>
             <div class="d-flex justify-content-between align-items-center mb-2">
               <h2 class="m-0">總金額:</h2>
-              <h2 class="m-0 text-end">${{ cartService.totalAmount() }}</h2>
+              <h2 class="m-0 text-end">${{ cartService.totalAmount() | number }}</h2>
             </div>
             <br>
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -169,7 +168,7 @@
             <hr>
             <div class="d-flex justify-content-between align-items-center mb-4">
               <h2 class="m-0">小計:</h2>
-              <h2 class="m-0 text-end">${{ getFinalTotal() }}</h2>
+              <h2 class="m-0 text-end">${{ getFinalTotal() | number }}</h2>
             </div>
             <button class="btn btn-animate-icon w-100" style="background-color: rgb(139, 168, 231);"
               [routerLink]="['/checkout']" [disabled]="cartService.selectedTotalQuantity() === 0">
@@ -237,7 +236,7 @@
                   {{ coupon.code }}
                 </span>
               </h5>
-              <p class="text-secondary m-0">折扣金額: -${{ coupon.discount }}</p>
+              <p class="text-secondary m-0">折扣金額: -${{ coupon.discount | number }}</p>
               <small>使用期限: {{ coupon.expiryDate | date }}</small>
             </div>
           </div>

@@ -102,9 +102,26 @@ export class ShoppingHeaderComponent {
     }
   }
 
+  /**
+   * 取得使用者頭像 URL
+   */
   getUserAvatar(): string {
-    if (this.currentUser?.avatar) return this.currentUser.avatar;
-    const initial = (this.displayUserName || 'U').charAt(0).toUpperCase();
+    const avatarUrl = this.currentUser?.avatar;
+
+    if (avatarUrl) {
+      return avatarUrl;
+    }
+
+    return this.getDefaultAvatar();
+  }
+
+  /**
+   * 產生預設頭像
+   */
+  private getDefaultAvatar(): string {
+    const name = this.displayUserName || 'U';
+    const initial = name.charAt(0).toUpperCase();
+
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(initial)}&background=667eea&color=fff&size=128`;
   }
 

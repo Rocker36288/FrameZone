@@ -43,8 +43,11 @@ export class ProductApiService {
   }
 
   // 取得特定賣家的商品
-  getProductsBySeller(sellerId: string | number): Observable<any[]> {
-    return this.http.get<any[]>(`https://localhost:7213/api/sellers/${sellerId}/products`);
+  getProductsBySeller(sellerId: string | number, page: number = 1, pageSize: number = 20, categoryId?: number | null, keyword?: string): Observable<any> {
+    let url = `https://localhost:7213/api/sellers/${sellerId}/products?page=${page}&pageSize=${pageSize}`;
+    if (categoryId) url += `&categoryId=${categoryId}`;
+    if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
+    return this.http.get<any>(url);
   }
 
   // 取得賣家資料

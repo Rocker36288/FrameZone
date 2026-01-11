@@ -16,3 +16,5 @@ export var frontendPublicUrl: string = 'http://localhost:4200';
 //如果用ngrok的Url要另外下載，只要設後端
 
 //採用另一個方式不用前端的連接埠
+
+//用本地端方式也不需要後端的開發人員通道

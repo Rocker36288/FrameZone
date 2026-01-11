@@ -84,6 +84,7 @@ export class ShoppingProductDetailComponent implements OnInit {
   // 互動狀態
   showShippingModal: boolean = false;
   showImageModal: boolean = false;
+  zoomImage: string = ''; // 用於存放要放大的圖片路徑
 
   // 相似商品（從 API 載入，暫時保留原本的陣列作為備用）
   similarProducts: ShopProduct[] = [];
@@ -172,7 +173,7 @@ export class ShoppingProductDetailComponent implements OnInit {
         this.sellerInfo = {
           userId: data.seller.userId,
           account: data.seller.displayName,
-          avatar: data.seller.avatar,
+          avatar: data.seller.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent((data.seller.displayName || 'S').charAt(0).toUpperCase())}&background=667eea&color=fff&size=128`,
           onlineStatus: '線上',
           rating: data.seller.rating,
           reviewCount: data.seller.reviewCount
@@ -342,7 +343,12 @@ export class ShoppingProductDetailComponent implements OnInit {
   /**
    * 顯示/隱藏圖片放大彈窗
    */
-  toggleImageModal(show: boolean): void {
+  toggleImageModal(show: boolean, imageUrl?: string): void {
+    if (show && imageUrl) {
+      this.zoomImage = imageUrl;
+    } else if (show && !imageUrl) {
+      this.zoomImage = this.currentImage;
+    }
     this.showImageModal = show;
   }
 

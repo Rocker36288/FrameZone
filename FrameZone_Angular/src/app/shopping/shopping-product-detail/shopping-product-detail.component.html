@@ -128,7 +128,7 @@
         </div>
 
         <div class="price-section">
-          <span class="price">NT$ {{ currentProduct?.price }}</span>
+          <span class="price">NT$ {{ currentProduct?.price | number }}</span>
         </div>
 
         @if (currentProduct?.specifications?.length > 1) {
@@ -169,7 +169,7 @@
             <label class="info-label">運送:</label>
             <div class="shipping-list">
               <div *ngFor="let option of shippingOptions" class="shipping-item">
-                <span>{{ option.label }} ${{ option.fee }}</span>
+                <span>{{ option.label }} ${{ option.fee | number }}</span>
                 <a *ngIf="option.isCombined" href="javascript:void(0)" class="combined-fee-link"
                   (click)="toggleShippingModal(true)">查看運費規則</a>
                 <span *ngIf="option.note" class="shipping-note">{{ option.note }}</span>
@@ -183,7 +183,7 @@
               <button *ngFor="let coupon of availableCoupons" (click)="claimCoupon(coupon)"
                 class="btn btn-sm coupon-btn" [class.btn-success]="coupon.isClaimed"
                 [class.btn-outline-primary]="!coupon.isClaimed">
-                {{ coupon.isClaimed ? '已領取' : '領取' }} (折{{ coupon.discount }})
+                {{ coupon.isClaimed ? '已領取' : '領取' }} (折{{ coupon.discount | number }})
               </button>
             </div>
           </div>
@@ -229,7 +229,8 @@
             </div>
 
             <div class="review-photos" *ngIf="review.imageUrls && review.imageUrls.length > 0">
-              <img *ngFor="let photo of review.imageUrls" [src]="photo" alt="評價圖片" class="review-photo">
+              <img *ngFor="let photo of review.imageUrls" [src]="photo" alt="評價圖片" class="review-photo"
+                (click)="toggleImageModal(true, photo)">
             </div>
 
             <div class="seller-reply" *ngIf="review.reply">
@@ -431,7 +432,7 @@
       </svg>
     </button>
 
-    <img [src]="currentImage" alt="放大圖片" class="image-modal-content">
+    <img [src]="zoomImage" alt="放大圖片" class="image-modal-content">
   </div>
 </div>
 
