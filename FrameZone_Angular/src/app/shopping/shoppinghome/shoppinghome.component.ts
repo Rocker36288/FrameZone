@@ -43,7 +43,7 @@ export class ShoppinghomeComponent {
     { name: '底片', image: 'images/products/3.jpg', keyword: '底片' },
     { name: '相機包', image: 'images/products/8.jpg', keyword: '相機包' },
     // 創作分類使用多個關鍵字，用 | 分隔
-    { name: '創作', image: 'images/products/1.jpg', keyword: '明信片|T恤|書|創作|手作|藝術|攝影集' }
+    { name: '創作', image: 'images/products/15.jpg', keyword: '明信片|T恤|書|創作|手作|藝術|攝影集' }
   ];
 
   // 熱門推薦商品
