@@ -5,6 +5,7 @@ import { ChatService } from '../services/chat.service';
 import { ChatRoomDto } from '../models/ChatRoomDto';
 import { MessageDto } from '../models/MessageDto';
 import { SocialChatStateService } from '../services/social-chat-state.service';
+import { DatePipe } from '@angular/common';
 
 interface ViewMessage {
   id?: number;
@@ -12,6 +13,7 @@ interface ViewMessage {
   isOwn: boolean;
   time: string;
   createdAt?: string;
+  displayTime: string;
   senderId?: number;
   displayName: string;
   avatar: string;
@@ -19,7 +21,7 @@ interface ViewMessage {
 
 @Component({
   selector: 'app-social-chat',
-  imports: [],
+  imports: [DatePipe],
   templateUrl: './social-chat.component.html',
   styleUrl: './social-chat.component.css'
 })
@@ -140,17 +142,27 @@ export class SocialChatComponent implements OnDestroy {
   private toViewMessage(message: MessageDto) {
     const isOwn = !!message.isOwner;
     const profile = this.getSenderProfile(isOwn);
+    const createdAt = message.createdAt ? new Date(message.createdAt) : null;
+    const isToday = createdAt ? this.isSameDay(createdAt, new Date()) : false;
+    const displayTime = createdAt
+      ? (isToday
+        ? `今天 ${createdAt.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: true })}`
+        : `${createdAt.getFullYear()}-${String(createdAt.getMonth() + 1).padStart(2, '0')}-${String(createdAt.getDate()).padStart(2, '0')} ${String(createdAt.getHours()).padStart(2, '0')}:${String(createdAt.getMinutes()).padStart(2, '0')}`)
+      : '';
+
     return {
       id: message.messageId,
       content: message.messageContent,
       isOwn,
-      time: new Date(message.createdAt).toLocaleTimeString(),
+      time: createdAt ? createdAt.toLocaleTimeString() : '',
       createdAt: message.createdAt,
       senderId: message.senderUserId,
       displayName: profile.name,
-      avatar: profile.avatar
+      avatar: profile.avatar,
+      displayTime
     };
   }
+
 
   ngOnDestroy(): void {
     this.teardownRealtime();
@@ -185,6 +197,12 @@ export class SocialChatComponent implements OnDestroy {
         el.scrollTop = el.scrollHeight;
       });
     });
+  }
+
+  private isSameDay(a: Date, b: Date) {
+    return a.getFullYear() === b.getFullYear()
+      && a.getMonth() === b.getMonth()
+      && a.getDate() === b.getDate();
   }
 
   private markRoomRead(roomId: number) {
