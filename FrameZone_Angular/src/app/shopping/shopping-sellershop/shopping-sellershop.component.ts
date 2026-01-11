@@ -372,6 +372,9 @@ export class ShoppingSellershopComponent {
 
   loadSellerData() {
     this.isLoading = true;
+    this.allProducts = [];
+    this.filteredProducts = [];
+    this.displayProducts = [];
     // 獲取賣家基本資料
     this.productApiService.getSellerProfile(this.sellerAccount).subscribe({
       next: (data: any) => {
@@ -610,4 +613,8 @@ export class ShoppingSellershopComponent {
   //     this.showToast = false;
   //   }, 2000);
   // }
+
+  trackByProductId(index: number, product: any): number {
+    return product.productId;
+  }
 }

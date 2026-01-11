@@ -121,13 +121,27 @@ namespace FrameZone_WebApi.Shopping.Repositories
                 .AsNoTracking()
                 .ToList();
         }
-        // 取得特定使用者的商品
+        // 取得特定使用者的商品 (優化版：不包含 User 關聯，用於單一賣家視圖)
+        public List<Product> GetProductsByUserIdOptimized(long userId)
+        {
+            return _context.Products
+                .Include(p => p.ProductImages)
+                .Include(p => p.ProductSpecifications)
+                .Include(p => p.ProductSellerCategoryMappins)
+                .Where(p => p.UserId == userId 
+                         && p.Status == "上架中" 
+                         && p.AuditStatus.Contains("通過"))
+                .AsNoTracking()
+                .ToList();
+        }
+
+        // 取得特定使用者的商品 (預設載入 User 資料，用於通用場景)
         public List<Product> GetProductsByUserId(long userId)
         {
             return _context.Products
                 .Include(p => p.ProductImages)
                 .Include(p => p.ProductSpecifications)
-                .Include(p => p.ProductSellerCategoryMappins) // 加入分類關聯
+                .Include(p => p.ProductSellerCategoryMappins)
                 .Include(p => p.User)
                 .ThenInclude(u => u.UserProfile)
                 .Where(p => p.UserId == userId 

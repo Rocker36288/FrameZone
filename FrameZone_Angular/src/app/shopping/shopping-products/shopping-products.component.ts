@@ -328,4 +328,8 @@ export class ShoppingProductsComponent {
       return `${Math.floor(diffDays / 30)} 個月前`;
     }
   }
+
+  trackByProductId(index: number, product: ShopProduct): number {
+    return product.productId;
+  }
 }

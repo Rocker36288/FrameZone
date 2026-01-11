@@ -221,6 +221,26 @@ namespace FrameZone_WebApi.Shopping.Services
             return MapToDtoList(sortedProducts, favoriteIds);
         }
 
+        // 根據 UserId 取得商品列表 (優化版：用於個人賣場，不重複查詢賣家資訊)
+        public List<ProductListDto> GetProductsByUserIdOptimized(long userId, long? observerUserId = null)
+        {
+            var products = _repo.GetProductsByUserIdOptimized(userId);
+            var favoriteIds = observerUserId.HasValue ? _repo.GetFavoriteProductIds(observerUserId.Value) : new List<long>();
+            
+            // 獲取賣家基本資訊
+            var user = _repo.GetUserWithProfile(userId);
+            var storeInfo = _repo.GetStoreInfoByUserId(userId);
+            string baseUrl = "https://localhost:7213";
+
+            // 手動將資訊附加到所有商品上
+            foreach (var p in products)
+            {
+                p.User = user;
+            }
+
+            return MapToDtoList(products, favoriteIds);
+        }
+
         // 根據 UserId 取得商品列表
         public List<ProductListDto> GetProductsByUserId(long userId, long? observerUserId = null)
         {

@@ -59,7 +59,7 @@
 
   <div class="row" *ngIf="cartService.items().length > 0; else emptyCart">
     <div class="col-lg-8">
-      <div *ngFor="let group of groupedItems()" class="card mb-4 seller-group">
+      <div *ngFor="let group of groupedItems(); trackBy: trackBySellerId" class="card mb-4 seller-group">
         <div class="card-header">
           <div class="col-auto ps-1 pt-1">
             <label class="form-check m-0">
@@ -78,7 +78,7 @@
           </h3>
         </div>
         <div class="card-body">
-          <div *ngFor="let item of group.items" class="card mb-3">
+          <div *ngFor="let item of group.items; trackBy: trackByCartItemId" class="card mb-3">
             <div class="row row-0 flex-fill align-items-center">
               <div class="col-auto ps-3">
                 <label class="form-check m-0">

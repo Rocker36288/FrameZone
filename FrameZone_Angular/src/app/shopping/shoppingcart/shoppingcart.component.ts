@@ -267,4 +267,17 @@ export class ShoppingcartComponent {
   // 範例會員名稱
   memberName: string = '';
 
+  /**
+   * TrackBy 函式：優化賣家分組渲染
+   */
+  trackBySellerId(index: number, group: any): string | number {
+    return group.sellerId;
+  }
+
+  /**
+   * TrackBy 函式：優化購物車項目渲染
+   */
+  trackByCartItemId(index: number, item: CartItem): string {
+    return `${item.id}-${item.specificationId}`;
+  }
 }

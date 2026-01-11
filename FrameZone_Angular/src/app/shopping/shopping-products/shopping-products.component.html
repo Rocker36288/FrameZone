@@ -96,7 +96,7 @@
           </div>
           } @else if (displayedProducts.length > 0) {
           <div class="row row-cards">
-            <div class="col-custom" *ngFor="let product of displayedProducts">
+            <div class="col-custom" *ngFor="let product of displayedProducts; trackBy: trackByProductId">
               <app-product-card [product]="product" (favoriteChange)="product.isFavorite = $event"></app-product-card>
             </div>
           </div>
