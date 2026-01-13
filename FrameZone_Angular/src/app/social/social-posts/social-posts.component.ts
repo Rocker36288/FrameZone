@@ -1,4 +1,4 @@
-import { PostService } from '../services/post.service';
+﻿import { PostService } from '../services/post.service';
 import { CommentService } from '../services/comment.service';
 import { Component, ElementRef, EventEmitter, HostListener, Input, Output, signal, inject, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { PostDto } from "../models/PostDto";
@@ -211,7 +211,10 @@ export class SocialPostsComponent implements AfterViewInit, OnDestroy {
 
   loadComments() {
     this.commentService.getCommentsByPost(this.post.postId).subscribe({
-      next: (data) => this.comments.set(data),
+      next: (data) => {
+        this.comments.set(data);
+        this.post.commentCount = this.countComments(data);
+      },
       error: (err) => console.error('載入留言失敗', err)
     });
   }
@@ -239,6 +242,7 @@ export class SocialPostsComponent implements AfterViewInit, OnDestroy {
           isOwner: true
         };
         this.comments.update(old => [enrichedComment, ...old]);
+        this.post.commentCount = (this.post.commentCount ?? 0) + 1;
         this.newCommentContent = ''; // 清空輸入框
         this.isSubmittingComment = false;
       },
@@ -254,6 +258,7 @@ export class SocialPostsComponent implements AfterViewInit, OnDestroy {
     this.commentService.getCommentsByPost(this.post.postId).subscribe({
       next: (res) => {
         this.comments.set(res);
+        this.post.commentCount = this.countComments(res);
       },
       error: (err) => console.error('刷新留言失敗', err)
     });
@@ -288,4 +293,15 @@ export class SocialPostsComponent implements AfterViewInit, OnDestroy {
       this.postDeleted.emit(this.post.postId);
     });
   }
+  private countComments(comments: CommentDto[]): number {
+    let total = 0;
+    for (const comment of comments) {
+      total += 1;
+      if (comment.replies?.length) {
+        total += this.countComments(comment.replies);
+      }
+    }
+    return total;
+  }
 }
+
