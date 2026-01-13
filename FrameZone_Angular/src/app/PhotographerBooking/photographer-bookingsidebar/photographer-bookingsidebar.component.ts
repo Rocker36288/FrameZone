@@ -5,6 +5,7 @@ import { PhotographerBookingService } from '../services/photographer-booking.ser
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -24,7 +25,8 @@ export class PhotographerBookingsidebarComponent implements OnChanges {
   constructor(
     private bookingService: PhotographerBookingService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) { }
 
 
@@ -69,20 +71,32 @@ export class PhotographerBookingsidebarComponent implements OnChanges {
   }
 
   onBookNow(): void {
+    // 優先檢查登入狀態
+    if (!this.authService.isAuthenticated()) {
+      this.toastr.error('請先登入後再進行預約', '需要登入', {
+        timeOut: 3000,
+        progressBar: true,
+        positionClass: 'toast-top-center'
+      });
+      this.router.navigate(['/login']);
+      return;
+    }
+
     if (!this.selectedService) {
-      alert('請先選擇拍攝方案');
+      this.toastr.warning('請先選擇拍攝方案', '未選擇方案', {
+        timeOut: 3000,
+        progressBar: true,
+        positionClass: 'toast-top-center'
+      });
       return;
     }
 
     if (!this.selectedSlotId) {
-      alert('請選擇拍攝日期與時段');
-      return;
-    }
-
-    // 檢查登入狀態
-    if (!this.authService.isAuthenticated()) {
-      alert('請先登入後再進行預約');
-      this.router.navigate(['/login']);
+      this.toastr.warning('請選擇拍攝日期與時段', '未選擇時段', {
+        timeOut: 3000,
+        progressBar: true,
+        positionClass: 'toast-top-center'
+      });
       return;
     }
 

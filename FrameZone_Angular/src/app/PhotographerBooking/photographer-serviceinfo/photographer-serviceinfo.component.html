@@ -30,17 +30,18 @@
 
   <div class="faq-section mt-5">
     <h2 class="section-title">常見問題</h2>
-    <div class="accordion accordion-flush border-top" id="faqAccordion">
+    <div class="accordion" id="faqAccordion">
       <div class="faq-item accordion-item" *ngFor="let faq of faqs; let i = index">
         <h2 class="accordion-header" [id]="'heading' + i">
-          <button class="accordion-button collapsed fw-bold px-0" type="button" [attr.data-bs-toggle]="'collapse'"
+          <button class="accordion-button collapsed" type="button" [attr.data-bs-toggle]="'collapse'"
             [attr.data-bs-target]="'#collapse' + i" aria-expanded="false" [attr.aria-controls]="'collapse' + i">
+            <i class="ti {{ faq.icon }} me-1" [ngClass]="{'text-primary': faq.icon === 'ti-map-pin'}"></i>
             {{ faq.question }}
           </button>
         </h2>
         <div [id]="'collapse' + i" class="accordion-collapse collapse" [attr.aria-labelledby]="'heading' + i"
           [attr.data-bs-parent]="'#faqAccordion'">
-          <div class="accordion-body px-0 text-secondary small">
+          <div class="accordion-body">
             {{ faq.answer }}
           </div>
         </div>
