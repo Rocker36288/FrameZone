@@ -70,7 +70,7 @@ namespace FrameZone_WebApi.Socials.Hubs
         }
 
         /// <summary>
-        /// ?? Hub ?湔??摮??荔??舫嚗?蝡舐????REST嚗?
+        /// 透過 Hub 傳送聊天室訊息：在 Hub 內處理驗證與儲存，並推送給同房間使用者。
         /// </summary>
         public async Task SendMessage(int roomId, string messageContent)
         {

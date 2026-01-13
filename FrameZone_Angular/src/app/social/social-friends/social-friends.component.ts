@@ -68,14 +68,7 @@ export class SocialFriendsComponent {
             this.followers = [];
           }
         });
-        this.chatService.getRecentSocialChats().subscribe({
-          next: (chats) => {
-            this.recentChats = chats;
-          },
-          error: () => {
-            this.recentChats = [];
-          }
-        });
+        this.refreshRecentChats();
         this.refreshUnreadCounts();
       });
 
@@ -83,6 +76,12 @@ export class SocialFriendsComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.refreshUnreadCounts();
+      });
+
+    this.chatState.recentRefresh$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.refreshRecentChats();
       });
   }
 
@@ -113,6 +112,17 @@ export class SocialFriendsComponent {
       },
       error: () => {
         this.unreadMap.clear();
+      }
+    });
+  }
+
+  private refreshRecentChats() {
+    this.chatService.getRecentSocialChats().subscribe({
+      next: (chats) => {
+        this.recentChats = chats;
+      },
+      error: () => {
+        this.recentChats = [];
       }
     });
   }

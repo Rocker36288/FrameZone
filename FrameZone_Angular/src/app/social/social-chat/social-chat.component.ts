@@ -113,7 +113,9 @@ export class SocialChatComponent implements OnDestroy {
     const text = content.trim();
     if (!text) return;
     this.chatService.sendMessage(this.room.roomId, text).subscribe({
-      next: () => { },
+      next: () => {
+        this.chatState.requestRecentRefresh();
+      },
       error: () => { }
     });
   }
@@ -129,6 +131,7 @@ export class SocialChatComponent implements OnDestroy {
         if (this.room) {
           this.markRoomRead(this.room.roomId);
         }
+        this.chatState.requestRecentRefresh();
       })
     );
   }
