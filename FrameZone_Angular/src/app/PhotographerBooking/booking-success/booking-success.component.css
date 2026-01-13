@@ -143,38 +143,48 @@ h1 {
 
 .action-buttons {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .btn-primary,
 .btn-outline {
     flex: 1;
-    padding: 1rem;
+    padding: 0.85rem;
     border-radius: 12px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    font-size: 0.95rem;
 }
 
 .btn-primary {
-    background: #1e293b;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
 }
 
 .btn-primary:hover {
-    background: #0f172a;
+    filter: brightness(1.08);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 16px rgba(102, 126, 234, 0.35);
+}
+
+.btn-primary:active {
+    transform: translateY(0) scale(0.98);
 }
 
 .btn-outline {
     background: white;
-    color: #64748b;
-    border: 1px solid #e2e8f0;
+    color: #667eea;
+    border: 1.5px solid #e2e8f0;
 }
 
 .btn-outline:hover {
     background: #f8fafc;
-    border-color: #cbd5e1;
+    border-color: #667eea;
+    color: #5568d3;
+    transform: translateY(-2px);
 }
 
 @keyframes fadeIn {
