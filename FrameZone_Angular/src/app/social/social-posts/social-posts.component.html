@@ -227,13 +227,6 @@
             <i class="bi bi-line fs-2"></i>
           </label>
         </div>
-        <div class="mb-3">
-          <label class="form-label">分享連結</label>
-          <div class="input-group">
-            <input class="form-control" [value]="shareLink" readonly />
-            <button class="btn btn-outline-secondary" type="button" (click)="copyShareLink()">複製</button>
-          </div>
-        </div>
         @if (shareTarget === 'personal') {
         <div class="mb-3">
           <label class="form-label">分享訊息</label>
