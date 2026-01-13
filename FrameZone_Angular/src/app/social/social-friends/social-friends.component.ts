@@ -40,34 +40,21 @@ export class SocialFriendsComponent {
     followers: false
   };
   searchTerm = '';
+  private currentUserId: number | null = null;
 
   ngOnInit(): void {
     this.authService.currentUser$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(user => {
-        if (!user?.userId) {
+        this.currentUserId = user?.userId ?? null;
+        if (!this.currentUserId) {
           this.following = [];
           this.followers = [];
           this.recentChats = [];
           this.unreadMap.clear();
           return;
         }
-        this.followService.getFollowing(user.userId).subscribe({
-          next: (users) => {
-            this.following = users;
-          },
-          error: () => {
-            this.following = [];
-          }
-        });
-        this.followService.getFollowers(user.userId).subscribe({
-          next: (users) => {
-            this.followers = users;
-          },
-          error: () => {
-            this.followers = [];
-          }
-        });
+        this.refreshFollowLists(this.currentUserId);
         this.refreshRecentChats();
         this.refreshUnreadCounts();
       });
@@ -82,6 +69,14 @@ export class SocialFriendsComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.refreshRecentChats();
+      });
+
+    this.chatState.followRefresh$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.currentUserId) {
+          this.refreshFollowLists(this.currentUserId);
+        }
       });
   }
 
@@ -123,6 +118,25 @@ export class SocialFriendsComponent {
       },
       error: () => {
         this.recentChats = [];
+      }
+    });
+  }
+
+  private refreshFollowLists(userId: number) {
+    this.followService.getFollowing(userId).subscribe({
+      next: (users) => {
+        this.following = users;
+      },
+      error: () => {
+        this.following = [];
+      }
+    });
+    this.followService.getFollowers(userId).subscribe({
+      next: (users) => {
+        this.followers = users;
+      },
+      error: () => {
+        this.followers = [];
       }
     });
   }

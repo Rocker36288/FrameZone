@@ -140,6 +140,7 @@ export class SocialProfileComponent {
       .subscribe({
         next: () => {
           this.profileRefresh$.next();
+          this.chatState.requestFollowRefresh();
           console.log('已追蹤');
         },
         error: (err) => {
@@ -160,6 +161,7 @@ export class SocialProfileComponent {
       .subscribe({
         next: () => {
           this.profileRefresh$.next();
+          this.chatState.requestFollowRefresh();
           console.log('已取消追蹤');
         },
         error: (err) => {

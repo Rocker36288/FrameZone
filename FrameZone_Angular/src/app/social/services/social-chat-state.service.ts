@@ -17,6 +17,8 @@ export class SocialChatStateService {
   unreadRefresh$ = this.unreadRefreshSubject.asObservable();
   private recentRefreshSubject = new Subject<void>();
   recentRefresh$ = this.recentRefreshSubject.asObservable();
+  private followRefreshSubject = new Subject<void>();
+  followRefresh$ = this.followRefreshSubject.asObservable();
 
   openChat(friend: ChatFriend) {
     this.openChatSubject.next(friend);
@@ -28,5 +30,9 @@ export class SocialChatStateService {
 
   requestRecentRefresh() {
     this.recentRefreshSubject.next();
+  }
+
+  requestFollowRefresh() {
+    this.followRefreshSubject.next();
   }
 }
