@@ -14,7 +14,7 @@ export const routes: Routes = [
         path: '',
         loadComponent: () =>
           import('./pages/login/login.component').then((m) => m.LoginComponent),
-        title: 'FrameZone - 登入',
+        title: 'FrameZone',
       },
     ],
   },
