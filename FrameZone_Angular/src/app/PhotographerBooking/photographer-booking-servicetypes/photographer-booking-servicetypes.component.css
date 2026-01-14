@@ -1,6 +1,8 @@
 .service-explore {
-  padding: 56px 32px; /* 左右內邊距增加到 32px */
-  max-width: 1280px; /* 最大寬度放大，和卡片區一致 */
+  padding: 56px 32px;
+  /* 左右內邊距增加到 32px */
+  max-width: 1600px;
+  /* 最大寬度放大，和卡片區一致 */
   margin: 0 auto;
 }
 
@@ -91,16 +93,19 @@
   .explore-row {
     flex-direction: column;
   }
+
   .explore-card,
   .explore-card.active {
     flex: none;
     height: 180px;
   }
+
   .card-content p {
     opacity: 1;
     max-height: none;
   }
 }
+
 /* 1. 外層容器：保持不變 */
 .custom-btn-container {
   margin-top: 3rem;
@@ -113,7 +118,8 @@
 .explore-more-btn {
   display: inline-flex;
   align-items: center;
-  padding: 0.75rem 2.5rem; /* 稍微增加寬度感 */
+  padding: 0.75rem 2.5rem;
+  /* 稍微增加寬度感 */
 
   /* 漸層背景 */
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -141,7 +147,8 @@
 
   /* 讓漸層稍微變亮一點 (透過濾鏡) */
   filter: brightness(1.1);
-  color: #ffffff; /* 確保文字維持白色 */
+  color: #ffffff;
+  /* 確保文字維持白色 */
 }
 
 /* 4. 圖標樣式：顏色改為白色 */
@@ -149,7 +156,8 @@
   margin-left: 0.5rem;
   width: 1.25rem;
   height: 1.25rem;
-  stroke: #ffffff; /* 確保箭頭也是白的 */
+  stroke: #ffffff;
+  /* 確保箭頭也是白的 */
   transition: transform 0.3s ease;
 }
 

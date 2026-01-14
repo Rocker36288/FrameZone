@@ -4,7 +4,7 @@
 
 /* 版型容器 - 統一與 specialty-tags 一致的 1280px */
 .container {
-  max-width: 1280px;
+  max-width: 1600px;
   margin: 0 auto;
   padding-left: 32px;
   padding-right: 32px;
@@ -13,16 +13,20 @@
 }
 
 h2.fw-bold {
-  font-size: 2rem; /* 或是使用 32px */
-  letter-spacing: -0.5px; /* 稍微縮小字距，看起來更專業 */
-  margin-bottom: 24px; /* 調整標題下方的距離 */
+  font-size: 2rem;
+  /* 或是使用 32px */
+  letter-spacing: -0.5px;
+  /* 稍微縮小字距，看起來更專業 */
+  margin-bottom: 24px;
+  /* 調整標題下方的距離 */
 }
 
 /* 卡片 Grid - 複製自 specialty-tags 的網格設定 */
 .photographer-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 24px; /* 卡片間距 */
+  gap: 24px;
+  /* 卡片間距 */
   margin-bottom: 50px;
 }
 
@@ -32,11 +36,13 @@ h2.fw-bold {
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
 @media (max-width: 992px) {
   .photographer-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 @media (max-width: 576px) {
   .photographer-grid {
     grid-template-columns: 1fr;
