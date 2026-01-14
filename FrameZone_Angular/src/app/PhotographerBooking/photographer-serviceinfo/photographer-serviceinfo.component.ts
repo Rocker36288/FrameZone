@@ -5,6 +5,7 @@ import { ServiceDto } from '../models/photographer-booking.models';
 export interface FAQ {
   question: string;
   answer: string;
+  icon?: string;
 }
 
 @Component({

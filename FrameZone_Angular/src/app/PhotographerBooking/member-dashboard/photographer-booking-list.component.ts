@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MockBookingService } from '../services/mock-booking.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-photographer-booking-list',
@@ -21,7 +22,8 @@ export class PhotographerBookingListComponent implements OnInit {
 
     constructor(
         private mockService: MockBookingService,
-        private router: Router
+        private router: Router,
+        private toastr: ToastrService
     ) { }
 
     ngOnInit(): void {
@@ -103,8 +105,15 @@ export class PhotographerBookingListComponent implements OnInit {
             this.currentReviewBooking.bookingNumber,
             { isReviewed: true }
         );
-        alert(
-            `評價成功！您對 ${this.currentReviewBooking.photographerName} 的評價已送出。`
+        this.toastr.success(
+            `您對 ${this.currentReviewBooking.photographerName} 的評價已送出。`,
+            '評價成功！',
+            {
+                timeOut: 3000,
+                progressBar: true,
+                closeButton: true,
+                positionClass: 'toast-top-center'
+            }
         );
         this.closeReviewModal();
     }

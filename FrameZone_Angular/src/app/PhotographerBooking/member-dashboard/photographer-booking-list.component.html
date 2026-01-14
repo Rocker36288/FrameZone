@@ -1,15 +1,56 @@
-<nav class="independent-nav">
-    <div class="nav-content">
-        <div class="brand" routerLink="/home">
-            <i class="ti ti-camera"></i>
-            <span>FrameZone 預約中心</span>
+<header class="navbar navbar-expand-md d-print-none">
+    <div class="container-xl">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu"
+            aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
+            <a routerLink="/home" aria-label="FrameZone" class="d-flex align-items-center gap-2 text-decoration-none">
+                <div class="logo-image">
+                    <img src="favicon2.png" alt="FrameZone Logo" width="32" height="32">
+                </div>
+                <h2 class="mb-0">FrameZone</h2>
+            </a>
         </div>
-        <div class="nav-links">
-            <a routerLink="/photographer-bookinghome">探索攝影師</a>
-            <a routerLink="/home">返回首頁</a>
+
+        <div class="collapse navbar-collapse" id="navbar-menu">
+            <ul class="navbar-nav ms-auto me-3">
+                <li class="nav-item">
+                    <a class="nav-link" routerLink="/photographer-bookinghome">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-camera">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path
+                                    d="M5 7h1l2 -2h8l2 2h1a3 3 0 0 1 3 3v9a3 3 0 0 1 -3 3h-14a3 3 0 0 1 -3 -3v-9a3 3 0 0 1 3 -3" />
+                                <path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                            </svg>
+                        </span>
+                        <span class="nav-link-title">探索攝影師</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" routerLink="/home">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-home">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
+                                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+                                <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+                            </svg>
+                        </span>
+                        <span class="nav-link-title">返回首頁</span>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
-</nav>
+</header>
 
 <div class="full-page-wrapper">
     <div class="booking-list-container animate-fade-in">

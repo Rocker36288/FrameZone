@@ -1,9 +1,12 @@
 .container {
-  max-width: 1280px; /* 最大寬度稍微放大 */
+  max-width: 1600px;
+  /* 最大寬度稍微放大 */
   margin: 0 auto;
-  padding-left: 32px; /* 左右內邊距加大 */
+  padding-left: 32px;
+  /* 左右內邊距加大 */
   padding-right: 32px;
 }
+
 .specialty-explore h2 {
   font-size: 28px;
   font-weight: 600;
@@ -18,18 +21,23 @@
 .tags-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px; /* 標籤之間間距拉大 */
-  margin-bottom: 40px; /* 標籤與卡片距離拉大 */
+  gap: 16px;
+  /* 標籤之間間距拉大 */
+  margin-bottom: 40px;
+  /* 標籤與卡片距離拉大 */
   align-items: center;
-  min-height: 60px; /* 標籤區高度增加 */
+  min-height: 60px;
+  /* 標籤區高度增加 */
 }
 
 /* 共用標籤樣式 */
 .tag {
   cursor: pointer;
-  padding: 12px 24px; /* 高度增加 */
+  padding: 12px 24px;
+  /* 高度增加 */
   border-radius: 50px;
-  font-size: 1.1rem; /* 文字稍大 */
+  font-size: 1.1rem;
+  /* 文字稍大 */
   font-weight: 450;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
@@ -40,7 +48,8 @@
   /* 邊框維持深紫色，或使用漸層中較深的顏色 #764ba2 */
   color: #667eea;
   border: 1.5px solid #667eea;
-  transition: all 0.3s ease; /* 增加轉場動畫，變色更平滑 */
+  transition: all 0.3s ease;
+  /* 增加轉場動畫，變色更平滑 */
   cursor: pointer;
 }
 
@@ -63,8 +72,10 @@
 .photographer-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 24px; /* 卡片間距 */
-  margin-bottom: 50px; /* 卡片區與下一區塊的間距 */
+  gap: 24px;
+  /* 卡片間距 */
+  margin-bottom: 50px;
+  /* 卡片區與下一區塊的間距 */
 }
 
 /* 響應式 */
@@ -73,11 +84,13 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
 @media (max-width: 992px) {
   .photographer-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 @media (max-width: 576px) {
   .photographer-grid {
     grid-template-columns: 1fr;
@@ -90,14 +103,16 @@
   display: flex;
   justify-content: center;
   width: 100%;
-  margin-bottom: 60px; /* 卡片區與下一區塊的間距 */
+  margin-bottom: 60px;
+  /* 卡片區與下一區塊的間距 */
 }
 
 /* 2. 按鈕主體：套用漸層色 */
 .explore-more-btn {
   display: inline-flex;
   align-items: center;
-  padding: 0.75rem 2.5rem; /* 稍微增加寬度感 */
+  padding: 0.75rem 2.5rem;
+  /* 稍微增加寬度感 */
 
   /* 漸層背景 */
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -125,7 +140,8 @@
 
   /* 讓漸層稍微變亮一點 (透過濾鏡) */
   filter: brightness(1.1);
-  color: #ffffff; /* 確保文字維持白色 */
+  color: #ffffff;
+  /* 確保文字維持白色 */
 }
 
 /* 4. 圖標樣式：顏色改為白色 */
@@ -133,7 +149,8 @@
   margin-left: 0.5rem;
   width: 1.25rem;
   height: 1.25rem;
-  stroke: #ffffff; /* 確保箭頭也是白的 */
+  stroke: #ffffff;
+  /* 確保箭頭也是白的 */
   transition: transform 0.3s ease;
 }
 

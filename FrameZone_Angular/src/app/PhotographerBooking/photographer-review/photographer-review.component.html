@@ -1,6 +1,6 @@
 <section class="py-5 border-top">
   <h2 class="fw-bold h2 mb-4">
-    <i class="fa-solid fa-star text-warning me-2"></i>
+    <i class="ti ti-star-filled text-warning me-2"></i>
     4.9 · {{ 125 + reviews.length }} 則評價
   </h2>
 
@@ -31,7 +31,7 @@
       </div>
 
       <div class="mb-2">
-        <i class="fa-solid fa-star text-warning" *ngFor="let star of getStarArray(review.rating)">
+        <i class="ti ti-star-filled text-warning" *ngFor="let star of getStarArray(review.rating)">
         </i>
       </div>
 

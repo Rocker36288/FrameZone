@@ -26,6 +26,7 @@ interface Review {
 interface FAQ {
   question: string;
   answer: string;
+  icon?: string;
 }
 
 @Component({
@@ -113,14 +114,17 @@ export class PhotographerDetailComponent implements OnInit {
       {
         question: '交通費用如何計算？',
         answer: '大台北地區免交通費。桃園、宜蘭地區需加收 TWD 500,其他地區請私訊詢問。',
+        icon: 'ti-map-pin'
       },
       {
         question: '如何改期或取消預約？',
         answer: '拍攝日前 7 天可免費改期一次,3 天內改期或取消將扣除 30% 訂金。',
+        icon: 'ti-calendar-event'
       },
       {
         question: '天氣不佳的改期政策',
         answer: '若氣象局發佈降雨機率 > 60%，可於拍攝前 24 小時免費改期一次。若因天災等不可APP力因素則無條件退還訂金。',
+        icon: 'ti-cloud-storm'
       },
     ];
 
