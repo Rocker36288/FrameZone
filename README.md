@@ -82,9 +82,9 @@ Frame Zone 以「攝影」作為核心，將上述需求整合於單一平台中
 
 ##  技術架構
 
-- **Frontend**：Angular、RxJS、RWD  
+- **Frontend**：Angular、TypeScript、RxJS  
 - **Backend**：ASP.NET Core Web API（三層式架構）  
-- **Database**：SQL Server  
+- **Database**：MS SQL  
 - **Realtime**：SignalR  
 - **Cloud / AI**：Azure Blob Storage、Azure AI、Azure OpenAI  
 - **Third Party**：Google OAuth、Google Maps API、ECPay、Sightengine  
